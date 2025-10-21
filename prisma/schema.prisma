@@ -1,0 +1,358 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== ENUMS =====
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum UserSource {
+  ENTRA
+  LOCAL
+}
+
+enum InvitationStatus {
+  PENDING
+  SENT
+  OPENED
+  EXPIRED
+  ACCEPTED
+  DECLINED
+}
+
+enum RoleKey {
+  SUPER_ADMIN
+  TENANT_ADMIN
+  RECEPTION
+  OFFICE_MANAGER
+  SECURITY
+  EMPLOYEE
+  VISITOR
+}
+
+enum Locale {
+  EN
+  HU
+}
+
+// ===== CORE MODELS =====
+
+model Tenant {
+  id            String       @id @default(cuid())
+  name          String
+  primaryDomain String       @unique
+  status        TenantStatus @default(ACTIVE)
+  settings      Json?        @default("{}")
+  locale        Locale       @default(EN)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  users             User[]
+  tenantTheme       TenantTheme?
+  tenantModules     TenantModule[]
+  tenantRolePermissions TenantRolePermission[]
+  invitations       Invitation[]
+  domainBlocklist   DomainBlocklist[]
+  backupSnapshots   BackupSnapshot[]
+  reportSpecs       ReportSpec[]
+  auditLogs         AuditLog[]
+  tenantSettings    TenantSettings?
+  emailTemplates    EmailTemplate[]
+
+  @@map("tenants")
+}
+
+model TenantTheme {
+  id               String   @id @default(cuid())
+  tenantId         String   @unique
+  logoUrl          String?
+  primaryColor     String   @default("#D7BB91")
+  secondaryColor   String   @default("#08122E")
+  emailHeaderHtml  String?
+  emailFooterHtml  String?
+  updatedBy        String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_themes")
+}
+
+model Role {
+  id          String  @id @default(cuid())
+  key         RoleKey @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  users                 User[]
+  rolePermissions       RolePermission[]
+  tenantRolePermissions TenantRolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String @id @default(cuid())
+  key         String @unique
+  description String
+  createdAt   DateTime @default(now())
+
+  // Relations
+  rolePermissions       RolePermission[]
+  tenantRolePermissions TenantRolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model TenantRolePermission {
+  id           String @id @default(cuid())
+  tenantId     String
+  roleId       String
+  permissionId String
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, roleId, permissionId])
+  @@map("tenant_role_permissions")
+}
+
+model User {
+  id          String     @id @default(cuid())
+  tenantId    String?    // Nullable for SUPER_ADMIN
+  email       String     @unique
+  name        String
+  status      UserStatus @default(ACTIVE)
+  roleId      String
+  lastLoginAt DateTime?
+  source      UserSource @default(ENTRA)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  tenant            Tenant?       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  role              Role          @relation(fields: [roleId], references: [id])
+  hostedInvitations Invitation[]  @relation("InvitationHost")
+  auditLogs         AuditLog[]
+  accounts          Account[]
+  sessions          Session[]
+
+  @@index([tenantId])
+  @@index([email])
+  @@map("users")
+}
+
+model Module {
+  id                 String @id @default(cuid())
+  key                String @unique
+  name               String
+  description        String?
+  isEnabledByDefault Boolean @default(false)
+  createdAt          DateTime @default(now())
+
+  // Relations
+  tenantModules TenantModule[]
+
+  @@map("modules")
+}
+
+model TenantModule {
+  id         String  @id @default(cuid())
+  tenantId   String
+  moduleId   String
+  purchased  Boolean @default(false)
+  createdAt  DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, moduleId])
+  @@map("tenant_modules")
+}
+
+model Invitation {
+  id                  String           @id @default(cuid())
+  tenantId            String
+  email               String
+  hostUserId          String
+  status              InvitationStatus @default(PENDING)
+  expiresAt           DateTime
+  deepLinkTokenHash   String?
+  sentAt              DateTime?
+  openedAt            DateTime?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  host   User   @relation("InvitationHost", fields: [hostUserId], references: [id])
+
+  @@index([tenantId])
+  @@index([email])
+  @@map("invitations")
+}
+
+model DomainBlocklist {
+  id       String @id @default(cuid())
+  tenantId String
+  domain   String
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, domain])
+  @@map("domain_blocklist")
+}
+
+model BackupSnapshot {
+  id         String   @id @default(cuid())
+  tenantId   String?  // Nullable for global backups
+  storageUrl String
+  createdBy  String
+  createdAt  DateTime @default(now())
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("backup_snapshots")
+}
+
+model ReportSpec {
+  id       String @id @default(cuid())
+  tenantId String? // Nullable for global reports
+  name     String
+  config   Json    @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("report_specs")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorUserId String
+  tenantId   String?  // Nullable for global actions
+  action     String
+  targetType String
+  targetId   String
+  diff       Json?    @default("{}")
+  createdAt  DateTime @default(now())
+
+  actor  User    @relation(fields: [actorUserId], references: [id])
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([actorUserId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model EmailTemplate {
+  id         String @id @default(cuid())
+  tenantId   String
+  name       String
+  subject    String
+  htmlContent String
+  textContent String?
+  variables  String[] @default([])
+  version    Int     @default(1)
+  isActive   Boolean @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdBy  String
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, name, version])
+  @@map("email_templates")
+}
+
+model TenantSettings {
+  id              String  @id @default(cuid())
+  tenantId        String  @unique
+  parkingEnabled  Boolean @default(true)
+  mdmEnabled      Boolean @default(true)
+  ssoEnabled      Boolean @default(true)
+  autoNotifyHost  Boolean @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("tenant_settings")
+}
+
+// NextAuth.js required models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
