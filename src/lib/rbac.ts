@@ -179,7 +179,7 @@ export async function createAuditLog(
   targetId: string,
   diff?: Record<string, unknown>,
   tenantId?: string | null
-)
+) {
   await prisma.auditLog.create({
     data: {
       actorUserId: actorId,
