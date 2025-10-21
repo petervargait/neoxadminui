@@ -32,45 +32,53 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '64px 32px' }}>
-        <div style={{ maxWidth: '1200px', width: '100%' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 32px' }}>
+        <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center' }}>
           {/* Hero Section */}
-          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+          <div style={{ marginBottom: '48px' }}>
             <h1 style={{
-              fontSize: '48px',
+              fontSize: '36px',
               fontWeight: '700',
               color: '#F1F5F9',
-              marginBottom: '24px',
-              lineHeight: '1.1'
+              marginBottom: '16px',
+              lineHeight: '1.2'
             }}>
-              Multi-Tenant Admin Platform
+              NEOX Infinity Admin Platform
             </h1>
-            <p style={{
-              fontSize: '20px',
-              color: '#64748B',
-              maxWidth: '800px',
-              margin: '0 auto 48px auto',
-              lineHeight: '1.6'
-            }}>
-              A production-ready administrative web application with comprehensive role-based access control, white-labeling, and OWASP security compliance.
-            </p>
           </div>
 
-          {/* Feature Cards */}
+          {/* Main Admin Panels */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '24px',
-            marginBottom: '64px'
+            maxWidth: '600px',
+            margin: '0 auto'
           }}>
-            <div style={{
-              padding: '32px',
-              borderRadius: '12px',
-              backgroundColor: '#162032',
-              border: '1px solid #1E293B',
-              textAlign: 'center',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-            }}>
+            <Link
+              href="/admin"
+              style={{
+                display: 'block',
+                padding: '40px 32px',
+                backgroundColor: '#162032',
+                border: '1px solid #1E293B',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E293B'
+                e.currentTarget.style.transform = 'translateY(-4px)'
+                e.currentTarget.style.boxShadow = '0 8px 25px -3px rgba(0, 0, 0, 0.2)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#162032'
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+            >
               <div style={{
                 width: '64px',
                 height: '64px',
@@ -79,22 +87,38 @@ export default function Home() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 20px auto'
+                margin: '0 auto 24px auto'
               }}>
-                <span style={{ fontSize: '32px' }}>🏢</span>
+                <span style={{ fontSize: '32px' }}>⚙️</span>
               </div>
-              <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Multi-Tenant</h3>
-              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Complete tenant isolation with custom branding and configurations</p>
-            </div>
+              <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Global Admin</h2>
+              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage tenants, users, and system-wide settings</p>
+            </Link>
 
-            <div style={{
-              padding: '32px',
-              borderRadius: '12px',
-              backgroundColor: '#162032',
-              border: '1px solid #1E293B',
-              textAlign: 'center',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-            }}>
+            <Link
+              href="/tenant"
+              style={{
+                display: 'block',
+                padding: '40px 32px',
+                backgroundColor: '#162032',
+                border: '1px solid #1E293B',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E293B'
+                e.currentTarget.style.transform = 'translateY(-4px)'
+                e.currentTarget.style.boxShadow = '0 8px 25px -3px rgba(0, 0, 0, 0.2)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#162032'
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+            >
               <div style={{
                 width: '64px',
                 height: '64px',
@@ -103,101 +127,12 @@ export default function Home() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 20px auto'
+                margin: '0 auto 24px auto'
               }}>
-                <span style={{ fontSize: '32px' }}>🔒</span>
+                <span style={{ fontSize: '32px' }}>👤</span>
               </div>
-              <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>RBAC Security</h3>
-              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Granular role-based permissions with audit logging and OWASP compliance</p>
-            </div>
-
-            <div style={{
-              padding: '32px',
-              borderRadius: '12px',
-              backgroundColor: '#162032',
-              border: '1px solid #1E293B',
-              textAlign: 'center',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-            }}>
-              <div style={{
-                width: '64px',
-                height: '64px',
-                borderRadius: '12px',
-                backgroundColor: '#F59E0B',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 20px auto'
-              }}>
-                <span style={{ fontSize: '32px' }}>🎨</span>
-              </div>
-              <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>White-Label</h3>
-              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Customize branding, themes, and email templates for each tenant</p>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', justifyContent: 'center', alignItems: 'center', marginTop: '40px' }}>
-            <Link
-              href="/admin"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '16px 32px',
-                backgroundColor: '#3B82F6',
-                color: '#F1F5F9',
-                fontWeight: '600',
-                fontSize: '18px',
-                borderRadius: '8px',
-                textDecoration: 'none',
-                border: '2px solid #3B82F6',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#2563EB'
-                e.currentTarget.style.borderColor = '#2563EB'
-                e.currentTarget.style.transform = 'translateY(-2px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#3B82F6'
-                e.currentTarget.style.borderColor = '#3B82F6'
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
-            >
-              <span style={{ fontSize: '20px' }}>⚙️</span>
-              Global Admin
-            </Link>
-            <Link
-              href="/tenant"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '16px 32px',
-                backgroundColor: 'transparent',
-                color: '#F1F5F9',
-                fontWeight: '600',
-                fontSize: '18px',
-                borderRadius: '8px',
-                textDecoration: 'none',
-                border: '2px solid #64748B',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#64748B'
-                e.currentTarget.style.color = '#F1F5F9'
-                e.currentTarget.style.transform = 'translateY(-2px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent'
-                e.currentTarget.style.color = '#F1F5F9'
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
-            >
-              <span style={{ fontSize: '20px' }}>👤</span>
-              Tenant Admin
+              <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Tenant Admin</h2>
+              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage your organization's users and settings</p>
             </Link>
           </div>
 
