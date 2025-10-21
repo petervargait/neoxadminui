@@ -5,6 +5,7 @@ import { useState } from 'react'
 
 export default function AdminPage() {
   const [activeSection, setActiveSection] = useState<string | null>(null)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const handleCreateTenant = () => {
     setActiveSection('createTenant')
@@ -51,232 +52,349 @@ export default function AdminPage() {
   }
   return (
     <div style={{ 
+      display: 'flex',
       minHeight: '100vh', 
-      padding: '32px', 
-      background: 'linear-gradient(135deg, #08122e 0%, #243b53 100%)' 
+      backgroundColor: '#0B1426',
+      fontFamily: 'Inter, system-ui, sans-serif'
     }}>
-      <div style={{ maxWidth: '1024px', margin: '0 auto' }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            marginBottom: '24px' 
-          }}>
-            <NeoxLogo width="300px" height="60px" />
-          </div>
-          <h1 style={{ fontSize: '30px', fontWeight: 'bold', marginBottom: '16px', color: '#d7bb91' }}>
-            Global Admin Dashboard
-          </h1>
-          <p style={{ 
-            maxWidth: '672px', 
-            margin: '0 auto 32px auto', 
-            color: '#d7bb91', 
-            opacity: 0.8 
-          }}>
-            Welcome to the global administration panel. Monitor and manage all tenants, users, and system operations.
-          </p>
-        </div>
-
-        {/* Cards */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-          gap: '24px', 
-          marginBottom: '32px' 
-        }}>
-          <div style={{
-            padding: '24px',
-            borderRadius: '16px',
-            backgroundColor: 'rgba(30, 55, 90, 0.5)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(75, 101, 129, 0.3)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-          }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px',
-              backgroundColor: 'rgba(215, 187, 145, 0.2)'
-            }}>
-              <svg style={{ width: '24px', height: '24px', color: '#d7bb91' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h1a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#d7bb91' }}>Tenants</h3>
-            <p style={{ fontSize: '14px', marginBottom: '16px', color: '#d7bb91', opacity: 0.7 }}>Manage organizations</p>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#d7bb91' }}>0</div>
-          </div>
-
-          <div style={{
-            padding: '24px',
-            borderRadius: '16px',
-            backgroundColor: 'rgba(30, 55, 90, 0.5)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(75, 101, 129, 0.3)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-          }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px',
-              backgroundColor: 'rgba(215, 187, 145, 0.2)'
-            }}>
-              <svg style={{ width: '24px', height: '24px', color: '#d7bb91' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-              </svg>
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#d7bb91' }}>Global Users</h3>
-            <p style={{ fontSize: '14px', marginBottom: '16px', color: '#d7bb91', opacity: 0.7 }}>All system users</p>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#d7bb91' }}>0</div>
-          </div>
-
-          <div style={{
-            padding: '24px',
-            borderRadius: '16px',
-            backgroundColor: 'rgba(30, 55, 90, 0.5)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(75, 101, 129, 0.3)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-          }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px',
-              backgroundColor: 'rgba(215, 187, 145, 0.2)'
-            }}>
-              <svg style={{ width: '24px', height: '24px', color: '#d7bb91' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#d7bb91' }}>System Health</h3>
-            <p style={{ fontSize: '14px', marginBottom: '16px', color: '#d7bb91', opacity: 0.7 }}>Monitor performance</p>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981' }}>Healthy</div>
-          </div>
-        </div>
-
-        {/* Actions */}
+      {/* Sidebar */}
+      <div style={{
+        width: sidebarCollapsed ? '60px' : '280px',
+        backgroundColor: '#162032',
+        borderRight: '1px solid #1E293B',
+        transition: 'width 0.3s ease',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        {/* Logo */}
         <div style={{
-          padding: '24px',
-          borderRadius: '16px',
-          backgroundColor: 'rgba(30, 55, 90, 0.5)',
-          backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(75, 101, 129, 0.3)',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          marginBottom: '32px'
+          padding: '24px 20px',
+          borderBottom: '1px solid #1E293B',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
         }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#d7bb91' }}>Quick Actions</h2>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-            gap: '16px' 
-          }}>
-            <button 
-              onClick={handleCreateTenant} 
-              onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
-              onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
+          <NeoxLogo width={sidebarCollapsed ? '32px' : '120px'} height="32px" />
+          {!sidebarCollapsed && (
+            <div style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600' }}>NEOX</div>
+          )}
+        </div>
+
+        {/* Navigation */}
+        <nav style={{ padding: '20px 0', flex: 1 }}>
+          {[
+            { icon: '👥', label: 'Tenants', action: () => setActiveSection('tenantsList') },
+            { icon: '🏢', label: 'Organizations', action: () => setActiveSection('organizations') },
+            { icon: '⚙️', label: 'System Settings', action: handleSystemSettings },
+            { icon: '📊', label: 'Analytics', action: () => setActiveSection('analytics') },
+            { icon: '🔧', label: 'Modules', action: handleManageModules },
+            { icon: '📁', label: 'Audit Logs', action: handleViewAuditLogs },
+            { icon: '📤', label: 'Bulk Upload', action: handleBulkUpload },
+            { icon: '🎨', label: 'White Label', action: handleWhiteLabel },
+          ].map((item, index) => (
+            <div key={index} 
+              onClick={item.action}
               style={{
-                backgroundColor: 'rgba(51, 78, 104, 0.8)',
-                color: '#d7bb91',
-                border: '1px solid rgba(75, 101, 129, 0.3)',
-                borderRadius: '12px',
-                padding: '12px 24px',
-                fontWeight: '500',
+                padding: '12px 20px',
+                margin: '4px 12px',
+                borderRadius: '8px',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
-                fontSize: '14px'
-              }}>Create Tenant</button>
-            <button onClick={handleManageModules} style={{
-              backgroundColor: 'rgba(51, 78, 104, 0.8)',
-              color: '#d7bb91',
-              border: '1px solid rgba(75, 101, 129, 0.3)',
-              borderRadius: '12px',
-              padding: '12px 24px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontSize: '14px'
-            }}>Manage Modules</button>
-            <button onClick={handleViewAuditLogs} style={{
-              backgroundColor: 'rgba(51, 78, 104, 0.8)',
-              color: '#d7bb91',
-              border: '1px solid rgba(75, 101, 129, 0.3)',
-              borderRadius: '12px',
-              padding: '12px 24px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontSize: '14px'
-            }}>View Audit Logs</button>
-            <button onClick={handleSystemSettings} style={{
-              backgroundColor: 'rgba(51, 78, 104, 0.8)',
-              color: '#d7bb91',
-              border: '1px solid rgba(75, 101, 129, 0.3)',
-              borderRadius: '12px',
-              padding: '12px 24px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontSize: '14px'
-            }}>System Settings</button>
-            <button 
-              onClick={handleBulkUpload}
-              onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
-              onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
-              style={{
-                backgroundColor: 'rgba(51, 78, 104, 0.8)',
-                color: '#d7bb91',
-                border: '1px solid rgba(75, 101, 129, 0.3)',
-                borderRadius: '12px',
-                padding: '12px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: '#94A3B8',
+                fontSize: '14px',
                 fontWeight: '500',
-                cursor: 'pointer',
                 transition: 'all 0.2s',
+                ':hover': {
+                  backgroundColor: '#1E293B',
+                  color: '#F1F5F9'
+                }
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#1E293B'
+                e.target.style.color = '#F1F5F9'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'transparent'
+                e.target.style.color = '#94A3B8'
+              }}
+            >
+              <span style={{ fontSize: '16px' }}>{item.icon}</span>
+              {!sidebarCollapsed && <span>{item.label}</span>}
+            </div>
+          ))}
+        </nav>
+
+        {/* Collapse Toggle */}
+        <button 
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            right: '-12px',
+            width: '24px',
+            height: '24px',
+            borderRadius: '50%',
+            backgroundColor: '#3B82F6',
+            border: 'none',
+            color: 'white',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '12px',
+            zIndex: 10
+          }}
+        >
+          {sidebarCollapsed ? '→' : '←'}
+        </button>
+      </div>
+
+      {/* Main Content */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Top Bar */}
+        <div style={{
+          height: '70px',
+          backgroundColor: '#0B1426',
+          borderBottom: '1px solid #1E293B',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 32px'
+        }}>
+          <div>
+            <h1 style={{ 
+              color: '#F1F5F9', 
+              fontSize: '24px', 
+              fontWeight: '600', 
+              margin: 0 
+            }}>
+              Global Admin Dashboard
+            </h1>
+            <p style={{ 
+              color: '#64748B', 
+              fontSize: '14px', 
+              margin: '4px 0 0 0' 
+            }}>
+              Manage tenants, users, and system operations
+            </p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Link href="/" style={{ 
+              color: '#64748B', 
+              textDecoration: 'none',
               fontSize: '14px'
-            }}>Bulk Upload Users</button>
-            <button 
-              onClick={handleWhiteLabel}
-              onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
-              onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
-              style={{
-                backgroundColor: 'rgba(51, 78, 104, 0.8)',
-                color: '#d7bb91',
-                border: '1px solid rgba(75, 101, 129, 0.3)',
-                borderRadius: '12px',
-                padding: '12px 24px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                fontSize: '14px'
-              }}>White Label Settings</button>
+            }}>
+              ← Back to Home
+            </Link>
           </div>
         </div>
 
-        {/* Footer */}
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: '14px', marginBottom: '8px', color: '#d7bb91', opacity: 0.6 }}>
-            ⚠️ Demo page - Database connection required
-          </p>
-          <Link href="/" style={{ 
-            fontSize: '14px', 
-            textDecoration: 'underline', 
-            color: '#d7bb91',
-            transition: 'opacity 0.2s'
+        {/* Dashboard Content */}
+        <div style={{ flex: 1, padding: '32px', overflow: 'auto' }}>
+          {/* Stats Cards */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '24px',
+            marginBottom: '32px'
           }}>
-            ← Back to Home
-          </Link>
+            <div style={{
+              padding: '24px',
+              borderRadius: '12px',
+              backgroundColor: '#162032',
+              border: '1px solid #1E293B',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '8px',
+                  backgroundColor: '#3B82F6',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '24px' }}>🏢</span>
+                </div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>12</div>
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Active Tenants</h3>
+              <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>Organizations using the platform</p>
+            </div>
+
+            <div style={{
+              padding: '24px',
+              borderRadius: '12px',
+              backgroundColor: '#162032',
+              border: '1px solid #1E293B',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '8px',
+                  backgroundColor: '#10B981',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '24px' }}>👥</span>
+                </div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>2,847</div>
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Total Users</h3>
+              <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>Across all tenants</p>
+            </div>
+
+            <div style={{
+              padding: '24px',
+              borderRadius: '12px',
+              backgroundColor: '#162032',
+              border: '1px solid #1E293B',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '8px',
+                  backgroundColor: '#F59E0B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '24px' }}>⚙️</span>
+                </div>
+                <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981' }}>Online</div>
+              </div>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>System Status</h3>
+              <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>All services operational</p>
+            </div>
+          </div>
+
+          {/* Tenants Table */}
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            border: '1px solid #1E293B',
+            overflow: 'hidden',
+            marginBottom: '32px'
+          }}>
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid #1E293B',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div>
+                <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Recent Tenants</h2>
+                <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Latest organization registrations</p>
+              </div>
+              <button 
+                onClick={handleCreateTenant}
+                style={{
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 16px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#2563EB'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#3B82F6'}
+              >
+                + Create Tenant
+              </button>
+            </div>
+            
+            {/* Table */}
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#0F1629' }}>
+                    <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Organization</th>
+                    <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                    <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Users</th>
+                    <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Plan</th>
+                    <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Created</th>
+                    <th style={{ padding: '16px 24px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { name: 'Acme Corporation', status: 'Active', users: 245, plan: 'Enterprise', created: '2024-01-15', logo: '🏢' },
+                    { name: 'TechFlow Industries', status: 'Active', users: 128, plan: 'Professional', created: '2024-01-10', logo: '🚀' },
+                    { name: 'Global Solutions Ltd', status: 'Pending', users: 0, plan: 'Starter', created: '2024-01-08', logo: '🌍' },
+                    { name: 'Innovation Labs', status: 'Active', users: 87, plan: 'Professional', created: '2024-01-05', logo: '🔬' },
+                    { name: 'Digital Dynamics', status: 'Suspended', users: 156, plan: 'Enterprise', created: '2024-01-03', logo: '⚡' },
+                  ].map((tenant, index) => (
+                    <tr key={index} style={{ borderBottom: '1px solid #1E293B' }}>
+                      <td style={{ padding: '16px 24px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '8px',
+                            backgroundColor: '#1E293B',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '16px'
+                          }}>
+                            {tenant.logo}
+                          </div>
+                          <div>
+                            <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{tenant.name}</div>
+                            <div style={{ color: '#64748B', fontSize: '12px' }}>ID: {String(index + 1).padStart(3, '0')}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '16px 24px' }}>
+                        <span style={{
+                          padding: '4px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          backgroundColor: tenant.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 
+                                           tenant.status === 'Pending' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                          color: tenant.status === 'Active' ? '#10B981' : 
+                                 tenant.status === 'Pending' ? '#F59E0B' : '#EF4444'
+                        }}>
+                          {tenant.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '16px 24px', color: '#F1F5F9', fontSize: '14px' }}>{tenant.users.toLocaleString()}</td>
+                      <td style={{ padding: '16px 24px', color: '#64748B', fontSize: '14px' }}>{tenant.plan}</td>
+                      <td style={{ padding: '16px 24px', color: '#64748B', fontSize: '14px' }}>{tenant.created}</td>
+                      <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                        <button style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid #1E293B',
+                          borderRadius: '6px',
+                          color: '#64748B',
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          cursor: 'pointer'
+                        }}>
+                          Manage
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -288,7 +406,7 @@ export default function AdminPage() {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(8, 18, 46, 0.9)',
+          backgroundColor: 'rgba(11, 20, 38, 0.9)',
           backdropFilter: 'blur(8px)',
           zIndex: 1000,
           display: 'flex',
@@ -297,8 +415,8 @@ export default function AdminPage() {
           padding: '20px'
         }}>
           <div style={{
-            backgroundColor: 'rgba(30, 55, 90, 0.95)',
-            border: '1px solid rgba(75, 101, 129, 0.5)',
+            backgroundColor: '#162032',
+            border: '1px solid #1E293B',
             borderRadius: '16px',
             padding: '32px',
             maxWidth: '600px',
