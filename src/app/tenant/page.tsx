@@ -2,6 +2,21 @@ import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
 
 export default function TenantPage() {
+  const handleInviteUser = () => {
+    alert('Invite User clicked - This would open user invitation form')
+  }
+
+  const handleSendInvitation = () => {
+    alert('Send Invitation clicked - This would show invitation management')
+  }
+
+  const handleManageTemplates = () => {
+    alert('Manage Templates clicked - This would show template management')
+  }
+
+  const handleViewReports = () => {
+    alert('View Reports clicked - This would show tenant reports')
+  }
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -16,7 +31,7 @@ export default function TenantPage() {
             justifyContent: 'center', 
             marginBottom: '24px' 
           }}>
-            <NeoxLogo width="80px" height="64px" color="#d7bb91" />
+            <NeoxLogo width="300px" height="60px" />
           </div>
           <h1 style={{ fontSize: '30px', fontWeight: 'bold', marginBottom: '16px', color: '#d7bb91' }}>
             Tenant Admin Dashboard
@@ -154,7 +169,7 @@ export default function TenantPage() {
           }}>
             <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#d7bb91' }}>Quick Actions</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <button style={{
+              <button onClick={handleInviteUser} style={{
                 backgroundColor: 'rgba(51, 78, 104, 0.8)',
                 color: '#d7bb91',
                 border: '1px solid rgba(75, 101, 129, 0.3)',
@@ -165,7 +180,7 @@ export default function TenantPage() {
                 transition: 'all 0.2s',
                 fontSize: '14px'
               }}>Invite User</button>
-              <button style={{
+              <button onClick={handleSendInvitation} style={{
                 backgroundColor: 'rgba(51, 78, 104, 0.8)',
                 color: '#d7bb91',
                 border: '1px solid rgba(75, 101, 129, 0.3)',
@@ -176,7 +191,7 @@ export default function TenantPage() {
                 transition: 'all 0.2s',
                 fontSize: '14px'
               }}>Send Invitation</button>
-              <button style={{
+              <button onClick={handleManageTemplates} style={{
                 backgroundColor: 'rgba(51, 78, 104, 0.8)',
                 color: '#d7bb91',
                 border: '1px solid rgba(75, 101, 129, 0.3)',
@@ -187,7 +202,7 @@ export default function TenantPage() {
                 transition: 'all 0.2s',
                 fontSize: '14px'
               }}>Manage Templates</button>
-              <button style={{
+              <button onClick={handleViewReports} style={{
                 backgroundColor: 'rgba(51, 78, 104, 0.8)',
                 color: '#d7bb91',
                 border: '1px solid rgba(75, 101, 129, 0.3)',

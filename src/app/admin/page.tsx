@@ -2,6 +2,21 @@ import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
 
 export default function AdminPage() {
+  const handleCreateTenant = () => {
+    alert('Create Tenant clicked - This would open a tenant creation form')
+  }
+
+  const handleManageModules = () => {
+    alert('Manage Modules clicked - This would show module management interface')
+  }
+
+  const handleViewAuditLogs = () => {
+    alert('View Audit Logs clicked - This would show system audit logs')
+  }
+
+  const handleSystemSettings = () => {
+    alert('System Settings clicked - This would open system configuration')
+  }
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -16,7 +31,7 @@ export default function AdminPage() {
             justifyContent: 'center', 
             marginBottom: '24px' 
           }}>
-            <NeoxLogo width="80px" height="64px" color="#d7bb91" />
+            <NeoxLogo width="300px" height="60px" />
           </div>
           <h1 style={{ fontSize: '30px', fontWeight: 'bold', marginBottom: '16px', color: '#d7bb91' }}>
             Global Admin Dashboard
@@ -136,18 +151,22 @@ export default function AdminPage() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
             gap: '16px' 
           }}>
-            <button style={{
-              backgroundColor: 'rgba(51, 78, 104, 0.8)',
-              color: '#d7bb91',
-              border: '1px solid rgba(75, 101, 129, 0.3)',
-              borderRadius: '12px',
-              padding: '12px 24px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontSize: '14px'
-            }}>Create Tenant</button>
-            <button style={{
+            <button 
+              onClick={handleCreateTenant} 
+              onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
+              style={{
+                backgroundColor: 'rgba(51, 78, 104, 0.8)',
+                color: '#d7bb91',
+                border: '1px solid rgba(75, 101, 129, 0.3)',
+                borderRadius: '12px',
+                padding: '12px 24px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                fontSize: '14px'
+              }}>Create Tenant</button>
+            <button onClick={handleManageModules} style={{
               backgroundColor: 'rgba(51, 78, 104, 0.8)',
               color: '#d7bb91',
               border: '1px solid rgba(75, 101, 129, 0.3)',
@@ -158,7 +177,7 @@ export default function AdminPage() {
               transition: 'all 0.2s',
               fontSize: '14px'
             }}>Manage Modules</button>
-            <button style={{
+            <button onClick={handleViewAuditLogs} style={{
               backgroundColor: 'rgba(51, 78, 104, 0.8)',
               color: '#d7bb91',
               border: '1px solid rgba(75, 101, 129, 0.3)',
@@ -169,7 +188,7 @@ export default function AdminPage() {
               transition: 'all 0.2s',
               fontSize: '14px'
             }}>View Audit Logs</button>
-            <button style={{
+            <button onClick={handleSystemSettings} style={{
               backgroundColor: 'rgba(51, 78, 104, 0.8)',
               color: '#d7bb91',
               border: '1px solid rgba(75, 101, 129, 0.3)',
