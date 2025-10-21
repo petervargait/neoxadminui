@@ -129,12 +129,12 @@ export function canAccessAdmin(role: RoleKey): boolean {
  * Check if user can access tenant routes
  */
 export function canAccessTenant(role: RoleKey): boolean {
-  return [
+  return ([
     RoleKey.TENANT_ADMIN,
     RoleKey.RECEPTION,
     RoleKey.OFFICE_MANAGER,
     RoleKey.SECURITY
-  ].includes(role)
+  ] as RoleKey[]).includes(role)
 }
 
 /**
