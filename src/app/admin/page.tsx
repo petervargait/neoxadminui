@@ -305,8 +305,8 @@ export default function AdminPage() {
                   cursor: 'pointer',
                   transition: 'background-color 0.2s'
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#2563EB'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#3B82F6'}
+                onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#2563EB'}
+                onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#3B82F6'}
               >
                 + Create Tenant
               </button>
