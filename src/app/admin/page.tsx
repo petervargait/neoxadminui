@@ -109,12 +109,12 @@ export default function AdminPage() {
                 transition: 'all 0.2s'
               }}
               onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#1E293B'
-                e.target.style.color = '#F1F5F9'
+                (e.target as HTMLElement).style.backgroundColor = '#1E293B';
+                (e.target as HTMLElement).style.color = '#F1F5F9';
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'transparent'
-                e.target.style.color = '#94A3B8'
+                (e.target as HTMLElement).style.backgroundColor = 'transparent';
+                (e.target as HTMLElement).style.color = '#94A3B8';
               }}
             >
               <span style={{ fontSize: '16px' }}>{item.icon}</span>
