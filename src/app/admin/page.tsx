@@ -1,22 +1,29 @@
 'use client'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
+import { useState } from 'react'
 
 export default function AdminPage() {
+  const [activeSection, setActiveSection] = useState<string | null>(null)
+
   const handleCreateTenant = () => {
-    alert('Create Tenant clicked - This would open a tenant creation form')
+    setActiveSection('createTenant')
   }
 
   const handleManageModules = () => {
-    alert('Manage Modules clicked - This would show module management interface')
+    setActiveSection('manageModules')
   }
 
   const handleViewAuditLogs = () => {
-    alert('View Audit Logs clicked - This would show system audit logs')
+    setActiveSection('auditLogs')
   }
 
   const handleSystemSettings = () => {
-    alert('System Settings clicked - This would open system configuration')
+    setActiveSection('systemSettings')
+  }
+
+  const closeSection = () => {
+    setActiveSection(null)
   }
   return (
     <div style={{ 
@@ -218,6 +225,253 @@ export default function AdminPage() {
           </Link>
         </div>
       </div>
+
+      {/* Modal Overlays for Different Sections */}
+      {activeSection && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(8, 18, 46, 0.9)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: 'rgba(30, 55, 90, 0.95)',
+            border: '1px solid rgba(75, 101, 129, 0.5)',
+            borderRadius: '16px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '100%',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#d7bb91', margin: 0 }}>
+                {activeSection === 'createTenant' && 'Create New Tenant'}
+                {activeSection === 'manageModules' && 'Manage Modules'}
+                {activeSection === 'auditLogs' && 'System Audit Logs'}
+                {activeSection === 'systemSettings' && 'System Settings'}
+              </h2>
+              <button onClick={closeSection} style={{
+                background: 'none',
+                border: '1px solid rgba(215, 187, 145, 0.5)',
+                borderRadius: '8px',
+                color: '#d7bb91',
+                fontSize: '20px',
+                width: '40px',
+                height: '40px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>×</button>
+            </div>
+
+            {activeSection === 'createTenant' && (
+              <div>
+                <form style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div>
+                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Tenant Name</label>
+                    <input type="text" placeholder="Enter tenant name" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      borderRadius: '8px',
+                      color: '#d7bb91',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Admin Email</label>
+                    <input type="email" placeholder="admin@company.com" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      borderRadius: '8px',
+                      color: '#d7bb91',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Features</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
+                        <input type="checkbox" /> User Management
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
+                        <input type="checkbox" /> Invitation System
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
+                        <input type="checkbox" /> Parking Management
+                      </label>
+                    </div>
+                  </div>
+                  <button type="submit" style={{
+                    backgroundColor: 'rgba(75, 101, 129, 0.8)',
+                    color: '#d7bb91',
+                    border: '1px solid rgba(75, 101, 129, 0.3)',
+                    borderRadius: '8px',
+                    padding: '12px 24px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    marginTop: '16px'
+                  }}>Create Tenant</button>
+                </form>
+              </div>
+            )}
+
+            {activeSection === 'manageModules' && (
+              <div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {['User Management', 'Invitation System', 'Parking Module', 'Reporting', 'Authentication'].map((module, index) => (
+                    <div key={index} style={{
+                      padding: '16px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.3)',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div>
+                        <h4 style={{ color: '#d7bb91', margin: '0 0 4px 0', fontSize: '16px' }}>{module}</h4>
+                        <p style={{ color: '#d7bb91', opacity: 0.7, margin: 0, fontSize: '14px' }}>Module configuration and settings</p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button style={{
+                          backgroundColor: 'rgba(75, 101, 129, 0.6)',
+                          color: '#d7bb91',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '6px',
+                          padding: '6px 12px',
+                          fontSize: '12px',
+                          cursor: 'pointer'
+                        }}>Configure</button>
+                        <button style={{
+                          backgroundColor: 'rgba(220, 38, 38, 0.6)',
+                          color: '#fff',
+                          border: '1px solid rgba(220, 38, 38, 0.3)',
+                          borderRadius: '6px',
+                          padding: '6px 12px',
+                          fontSize: '12px',
+                          cursor: 'pointer'
+                        }}>Disable</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'auditLogs' && (
+              <div>
+                <div style={{ marginBottom: '16px' }}>
+                  <input type="search" placeholder="Search logs..." style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                    border: '1px solid rgba(75, 101, 129, 0.3)',
+                    borderRadius: '8px',
+                    color: '#d7bb91',
+                    fontSize: '14px'
+                  }} />
+                </div>
+                <div style={{ maxHeight: '300px', overflow: 'auto' }}>
+                  {[
+                    { time: '2025-10-21 13:05:23', user: 'admin@system', action: 'Created tenant "Acme Corp"', status: 'Success' },
+                    { time: '2025-10-21 12:58:15', user: 'admin@system', action: 'Updated system configuration', status: 'Success' },
+                    { time: '2025-10-21 12:45:02', user: 'john@tenant1', action: 'Failed login attempt', status: 'Failed' },
+                    { time: '2025-10-21 12:30:18', user: 'admin@system', action: 'Enabled parking module', status: 'Success' },
+                    { time: '2025-10-21 12:15:44', user: 'jane@tenant2', action: 'Sent invitation to visitor', status: 'Success' }
+                  ].map((log, index) => (
+                    <div key={index} style={{
+                      padding: '12px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.3)',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      marginBottom: '8px'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <div style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500' }}>{log.action}</div>
+                          <div style={{ color: '#d7bb91', opacity: 0.7, fontSize: '12px' }}>{log.user} - {log.time}</div>
+                        </div>
+                        <span style={{
+                          backgroundColor: log.status === 'Success' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)',
+                          color: log.status === 'Success' ? '#10b981' : '#ef4444',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          fontSize: '12px',
+                          fontWeight: '500'
+                        }}>{log.status}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'systemSettings' && (
+              <div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div>
+                    <h3 style={{ color: '#d7bb91', fontSize: '18px', marginBottom: '16px' }}>General Settings</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91' }}>
+                        <input type="checkbox" defaultChecked /> Enable email notifications
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91' }}>
+                        <input type="checkbox" defaultChecked /> Auto-approve invitations
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91' }}>
+                        <input type="checkbox" /> Maintenance mode
+                      </label>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 style={{ color: '#d7bb91', fontSize: '18px', marginBottom: '16px' }}>Security</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', marginBottom: '8px', display: 'block' }}>Session timeout (minutes)</label>
+                        <input type="number" defaultValue="30" style={{
+                          width: '100px',
+                          padding: '8px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91'
+                        }} />
+                      </div>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91' }}>
+                        <input type="checkbox" defaultChecked /> Require 2FA for admins
+                      </label>
+                    </div>
+                  </div>
+                  <button style={{
+                    backgroundColor: 'rgba(75, 101, 129, 0.8)',
+                    color: '#d7bb91',
+                    border: '1px solid rgba(75, 101, 129, 0.3)',
+                    borderRadius: '8px',
+                    padding: '12px 24px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>Save Settings</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
