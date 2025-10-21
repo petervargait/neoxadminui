@@ -84,8 +84,9 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    '/admin/:path*',
-    '/tenant/:path*',
+    // Temporarily disabled until authentication is configured
+    // '/admin/:path*',
+    // '/tenant/:path*',
     '/api/admin/:path*',
     '/api/tenant/:path*'
   ]
