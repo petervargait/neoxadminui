@@ -1,6 +1,5 @@
 import { withAuth } from 'next-auth/middleware'
 import { NextRequest, NextResponse } from 'next/server'
-import { RoleKey } from '@prisma/client'
 
 // Inline these functions to avoid dynamic imports in edge runtime
 function canAccessAdmin(role: string): boolean {

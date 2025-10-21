@@ -51,7 +51,7 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       if (!user.email) {
         return false
       }
@@ -82,7 +82,7 @@ export const authOptions: NextAuthOptions = {
     error: '/auth/error'
   },
   events: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       // Log sign-in event
       if (user.email) {
         const dbUser = await prisma.user.findUnique({
