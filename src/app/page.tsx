@@ -132,7 +132,7 @@ export default function Home() {
                 <span style={{ fontSize: '32px' }}>👤</span>
               </div>
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Tenant Admin</h2>
-              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage your organization's users and settings</p>
+              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage your organization&apos;s users and settings</p>
             </Link>
           </div>
 
