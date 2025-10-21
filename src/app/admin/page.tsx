@@ -801,18 +801,7 @@ export default function AdminPage() {
                       </div>
                       <div>
                         <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Invitation Email Body</label>
-                        <textarea defaultValue={`Hello {{visitor_name}},
-
-You have been invited to visit {{company_name}} on {{visit_date}} at {{visit_time}}.
-
-Purpose: {{purpose}}
-Host: {{host_name}}
-
-Please confirm your visit by clicking the link below:
-{{confirmation_link}}
-
-Best regards,
-{{company_name}} Team`} style={{
+                        <textarea defaultValue="Hello {{visitor_name}},\n\nYou have been invited to visit {{company_name}} on {{visit_date}} at {{visit_time}}.\n\nPurpose: {{purpose}}\nHost: {{host_name}}\n\nPlease confirm your visit by clicking the link below:\n{{confirmation_link}}\n\nBest regards,\n{{company_name}} Team" style={{
                           width: '100%',
                           minHeight: '150px',
                           padding: '12px',
@@ -828,7 +817,7 @@ Best regards,
                       <div style={{ padding: '12px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
                         <h4 style={{ color: '#3b82f6', fontSize: '14px', margin: '0 0 8px 0' }}>Available Variables:</h4>
                         <div style={{ color: '#d7bb91', fontSize: '12px', fontFamily: 'monospace', opacity: 0.8 }}>
-                          {{`{{visitor_name}}`}} {{`{{company_name}}`}} {{`{{visit_date}}`}} {{`{{visit_time}}`}} {{`{{purpose}}`}} {{`{{host_name}}`}} {{`{{confirmation_link}}`}}
+                          {'{'}{'{'}{'}'}visitor_name{'}'}{'}'}  {'{'}{'{'}{'}'}company_name{'}'}{'}'}  {'{'}{'{'}{'}'}visit_date{'}'}{'}'}  {'{'}{'{'}{'}'}visit_time{'}'}{'}'}  {'{'}{'{'}{'}'}purpose{'}'}{'}'}  {'{'}{'{'}{'}'}host_name{'}'}{'}'}  {'{'}{'{'}{'}'}confirmation_link{'}'}{'}'}  
                         </div>
                       </div>
                     </div>
