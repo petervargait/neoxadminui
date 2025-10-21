@@ -16,7 +16,7 @@ function canAccessTenant(role: string): boolean {
 }
 
 export default withAuth(
-  function middleware(req: NextRequest) {
+  function middleware(req) {
     const token = req.nextauth.token
     const { pathname } = req.nextUrl
 
