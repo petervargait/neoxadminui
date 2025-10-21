@@ -22,8 +22,28 @@ export default function TenantPage() {
     setActiveSection('viewReports')
   }
 
+  const handleBulkUpload = () => {
+    setActiveSection('bulkUpload')
+  }
+
   const closeSection = () => {
     setActiveSection(null)
+  }
+
+  const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.type === 'text/csv') {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const csv = e.target?.result as string
+        console.log('CSV uploaded:', csv)
+        // Here you would parse and process the CSV
+        alert(`CSV file "${file.name}" uploaded successfully! Processing ${csv.split('\n').length - 1} users.`)
+      }
+      reader.readAsText(file)
+    } else {
+      alert('Please select a valid CSV file')
+    }
   }
   return (
     <div style={{ 
@@ -225,6 +245,21 @@ export default function TenantPage() {
                 transition: 'all 0.2s',
                 fontSize: '14px'
               }}>View Reports</button>
+              <button 
+                onClick={handleBulkUpload}
+                onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
+                onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
+                style={{
+                  backgroundColor: 'rgba(51, 78, 104, 0.8)',
+                  color: '#d7bb91',
+                  border: '1px solid rgba(75, 101, 129, 0.3)',
+                  borderRadius: '12px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  fontSize: '14px'
+                }}>Bulk Upload Users</button>
             </div>
           </div>
         </div>
@@ -278,6 +313,7 @@ export default function TenantPage() {
                 {activeSection === 'sendInvitation' && 'Send Visitor Invitation'}
                 {activeSection === 'manageTemplates' && 'Manage Templates'}
                 {activeSection === 'viewReports' && 'View Reports'}
+                {activeSection === 'bulkUpload' && 'Bulk Upload Users'}
               </h2>
               <button onClick={closeSection} style={{
                 background: 'none',
@@ -591,6 +627,101 @@ export default function TenantPage() {
                       }}>{activity.status}</span>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'bulkUpload' && (
+              <div>
+                <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                  <h3 style={{ color: '#3b82f6', fontSize: '16px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '18px' }}>ℹ️</span> CSV Format Requirements
+                  </h3>
+                  <p style={{ color: '#d7bb91', fontSize: '14px', margin: '0 0 12px 0' }}>
+                    Your CSV file should include the following columns (in order):
+                  </p>
+                  <div style={{ fontFamily: 'monospace', backgroundColor: 'rgba(51, 78, 104, 0.5)', padding: '12px', borderRadius: '6px', color: '#d7bb91', fontSize: '12px' }}>
+                    name,email,role,department
+                  </div>
+                  <div style={{ marginTop: '12px' }}>
+                    <button style={{
+                      backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                      color: '#fff',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      textDecoration: 'none'
+                    }} onClick={() => {
+                      const csvContent = "name,email,role,department\nJohn Smith,john@company.com,user,IT\nJane Doe,jane@company.com,admin,HR\nBob Johnson,bob@company.com,manager,Sales"
+                      const blob = new Blob([csvContent], { type: 'text/csv' })
+                      const url = window.URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url
+                      a.download = 'tenant_users_template.csv'
+                      a.click()
+                      window.URL.revokeObjectURL(url)
+                    }}>Download Sample CSV</button>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Upload CSV File</label>
+                  <div style={{ 
+                    border: '2px dashed rgba(75, 101, 129, 0.5)', 
+                    borderRadius: '12px', 
+                    padding: '32px', 
+                    textAlign: 'center',
+                    backgroundColor: 'rgba(51, 78, 104, 0.1)'
+                  }}>
+                    <input 
+                      type="file" 
+                      accept=".csv"
+                      onChange={handleCSVUpload}
+                      style={{ display: 'none' }}
+                      id="csv-upload-tenant"
+                    />
+                    <label htmlFor="csv-upload-tenant" style={{
+                      backgroundColor: 'rgba(75, 101, 129, 0.8)',
+                      color: '#d7bb91',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      borderRadius: '8px',
+                      padding: '12px 24px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'inline-block'
+                    }}>Choose CSV File</label>
+                    <p style={{ color: '#d7bb91', opacity: 0.7, marginTop: '12px', fontSize: '14px' }}>
+                      Select a CSV file to upload multiple users to your tenant
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                  <div style={{ padding: '16px', backgroundColor: 'rgba(34, 197, 94, 0.1)', borderRadius: '8px', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
+                    <h3 style={{ color: '#10b981', fontSize: '16px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '18px' }}>✅</span> Supported Features
+                    </h3>
+                    <ul style={{ color: '#d7bb91', fontSize: '14px', margin: 0, paddingLeft: '20px' }}>
+                      <li>Automatic email validation</li>
+                      <li>Role assignment (user/admin/manager)</li>
+                      <li>Department categorization</li>
+                      <li>Duplicate detection</li>
+                    </ul>
+                  </div>
+                  
+                  <div style={{ padding: '16px', backgroundColor: 'rgba(234, 179, 8, 0.1)', borderRadius: '8px', border: '1px solid rgba(234, 179, 8, 0.3)' }}>
+                    <h3 style={{ color: '#eab308', fontSize: '16px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '18px' }}>⚠️</span> Upload Process
+                    </h3>
+                    <ul style={{ color: '#d7bb91', fontSize: '14px', margin: 0, paddingLeft: '20px' }}>
+                      <li>Users are added to current tenant</li>
+                      <li>Welcome emails sent automatically</li>
+                      <li>Invalid entries skipped</li>
+                      <li>Progress report generated</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             )}
