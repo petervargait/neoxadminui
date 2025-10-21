@@ -1,7 +1,20 @@
 import { withAuth } from 'next-auth/middleware'
 import { NextRequest, NextResponse } from 'next/server'
 import { RoleKey } from '@prisma/client'
-import { canAccessAdmin, canAccessTenant } from '@/lib/rbac'
+
+// Inline these functions to avoid dynamic imports in edge runtime
+function canAccessAdmin(role: string): boolean {
+  return role === 'SUPER_ADMIN'
+}
+
+function canAccessTenant(role: string): boolean {
+  return [
+    'TENANT_ADMIN',
+    'RECEPTION', 
+    'OFFICE_MANAGER',
+    'SECURITY'
+  ].includes(role)
+}
 
 export default withAuth(
   function middleware(req: NextRequest) {
@@ -18,7 +31,7 @@ export default withAuth(
       return NextResponse.redirect(new URL('/auth/signin', req.url))
     }
 
-    const userRole = token.role as RoleKey
+    const userRole = token.role as string
 
     // Admin routes - only super admin
     if (pathname.startsWith('/admin')) {
