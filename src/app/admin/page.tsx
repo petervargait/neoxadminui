@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import NeoxLogo from '../../components/NeoxLogo'
 
 export default function AdminPage() {
   return (
@@ -12,30 +13,10 @@ export default function AdminPage() {
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
           <div style={{ 
             display: 'flex', 
-            alignItems: 'center', 
             justifyContent: 'center', 
-            gap: '12px', 
-            marginBottom: '24px', 
-            color: '#d7bb91' 
+            marginBottom: '24px' 
           }}>
-            <svg style={{ width: '64px', height: '64px' }} viewBox="0 0 100 100" fill="none">
-              <g fill="currentColor">
-                <rect x="10" y="70" width="8" height="30" />
-                <rect x="22" y="60" width="8" height="40" />
-                <rect x="34" y="45" width="8" height="55" />
-                <rect x="46" y="35" width="8" height="65" />
-                <rect x="58" y="45" width="8" height="55" />
-                <rect x="70" y="60" width="8" height="40" />
-                <rect x="82" y="70" width="8" height="30" />
-                <path d="M25 50 Q50 30 75 50 Q50 70 25 50" stroke="currentColor" strokeWidth="2" fill="none" />
-                <rect x="10" y="98" width="80" height="2" />
-                <circle cx="50" cy="25" r="3" />
-              </g>
-            </svg>
-            <div>
-              <div style={{ fontSize: '20px', fontWeight: 'bold' }}>NEOX</div>
-              <div style={{ fontSize: '12px', opacity: 0.8 }}>INFINITY</div>
-            </div>
+            <NeoxLogo width="80px" height="64px" color="#d7bb91" />
           </div>
           <h1 style={{ fontSize: '30px', fontWeight: 'bold', marginBottom: '16px', color: '#d7bb91' }}>
             Global Admin Dashboard
