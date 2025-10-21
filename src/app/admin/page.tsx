@@ -26,6 +26,10 @@ export default function AdminPage() {
     setActiveSection('bulkUpload')
   }
 
+  const handleWhiteLabel = () => {
+    setActiveSection('whiteLabel')
+  }
+
   const closeSection = () => {
     setActiveSection(null)
   }
@@ -240,8 +244,23 @@ export default function AdminPage() {
                 fontWeight: '500',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
+              fontSize: '14px'
+            }}>Bulk Upload Users</button>
+            <button 
+              onClick={handleWhiteLabel}
+              onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
+              onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
+              style={{
+                backgroundColor: 'rgba(51, 78, 104, 0.8)',
+                color: '#d7bb91',
+                border: '1px solid rgba(75, 101, 129, 0.3)',
+                borderRadius: '12px',
+                padding: '12px 24px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
                 fontSize: '14px'
-              }}>Bulk Upload Users</button>
+              }}>White Label Settings</button>
           </div>
         </div>
 
@@ -295,6 +314,7 @@ export default function AdminPage() {
                 {activeSection === 'auditLogs' && 'System Audit Logs'}
                 {activeSection === 'systemSettings' && 'System Settings'}
                 {activeSection === 'bulkUpload' && 'Bulk Upload Users'}
+                {activeSection === 'whiteLabel' && 'White Label Settings'}
               </h2>
               <button onClick={closeSection} style={{
                 background: 'none',
@@ -369,7 +389,23 @@ export default function AdminPage() {
             {activeSection === 'manageModules' && (
               <div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {['User Management', 'Invitation System', 'Parking Module', 'Reporting', 'Authentication'].map((module, index) => (
+                  {[
+                    'User Management', 
+                    'Visitor Management', 
+                    'Parking', 
+                    'Emergency', 
+                    'Map', 
+                    'Restaurant', 
+                    'Ticketing', 
+                    'Service Hub', 
+                    'Lockers', 
+                    'News', 
+                    'AI Assistant', 
+                    'Space Management', 
+                    'Private Delivery',
+                    'Authentication',
+                    'Reporting'
+                  ].map((module, index) => (
                     <div key={index} style={{
                       padding: '16px',
                       backgroundColor: 'rgba(51, 78, 104, 0.3)',
@@ -583,6 +619,263 @@ export default function AdminPage() {
                     <li>Invalid entries will be reported</li>
                     <li>Email invitations will be sent automatically</li>
                   </ul>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'whiteLabel' && (
+              <div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                  {/* Branding Section */}
+                  <div>
+                    <h3 style={{ color: '#d7bb91', fontSize: '20px', marginBottom: '20px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Brand Identity</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Company Logo</label>
+                        <div style={{
+                          border: '2px dashed rgba(75, 101, 129, 0.5)',
+                          borderRadius: '8px',
+                          padding: '20px',
+                          textAlign: 'center',
+                          backgroundColor: 'rgba(51, 78, 104, 0.1)'
+                        }}>
+                          <input type="file" accept="image/*" style={{ display: 'none' }} id="logo-upload" />
+                          <label htmlFor="logo-upload" style={{
+                            backgroundColor: 'rgba(75, 101, 129, 0.6)',
+                            color: '#d7bb91',
+                            border: '1px solid rgba(75, 101, 129, 0.3)',
+                            borderRadius: '6px',
+                            padding: '8px 16px',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            display: 'inline-block'
+                          }}>Upload Logo</label>
+                          <p style={{ color: '#d7bb91', opacity: 0.7, margin: '8px 0 0 0', fontSize: '12px' }}>PNG, JPG, SVG (max 2MB)</p>
+                        </div>
+                      </div>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Company Name</label>
+                        <input type="text" placeholder="Your Company Name" style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Color Scheme Section */}
+                  <div>
+                    <h3 style={{ color: '#d7bb91', fontSize: '20px', marginBottom: '20px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Color Scheme</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Primary Color</label>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <input type="color" defaultValue="#d7bb91" style={{
+                            width: '40px',
+                            height: '40px',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer'
+                          }} />
+                          <input type="text" defaultValue="#d7bb91" style={{
+                            flex: 1,
+                            padding: '8px 12px',
+                            backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                            border: '1px solid rgba(75, 101, 129, 0.3)',
+                            borderRadius: '8px',
+                            color: '#d7bb91',
+                            fontSize: '14px',
+                            fontFamily: 'monospace'
+                          }} />
+                        </div>
+                      </div>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Secondary Color</label>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <input type="color" defaultValue="#08122e" style={{
+                            width: '40px',
+                            height: '40px',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer'
+                          }} />
+                          <input type="text" defaultValue="#08122e" style={{
+                            flex: 1,
+                            padding: '8px 12px',
+                            backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                            border: '1px solid rgba(75, 101, 129, 0.3)',
+                            borderRadius: '8px',
+                            color: '#d7bb91',
+                            fontSize: '14px',
+                            fontFamily: 'monospace'
+                          }} />
+                        </div>
+                      </div>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Accent Color</label>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <input type="color" defaultValue="#3b82f6" style={{
+                            width: '40px',
+                            height: '40px',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer'
+                          }} />
+                          <input type="text" defaultValue="#3b82f6" style={{
+                            flex: 1,
+                            padding: '8px 12px',
+                            backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                            border: '1px solid rgba(75, 101, 129, 0.3)',
+                            borderRadius: '8px',
+                            color: '#d7bb91',
+                            fontSize: '14px',
+                            fontFamily: 'monospace'
+                          }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Typography Section */}
+                  <div>
+                    <h3 style={{ color: '#d7bb91', fontSize: '20px', marginBottom: '20px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Typography</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Primary Font</label>
+                        <select style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }}>
+                          <option value="Inter">Inter (Default)</option>
+                          <option value="Roboto">Roboto</option>
+                          <option value="Open Sans">Open Sans</option>
+                          <option value="Lato">Lato</option>
+                          <option value="Poppins">Poppins</option>
+                          <option value="Montserrat">Montserrat</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Font Size Scale</label>
+                        <select style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }}>
+                          <option value="small">Small</option>
+                          <option value="medium" selected>Medium (Default)</option>
+                          <option value="large">Large</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Email Templates Section */}
+                  <div>
+                    <h3 style={{ color: '#d7bb91', fontSize: '20px', marginBottom: '20px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Email Templates</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Invitation Email Subject</label>
+                        <input type="text" defaultValue="You're invited to visit {{company_name}}" style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                      </div>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Invitation Email Body</label>
+                        <textarea defaultValue={`Hello {{visitor_name}},
+
+You have been invited to visit {{company_name}} on {{visit_date}} at {{visit_time}}.
+
+Purpose: {{purpose}}
+Host: {{host_name}}
+
+Please confirm your visit by clicking the link below:
+{{confirmation_link}}
+
+Best regards,
+{{company_name}} Team`} style={{
+                          width: '100%',
+                          minHeight: '150px',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px',
+                          resize: 'vertical',
+                          fontFamily: 'monospace'
+                        }} />
+                      </div>
+                      <div style={{ padding: '12px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                        <h4 style={{ color: '#3b82f6', fontSize: '14px', margin: '0 0 8px 0' }}>Available Variables:</h4>
+                        <div style={{ color: '#d7bb91', fontSize: '12px', fontFamily: 'monospace', opacity: 0.8 }}>
+                          {{`{{visitor_name}}`}} {{`{{company_name}}`}} {{`{{visit_date}}`}} {{`{{visit_time}}`}} {{`{{purpose}}`}} {{`{{host_name}}`}} {{`{{confirmation_link}}`}}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Preview Section */}
+                  <div>
+                    <h3 style={{ color: '#d7bb91', fontSize: '20px', marginBottom: '20px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Preview</h3>
+                    <div style={{
+                      padding: '20px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.2)',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(75, 101, 129, 0.3)'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          backgroundColor: '#d7bb91',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#08122e',
+                          fontWeight: 'bold',
+                          fontSize: '12px'
+                        }}>LOGO</div>
+                        <div style={{ color: '#d7bb91', fontSize: '18px', fontWeight: 'bold' }}>Your Company Name</div>
+                      </div>
+                      <p style={{ color: '#d7bb91', opacity: 0.7, fontSize: '14px' }}>This is how your brand will appear to visitors and users throughout the platform.</p>
+                    </div>
+                  </div>
+
+                  {/* Save Button */}
+                  <div style={{ textAlign: 'center', paddingTop: '20px', borderTop: '1px solid rgba(75, 101, 129, 0.3)' }}>
+                    <button style={{
+                      backgroundColor: 'rgba(75, 101, 129, 0.8)',
+                      color: '#d7bb91',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      borderRadius: '8px',
+                      padding: '16px 32px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontSize: '16px',
+                      minWidth: '200px'
+                    }}>Save White Label Settings</button>
+                  </div>
                 </div>
               </div>
             )}
