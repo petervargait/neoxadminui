@@ -17,22 +17,6 @@ const nextConfig = {
       }
     ]
   },
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/auth/signin',
-        permanent: false,
-        has: [
-          {
-            type: 'header',
-            key: 'user-agent',
-            value: '(?!.*bot).*', // Exclude bots from redirect
-          }
-        ]
-      }
-    ]
-  },
   async headers() {
     return [
       {
