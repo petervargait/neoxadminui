@@ -106,11 +106,7 @@ export default function AdminPage() {
                 color: '#94A3B8',
                 fontSize: '14px',
                 fontWeight: '500',
-                transition: 'all 0.2s',
-                ':hover': {
-                  backgroundColor: '#1E293B',
-                  color: '#F1F5F9'
-                }
+                transition: 'all 0.2s'
               }}
               onMouseEnter={(e) => {
                 e.target.style.backgroundColor = '#1E293B'
