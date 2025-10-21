@@ -1,4 +1,5 @@
 import { NEOXLogo } from '@/components/ui/neox-logo'
+import Link from 'next/link'
 
 export default function TenantPage() {
   return (
@@ -87,9 +88,9 @@ export default function TenantPage() {
           <p className="text-gold-400 text-sm">
             ⚠️ This is a placeholder page. Database connection and authentication required.
           </p>
-          <a href="/" className="text-gold-600 hover:text-gold-500 text-sm underline">
+          <Link href="/" className="text-gold-600 hover:text-gold-500 text-sm underline">
             ← Back to Home
-          </a>
+          </Link>
         </div>
       </div>
     </div>

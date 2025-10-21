@@ -1,5 +1,5 @@
 import { withAuth } from 'next-auth/middleware'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 // Inline these functions to avoid dynamic imports in edge runtime
 function canAccessAdmin(role: string): boolean {

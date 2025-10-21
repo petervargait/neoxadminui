@@ -1,4 +1,5 @@
 import { NEOXLogo } from '@/components/ui/neox-logo'
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -51,7 +52,7 @@ export default function Home() {
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <a
+          <Link
             href="/admin"
             className="neox-button inline-flex items-center gap-2"
           >
@@ -60,8 +61,8 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             Global Admin
-          </a>
-          <a
+          </Link>
+          <Link
             href="/tenant"
             className="neox-button-secondary inline-flex items-center gap-2"
           >
@@ -69,7 +70,7 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
             Tenant Admin
-          </a>
+          </Link>
         </div>
 
         {/* Footer */}
