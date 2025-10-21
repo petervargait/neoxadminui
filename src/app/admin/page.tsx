@@ -153,8 +153,8 @@ export default function AdminPage() {
           }}>
             <button 
               onClick={handleCreateTenant} 
-              onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
+              onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
+              onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
               style={{
                 backgroundColor: 'rgba(51, 78, 104, 0.8)',
                 color: '#d7bb91',

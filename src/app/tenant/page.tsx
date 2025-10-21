@@ -169,7 +169,11 @@ export default function TenantPage() {
           }}>
             <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#d7bb91' }}>Quick Actions</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <button onClick={handleInviteUser} style={{
+              <button 
+                onClick={handleInviteUser} 
+                onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
+                onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
+                style={{
                 backgroundColor: 'rgba(51, 78, 104, 0.8)',
                 color: '#d7bb91',
                 border: '1px solid rgba(75, 101, 129, 0.3)',
