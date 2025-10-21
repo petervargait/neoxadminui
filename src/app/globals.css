@@ -30,11 +30,12 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Poppins', system-ui, sans-serif;
   }
@@ -49,15 +50,40 @@
   }
 
   .neox-card {
-    @apply bg-card/50 backdrop-blur-sm border border-border rounded-2xl shadow-xl;
+    background-color: hsl(var(--card) / 0.5);
+    backdrop-filter: blur(8px);
+    border: 1px solid hsl(var(--border));
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
 
   .neox-button {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-6 py-3 font-medium transition-all duration-200 shadow-lg hover:shadow-xl;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .neox-button:hover {
+    background-color: hsl(var(--primary) / 0.9);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   }
 
   .neox-button-secondary {
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border rounded-xl px-6 py-3 font-medium transition-all duration-200;
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .neox-button-secondary:hover {
+    background-color: hsl(var(--secondary) / 0.8);
   }
 
   /* Custom scrollbar */
@@ -66,15 +92,16 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-muted;
+    background-color: hsl(var(--muted));
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/50 rounded-full;
+    background-color: hsl(var(--muted-foreground) / 0.5);
+    border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/70;
+    background-color: hsl(var(--muted-foreground) / 0.7);
   }
 }
 
