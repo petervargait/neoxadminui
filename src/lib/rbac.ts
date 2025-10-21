@@ -1,4 +1,4 @@
-import { RoleKey } from '@prisma/client'
+import { RoleKey, Prisma } from '@prisma/client'
 import { getServerSession } from 'next-auth'
 import { authOptions } from './auth'
 import { prisma } from './prisma'
@@ -187,7 +187,7 @@ export async function createAuditLog(
       action,
       targetType,
       targetId,
-      diff: (diff || {}) as any
+      diff: (diff || {}) as Prisma.InputJsonValue
     }
   })
 }
