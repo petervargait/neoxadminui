@@ -187,7 +187,7 @@ export async function createAuditLog(
       action,
       targetType,
       targetId,
-      diff: diff || {}
+      diff: (diff || {}) as any
     }
   })
 }
