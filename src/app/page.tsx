@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import NeoxLogo from '../components/NeoxLogo'
 
@@ -213,6 +215,7 @@ export default function Home() {
               Production-ready • OWASP Compliant • Multi-tenant Architecture
             </p>
           </div>
+        </div>
       </div>
     </div>
   )
