@@ -376,13 +376,13 @@ export default function AdminPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(71, 85, 105, 0.5)',
+                      backgroundColor: 'rgba(215, 187, 145, 0.2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: '0 0 15px rgba(71, 85, 105, 0.4), 0 0 30px rgba(71, 85, 105, 0.2)'
+                      boxShadow: '0 0 15px rgba(215, 187, 145, 0.4), 0 0 30px rgba(215, 187, 145, 0.2)'
                     }}>
-                      <span style={{ fontSize: '24px', color: '#94A3B8' }}>◎</span>
+                      <span style={{ fontSize: '24px', color: '#D7BB91' }}>◎</span>
                     </div>
                     <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>12</div>
                   </div>
@@ -402,13 +402,13 @@ export default function AdminPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(71, 85, 105, 0.5)',
+                      backgroundColor: 'rgba(96, 165, 250, 0.2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: '0 0 15px rgba(100, 116, 139, 0.4), 0 0 30px rgba(100, 116, 139, 0.2)'
+                      boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 30px rgba(96, 165, 250, 0.2)'
                     }}>
-                      <span style={{ fontSize: '24px', color: '#94A3B8' }}>◧</span>
+                      <span style={{ fontSize: '24px', color: '#60A5FA' }}>◧</span>
                     </div>
                     <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>2,847</div>
                   </div>
@@ -428,15 +428,15 @@ export default function AdminPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(71, 85, 105, 0.5)',
+                      backgroundColor: 'rgba(34, 197, 94, 0.2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: '0 0 15px rgba(71, 85, 105, 0.4), 0 0 30px rgba(71, 85, 105, 0.2)'
+                      boxShadow: '0 0 15px rgba(34, 197, 94, 0.4), 0 0 30px rgba(34, 197, 94, 0.2)'
                     }}>
-                      <span style={{ fontSize: '24px', color: '#94A3B8' }}>◈</span>
+                      <span style={{ fontSize: '24px', color: '#22C55E' }}>◈</span>
                     </div>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#94A3B8' }}>Online</div>
+                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#22C55E' }}>Online</div>
                   </div>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>System Status</h3>
                   <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>All services operational</p>
