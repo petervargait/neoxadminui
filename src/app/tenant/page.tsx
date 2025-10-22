@@ -297,22 +297,32 @@ export default function TenantPage() {
                 onClick={() => setActiveModal('inviteUser')}
                 style={{
                   padding: '16px',
-                  backgroundColor: '#3B82F6',
+                  backgroundColor: '#1E293B',
                   color: '#F1F5F9',
-                  border: 'none',
+                  border: '2px solid #D7BB91',
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '500',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 0 10px rgba(215, 187, 145, 0.3)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#D7BB91'
+                  e.currentTarget.style.color = '#0B1426'
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(215, 187, 145, 0.6), 0 0 40px rgba(215, 187, 145, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1E293B'
+                  e.currentTarget.style.color = '#F1F5F9'
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
               >
-                <span>📬</span>
+                <span style={{ fontSize: '18px' }}>✉️</span>
                 Invite User
               </button>
               
@@ -320,22 +330,32 @@ export default function TenantPage() {
                 onClick={() => setActiveModal('sendInvitation')}
                 style={{
                   padding: '16px',
-                  backgroundColor: '#10B981',
+                  backgroundColor: '#1E293B',
                   color: '#F1F5F9',
-                  border: 'none',
+                  border: '2px solid #D7BB91',
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '500',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 0 10px rgba(215, 187, 145, 0.3)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10B981'}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#D7BB91'
+                  e.currentTarget.style.color = '#0B1426'
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(215, 187, 145, 0.6), 0 0 40px rgba(215, 187, 145, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1E293B'
+                  e.currentTarget.style.color = '#F1F5F9'
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
               >
-                <span>🕰</span>
+                <span style={{ fontSize: '18px' }}>📅</span>
                 Schedule Visit
               </button>
               
@@ -343,22 +363,32 @@ export default function TenantPage() {
                 onClick={() => setActiveModal('manageTemplates')}
                 style={{
                   padding: '16px',
-                  backgroundColor: '#F59E0B',
+                  backgroundColor: '#1E293B',
                   color: '#F1F5F9',
-                  border: 'none',
+                  border: '2px solid #D7BB91',
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '500',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 0 10px rgba(215, 187, 145, 0.3)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#D97706'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F59E0B'}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#D7BB91'
+                  e.currentTarget.style.color = '#0B1426'
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(215, 187, 145, 0.6), 0 0 40px rgba(215, 187, 145, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1E293B'
+                  e.currentTarget.style.color = '#F1F5F9'
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
               >
-                <span>📝</span>
+                <span style={{ fontSize: '18px' }}>📄</span>
                 Templates
               </button>
               
@@ -366,22 +396,32 @@ export default function TenantPage() {
                 onClick={() => setActiveModal('bulkUpload')}
                 style={{
                   padding: '16px',
-                  backgroundColor: '#8B5CF6',
+                  backgroundColor: '#1E293B',
                   color: '#F1F5F9',
-                  border: 'none',
+                  border: '2px solid #D7BB91',
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: '500',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 0 10px rgba(215, 187, 145, 0.3)'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7C3AED'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8B5CF6'}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#D7BB91'
+                  e.currentTarget.style.color = '#0B1426'
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(215, 187, 145, 0.6), 0 0 40px rgba(215, 187, 145, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1E293B'
+                  e.currentTarget.style.color = '#F1F5F9'
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
               >
-                <span>📄</span>
+                <span style={{ fontSize: '18px' }}>📤</span>
                 Bulk Upload
               </button>
             </div>
