@@ -6,11 +6,11 @@ export const metadata: Metadata = {
   description: "Production-ready multi-tenant administrative web application with comprehensive role-based access control, white-labeling, and OWASP security compliance.",
   icons: {
     icon: [
-      { url: '/favicon.ico' },
-      { url: '/neox-logo.png', type: 'image/png' }
+      { url: '/neoxfavicon.png', type: 'image/png' },
+      { url: '/favicon.ico' }
     ],
-    shortcut: '/favicon.ico',
-    apple: '/neox-logo.png',
+    shortcut: '/neoxfavicon.png',
+    apple: '/neoxfavicon.png',
   },
   keywords: [
     "multi-tenant",
