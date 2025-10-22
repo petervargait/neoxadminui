@@ -231,11 +231,26 @@ export default function Home() {
             borderTop: '1px solid #1E293B',
             textAlign: 'center'
           }}>
-            <p style={{ color: '#64748B', fontSize: '14px' }}>
-              Built with Next.js 14, TypeScript, Prisma, and NextAuth.js
+            <p style={{ color: '#64748B', fontSize: '14px', margin: 0 }}>
+              A product by{' '}
+              <a 
+                href="https://neox.team" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ 
+                  color: '#94A3B8', 
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  transition: 'color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#F1F5F9'}
+                onMouseLeave={(e) => e.currentTarget.style.color = '#94A3B8'}
+              >
+                NEOX Smart Solution Ltd
+              </a>
             </p>
             <p style={{ color: '#64748B', fontSize: '12px', marginTop: '8px' }}>
-              Production-ready • OWASP Compliant • Multi-tenant Architecture
+              © {new Date().getFullYear()} NEOX. All Rights Reserved.
             </p>
           </div>
         </div>

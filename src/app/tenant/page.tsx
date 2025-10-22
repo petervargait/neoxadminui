@@ -32,6 +32,8 @@ export default function TenantPage() {
   const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string} | null>(null)
   const [showTemplateEditor, setShowTemplateEditor] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<{name: string; subject?: string; status?: string} | null>(null)
+  const [showParkingModal, setShowParkingModal] = useState(false)
+  const [selectedParkingSpace, setSelectedParkingSpace] = useState<number | null>(null)
 
   if (!isAuthenticated) {
     return null
@@ -837,7 +839,7 @@ export default function TenantPage() {
               }}>
                 <div style={{ padding: '24px', borderBottom: '1px solid #1E293B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Parking Spaces</h3>
-                  <button onClick={() => alert('Assign parking space: Select a user and an available space')} style={{
+                  <button onClick={() => setShowParkingModal(true)} style={{
                     backgroundColor: '#3B82F6',
                     color: 'white',
                     border: 'none',
@@ -853,20 +855,28 @@ export default function TenantPage() {
                     {Array.from({ length: 50 }, (_, i) => {
                       const occupied = [2, 5, 8, 12, 15, 18, 23, 27, 31, 38, 42, 47].includes(i + 1);
                       return (
-                        <div key={i} style={{
+                        <div key={i} 
+                          onClick={() => {
+                            if (!occupied) {
+                              setSelectedParkingSpace(i + 1);
+                              setShowParkingModal(true);
+                            }
+                          }}
+                          style={{
                           padding: '20px',
                           backgroundColor: occupied ? '#1E293B' : '#0F1629',
                           border: `2px solid ${occupied ? '#EF4444' : '#10B981'}`,
                           borderRadius: '8px',
                           textAlign: 'center',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
+                          cursor: occupied ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s',
+                          opacity: occupied ? 0.6 : 1
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'scale(1.05)';
+                          if (!occupied) e.currentTarget.style.transform = 'scale(1.05)';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'scale(1)';
+                          if (!occupied) e.currentTarget.style.transform = 'scale(1)';
                         }}>
                           <div style={{ fontSize: '18px', fontWeight: 'bold', color: occupied ? '#EF4444' : '#10B981', marginBottom: '4px' }}>{i + 1}</div>
                           <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{occupied ? 'Occupied' : 'Available'}</div>
@@ -1373,6 +1383,136 @@ export default function TenantPage() {
                   fontSize: '14px'
                 }}>Save Template</button>
                 <button type="button" onClick={() => setShowTemplateEditor(false)} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Parking Assignment Modal */}
+      {showParkingModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => { setShowParkingModal(false); setSelectedParkingSpace(null); }}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            border: '1px solid #1E293B'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
+              Assign Parking Space {selectedParkingSpace ? `#${selectedParkingSpace}` : ''}
+            </h2>
+            <form onSubmit={(e) => { 
+              e.preventDefault(); 
+              alert(`Parking space ${selectedParkingSpace} assigned successfully!`); 
+              setShowParkingModal(false);
+              setSelectedParkingSpace(null);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Select User *</label>
+                <select required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}>
+                  <option value="">Choose a user...</option>
+                  <option value="john">John Smith</option>
+                  <option value="sarah">Sarah Johnson</option>
+                  <option value="mike">Mike Davis</option>
+                  <option value="lisa">Lisa Wilson</option>
+                  <option value="tom">Tom Anderson</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Vehicle Information *</label>
+                <input type="text" placeholder="e.g., Tesla Model 3" required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px'
+                }} />
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>License Plate *</label>
+                <input type="text" placeholder="e.g., ABC-1234" required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px'
+                }} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>From Date *</label>
+                  <input type="date" required style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} />
+                </div>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>To Date *</label>
+                  <input type="date" required style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Assign Space</button>
+                <button type="button" onClick={() => { setShowParkingModal(false); setSelectedParkingSpace(null); }} style={{
                   flex: 1,
                   backgroundColor: 'transparent',
                   color: '#F1F5F9',
