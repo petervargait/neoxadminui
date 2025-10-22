@@ -169,14 +169,14 @@ export default function Home() {
                 width: '64px',
                 height: '64px',
                 borderRadius: '12px',
-                backgroundColor: '#3B82F6',
+                backgroundColor: 'rgba(71, 85, 105, 0.6)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: '0 auto 24px auto',
-                boxShadow: '0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3)'
+                boxShadow: '0 0 20px rgba(71, 85, 105, 0.5), 0 0 40px rgba(71, 85, 105, 0.3)'
               }}>
-                <span style={{ fontSize: '32px' }}>◈</span>
+                <span style={{ fontSize: '32px', color: '#94A3B8' }}>◈</span>
               </div>
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Global Admin</h2>
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage tenants, users, and system-wide settings</p>
@@ -210,14 +210,14 @@ export default function Home() {
                 width: '64px',
                 height: '64px',
                 borderRadius: '12px',
-                backgroundColor: '#10B981',
+                backgroundColor: 'rgba(100, 116, 139, 0.6)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: '0 auto 24px auto',
-                boxShadow: '0 0 20px rgba(16, 185, 129, 0.5), 0 0 40px rgba(16, 185, 129, 0.3)'
+                boxShadow: '0 0 20px rgba(100, 116, 139, 0.5), 0 0 40px rgba(100, 116, 139, 0.3)'
               }}>
-                <span style={{ fontSize: '32px' }}>◎</span>
+                <span style={{ fontSize: '32px', color: '#94A3B8' }}>◎</span>
               </div>
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Tenant Admin</h2>
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage your organization&apos;s users and settings</p>

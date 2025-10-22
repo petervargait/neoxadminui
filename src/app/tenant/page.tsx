@@ -274,11 +274,13 @@ export default function TenantPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '8px',
-                      backgroundColor: '#3B82F6',
+                      backgroundColor: 'rgba(71, 85, 105, 0.5)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '24px'
+                      fontSize: '24px',
+                      color: '#94A3B8',
+                      boxShadow: '0 0 15px rgba(71, 85, 105, 0.4), 0 0 30px rgba(71, 85, 105, 0.2)'
                     }}>◎</div>
                     <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>147</div>
                   </div>
@@ -298,11 +300,13 @@ export default function TenantPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '8px',
-                      backgroundColor: '#10B981',
+                      backgroundColor: 'rgba(100, 116, 139, 0.5)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '24px'
+                      fontSize: '24px',
+                      color: '#94A3B8',
+                      boxShadow: '0 0 15px rgba(100, 116, 139, 0.4), 0 0 30px rgba(100, 116, 139, 0.2)'
                     }}>◫</div>
                     <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>23</div>
                   </div>
@@ -322,11 +326,13 @@ export default function TenantPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '8px',
-                      backgroundColor: '#F59E0B',
+                      backgroundColor: 'rgba(71, 85, 105, 0.5)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '24px'
+                      fontSize: '24px',
+                      color: '#94A3B8',
+                      boxShadow: '0 0 15px rgba(71, 85, 105, 0.4), 0 0 30px rgba(71, 85, 105, 0.2)'
                     }}>◧</div>
                     <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>12/50</div>
                   </div>
