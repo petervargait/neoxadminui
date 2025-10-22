@@ -26,16 +26,16 @@ export default function TenantPage() {
     router.push('/login')
   }
 
-  if (!isAuthenticated) {
-    return null
-  }
-
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const [showUserModal, setShowUserModal] = useState(false)
   const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string} | null>(null)
   const [showTemplateEditor, setShowTemplateEditor] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<{name: string; subject?: string; status?: string} | null>(null)
+
+  if (!isAuthenticated) {
+    return null
+  }
 
   return (
     <div style={{ 
