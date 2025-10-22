@@ -74,12 +74,9 @@ export default function AdminPage() {
           borderBottom: '1px solid #1E293B',
           display: 'flex',
           alignItems: 'center',
-          gap: '12px'
+          justifyContent: 'center'
         }}>
-          <NeoxLogo width={sidebarCollapsed ? '64px' : '240px'} height="64px" />
-          {!sidebarCollapsed && (
-            <div style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600' }}>NEOX</div>
-          )}
+          <NeoxLogo width="64px" height="64px" />
         </div>
 
         {/* Tenant Selector */}
@@ -114,14 +111,14 @@ export default function AdminPage() {
         {/* Navigation */}
         <nav style={{ padding: '20px 0', flex: 1 }}>
           {[
-            { icon: '👥', label: 'Tenants', action: () => setActiveSection('tenantsList') },
-            { icon: '🏢', label: 'Organizations', action: () => setActiveSection('organizations') },
-            { icon: '⚙️', label: 'System Settings', action: handleSystemSettings },
-            { icon: '📈', label: 'Analytics', action: () => setActiveSection('analytics') },
-            { icon: '🔧', label: 'Modules', action: handleManageModules },
-            { icon: '📁', label: 'Audit Logs', action: handleViewAuditLogs },
-            { icon: '📤', label: 'Bulk Upload', action: handleBulkUpload },
-            { icon: '🎨', label: 'White Label', action: handleWhiteLabel },
+            { icon: '◎', label: 'Tenants', action: () => setActiveSection('tenantsList') },
+            { icon: '■', label: 'Organizations', action: () => setActiveSection('organizations') },
+            { icon: '◦', label: 'System Settings', action: handleSystemSettings },
+            { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics') },
+            { icon: '◧', label: 'Modules', action: handleManageModules },
+            { icon: '◫', label: 'Audit Logs', action: handleViewAuditLogs },
+            { icon: '◨', label: 'Bulk Upload', action: handleBulkUpload },
+            { icon: '◆', label: 'White Label', action: handleWhiteLabel },
           ].map((item, index) => (
             <div key={index} 
               onClick={item.action}
@@ -139,15 +136,17 @@ export default function AdminPage() {
                 transition: 'all 0.2s'
               }}
               onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.backgroundColor = '#1E293B';
-                (e.target as HTMLElement).style.color = '#F1F5F9';
+                const target = e.currentTarget;
+                target.style.backgroundColor = '#1E293B';
+                target.style.color = '#F1F5F9';
               }}
               onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                (e.target as HTMLElement).style.color = '#94A3B8';
+                const target = e.currentTarget;
+                target.style.backgroundColor = 'transparent';
+                target.style.color = '#94A3B8';
               }}
             >
-              <span style={{ fontSize: '16px' }}>{item.icon}</span>
+              <span style={{ fontSize: '18px' }}>{item.icon}</span>
               {!sidebarCollapsed && <span>{item.label}</span>}
             </div>
           ))}
@@ -460,6 +459,8 @@ export default function AdminPage() {
                 {activeSection === 'bulkUpload' && 'Bulk Upload Users'}
                 {activeSection === 'whiteLabel' && 'White Label Settings'}
                 {activeSection === 'analytics' && 'Analytics Dashboard'}
+                {activeSection === 'tenantsList' && 'Tenants Management'}
+                {activeSection === 'organizations' && 'Organizations'}
               </h2>
               <button onClick={closeSection} style={{
                 background: 'none',
@@ -1011,6 +1012,18 @@ export default function AdminPage() {
                     }}>Save White Label Settings</button>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeSection === 'tenantsList' && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <p style={{ color: '#64748B', fontSize: '16px' }}>Detailed tenant list interface coming soon...</p>
+              </div>
+            )}
+
+            {activeSection === 'organizations' && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <p style={{ color: '#64748B', fontSize: '16px' }}>Organization management interface coming soon...</p>
               </div>
             )}
 

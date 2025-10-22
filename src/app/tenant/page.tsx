@@ -52,12 +52,9 @@ export default function TenantPage() {
           borderBottom: '1px solid #1E293B',
           display: 'flex',
           alignItems: 'center',
-          gap: '12px'
+          justifyContent: 'center'
         }}>
           <NeoxLogo width="64px" height="64px" />
-          {sidebarExpanded && (
-            <span style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600' }}>NEOX</span>
-          )}
         </div>
 
         {/* Menu Toggle */}
@@ -86,12 +83,12 @@ export default function TenantPage() {
         {/* Navigation */}
         <nav style={{ padding: '20px 0', flex: 1 }}>
           {[
-            { icon: '📈', label: 'Dashboard', action: () => setActiveModal(null) },
-            { icon: '📈', label: 'Analytics', action: () => setActiveModal('analytics') },
-            { icon: '👥', label: 'Users', action: () => setActiveModal('users') },
-            { icon: '📬', label: 'Invitations', action: () => setActiveModal('invitations') },
-            { icon: '🏎️', label: 'Parking', action: () => setActiveModal('parking') },
-            { icon: '📝', label: 'Templates', action: () => setActiveModal('manageTemplates') },
+            { icon: '◈', label: 'Dashboard', action: () => setActiveModal(null) },
+            { icon: '◐', label: 'Analytics', action: () => setActiveModal('analytics') },
+            { icon: '◎', label: 'Users', action: () => setActiveModal('users') },
+            { icon: '◫', label: 'Invitations', action: () => setActiveModal('invitations') },
+            { icon: '◧', label: 'Parking', action: () => setActiveModal('parking') },
+            { icon: '◨', label: 'Templates', action: () => setActiveModal('manageTemplates') },
           ].map((item, index) => (
             <div key={index} 
               onClick={item.action}
@@ -109,15 +106,17 @@ export default function TenantPage() {
                 transition: 'all 0.2s'
               }}
               onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.backgroundColor = '#1E293B';
-                (e.target as HTMLElement).style.color = '#F1F5F9';
+                const target = e.currentTarget;
+                target.style.backgroundColor = '#1E293B';
+                target.style.color = '#F1F5F9';
               }}
               onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.backgroundColor = 'transparent';
-                (e.target as HTMLElement).style.color = '#94A3B8';
+                const target = e.currentTarget;
+                target.style.backgroundColor = 'transparent';
+                target.style.color = '#94A3B8';
               }}
             >
-              <span style={{ fontSize: '16px' }}>{item.icon}</span>
+              <span style={{ fontSize: '18px' }}>{item.icon}</span>
               {sidebarExpanded && <span>{item.label}</span>}
             </div>
           ))}
@@ -133,6 +132,7 @@ export default function TenantPage() {
           textDecoration: 'none',
           fontSize: '14px',
           borderTop: '1px solid #1E293B',
+          marginTop: 'auto',
           transition: 'all 0.2s ease'
         }}
         onMouseEnter={(e) => {
@@ -143,7 +143,7 @@ export default function TenantPage() {
           e.currentTarget.style.backgroundColor = 'transparent'
           e.currentTarget.style.color = '#64748B'
         }}>
-          <span style={{ fontSize: '16px' }}>←</span>
+          <span style={{ fontSize: '18px' }}>◄</span>
           {sidebarExpanded && <span>Back to Home</span>}
         </Link>
       </div>
@@ -458,12 +458,15 @@ export default function TenantPage() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#F1F5F9', margin: 0 }}>
-                {activeModal === 'inviteUser' && 'Invite New User'}
+            {activeModal === 'inviteUser' && 'Invite New User'}
                 {activeModal === 'sendInvitation' && 'Schedule Visitor'}
                 {activeModal === 'manageTemplates' && 'Manage Templates'}
                 {activeModal === 'viewReports' && 'View Reports'}
                 {activeModal === 'bulkUpload' && 'Bulk Upload Users'}
                 {activeModal === 'analytics' && 'Analytics Dashboard'}
+                {activeModal === 'users' && 'Manage Users'}
+                {activeModal === 'invitations' && 'Manage Invitations'}
+                {activeModal === 'parking' && 'Parking Management'}
               </h2>
               <button onClick={() => setActiveModal(null)} style={{
                 background: 'none',
@@ -675,6 +678,24 @@ export default function TenantPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {activeModal === 'users' && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <p style={{ color: '#64748B', fontSize: '16px' }}>User management interface coming soon...</p>
+              </div>
+            )}
+
+            {activeModal === 'invitations' && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <p style={{ color: '#64748B', fontSize: '16px' }}>Invitation management interface coming soon...</p>
+              </div>
+            )}
+
+            {activeModal === 'parking' && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <p style={{ color: '#64748B', fontSize: '16px' }}>Parking management interface coming soon...</p>
               </div>
             )}
 
