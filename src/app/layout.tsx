@@ -4,6 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "NEOX Infinity - Multi-Tenant Admin Platform",
   description: "Production-ready multi-tenant administrative web application with comprehensive role-based access control, white-labeling, and OWASP security compliance.",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
   icons: {
     icon: '/neoxfavicon.png',
     shortcut: '/neoxfavicon.png',

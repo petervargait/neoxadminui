@@ -218,3 +218,78 @@
     color: #d97706;
   }
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  /* Hide sidebar on mobile by default */
+  .mobile-sidebar-hidden {
+    transform: translateX(-100%);
+    position: fixed;
+    z-index: 50;
+  }
+
+  .mobile-sidebar-visible {
+    transform: translateX(0);
+    position: fixed;
+    z-index: 50;
+    width: 280px;
+  }
+
+  /* Mobile overlay */
+  .mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+  }
+
+  /* Mobile table wrapper */
+  .mobile-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile card layout */
+  .mobile-card-list > * {
+    margin-bottom: 1rem;
+  }
+
+  /* Stack grid columns on mobile */
+  .mobile-stack {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Reduce padding on mobile */
+  .mobile-padding {
+    padding: 1rem !important;
+  }
+
+  /* Hide elements on mobile */
+  .mobile-hidden {
+    display: none !important;
+  }
+
+  /* Full width on mobile */
+  .mobile-full-width {
+    width: 100% !important;
+  }
+
+  /* Smaller text on mobile */
+  .mobile-text-sm {
+    font-size: 0.875rem !important;
+  }
+
+  /* Mobile button */
+  .mobile-button {
+    width: 100%;
+    padding: 0.75rem;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Adjust for tablet */
+  .tablet-sidebar {
+    width: 240px;
+  }
+}
