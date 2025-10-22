@@ -208,6 +208,30 @@ export default function AdminPage() {
           ))}
         </nav>
 
+        {/* Back to Home Button */}
+        <Link href="/" style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '16px 20px',
+          color: '#64748B',
+          textDecoration: 'none',
+          fontSize: '14px',
+          borderTop: '1px solid #1E293B',
+          transition: 'all 0.2s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#1E293B'
+          e.currentTarget.style.color = '#F1F5F9'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent'
+          e.currentTarget.style.color = '#64748B'
+        }}>
+          <span style={{ fontSize: '18px' }}>◄</span>
+          {!sidebarCollapsed && <span>Back to Home</span>}
+        </Link>
+
         <button 
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           style={{
@@ -323,13 +347,6 @@ export default function AdminPage() {
             >
               Logout
             </button>
-            <Link href="/" style={{ 
-              color: '#64748B', 
-              textDecoration: 'none',
-              fontSize: '14px'
-            }}>
-              ← Back to Home
-            </Link>
           </div>
         </div>
 
