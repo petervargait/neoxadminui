@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
+import { PersonRegular } from '@fluentui/react-icons'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -160,16 +161,17 @@ export default function AdminPage() {
 
         <nav style={{ padding: '20px 0', flex: 1 }}>
           {[
-            { icon: '◈', label: 'Dashboard', action: () => setActiveSection('dashboard'), enabled: true },
-            { icon: '◎', label: 'Tenants', action: () => setActiveSection('tenantsList'), enabled: true },
-            { icon: '◦', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all' },
-            { icon: '◧', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all' },
-            { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all' },
-            { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all' },
-            { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), enabled: true },
-            { icon: '◫', label: 'Audit Logs', action: () => setActiveSection('auditLogs'), enabled: true },
-            { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), enabled: true },
-            { icon: '◦', label: 'System Settings', action: () => setActiveSection('systemSettings'), enabled: true },
+            { icon: '◈', label: 'Dashboard', action: () => setActiveSection('dashboard'), enabled: true, isFluentIcon: false },
+            { icon: '◎', label: 'Tenants', action: () => setActiveSection('tenantsList'), enabled: true, isFluentIcon: false },
+            { icon: 'person', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all', isFluentIcon: true },
+            { icon: '◧', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all', isFluentIcon: false },
+            { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all', isFluentIcon: false },
+            { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all', isFluentIcon: false },
+            { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), enabled: true, isFluentIcon: false },
+            { icon: '🎫', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: false },
+            { icon: '◫', label: 'Audit Logs', action: () => setActiveSection('auditLogs'), enabled: true, isFluentIcon: false },
+            { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), enabled: true, isFluentIcon: false },
+            { icon: '◦', label: 'System Settings', action: () => setActiveSection('systemSettings'), enabled: true, isFluentIcon: false },
           ].map((item, index) => (
             <div key={index} 
               onClick={item.enabled ? item.action : undefined}
@@ -202,7 +204,11 @@ export default function AdminPage() {
                 }
               }}
             >
-              <span style={{ fontSize: '18px' }}>{item.icon}</span>
+              {item.isFluentIcon ? (
+                <PersonRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+              ) : (
+                <span style={{ fontSize: '18px' }}>{item.icon}</span>
+              )}
               {!sidebarCollapsed && <span>{item.label}</span>}
             </div>
           ))}
@@ -284,6 +290,7 @@ export default function AdminPage() {
               {activeSection === 'bulkUpload' && 'Bulk Upload Users'}
               {activeSection === 'whiteLabel' && 'White Label Settings'}
               {activeSection === 'policies' && 'Policy Management'}
+              {activeSection === 'ticketManagement' && 'Ticket Management'}
               {activeSection === 'auditLogs' && 'System Audit Logs'}
               {activeSection === 'analytics' && 'Analytics Dashboard'}
               {activeSection === 'systemSettings' && 'System Settings'}
@@ -1152,6 +1159,204 @@ export default function AdminPage() {
                     fontSize: '16px',
                     minWidth: '200px'
                   }}>Save White Label Settings</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Ticket Management */}
+          {activeSection === 'ticketManagement' && (
+            <div>
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderBottom: '1px solid #1E293B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Support Tickets</h2>
+                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Manage support tickets from tenants</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <select style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}>
+                      <option>All Status</option>
+                      <option>Open</option>
+                      <option>In Progress</option>
+                      <option>Resolved</option>
+                      <option>Closed</option>
+                    </select>
+                    <select style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}>
+                      <option>All Priority</option>
+                      <option>Critical</option>
+                      <option>High</option>
+                      <option>Medium</option>
+                      <option>Low</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#0F1629' }}>
+                        <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ticket ID</th>
+                        <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tenant</th>
+                        <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Subject</th>
+                        <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Priority</th>
+                        <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                        <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Created</th>
+                        <th style={{ padding: '16px 24px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { id: 'TKT-1024', tenant: 'Acme Corporation', subject: 'Unable to access parking module', priority: 'High', status: 'Open', created: '2025-10-22 14:30', assignedTo: 'Support Team' },
+                        { id: 'TKT-1023', tenant: 'TechFlow Industries', subject: 'White label configuration help', priority: 'Medium', status: 'In Progress', created: '2025-10-22 10:15', assignedTo: 'John Smith' },
+                        { id: 'TKT-1022', tenant: 'Innovation Labs', subject: 'Bulk user upload failing', priority: 'Critical', status: 'Open', created: '2025-10-22 09:45', assignedTo: 'Support Team' },
+                        { id: 'TKT-1021', tenant: 'Global Solutions', subject: 'Need additional module activation', priority: 'Low', status: 'Resolved', created: '2025-10-21 16:20', assignedTo: 'Sarah Johnson' },
+                        { id: 'TKT-1020', tenant: 'Digital Dynamics', subject: 'User permissions issue', priority: 'High', status: 'In Progress', created: '2025-10-21 13:10', assignedTo: 'Mike Davis' },
+                      ].map((ticket, index) => (
+                        <tr key={index} style={{ borderBottom: '1px solid #1E293B' }}>
+                          <td style={{ padding: '16px 24px' }}>
+                            <div style={{ color: '#3B82F6', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace' }}>{ticket.id}</div>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{ticket.tenant}</div>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <div style={{ color: '#F1F5F9', fontSize: '14px', maxWidth: '300px' }}>{ticket.subject}</div>
+                            <div style={{ color: '#64748B', fontSize: '12px', marginTop: '4px' }}>Assigned to: {ticket.assignedTo}</div>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: 
+                                ticket.priority === 'Critical' ? 'rgba(239, 68, 68, 0.2)' :
+                                ticket.priority === 'High' ? 'rgba(245, 158, 11, 0.2)' :
+                                ticket.priority === 'Medium' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(100, 116, 139, 0.2)',
+                              color: 
+                                ticket.priority === 'Critical' ? '#EF4444' :
+                                ticket.priority === 'High' ? '#F59E0B' :
+                                ticket.priority === 'Medium' ? '#3B82F6' : '#64748B'
+                            }}>
+                              {ticket.priority}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: 
+                                ticket.status === 'Open' ? 'rgba(239, 68, 68, 0.1)' :
+                                ticket.status === 'In Progress' ? 'rgba(59, 130, 246, 0.1)' :
+                                ticket.status === 'Resolved' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                              color: 
+                                ticket.status === 'Open' ? '#EF4444' :
+                                ticket.status === 'In Progress' ? '#3B82F6' :
+                                ticket.status === 'Resolved' ? '#10B981' : '#64748B'
+                            }}>
+                              {ticket.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px', color: '#64748B', fontSize: '13px' }}>{ticket.created}</td>
+                          <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                            <button style={{
+                              backgroundColor: '#3B82F6',
+                              border: 'none',
+                              borderRadius: '6px',
+                              color: '#FFFFFF',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer',
+                              marginRight: '8px'
+                            }}>View</button>
+                            <button style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #1E293B',
+                              borderRadius: '6px',
+                              color: '#64748B',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer'
+                            }}>Assign</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Ticket Statistics */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '16px',
+                marginTop: '24px'
+              }}>
+                <div style={{
+                  padding: '20px',
+                  backgroundColor: '#162032',
+                  borderRadius: '12px',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>8</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Open Tickets</div>
+                </div>
+                <div style={{
+                  padding: '20px',
+                  backgroundColor: '#162032',
+                  borderRadius: '12px',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>5</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>In Progress</div>
+                </div>
+                <div style={{
+                  padding: '20px',
+                  backgroundColor: '#162032',
+                  borderRadius: '12px',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>42</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Resolved This Month</div>
+                </div>
+                <div style={{
+                  padding: '20px',
+                  backgroundColor: '#162032',
+                  borderRadius: '12px',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F59E0B', marginBottom: '8px' }}>2.4h</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Avg Response Time</div>
                 </div>
               </div>
             </div>

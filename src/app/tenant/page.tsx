@@ -228,7 +228,7 @@ export default function TenantPage() {
             </div>
 
             {/* Notifications */}
-            <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => alert('Notifications')}}>
+            <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => alert('Notifications')}>
               <div style={{
                 padding: '8px',
                 backgroundColor: '#1E293B',
