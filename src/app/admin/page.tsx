@@ -166,7 +166,7 @@ export default function AdminPage() {
             { icon: '◧', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all' },
             { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all' },
             { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all' },
-            { icon: '📋', label: 'Policies', action: () => setActiveSection('policies'), enabled: true },
+            { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), enabled: true },
             { icon: '◫', label: 'Audit Logs', action: () => setActiveSection('auditLogs'), enabled: true },
             { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), enabled: true },
             { icon: '◦', label: 'System Settings', action: () => setActiveSection('systemSettings'), enabled: true },

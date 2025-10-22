@@ -79,7 +79,7 @@ export default function TenantPage() {
             { icon: '◫', label: 'Invitations', action: () => setActiveSection('invitations') },
             { icon: '◧', label: 'Parking', action: () => setActiveSection('parking') },
             { icon: '◨', label: 'Templates', action: () => setActiveSection('templates') },
-            { icon: '📋', label: 'Policies', action: () => setActiveSection('policies') },
+            { icon: '◪', label: 'Policies', action: () => setActiveSection('policies') },
           ].map((item, index) => (
             <div key={index} 
               onClick={item.action}
