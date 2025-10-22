@@ -1250,6 +1250,161 @@ export default function TenantPage() {
               </div>
             </div>
           )}
+
+          {/* Support Section */}
+          {activeSection === 'support' && (
+            <div>
+              {/* Contact Information */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                padding: '24px',
+                marginBottom: '24px'
+              }}>
+                <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', marginBottom: '20px' }}>NEOX Support</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '24px' }}>📧</div>
+                    <div>
+                      <div style={{ color: '#64748B', fontSize: '12px', marginBottom: '4px' }}>Email Support</div>
+                      <a href="mailto:support@neox.team" style={{ color: '#60A5FA', fontSize: '14px', textDecoration: 'none' }}>support@neox.team</a>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '24px' }}>📞</div>
+                    <div>
+                      <div style={{ color: '#64748B', fontSize: '12px', marginBottom: '4px' }}>Phone Support</div>
+                      <a href="tel:+3618888888" style={{ color: '#60A5FA', fontSize: '14px', textDecoration: 'none' }}>+36 1 888 888</a>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '24px' }}>⏰</div>
+                    <div>
+                      <div style={{ color: '#64748B', fontSize: '12px', marginBottom: '4px' }}>Availability</div>
+                      <div style={{ color: '#F1F5F9', fontSize: '14px' }}>Mon-Fri, 9:00-18:00 CET</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Create New Ticket Button */}
+              <button onClick={() => setShowTicketModal(true)} style={{
+                width: '100%',
+                padding: '16px',
+                backgroundColor: '#3B82F6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                marginBottom: '24px',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}>
+                + Create New Support Ticket
+              </button>
+
+              {/* Tickets List */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>My Support Tickets</h3>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  {[
+                    { id: 'TKT-1001', subject: 'Login issue on mobile app', category: 'Technical', severity: 'High', status: 'Open', created: '2025-10-22', lastUpdate: '2 hours ago' },
+                    { id: 'TKT-0998', subject: 'Request for additional user licenses', category: 'Billing', severity: 'Medium', status: 'In Progress', created: '2025-10-20', lastUpdate: '1 day ago' },
+                    { id: 'TKT-0995', subject: 'Feature request: Dark mode', category: 'Feature Request', severity: 'Low', status: 'Resolved', created: '2025-10-18', lastUpdate: '3 days ago' },
+                  ].map((ticket) => (
+                    <div key={ticket.id} style={{
+                      padding: '16px',
+                      backgroundColor: '#1E293B',
+                      borderRadius: '8px',
+                      marginBottom: '12px',
+                      border: '1px solid #475569'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                            <span style={{ color: '#60A5FA', fontSize: '14px', fontWeight: '600' }}>{ticket.id}</span>
+                            <span style={{
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              backgroundColor: ticket.severity === 'High' ? 'rgba(239, 68, 68, 0.2)' : ticket.severity === 'Medium' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(34, 197, 94, 0.2)',
+                              color: ticket.severity === 'High' ? '#EF4444' : ticket.severity === 'Medium' ? '#F59E0B' : '#22C55E'
+                            }}>
+                              {ticket.severity}
+                            </span>
+                            <span style={{
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              backgroundColor: ticket.status === 'Open' ? 'rgba(59, 130, 246, 0.2)' : ticket.status === 'In Progress' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(34, 197, 94, 0.2)',
+                              color: ticket.status === 'Open' ? '#3B82F6' : ticket.status === 'In Progress' ? '#F59E0B' : '#22C55E'
+                            }}>
+                              {ticket.status}
+                            </span>
+                          </div>
+                          <h4 style={{ color: '#F1F5F9', margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600' }}>{ticket.subject}</h4>
+                          <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: '#64748B' }}>
+                            <span>Category: {ticket.category}</span>
+                            <span>Created: {ticket.created}</span>
+                            <span>Updated: {ticket.lastUpdate}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button onClick={() => alert(`Viewing ticket ${ticket.id}`)} style={{
+                          padding: '6px 12px',
+                          backgroundColor: '#3B82F6',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          cursor: 'pointer'
+                        }}>View</button>
+                        {ticket.status !== 'Resolved' && (
+                          <button onClick={() => alert(`Adding reply to ${ticket.id}`)} style={{
+                            padding: '6px 12px',
+                            backgroundColor: 'transparent',
+                            color: '#94A3B8',
+                            border: '1px solid #475569',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            cursor: 'pointer'
+                          }}>Reply</button>
+                        )}
+                        {ticket.status === 'Resolved' && (
+                          <button onClick={() => alert(`Reopening ticket ${ticket.id}`)} style={{
+                            padding: '6px 12px',
+                            backgroundColor: 'transparent',
+                            color: '#F59E0B',
+                            border: '1px solid #475569',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            cursor: 'pointer'
+                          }}>Reopen</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -1574,6 +1729,132 @@ export default function TenantPage() {
                   fontSize: '14px'
                 }}>Assign Space</button>
                 <button type="button" onClick={() => { setShowParkingModal(false); setSelectedParkingSpace(null); }} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Create Ticket Modal */}
+      {showTicketModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => setShowTicketModal(false)}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '90%',
+            border: '1px solid #1E293B',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
+              Create Support Ticket
+            </h2>
+            <form onSubmit={(e) => { 
+              e.preventDefault(); 
+              alert('Support ticket created successfully!');
+              setShowTicketModal(false);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Subject *</label>
+                <input type="text" placeholder="Brief description of the issue" required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px'
+                }} />
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Category *</label>
+                <select required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}>
+                  <option value="">Select category...</option>
+                  <option value="technical">Technical Issue</option>
+                  <option value="billing">Billing & Licensing</option>
+                  <option value="feature">Feature Request</option>
+                  <option value="account">Account Management</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Severity *</label>
+                <select required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}>
+                  <option value="">Select severity...</option>
+                  <option value="low">Low - Minor issue, no immediate impact</option>
+                  <option value="medium">Medium - Moderate impact on operations</option>
+                  <option value="high">High - Significant impact, needs urgent attention</option>
+                  <option value="critical">Critical - System down or data loss</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Description *</label>
+                <textarea placeholder="Please provide detailed information about your issue..." required style={{
+                  width: '100%',
+                  minHeight: '150px',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px',
+                  resize: 'vertical'
+                }} />
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Create Ticket</button>
+                <button type="button" onClick={() => setShowTicketModal(false)} style={{
                   flex: 1,
                   backgroundColor: 'transparent',
                   color: '#F1F5F9',
