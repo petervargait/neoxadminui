@@ -34,6 +34,9 @@ export default function TenantPage() {
   const [editingTemplate, setEditingTemplate] = useState<{name: string; subject?: string; status?: string} | null>(null)
   const [showParkingModal, setShowParkingModal] = useState(false)
   const [selectedParkingSpace, setSelectedParkingSpace] = useState<number | null>(null)
+  const [showTicketModal, setShowTicketModal] = useState(false)
+  const [systemOnline, setSystemOnline] = useState(true)
+  const [notificationCount, setNotificationCount] = useState(3)
 
   if (!isAuthenticated) {
     return null
@@ -82,6 +85,7 @@ export default function TenantPage() {
             { icon: '◧', label: 'Parking', action: () => setActiveSection('parking') },
             { icon: '◨', label: 'Templates', action: () => setActiveSection('templates') },
             { icon: '◪', label: 'Policies', action: () => setActiveSection('policies') },
+            { icon: '◭', label: 'Support', action: () => setActiveSection('support') },
           ].map((item, index) => (
             <div key={index} 
               onClick={item.action}
@@ -189,6 +193,7 @@ export default function TenantPage() {
               {activeSection === 'parking' && 'Parking Management'}
               {activeSection === 'templates' && 'Template Management'}
               {activeSection === 'policies' && 'Company Policies'}
+              {activeSection === 'support' && 'Support & Help'}
               {!activeSection && 'Tenant Admin Dashboard'}
             </h1>
             <p style={{ 
@@ -200,6 +205,62 @@ export default function TenantPage() {
             </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* System Status Indicator */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 12px',
+              backgroundColor: '#1E293B',
+              borderRadius: '8px',
+              border: '1px solid #334155'
+            }}>
+              <div style={{
+                width: '10px',
+                height: '10px',
+                borderRadius: '50%',
+                backgroundColor: systemOnline ? '#22C55E' : '#EF4444',
+                boxShadow: systemOnline ? '0 0 10px rgba(34, 197, 94, 0.6)' : '0 0 10px rgba(239, 68, 68, 0.6)'
+              }} />
+              <span style={{ color: '#F1F5F9', fontSize: '12px', fontWeight: '500' }}>
+                {systemOnline ? 'Online' : 'Offline'}
+              </span>
+            </div>
+
+            {/* Notifications */}
+            <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => alert('Notifications')}}>
+              <div style={{
+                padding: '8px',
+                backgroundColor: '#1E293B',
+                borderRadius: '8px',
+                border: '1px solid #334155',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <span style={{ fontSize: '18px' }}>🔔</span>
+              </div>
+              {notificationCount > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '-4px',
+                  right: '-4px',
+                  backgroundColor: '#EF4444',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '18px',
+                  height: '18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '10px',
+                  fontWeight: '600'
+                }}>
+                  {notificationCount}
+                </div>
+              )}
+            </div>
+
             <div style={{
               display: 'flex',
               alignItems: 'center',
