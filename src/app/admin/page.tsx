@@ -69,15 +69,20 @@ export default function AdminPage() {
         flexDirection: 'column'
       }}>
         {/* Logo */}
-        <div style={{
+        <Link href="/" style={{
           padding: '24px 20px',
           borderBottom: '1px solid #1E293B',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
-        }}>
+          justifyContent: 'center',
+          cursor: 'pointer',
+          textDecoration: 'none',
+          transition: 'opacity 0.2s'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
           <NeoxLogo width="128px" height="128px" />
-        </div>
+        </Link>
 
         {/* Tenant Selector */}
         {!sidebarCollapsed && (
