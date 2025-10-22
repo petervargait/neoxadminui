@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { PersonRegular } from '@fluentui/react-icons'
+import { PersonRegular, AlertRegular, StatusRegular } from '@fluentui/react-icons'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -161,17 +161,19 @@ export default function AdminPage() {
 
         <nav style={{ padding: '20px 0', flex: 1 }}>
           {[
-            { icon: '◈', label: 'Dashboard', action: () => setActiveSection('dashboard'), enabled: true, isFluentIcon: false },
-            { icon: '◎', label: 'Tenants', action: () => setActiveSection('tenantsList'), enabled: true, isFluentIcon: false },
-            { icon: 'person', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all', isFluentIcon: true },
-            { icon: '◧', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all', isFluentIcon: false },
-            { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all', isFluentIcon: false },
-            { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all', isFluentIcon: false },
-            { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), enabled: true, isFluentIcon: false },
-            { icon: '🎫', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: false },
-            { icon: '◫', label: 'Audit Logs', action: () => setActiveSection('auditLogs'), enabled: true, isFluentIcon: false },
-            { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), enabled: true, isFluentIcon: false },
-            { icon: '◦', label: 'System Settings', action: () => setActiveSection('systemSettings'), enabled: true, isFluentIcon: false },
+            { icon: '◈', label: 'Dashboard', action: () => setActiveSection('dashboard'), enabled: true, isFluentIcon: false, iconType: null },
+            { icon: '◎', label: 'Tenants', action: () => setActiveSection('tenantsList'), enabled: true, isFluentIcon: false, iconType: null },
+            { icon: 'person', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'person' },
+            { icon: '◧', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), enabled: true, isFluentIcon: false, iconType: null },
+            { icon: '🎫', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: false, iconType: null },
+            { icon: 'alert', label: 'Notifications', action: () => setActiveSection('notifications'), enabled: true, isFluentIcon: true, iconType: 'alert' },
+            { icon: 'status', label: 'System Status', action: () => setActiveSection('systemStatus'), enabled: true, isFluentIcon: true, iconType: 'status' },
+            { icon: '◫', label: 'Audit Logs', action: () => setActiveSection('auditLogs'), enabled: true, isFluentIcon: false, iconType: null },
+            { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), enabled: true, isFluentIcon: false, iconType: null },
+            { icon: '◦', label: 'System Settings', action: () => setActiveSection('systemSettings'), enabled: true, isFluentIcon: false, iconType: null },
           ].map((item, index) => (
             <div key={index} 
               onClick={item.enabled ? item.action : undefined}
@@ -205,7 +207,15 @@ export default function AdminPage() {
               }}
             >
               {item.isFluentIcon ? (
-                <PersonRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                item.iconType === 'person' ? (
+                  <PersonRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'alert' ? (
+                  <AlertRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'status' ? (
+                  <StatusRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : (
+                  <span style={{ fontSize: '18px' }}>{item.icon}</span>
+                )
               ) : (
                 <span style={{ fontSize: '18px' }}>{item.icon}</span>
               )}
@@ -291,6 +301,8 @@ export default function AdminPage() {
               {activeSection === 'whiteLabel' && 'White Label Settings'}
               {activeSection === 'policies' && 'Policy Management'}
               {activeSection === 'ticketManagement' && 'Ticket Management'}
+              {activeSection === 'notifications' && 'Notifications'}
+              {activeSection === 'systemStatus' && 'System Status'}
               {activeSection === 'auditLogs' && 'System Audit Logs'}
               {activeSection === 'analytics' && 'Analytics Dashboard'}
               {activeSection === 'systemSettings' && 'System Settings'}
@@ -1357,6 +1369,240 @@ export default function AdminPage() {
                 }}>
                   <div style={{ fontSize: '32px', fontWeight: '700', color: '#F59E0B', marginBottom: '8px' }}>2.4h</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Avg Response Time</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Notifications */}
+          {activeSection === 'notifications' && (
+            <div>
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderBottom: '1px solid #1E293B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>System Notifications</h2>
+                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Important system alerts and updates</p>
+                  </div>
+                  <button style={{
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>Mark All Read</button>
+                </div>
+
+                <div style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {[
+                      { id: 1, type: 'Critical', title: 'System Maintenance Scheduled', message: 'Planned maintenance window on Oct 25, 2025 from 2:00 AM - 4:00 AM UTC', time: '2 hours ago', unread: true },
+                      { id: 2, type: 'Warning', title: 'High CPU Usage Detected', message: 'Server load has exceeded 85% for the past 30 minutes', time: '5 hours ago', unread: true },
+                      { id: 3, type: 'Info', title: 'New Feature Released', message: 'Enhanced reporting module is now available for all tenants', time: '1 day ago', unread: false },
+                      { id: 4, type: 'Success', title: 'Backup Completed Successfully', message: 'Daily system backup completed without errors', time: '1 day ago', unread: false },
+                      { id: 5, type: 'Warning', title: 'SSL Certificate Expiring Soon', message: 'Your SSL certificate will expire in 30 days. Please renew.', time: '2 days ago', unread: false },
+                      { id: 6, type: 'Info', title: 'Security Update Available', message: 'A new security patch is available for installation', time: '3 days ago', unread: false },
+                    ].map((notification) => (
+                      <div key={notification.id} style={{
+                        padding: '16px',
+                        backgroundColor: notification.unread ? 'rgba(59, 130, 246, 0.05)' : '#1E293B',
+                        borderRadius: '8px',
+                        border: `1px solid ${notification.unread ? 'rgba(59, 130, 246, 0.2)' : '#1E293B'}`,
+                        display: 'flex',
+                        gap: '16px'
+                      }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '8px',
+                          backgroundColor: 
+                            notification.type === 'Critical' ? 'rgba(239, 68, 68, 0.2)' :
+                            notification.type === 'Warning' ? 'rgba(245, 158, 11, 0.2)' :
+                            notification.type === 'Success' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '20px',
+                          flexShrink: 0
+                        }}>
+                          {notification.type === 'Critical' ? '🚨' : 
+                           notification.type === 'Warning' ? '⚠️' : 
+                           notification.type === 'Success' ? '✅' : 'ℹ️'}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
+                            <h3 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', margin: 0 }}>
+                              {notification.title}
+                              {notification.unread && (
+                                <span style={{
+                                  marginLeft: '8px',
+                                  width: '8px',
+                                  height: '8px',
+                                  backgroundColor: '#3B82F6',
+                                  borderRadius: '50%',
+                                  display: 'inline-block'
+                                }}></span>
+                              )}
+                            </h3>
+                            <span style={{ color: '#64748B', fontSize: '12px', whiteSpace: 'nowrap' }}>{notification.time}</span>
+                          </div>
+                          <p style={{ color: '#94A3B8', fontSize: '14px', margin: '0 0 12px 0' }}>{notification.message}</p>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #334155',
+                              borderRadius: '6px',
+                              color: '#94A3B8',
+                              fontSize: '12px',
+                              padding: '4px 12px',
+                              cursor: 'pointer'
+                            }}>View Details</button>
+                            {notification.unread && (
+                              <button style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #334155',
+                                borderRadius: '6px',
+                                color: '#3B82F6',
+                                fontSize: '12px',
+                                padding: '4px 12px',
+                                cursor: 'pointer'
+                              }}>Mark as Read</button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* System Status */}
+          {activeSection === 'systemStatus' && (
+            <div>
+              {/* Overall Status */}
+              <div style={{
+                padding: '24px',
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                marginBottom: '24px',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 16px auto',
+                  boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)'
+                }}>
+                  <span style={{ fontSize: '32px' }}>✓</span>
+                </div>
+                <h2 style={{ color: '#10B981', fontSize: '28px', fontWeight: '700', margin: '0 0 8px 0' }}>All Systems Operational</h2>
+                <p style={{ color: '#64748B', fontSize: '14px', margin: 0 }}>Last checked: Just now</p>
+              </div>
+
+              {/* Service Status Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: '16px',
+                marginBottom: '24px'
+              }}>
+                {[
+                  { name: 'API Gateway', status: 'Operational', uptime: '99.99%', responseTime: '45ms' },
+                  { name: 'Database', status: 'Operational', uptime: '99.98%', responseTime: '12ms' },
+                  { name: 'Authentication Service', status: 'Operational', uptime: '100%', responseTime: '23ms' },
+                  { name: 'File Storage', status: 'Operational', uptime: '99.97%', responseTime: '89ms' },
+                  { name: 'Email Service', status: 'Operational', uptime: '99.95%', responseTime: '156ms' },
+                  { name: 'Notification System', status: 'Operational', uptime: '99.99%', responseTime: '34ms' },
+                ].map((service, index) => (
+                  <div key={index} style={{
+                    padding: '20px',
+                    backgroundColor: '#162032',
+                    borderRadius: '12px',
+                    border: '1px solid #1E293B'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <h3 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', margin: 0 }}>{service.name}</h3>
+                      <span style={{
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        color: '#10B981'
+                      }}>{service.status}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ color: '#64748B', fontSize: '13px' }}>Uptime</span>
+                      <span style={{ color: '#F1F5F9', fontSize: '13px', fontWeight: '500' }}>{service.uptime}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#64748B', fontSize: '13px' }}>Response Time</span>
+                      <span style={{ color: '#F1F5F9', fontSize: '13px', fontWeight: '500' }}>{service.responseTime}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Recent Incidents */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Recent Incidents</h3>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  {[
+                    { date: 'Oct 20, 2025', title: 'Database Connection Issue', status: 'Resolved', duration: '15 minutes', severity: 'Minor' },
+                    { date: 'Oct 18, 2025', title: 'API Rate Limiting', status: 'Resolved', duration: '45 minutes', severity: 'Moderate' },
+                    { date: 'Oct 15, 2025', title: 'Scheduled Maintenance', status: 'Completed', duration: '2 hours', severity: 'Planned' },
+                  ].map((incident, index) => (
+                    <div key={index} style={{
+                      padding: '16px',
+                      backgroundColor: '#1E293B',
+                      borderRadius: '8px',
+                      marginBottom: index < 2 ? '12px' : 0
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
+                        <div>
+                          <h4 style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '600', margin: '0 0 4px 0' }}>{incident.title}</h4>
+                          <p style={{ color: '#64748B', fontSize: '13px', margin: 0 }}>{incident.date} • Duration: {incident.duration}</p>
+                        </div>
+                        <span style={{
+                          padding: '4px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                          color: '#10B981',
+                          whiteSpace: 'nowrap'
+                        }}>{incident.status}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

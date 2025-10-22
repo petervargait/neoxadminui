@@ -105,7 +105,7 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 32px', position: 'relative' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '80px 32px 40px 32px', position: 'relative' }}>
         {/* Background Design Element */}
         <div style={{
           position: 'absolute',
@@ -121,8 +121,8 @@ export default function Home() {
         }} />
         <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           {/* Hero Section */}
-          <div style={{ marginBottom: '48px' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}>
+          <div style={{ marginBottom: '32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
               <NeoxLogo width="960px" height="256px" />
             </div>
             <h1 style={{
