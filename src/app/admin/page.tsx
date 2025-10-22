@@ -162,7 +162,7 @@ export default function AdminPage() {
           {[
             { icon: '◈', label: 'Dashboard', action: () => setActiveSection('dashboard'), enabled: true },
             { icon: '◎', label: 'Tenants', action: () => setActiveSection('tenantsList'), enabled: true },
-            { icon: '👥', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all' },
+            { icon: '◦', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all' },
             { icon: '◧', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all' },
             { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all' },
             { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all' },

@@ -49,7 +49,7 @@ export default function Home() {
         padding: '0 32px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <NeoxLogo width="480px" height="128px" />
+          {/* Logo moved to center hero section */}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div style={{
@@ -122,6 +122,9 @@ export default function Home() {
         <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           {/* Hero Section */}
           <div style={{ marginBottom: '48px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}>
+              <NeoxLogo width="960px" height="256px" />
+            </div>
             <h1 style={{
               fontSize: '36px',
               fontWeight: '700',
