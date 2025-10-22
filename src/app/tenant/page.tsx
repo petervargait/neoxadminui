@@ -276,13 +276,13 @@ export default function TenantPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(71, 85, 105, 0.5)',
+                      backgroundColor: 'rgba(215, 187, 145, 0.2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '24px',
-                      color: '#94A3B8',
-                      boxShadow: '0 0 15px rgba(71, 85, 105, 0.4), 0 0 30px rgba(71, 85, 105, 0.2)'
+                      color: '#D7BB91',
+                      boxShadow: '0 0 15px rgba(215, 187, 145, 0.4), 0 0 30px rgba(215, 187, 145, 0.2)'
                     }}>◎</div>
                     <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>147</div>
                   </div>
@@ -302,13 +302,13 @@ export default function TenantPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(100, 116, 139, 0.5)',
+                      backgroundColor: 'rgba(203, 213, 225, 0.2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '24px',
-                      color: '#94A3B8',
-                      boxShadow: '0 0 15px rgba(100, 116, 139, 0.4), 0 0 30px rgba(100, 116, 139, 0.2)'
+                      color: '#CBD5E1',
+                      boxShadow: '0 0 15px rgba(203, 213, 225, 0.4), 0 0 30px rgba(203, 213, 225, 0.2)'
                     }}>◫</div>
                     <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>23</div>
                   </div>
@@ -328,13 +328,13 @@ export default function TenantPage() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(71, 85, 105, 0.5)',
+                      backgroundColor: 'rgba(96, 165, 250, 0.2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '24px',
-                      color: '#94A3B8',
-                      boxShadow: '0 0 15px rgba(71, 85, 105, 0.4), 0 0 30px rgba(71, 85, 105, 0.2)'
+                      color: '#60A5FA',
+                      boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 30px rgba(96, 165, 250, 0.2)'
                     }}>◧</div>
                     <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>12/50</div>
                   </div>
