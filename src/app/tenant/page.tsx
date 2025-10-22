@@ -437,7 +437,10 @@ export default function TenantPage() {
                 alignItems: 'center',
                 justifyContent: 'space-between'
               }}>
-                <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>User Management</h2>
+                <div>
+                  <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>User Management</h2>
+                  <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Manage organization users and permissions</p>
+                </div>
                 <button style={{
                   backgroundColor: '#3B82F6',
                   color: 'white',
@@ -453,55 +456,539 @@ export default function TenantPage() {
               </div>
               
               <div style={{ padding: '24px' }}>
-                <p style={{ color: '#64748B', fontSize: '16px', textAlign: 'center', padding: '40px' }}>
-                  User management interface with table, filters, and CRUD operations coming soon...
-                </p>
+                <div style={{ marginBottom: '20px', display: 'flex', gap: '12px' }}>
+                  <input type="search" placeholder="Search users..." style={{
+                    flex: 1,
+                    padding: '10px 16px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} />
+                  <select style={{
+                    padding: '10px 16px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}>
+                    <option>All Roles</option>
+                    <option>Admin</option>
+                    <option>Manager</option>
+                    <option>User</option>
+                  </select>
+                </div>
+
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#0F1629' }}>
+                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Name</th>
+                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Email</th>
+                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Role</th>
+                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Department</th>
+                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Status</th>
+                        <th style={{ padding: '12px 16px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { name: 'John Smith', email: 'john.smith@company.com', role: 'Admin', department: 'IT', status: 'Active' },
+                        { name: 'Sarah Johnson', email: 'sarah.j@company.com', role: 'Manager', department: 'HR', status: 'Active' },
+                        { name: 'Mike Davis', email: 'mike.davis@company.com', role: 'User', department: 'Sales', status: 'Active' },
+                        { name: 'Lisa Wilson', email: 'lisa.w@company.com', role: 'User', department: 'Marketing', status: 'Inactive' },
+                        { name: 'Tom Brown', email: 'tom.brown@company.com', role: 'Manager', department: 'Operations', status: 'Active' },
+                      ].map((user, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #1E293B' }}>
+                          <td style={{ padding: '16px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{user.name}</td>
+                          <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.email}</td>
+                          <td style={{ padding: '16px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: user.role === 'Admin' ? 'rgba(239, 68, 68, 0.1)' : user.role === 'Manager' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                              color: user.role === 'Admin' ? '#EF4444' : user.role === 'Manager' ? '#F59E0B' : '#3B82F6'
+                            }}>
+                              {user.role}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.department}</td>
+                          <td style={{ padding: '16px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: user.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                              color: user.status === 'Active' ? '#10B981' : '#64748B'
+                            }}>
+                              {user.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px', textAlign: 'right' }}>
+                            <button style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #1E293B',
+                              borderRadius: '6px',
+                              color: '#3B82F6',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer',
+                              marginRight: '8px'
+                            }}>Edit</button>
+                            <button style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #1E293B',
+                              borderRadius: '6px',
+                              color: '#EF4444',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer'
+                            }}>Delete</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
 
           {/* Invitation Management Section */}
           {activeSection === 'invitations' && (
-            <div style={{
-              backgroundColor: '#162032',
-              borderRadius: '12px',
-              border: '1px solid #1E293B',
-              padding: '24px'
-            }}>
-              <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', marginBottom: '20px' }}>Invitation Management</h2>
-              <p style={{ color: '#64748B', fontSize: '16px', textAlign: 'center', padding: '40px' }}>
-                Invitation management interface with forms and tracking coming soon...
-              </p>
+            <div>
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                padding: '24px',
+                marginBottom: '24px'
+              }}>
+                <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', marginBottom: '20px' }}>Send New Invitation</h2>
+                <form style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Name *</label>
+                    <input type="text" placeholder="Full name" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email *</label>
+                    <input type="email" placeholder="visitor@email.com" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Date *</label>
+                    <input type="date" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Time *</label>
+                    <input type="time" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Purpose of Visit</label>
+                    <textarea placeholder="Enter purpose of visit" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      minHeight: '80px',
+                      resize: 'vertical'
+                    }} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <button type="submit" style={{
+                      backgroundColor: '#3B82F6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '12px 24px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      fontSize: '14px'
+                    }}>Send Invitation</button>
+                  </div>
+                </form>
+              </div>
+
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Active Invitations</h3>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  {[
+                    { visitor: 'Alice Cooper', email: 'alice@email.com', date: '2025-10-25', time: '10:00 AM', status: 'Pending', purpose: 'Business Meeting' },
+                    { visitor: 'Bob Martin', email: 'bob@email.com', date: '2025-10-24', time: '2:00 PM', status: 'Confirmed', purpose: 'Interview' },
+                    { visitor: 'Carol White', email: 'carol@email.com', date: '2025-10-23', time: '11:30 AM', status: 'Declined', purpose: 'Consultation' },
+                    { visitor: 'David Lee', email: 'david@email.com', date: '2025-10-26', time: '3:00 PM', status: 'Pending', purpose: 'Product Demo' },
+                  ].map((inv, idx) => (
+                    <div key={idx} style={{
+                      padding: '16px',
+                      backgroundColor: '#1E293B',
+                      borderRadius: '8px',
+                      marginBottom: '12px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '16px', fontWeight: '600' }}>{inv.visitor}</h4>
+                        <p style={{ color: '#94A3B8', margin: '0 0 4px 0', fontSize: '13px' }}>{inv.email}</p>
+                        <p style={{ color: '#64748B', margin: 0, fontSize: '13px' }}>{inv.date} at {inv.time} • {inv.purpose}</p>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{
+                          padding: '6px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          backgroundColor: inv.status === 'Confirmed' ? 'rgba(16, 185, 129, 0.1)' : inv.status === 'Declined' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                          color: inv.status === 'Confirmed' ? '#10B981' : inv.status === 'Declined' ? '#EF4444' : '#F59E0B'
+                        }}>
+                          {inv.status}
+                        </span>
+                        <button style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid #475569',
+                          borderRadius: '6px',
+                          color: '#3B82F6',
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          cursor: 'pointer'
+                        }}>View</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
           {/* Parking Management Section */}
           {activeSection === 'parking' && (
-            <div style={{
-              backgroundColor: '#162032',
-              borderRadius: '12px',
-              border: '1px solid #1E293B',
-              padding: '24px'
-            }}>
-              <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', marginBottom: '20px' }}>Parking Management</h2>
-              <p style={{ color: '#64748B', fontSize: '16px', textAlign: 'center', padding: '40px' }}>
-                Parking space management interface with allocation and scheduling coming soon...
-              </p>
+            <div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '24px' }}>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Spaces</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F1F5F9' }}>50</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Occupied</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>12</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Available</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>38</div>
+                </div>
+              </div>
+
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Parking Spaces</h3>
+                  <button style={{
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>Assign Space</button>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
+                    {Array.from({ length: 50 }, (_, i) => {
+                      const occupied = [2, 5, 8, 12, 15, 18, 23, 27, 31, 38, 42, 47].includes(i + 1);
+                      return (
+                        <div key={i} style={{
+                          padding: '20px',
+                          backgroundColor: occupied ? '#1E293B' : '#0F1629',
+                          border: `2px solid ${occupied ? '#EF4444' : '#10B981'}`,
+                          borderRadius: '8px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)';
+                        }}>
+                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: occupied ? '#EF4444' : '#10B981', marginBottom: '4px' }}>{i + 1}</div>
+                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{occupied ? 'Occupied' : 'Available'}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden',
+                marginTop: '24px'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Current Assignments</h3>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  {[
+                    { space: 'A-02', user: 'John Smith', vehicle: 'Tesla Model 3', plate: 'ABC-1234', from: '2025-10-22', to: '2025-10-25' },
+                    { space: 'A-05', user: 'Sarah Johnson', vehicle: 'BMW X5', plate: 'XYZ-5678', from: '2025-10-21', to: '2025-10-24' },
+                    { space: 'B-08', user: 'Mike Davis', vehicle: 'Audi A4', plate: 'DEF-9012', from: '2025-10-22', to: '2025-10-26' },
+                    { space: 'B-12', user: 'Lisa Wilson', vehicle: 'Honda Civic', plate: 'GHI-3456', from: '2025-10-20', to: '2025-10-23' },
+                  ].map((assignment, idx) => (
+                    <div key={idx} style={{
+                      padding: '16px',
+                      backgroundColor: '#1E293B',
+                      borderRadius: '8px',
+                      marginBottom: '12px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          backgroundColor: '#0F1629',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          color: '#3B82F6'
+                        }}>{assignment.space}</div>
+                        <div>
+                          <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600' }}>{assignment.user}</h4>
+                          <p style={{ color: '#94A3B8', margin: '0 0 2px 0', fontSize: '13px' }}>{assignment.vehicle} • {assignment.plate}</p>
+                          <p style={{ color: '#64748B', margin: 0, fontSize: '12px' }}>{assignment.from} to {assignment.to}</p>
+                        </div>
+                      </div>
+                      <button style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid #475569',
+                        borderRadius: '6px',
+                        color: '#EF4444',
+                        fontSize: '12px',
+                        padding: '6px 12px',
+                        cursor: 'pointer'
+                      }}>Release</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
           {/* Template Management Section */}
           {activeSection === 'templates' && (
-            <div style={{
-              backgroundColor: '#162032',
-              borderRadius: '12px',
-              border: '1px solid #1E293B',
-              padding: '24px'
-            }}>
-              <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', marginBottom: '20px' }}>Template Management</h2>
-              <p style={{ color: '#64748B', fontSize: '16px', textAlign: 'center', padding: '40px' }}>
-                Email and document template management interface coming soon...
-              </p>
+            <div>
+              {/* Email Templates */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                padding: '24px',
+                marginBottom: '24px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Email Templates</h2>
+                  <button style={{
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>+ New Template</button>
+                </div>
+                <div style={{ display: 'grid', gap: '16px' }}>
+                  {[
+                    { name: 'Visitor Invitation', subject: 'You\'re invited to visit {{company_name}}', lastModified: '2025-10-20', status: 'Active' },
+                    { name: 'Welcome Email', subject: 'Welcome to {{company_name}}', lastModified: '2025-10-18', status: 'Active' },
+                    { name: 'Parking Confirmation', subject: 'Parking Space Reserved - {{space_number}}', lastModified: '2025-10-15', status: 'Active' },
+                    { name: 'Visit Reminder', subject: 'Reminder: Your visit to {{company_name}} tomorrow', lastModified: '2025-10-12', status: 'Draft' },
+                  ].map((template, idx) => (
+                    <div key={idx} style={{
+                      padding: '16px',
+                      backgroundColor: '#1E293B',
+                      borderRadius: '8px',
+                      border: '1px solid #475569',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '16px', fontWeight: '600' }}>{template.name}</h4>
+                        <p style={{ color: '#94A3B8', margin: '0 0 4px 0', fontSize: '13px' }}>{template.subject}</p>
+                        <p style={{ color: '#64748B', margin: 0, fontSize: '12px' }}>Last modified: {template.lastModified}</p>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{
+                          padding: '4px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          backgroundColor: template.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                          color: template.status === 'Active' ? '#10B981' : '#F59E0B'
+                        }}>
+                          {template.status}
+                        </span>
+                        <button style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid #475569',
+                          borderRadius: '6px',
+                          color: '#3B82F6',
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          cursor: 'pointer',
+                          marginRight: '4px'
+                        }}>Edit</button>
+                        <button style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid #475569',
+                          borderRadius: '6px',
+                          color: '#64748B',
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          cursor: 'pointer'
+                        }}>Preview</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Application/Form Templates */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                padding: '24px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Application Templates</h2>
+                  <button style={{
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>+ New Template</button>
+                </div>
+                <div style={{ display: 'grid', gap: '16px' }}>
+                  {[
+                    { name: 'Visitor Registration Form', fields: 8, submissions: 145, lastModified: '2025-10-19' },
+                    { name: 'Parking Request Form', fields: 6, submissions: 89, lastModified: '2025-10-17' },
+                    { name: 'Access Request Form', fields: 10, submissions: 234, lastModified: '2025-10-14' },
+                    { name: 'Meeting Room Booking', fields: 7, submissions: 156, lastModified: '2025-10-10' },
+                  ].map((template, idx) => (
+                    <div key={idx} style={{
+                      padding: '16px',
+                      backgroundColor: '#1E293B',
+                      borderRadius: '8px',
+                      border: '1px solid #475569',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '16px', fontWeight: '600' }}>{template.name}</h4>
+                        <p style={{ color: '#94A3B8', margin: '0 0 4px 0', fontSize: '13px' }}>{template.fields} fields • {template.submissions} submissions</p>
+                        <p style={{ color: '#64748B', margin: 0, fontSize: '12px' }}>Last modified: {template.lastModified}</p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid #475569',
+                          borderRadius: '6px',
+                          color: '#3B82F6',
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          cursor: 'pointer'
+                        }}>Edit</button>
+                        <button style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid #475569',
+                          borderRadius: '6px',
+                          color: '#64748B',
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          cursor: 'pointer'
+                        }}>Preview</button>
+                        <button style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid #475569',
+                          borderRadius: '6px',
+                          color: '#10B981',
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          cursor: 'pointer'
+                        }}>Export</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
