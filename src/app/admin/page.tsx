@@ -6,6 +6,7 @@ import { useState } from 'react'
 export default function AdminPage() {
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [selectedTenant, setSelectedTenant] = useState<string>('all')
 
   const handleCreateTenant = () => {
     setActiveSection('createTenant')
@@ -81,13 +82,42 @@ export default function AdminPage() {
           )}
         </div>
 
+        {/* Tenant Selector */}
+        {!sidebarCollapsed && (
+          <div style={{ padding: '20px 20px 10px 20px', borderBottom: '1px solid #1E293B' }}>
+            <label style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>Select Tenant</label>
+            <select 
+              value={selectedTenant}
+              onChange={(e) => setSelectedTenant(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                backgroundColor: '#0B1426',
+                border: '1px solid #1E293B',
+                borderRadius: '6px',
+                color: '#F1F5F9',
+                fontSize: '14px',
+                cursor: 'pointer',
+                outline: 'none'
+              }}
+            >
+              <option value="all">All Tenants</option>
+              <option value="acme">Acme Corporation</option>
+              <option value="techflow">TechFlow Industries</option>
+              <option value="global">Global Solutions Ltd</option>
+              <option value="innovation">Innovation Labs</option>
+              <option value="digital">Digital Dynamics</option>
+            </select>
+          </div>
+        )}
+
         {/* Navigation */}
         <nav style={{ padding: '20px 0', flex: 1 }}>
           {[
             { icon: '👥', label: 'Tenants', action: () => setActiveSection('tenantsList') },
             { icon: '🏢', label: 'Organizations', action: () => setActiveSection('organizations') },
             { icon: '⚙️', label: 'System Settings', action: handleSystemSettings },
-            { icon: '📊', label: 'Analytics', action: () => setActiveSection('analytics') },
+            { icon: '📈', label: 'Analytics', action: () => setActiveSection('analytics') },
             { icon: '🔧', label: 'Modules', action: handleManageModules },
             { icon: '📁', label: 'Audit Logs', action: handleViewAuditLogs },
             { icon: '📤', label: 'Bulk Upload', action: handleBulkUpload },
@@ -429,6 +459,7 @@ export default function AdminPage() {
                 {activeSection === 'systemSettings' && 'System Settings'}
                 {activeSection === 'bulkUpload' && 'Bulk Upload Users'}
                 {activeSection === 'whiteLabel' && 'White Label Settings'}
+                {activeSection === 'analytics' && 'Analytics Dashboard'}
               </h2>
               <button onClick={closeSection} style={{
                 background: 'none',
@@ -979,6 +1010,50 @@ export default function AdminPage() {
                       minWidth: '200px'
                     }}>Save White Label Settings</button>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'analytics' && (
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '24px' }}>
+                  <div style={{ padding: '20px', backgroundColor: 'rgba(51, 78, 104, 0.3)', borderRadius: '12px', border: '1px solid rgba(75, 101, 129, 0.3)' }}>
+                    <h4 style={{ color: '#d7bb91', fontSize: '14px', margin: '0 0 8px 0', opacity: 0.8 }}>Total Tenants</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>847</div>
+                    <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 12.5% from last month</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: 'rgba(51, 78, 104, 0.3)', borderRadius: '12px', border: '1px solid rgba(75, 101, 129, 0.3)' }}>
+                    <h4 style={{ color: '#d7bb91', fontSize: '14px', margin: '0 0 8px 0', opacity: 0.8 }}>Active Users</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#3B82F6', marginBottom: '8px' }}>12,543</div>
+                    <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 8.2% from last month</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: 'rgba(51, 78, 104, 0.3)', borderRadius: '12px', border: '1px solid rgba(75, 101, 129, 0.3)' }}>
+                    <h4 style={{ color: '#d7bb91', fontSize: '14px', margin: '0 0 8px 0', opacity: 0.8 }}>Total Invitations</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B', marginBottom: '8px' }}>2,186</div>
+                    <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 15.7% from last month</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: 'rgba(51, 78, 104, 0.3)', borderRadius: '12px', border: '1px solid rgba(75, 101, 129, 0.3)' }}>
+                    <h4 style={{ color: '#d7bb91', fontSize: '14px', margin: '0 0 8px 0', opacity: 0.8 }}>System Uptime</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>99.9%</div>
+                    <div style={{ fontSize: '12px', color: '#64748B' }}>Last 30 days</div>
+                  </div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: 'rgba(51, 78, 104, 0.2)', borderRadius: '12px', border: '1px solid rgba(75, 101, 129, 0.3)' }}>
+                  <h4 style={{ color: '#d7bb91', fontSize: '16px', margin: '0 0 16px 0' }}>Top Performing Tenants</h4>
+                  {[
+                    { name: 'Acme Corporation', users: 245, growth: '+12%' },
+                    { name: 'TechFlow Industries', users: 228, growth: '+18%' },
+                    { name: 'Innovation Labs', users: 187, growth: '+9%' },
+                    { name: 'Digital Dynamics', users: 156, growth: '+23%' },
+                  ].map((tenant, idx) => (
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: idx < 3 ? '1px solid rgba(75, 101, 129, 0.2)' : 'none' }}>
+                      <span style={{ color: '#d7bb91', fontSize: '14px' }}>{tenant.name}</span>
+                      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                        <span style={{ color: '#64748B', fontSize: '14px' }}>{tenant.users} users</span>
+                        <span style={{ color: '#10B981', fontSize: '14px', fontWeight: '600' }}>{tenant.growth}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

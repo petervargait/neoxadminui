@@ -463,6 +463,7 @@ export default function TenantPage() {
                 {activeModal === 'manageTemplates' && 'Manage Templates'}
                 {activeModal === 'viewReports' && 'View Reports'}
                 {activeModal === 'bulkUpload' && 'Bulk Upload Users'}
+                {activeModal === 'analytics' && 'Analytics Dashboard'}
               </h2>
               <button onClick={() => setActiveModal(null)} style={{
                 background: 'none',
@@ -631,6 +632,50 @@ export default function TenantPage() {
 
             {activeModal === 'manageTemplates' && (
               <p style={{ color: '#64748B', textAlign: 'center', padding: '40px' }}>Template management coming soon...</p>
+            )}
+
+            {activeModal === 'analytics' && (
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '24px' }}>
+                  <div style={{ padding: '20px', backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #475569' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Users</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>147</div>
+                    <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 12% from last month</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #475569' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Active Invitations</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#3B82F6', marginBottom: '8px' }}>23</div>
+                    <div style={{ fontSize: '12px', color: '#64748B' }}>8 pending responses</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #475569' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Parking Usage</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B', marginBottom: '8px' }}>24%</div>
+                    <div style={{ fontSize: '12px', color: '#10B981' }}>12 of 50 spaces</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #475569' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Monthly Growth</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>+18%</div>
+                    <div style={{ fontSize: '12px', color: '#64748B' }}>vs previous month</div>
+                  </div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #475569' }}>
+                  <h4 style={{ color: '#F1F5F9', fontSize: '16px', margin: '0 0 16px 0' }}>Recent Activity</h4>
+                  {[
+                    { action: 'New user registered', user: 'John Smith', time: '2 hours ago' },
+                    { action: 'Invitation sent', user: 'Sarah Johnson', time: '4 hours ago' },
+                    { action: 'Parking reserved', user: 'Mike Davis', time: '6 hours ago' },
+                    { action: 'Visit scheduled', user: 'Lisa Wilson', time: '1 day ago' },
+                  ].map((activity, idx) => (
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: idx < 3 ? '1px solid #475569' : 'none' }}>
+                      <div>
+                        <div style={{ color: '#F1F5F9', fontSize: '14px', marginBottom: '4px' }}>{activity.action}</div>
+                        <div style={{ color: '#64748B', fontSize: '12px' }}>{activity.user}</div>
+                      </div>
+                      <span style={{ color: '#64748B', fontSize: '12px' }}>{activity.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {activeModal === 'bulkUpload' && (
