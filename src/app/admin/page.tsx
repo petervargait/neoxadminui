@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { PersonRegular, AlertRegular, StatusRegular } from '@fluentui/react-icons'
+import { PersonRegular, AlertRegular, StatusRegular, TicketRegular } from '@fluentui/react-icons'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -168,7 +168,7 @@ export default function AdminPage() {
             { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), enabled: true, isFluentIcon: false, iconType: null },
-            { icon: '🎫', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: false, iconType: null },
+            { icon: 'ticket', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: true, iconType: 'ticket' },
             { icon: 'alert', label: 'Notifications', action: () => setActiveSection('notifications'), enabled: true, isFluentIcon: true, iconType: 'alert' },
             { icon: 'status', label: 'System Status', action: () => setActiveSection('systemStatus'), enabled: true, isFluentIcon: true, iconType: 'status' },
             { icon: '◫', label: 'Audit Logs', action: () => setActiveSection('auditLogs'), enabled: true, isFluentIcon: false, iconType: null },
@@ -213,6 +213,8 @@ export default function AdminPage() {
                   <AlertRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : item.iconType === 'status' ? (
                   <StatusRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'ticket' ? (
+                  <TicketRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : (
                   <span style={{ fontSize: '18px' }}>{item.icon}</span>
                 )
@@ -317,18 +319,84 @@ export default function AdminPage() {
             </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* System Status Icon */}
+            <button
+              onClick={() => setActiveSection('systemStatus')}
+              style={{
+                width: '40px',
+                height: '40px',
+                backgroundColor: '#1E293B',
+                border: '1px solid #334155',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                position: 'relative'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#334155'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E293B'
+              }}
+              title="System Status"
+            >
+              <StatusRegular style={{ fontSize: '20px', width: '20px', height: '20px', color: '#10B981' }} />
+            </button>
+            
+            {/* Notifications Icon */}
+            <button
+              onClick={() => setActiveSection('notifications')}
+              style={{
+                width: '40px',
+                height: '40px',
+                backgroundColor: '#1E293B',
+                border: '1px solid #334155',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                position: 'relative'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#334155'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E293B'
+              }}
+              title="Notifications"
+            >
+              <AlertRegular style={{ fontSize: '20px', width: '20px', height: '20px', color: '#F1F5F9' }} />
+              <span style={{
+                position: 'absolute',
+                top: '6px',
+                right: '6px',
+                width: '8px',
+                height: '8px',
+                backgroundColor: '#EF4444',
+                borderRadius: '50%',
+                border: '2px solid #1E293B'
+              }}></span>
+            </button>
+
+            {/* User Profile */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
-              padding: '8px 16px',
+              padding: '6px 12px',
+              height: '40px',
               backgroundColor: '#1E293B',
               borderRadius: '8px',
               border: '1px solid #334155'
             }}>
               <div style={{
-                width: '32px',
-                height: '32px',
+                width: '28px',
+                height: '28px',
                 borderRadius: '50%',
                 backgroundColor: '#3B82F6',
                 display: 'flex',
@@ -342,10 +410,13 @@ export default function AdminPage() {
               </div>
               <span style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{username}</span>
             </div>
+
+            {/* Logout Button */}
             <button
               onClick={handleLogout}
               style={{
-                padding: '8px 16px',
+                padding: '0 16px',
+                height: '40px',
                 backgroundColor: '#1E293B',
                 border: '1px solid #334155',
                 borderRadius: '8px',

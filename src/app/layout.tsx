@@ -53,6 +53,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
+      <head>
+        <link rel="icon" href="/neoxfavicon.png" type="image/png" />
+      </head>
       <body className="h-full antialiased">
         {children}
       </body>
