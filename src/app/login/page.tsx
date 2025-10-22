@@ -123,13 +123,16 @@ export default function LoginPage() {
           {loginStep === 'credentials' && (
             <>
               <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}>
+                  <NeoxLogo width="200px" height="64px" />
+                </div>
                 <h1 style={{
                   fontSize: '28px',
                   fontWeight: '700',
                   color: '#F1F5F9',
                   marginBottom: '8px'
                 }}>
-                  Welcome Back
+                  NEOX Infinity Admin
                 </h1>
                 <p style={{ color: '#64748B', fontSize: '14px' }}>
                   Sign in to access your admin dashboard
@@ -485,18 +488,6 @@ export default function LoginPage() {
               </form>
             </>
           )}
-
-          {/* Footer */}
-          <div style={{
-            marginTop: '32px',
-            paddingTop: '24px',
-            borderTop: '1px solid #1E293B',
-            textAlign: 'center'
-          }}>
-            <p style={{ color: '#64748B', fontSize: '12px' }}>
-              Protected by enterprise-grade security
-            </p>
-          </div>
         </div>
       </div>
     </div>
