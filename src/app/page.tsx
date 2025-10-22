@@ -1,9 +1,35 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../components/NeoxLogo'
 
 export default function Home() {
+  const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [username, setUsername] = useState('')
+
+  useEffect(() => {
+    const authStatus = sessionStorage.getItem('isAuthenticated')
+    const storedUsername = sessionStorage.getItem('username') || ''
+    
+    if (authStatus !== 'true') {
+      router.push('/login')
+    } else {
+      setIsAuthenticated(true)
+      setUsername(storedUsername)
+    }
+  }, [router])
+
+  const handleLogout = () => {
+    sessionStorage.clear()
+    router.push('/login')
+  }
+
+  if (!isAuthenticated) {
+    return null
+  }
   return (
     <div style={{
       minHeight: '100vh',
@@ -26,7 +52,55 @@ export default function Home() {
           <NeoxLogo width="480px" height="128px" />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {/* Empty - reserved for future use */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '8px 16px',
+            backgroundColor: '#1E293B',
+            borderRadius: '8px',
+            border: '1px solid #334155'
+          }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: '#3B82F6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}>
+              {username.charAt(0).toUpperCase()}
+            </div>
+            <span style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{username}</span>
+          </div>
+          <button
+            onClick={handleLogout}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#1E293B',
+              border: '1px solid #334155',
+              borderRadius: '8px',
+              color: '#F1F5F9',
+              fontSize: '14px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#EF4444'
+              e.currentTarget.style.borderColor = '#EF4444'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#1E293B'
+              e.currentTarget.style.borderColor = '#334155'
+            }}
+          >
+            Logout
+          </button>
         </div>
       </div>
 
@@ -39,7 +113,7 @@ export default function Home() {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundImage: 'url(/NEOXOfficeAi.png)',
+          backgroundImage: 'url(/NEOXOfficeAI.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           opacity: 0.15,

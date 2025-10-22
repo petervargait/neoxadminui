@@ -1,9 +1,35 @@
 'use client'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { useState } from 'react'
 
 export default function TenantPage() {
+  const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [username, setUsername] = useState('')
+
+  useEffect(() => {
+    const authStatus = sessionStorage.getItem('isAuthenticated')
+    const storedUsername = sessionStorage.getItem('username') || ''
+    
+    if (authStatus !== 'true') {
+      router.push('/login')
+    } else {
+      setIsAuthenticated(true)
+      setUsername(storedUsername)
+    }
+  }, [router])
+
+  const handleLogout = () => {
+    sessionStorage.clear()
+    router.push('/login')
+  }
+
+  if (!isAuthenticated) {
+    return null
+  }
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const [showUserModal, setShowUserModal] = useState(false)
@@ -168,6 +194,57 @@ export default function TenantPage() {
             }}>
               {activeSection ? 'Manage your organization' : 'Welcome to your organization'}
             </p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '8px 16px',
+              backgroundColor: '#1E293B',
+              borderRadius: '8px',
+              border: '1px solid #334155'
+            }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                backgroundColor: '#10B981',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+                fontSize: '14px',
+                fontWeight: '600'
+              }}>
+                {username.charAt(0).toUpperCase()}
+              </div>
+              <span style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{username}</span>
+            </div>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#1E293B',
+                border: '1px solid #334155',
+                borderRadius: '8px',
+                color: '#F1F5F9',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#EF4444'
+                e.currentTarget.style.borderColor = '#EF4444'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E293B'
+                e.currentTarget.style.borderColor = '#334155'
+              }}
+            >
+              Logout
+            </button>
           </div>
         </div>
 
