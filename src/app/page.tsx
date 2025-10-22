@@ -106,7 +106,7 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '80px 32px 40px 32px', position: 'relative' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '40px 32px 40px 32px', position: 'relative' }}>
         {/* Background Design Element */}
         <div style={{
           position: 'absolute',
@@ -120,17 +120,17 @@ export default function Home() {
           opacity: 0.15,
           zIndex: 0
         }} />
-        <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: '1200px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           {/* Hero Section */}
-          <div style={{ marginBottom: '32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-              <NeoxLogo width="960px" height="256px" />
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+              <NeoxLogo width="640px" height="170px" />
             </div>
             <h1 style={{
               fontSize: '36px',
               fontWeight: '700',
               color: '#F1F5F9',
-              marginBottom: '16px',
+              marginBottom: '0px',
               lineHeight: '1.2'
             }}>
               NEOX Infinity Admin Platform
@@ -140,9 +140,9 @@ export default function Home() {
           {/* Main Admin Panels */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '24px',
-            maxWidth: '600px',
+            maxWidth: '1200px',
             margin: '0 auto'
           }}>
             <Link
