@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
+import { AlertRegular } from '@fluentui/react-icons'
 
 export default function TenantPage() {
   const router = useRouter()
@@ -194,6 +195,7 @@ export default function TenantPage() {
               {activeSection === 'templates' && 'Template Management'}
               {activeSection === 'policies' && 'Company Policies'}
               {activeSection === 'support' && 'Support & Help'}
+              {activeSection === 'notifications' && 'Notifications'}
               {!activeSection && 'Tenant Admin Dashboard'}
             </h1>
             <p style={{ 
@@ -228,51 +230,58 @@ export default function TenantPage() {
             </div>
 
             {/* Notifications */}
-            <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => alert('Notifications')}>
-              <div style={{
-                padding: '8px',
+            <button
+              onClick={() => setActiveSection('notifications')}
+              style={{
+                width: '40px',
+                height: '40px',
                 backgroundColor: '#1E293B',
-                borderRadius: '8px',
                 border: '1px solid #334155',
+                borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <span style={{ fontSize: '18px' }}>🔔</span>
-              </div>
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                position: 'relative'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#334155'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E293B'
+              }}
+              title="Notifications"
+            >
+              <AlertRegular style={{ fontSize: '20px', width: '20px', height: '20px', color: '#F1F5F9' }} />
               {notificationCount > 0 && (
-                <div style={{
+                <span style={{
                   position: 'absolute',
-                  top: '-4px',
-                  right: '-4px',
+                  top: '6px',
+                  right: '6px',
+                  width: '8px',
+                  height: '8px',
                   backgroundColor: '#EF4444',
-                  color: 'white',
                   borderRadius: '50%',
-                  width: '18px',
-                  height: '18px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '10px',
-                  fontWeight: '600'
-                }}>
-                  {notificationCount}
-                </div>
+                  border: '2px solid #1E293B'
+                }}></span>
               )}
-            </div>
+            </button>
 
+            {/* User Profile */}
             <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
-              padding: '8px 16px',
+              padding: '6px 12px',
+              height: '40px',
               backgroundColor: '#1E293B',
               borderRadius: '8px',
               border: '1px solid #334155'
             }}>
               <div style={{
-                width: '32px',
-                height: '32px',
+                width: '28px',
+                height: '28px',
                 borderRadius: '50%',
                 backgroundColor: '#10B981',
                 display: 'flex',
@@ -286,10 +295,13 @@ export default function TenantPage() {
               </div>
               <span style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{username}</span>
             </div>
+
+            {/* Logout Button */}
             <button
               onClick={handleLogout}
               style={{
-                padding: '8px 16px',
+                padding: '0 16px',
+                height: '40px',
                 backgroundColor: '#1E293B',
                 border: '1px solid #334155',
                 borderRadius: '8px',
@@ -1401,6 +1413,120 @@ export default function TenantPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Notifications Section */}
+          {activeSection === 'notifications' && (
+            <div>
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderBottom: '1px solid #1E293B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Notifications</h2>
+                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Stay updated with your organization alerts</p>
+                  </div>
+                  <button onClick={() => setNotificationCount(0)} style={{
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>Mark All Read</button>
+                </div>
+
+                <div style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {[
+                      { id: 1, type: 'Info', title: 'New parking space assigned', message: 'You have been assigned parking space P-42 for this month', time: '2 hours ago', unread: true },
+                      { id: 2, type: 'Success', title: 'Invitation accepted', message: 'John Doe has accepted your invitation and joined your organization', time: '5 hours ago', unread: true },
+                      { id: 3, type: 'Warning', title: 'Policy update required', message: 'Please review and accept the updated company policies', time: '1 day ago', unread: true },
+                      { id: 4, type: 'Info', title: 'System maintenance scheduled', message: 'Planned maintenance on Oct 25, 2025 from 2:00 AM - 4:00 AM', time: '2 days ago', unread: false },
+                      { id: 5, type: 'Success', title: 'Support ticket resolved', message: 'Your support ticket TKT-0995 has been resolved', time: '3 days ago', unread: false },
+                    ].map((notification) => (
+                      <div key={notification.id} style={{
+                        padding: '16px',
+                        backgroundColor: notification.unread ? 'rgba(59, 130, 246, 0.05)' : '#1E293B',
+                        borderRadius: '8px',
+                        border: `1px solid ${notification.unread ? 'rgba(59, 130, 246, 0.2)' : '#1E293B'}`,
+                        display: 'flex',
+                        gap: '16px'
+                      }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '8px',
+                          backgroundColor: 
+                            notification.type === 'Warning' ? 'rgba(245, 158, 11, 0.2)' :
+                            notification.type === 'Success' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '20px',
+                          flexShrink: 0
+                        }}>
+                          {notification.type === 'Warning' ? '⚠️' : 
+                           notification.type === 'Success' ? '✅' : 'ℹ️'}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
+                            <h3 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', margin: 0 }}>
+                              {notification.title}
+                              {notification.unread && (
+                                <span style={{
+                                  marginLeft: '8px',
+                                  width: '8px',
+                                  height: '8px',
+                                  backgroundColor: '#3B82F6',
+                                  borderRadius: '50%',
+                                  display: 'inline-block'
+                                }}></span>
+                              )}
+                            </h3>
+                            <span style={{ color: '#64748B', fontSize: '12px', whiteSpace: 'nowrap' }}>{notification.time}</span>
+                          </div>
+                          <p style={{ color: '#94A3B8', fontSize: '14px', margin: '0 0 12px 0' }}>{notification.message}</p>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #334155',
+                              borderRadius: '6px',
+                              color: '#94A3B8',
+                              fontSize: '12px',
+                              padding: '4px 12px',
+                              cursor: 'pointer'
+                            }}>View Details</button>
+                            {notification.unread && (
+                              <button onClick={() => setNotificationCount(prev => Math.max(0, prev - 1))} style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #334155',
+                                borderRadius: '6px',
+                                color: '#3B82F6',
+                                fontSize: '12px',
+                                padding: '4px 12px',
+                                cursor: 'pointer'
+                              }}>Mark as Read</button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
