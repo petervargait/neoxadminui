@@ -4,30 +4,11 @@ import NeoxLogo from '../../components/NeoxLogo'
 import { useState } from 'react'
 
 export default function TenantPage() {
-  const [activeSection, setActiveSection] = useState<string | null>(null)
-
-  const handleInviteUser = () => {
-    setActiveSection('inviteUser')
-  }
-
-  const handleSendInvitation = () => {
-    setActiveSection('sendInvitation')
-  }
-
-  const handleManageTemplates = () => {
-    setActiveSection('manageTemplates')
-  }
-
-  const handleViewReports = () => {
-    setActiveSection('viewReports')
-  }
-
-  const handleBulkUpload = () => {
-    setActiveSection('bulkUpload')
-  }
-
-  const closeSection = () => {
-    setActiveSection(null)
+  const [sidebarExpanded, setSidebarExpanded] = useState(false)
+  const [activeModal, setActiveModal] = useState<string | null>(null)
+  
+  const toggleSidebar = () => {
+    setSidebarExpanded(!sidebarExpanded)
   }
 
   const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +18,6 @@ export default function TenantPage() {
       reader.onload = (e) => {
         const csv = e.target?.result as string
         console.log('CSV uploaded:', csv)
-        // Here you would parse and process the CSV
         alert(`CSV file "${file.name}" uploaded successfully! Processing ${csv.split('\n').length - 1} users.`)
       }
       reader.readAsText(file)
@@ -45,250 +25,340 @@ export default function TenantPage() {
       alert('Please select a valid CSV file')
     }
   }
+
   return (
     <div style={{ 
-      minHeight: '100vh', 
-      padding: '32px', 
-      background: 'linear-gradient(135deg, #08122e 0%, #243b53 100%)' 
+      minHeight: '100vh',
+      backgroundColor: '#0B1426',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      display: 'flex'
     }}>
-      <div style={{ maxWidth: '1024px', margin: '0 auto' }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            marginBottom: '24px' 
-          }}>
-            <NeoxLogo width="300px" height="60px" />
-          </div>
-          <h1 style={{ fontSize: '30px', fontWeight: 'bold', marginBottom: '16px', color: '#d7bb91' }}>
-            Tenant Admin Dashboard
-          </h1>
-          <p style={{ 
-            maxWidth: '672px', 
-            margin: '0 auto 32px auto', 
-            color: '#d7bb91', 
-            opacity: 0.8 
-          }}>
-            Welcome to your tenant administration panel. Manage users, invitations, and resources.
-          </p>
-        </div>
-
-        {/* Cards */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-          gap: '24px', 
-          marginBottom: '32px' 
+      {/* Sidebar */}
+      <div style={{
+        width: sidebarExpanded ? '280px' : '70px',
+        height: '100vh',
+        backgroundColor: '#162032',
+        borderRight: '1px solid #1E293B',
+        transition: 'width 0.3s ease',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        zIndex: 100,
+        overflow: 'hidden'
+      }}>
+        {/* Logo */}
+        <div style={{
+          padding: '20px',
+          borderBottom: '1px solid #1E293B',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
         }}>
-          <div style={{
-            padding: '24px',
-            borderRadius: '16px',
-            backgroundColor: 'rgba(30, 55, 90, 0.5)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(75, 101, 129, 0.3)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-          }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px',
-              backgroundColor: 'rgba(215, 187, 145, 0.2)'
-            }}>
-              <svg style={{ width: '24px', height: '24px', color: '#d7bb91' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#d7bb91' }}>Users</h3>
-            <p style={{ fontSize: '14px', marginBottom: '16px', color: '#d7bb91', opacity: 0.7 }}>Manage team members</p>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#d7bb91' }}>0</div>
-          </div>
-
-          <div style={{
-            padding: '24px',
-            borderRadius: '16px',
-            backgroundColor: 'rgba(30, 55, 90, 0.5)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(75, 101, 129, 0.3)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-          }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px',
-              backgroundColor: 'rgba(215, 187, 145, 0.2)'
-            }}>
-              <svg style={{ width: '24px', height: '24px', color: '#d7bb91' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 7.89a2 2 0 002.83 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#d7bb91' }}>Invitations</h3>
-            <p style={{ fontSize: '14px', marginBottom: '16px', color: '#d7bb91', opacity: 0.7 }}>Visitor management</p>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#d7bb91' }}>0</div>
-          </div>
-
-          <div style={{
-            padding: '24px',
-            borderRadius: '16px',
-            backgroundColor: 'rgba(30, 55, 90, 0.5)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(75, 101, 129, 0.3)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-          }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px',
-              backgroundColor: 'rgba(215, 187, 145, 0.2)'
-            }}>
-              <svg style={{ width: '24px', height: '24px', color: '#d7bb91' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#d7bb91' }}>Parking</h3>
-            <p style={{ fontSize: '14px', marginBottom: '16px', color: '#d7bb91', opacity: 0.7 }}>Space management</p>
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981' }}>Available</div>
-          </div>
+          <NeoxLogo width="32px" height="32px" />
+          {sidebarExpanded && (
+            <span style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600' }}>NEOX</span>
+          )}
         </div>
 
-        {/* Actions */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-          gap: '24px', 
-          marginBottom: '32px' 
-        }}>
-          <div style={{
-            padding: '24px',
-            borderRadius: '16px',
-            backgroundColor: 'rgba(30, 55, 90, 0.5)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(75, 101, 129, 0.3)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-          }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#d7bb91' }}>Recent Activity</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#d7bb91' }}></div>
-                <span style={{ color: '#d7bb91', opacity: 0.7 }}>No recent activity</span>
-              </div>
-            </div>
-          </div>
+        {/* Menu Toggle */}
+        <button 
+          onClick={toggleSidebar}
+          style={{
+            width: '100%',
+            padding: '16px 20px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: '#64748B',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            fontSize: '14px',
+            borderBottom: '1px solid #1E293B'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1E293B'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+          <span style={{ fontSize: '16px' }}>☰</span>
+          {sidebarExpanded && <span>Menu</span>}
+        </button>
 
-          <div style={{
-            padding: '24px',
-            borderRadius: '16px',
-            backgroundColor: 'rgba(30, 55, 90, 0.5)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(75, 101, 129, 0.3)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        {/* Navigation */}
+        <div style={{ padding: '20px 0' }}>
+          <Link href="/" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '12px 20px',
+            color: '#64748B',
+            textDecoration: 'none',
+            fontSize: '14px',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#1E293B'
+            e.currentTarget.style.color = '#F1F5F9'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent'
+            e.currentTarget.style.color = '#64748B'
           }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px', color: '#d7bb91' }}>Quick Actions</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <button 
-                onClick={handleInviteUser} 
-                onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
-                onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
-                style={{
-                backgroundColor: 'rgba(51, 78, 104, 0.8)',
-                color: '#d7bb91',
-                border: '1px solid rgba(75, 101, 129, 0.3)',
-                borderRadius: '12px',
-                padding: '12px 24px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                fontSize: '14px'
-              }}>Invite User</button>
-              <button onClick={handleSendInvitation} style={{
-                backgroundColor: 'rgba(51, 78, 104, 0.8)',
-                color: '#d7bb91',
-                border: '1px solid rgba(75, 101, 129, 0.3)',
-                borderRadius: '12px',
-                padding: '12px 24px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                fontSize: '14px'
-              }}>Send Invitation</button>
-              <button onClick={handleManageTemplates} style={{
-                backgroundColor: 'rgba(51, 78, 104, 0.8)',
-                color: '#d7bb91',
-                border: '1px solid rgba(75, 101, 129, 0.3)',
-                borderRadius: '12px',
-                padding: '12px 24px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                fontSize: '14px'
-              }}>Manage Templates</button>
-              <button onClick={handleViewReports} style={{
-                backgroundColor: 'rgba(51, 78, 104, 0.8)',
-                color: '#d7bb91',
-                border: '1px solid rgba(75, 101, 129, 0.3)',
-                borderRadius: '12px',
-                padding: '12px 24px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                fontSize: '14px'
-              }}>View Reports</button>
-              <button 
-                onClick={handleBulkUpload}
-                onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(75, 101, 129, 0.9)'}
-                onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(51, 78, 104, 0.8)'}
-                style={{
-                  backgroundColor: 'rgba(51, 78, 104, 0.8)',
-                  color: '#d7bb91',
-                  border: '1px solid rgba(75, 101, 129, 0.3)',
-                  borderRadius: '12px',
-                  padding: '12px 24px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  fontSize: '14px'
-                }}>Bulk Upload Users</button>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: '14px', marginBottom: '8px', color: '#d7bb91', opacity: 0.6 }}>
-            ⚠️ Demo page - Database connection required
-          </p>
-          <Link href="/" style={{ 
-            fontSize: '14px', 
-            textDecoration: 'underline', 
-            color: '#d7bb91',
-            transition: 'opacity 0.2s'
-          }}>
-            ← Back to Home
+            <span style={{ fontSize: '16px' }}>🏠</span>
+            {sidebarExpanded && <span>Home</span>}
           </Link>
         </div>
       </div>
 
+      {/* Main Content */}
+      <div style={{
+        marginLeft: sidebarExpanded ? '280px' : '70px',
+        flex: 1,
+        transition: 'margin-left 0.3s ease',
+        minHeight: '100vh'
+      }}>
+        {/* Top Navigation */}
+        <div style={{
+          height: '70px',
+          backgroundColor: '#162032',
+          borderBottom: '1px solid #1E293B',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 32px'
+        }}>
+          <h1 style={{
+            fontSize: '24px',
+            fontWeight: '600',
+            color: '#F1F5F9',
+            margin: 0
+          }}>
+            Tenant Admin Dashboard
+          </h1>
+          <div style={{ color: '#64748B', fontSize: '14px' }}>Welcome to your organization</div>
+        </div>
+
+        {/* Dashboard Content */}
+        <div style={{ padding: '32px' }}>
+          {/* Stats Cards */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '24px',
+            marginBottom: '32px'
+          }}>
+            {/* Users Card */}
+            <div style={{
+              backgroundColor: '#162032',
+              border: '1px solid #1E293B',
+              borderRadius: '12px',
+              padding: '24px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '12px'
+              }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '500', color: '#64748B', margin: 0 }}>Total Users</h3>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  backgroundColor: '#3B82F6',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '20px' }}>👥</span>
+                </div>
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>147</div>
+              <div style={{ fontSize: '14px', color: '#10B981' }}>+12% from last month</div>
+            </div>
+
+            {/* Invitations Card */}
+            <div style={{
+              backgroundColor: '#162032',
+              border: '1px solid #1E293B',
+              borderRadius: '12px',
+              padding: '24px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '12px'
+              }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '500', color: '#64748B', margin: 0 }}>Active Invitations</h3>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  backgroundColor: '#10B981',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '20px' }}>📬</span>
+                </div>
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>23</div>
+              <div style={{ fontSize: '14px', color: '#64748B' }}>8 pending responses</div>
+            </div>
+
+            {/* Parking Card */}
+            <div style={{
+              backgroundColor: '#162032',
+              border: '1px solid #1E293B',
+              borderRadius: '12px',
+              padding: '24px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '12px'
+              }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '500', color: '#64748B', margin: 0 }}>Parking Spaces</h3>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  backgroundColor: '#F59E0B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '20px' }}>🏎️</span>
+                </div>
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>12/50</div>
+              <div style={{ fontSize: '14px', color: '#10B981' }}>38 spaces available</div>
+            </div>
+          </div>
+
+          {/* Quick Actions Panel */}
+          <div style={{
+            backgroundColor: '#162032',
+            border: '1px solid #1E293B',
+            borderRadius: '12px',
+            padding: '24px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#F1F5F9', marginBottom: '20px' }}>Quick Actions</h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px'
+            }}>
+              <button 
+                onClick={() => setActiveModal('inviteUser')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#3B82F6',
+                  color: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
+              >
+                <span>📬</span>
+                Invite User
+              </button>
+              
+              <button 
+                onClick={() => setActiveModal('sendInvitation')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#10B981',
+                  color: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10B981'}
+              >
+                <span>🕰</span>
+                Schedule Visit
+              </button>
+              
+              <button 
+                onClick={() => setActiveModal('manageTemplates')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#F59E0B',
+                  color: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#D97706'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F59E0B'}
+              >
+                <span>📝</span>
+                Templates
+              </button>
+              
+              <button 
+                onClick={() => setActiveModal('bulkUpload')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#8B5CF6',
+                  color: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7C3AED'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8B5CF6'}
+              >
+                <span>📄</span>
+                Bulk Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Modal Overlays for Different Sections */}
-      {activeSection && (
+      {activeModal && (
         <div style={{
           position: 'fixed',
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(8, 18, 46, 0.9)',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
           backdropFilter: 'blur(8px)',
           zIndex: 1000,
           display: 'flex',
@@ -297,9 +367,9 @@ export default function TenantPage() {
           padding: '20px'
         }}>
           <div style={{
-            backgroundColor: 'rgba(30, 55, 90, 0.95)',
-            border: '1px solid rgba(75, 101, 129, 0.5)',
-            borderRadius: '16px',
+            backgroundColor: '#162032',
+            border: '1px solid #1E293B',
+            borderRadius: '12px',
             padding: '32px',
             maxWidth: '600px',
             width: '100%',
@@ -308,18 +378,18 @@ export default function TenantPage() {
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#d7bb91', margin: 0 }}>
-                {activeSection === 'inviteUser' && 'Invite New User'}
-                {activeSection === 'sendInvitation' && 'Send Visitor Invitation'}
-                {activeSection === 'manageTemplates' && 'Manage Templates'}
-                {activeSection === 'viewReports' && 'View Reports'}
-                {activeSection === 'bulkUpload' && 'Bulk Upload Users'}
+              <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#F1F5F9', margin: 0 }}>
+                {activeModal === 'inviteUser' && 'Invite New User'}
+                {activeModal === 'sendInvitation' && 'Schedule Visitor'}
+                {activeModal === 'manageTemplates' && 'Manage Templates'}
+                {activeModal === 'viewReports' && 'View Reports'}
+                {activeModal === 'bulkUpload' && 'Bulk Upload Users'}
               </h2>
-              <button onClick={closeSection} style={{
+              <button onClick={() => setActiveModal(null)} style={{
                 background: 'none',
-                border: '1px solid rgba(215, 187, 145, 0.5)',
+                border: '1px solid #64748B',
                 borderRadius: '8px',
-                color: '#d7bb91',
+                color: '#F1F5F9',
                 fontSize: '20px',
                 width: '40px',
                 height: '40px',
@@ -330,7 +400,7 @@ export default function TenantPage() {
               }}>×</button>
             </div>
 
-            {activeSection === 'inviteUser' && (
+            {activeModal === 'inviteUser' && (
               <div>
                 <form style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
@@ -399,239 +469,92 @@ export default function TenantPage() {
               </div>
             )}
 
-            {activeSection === 'sendInvitation' && (
+            {activeModal === 'sendInvitation' && (
               <div>
                 <form style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
-                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Name</label>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Name</label>
                     <input type="text" placeholder="Enter visitor name" style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
                       borderRadius: '8px',
-                      color: '#d7bb91',
+                      color: '#F1F5F9',
                       fontSize: '14px'
                     }} />
                   </div>
                   <div>
-                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Email</label>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Email</label>
                     <input type="email" placeholder="visitor@email.com" style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
                       borderRadius: '8px',
-                      color: '#d7bb91',
+                      color: '#F1F5F9',
                       fontSize: '14px'
                     }} />
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
-                      <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Date</label>
+                      <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Date</label>
                       <input type="date" style={{
                         width: '100%',
                         padding: '12px',
-                        backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                        border: '1px solid rgba(75, 101, 129, 0.3)',
+                        backgroundColor: '#1E293B',
+                        border: '1px solid #475569',
                         borderRadius: '8px',
-                        color: '#d7bb91',
+                        color: '#F1F5F9',
                         fontSize: '14px'
                       }} />
                     </div>
                     <div>
-                      <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Time</label>
+                      <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Time</label>
                       <input type="time" style={{
                         width: '100%',
                         padding: '12px',
-                        backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                        border: '1px solid rgba(75, 101, 129, 0.3)',
+                        backgroundColor: '#1E293B',
+                        border: '1px solid #475569',
                         borderRadius: '8px',
-                        color: '#d7bb91',
+                        color: '#F1F5F9',
                         fontSize: '14px'
                       }} />
                     </div>
                   </div>
                   <div>
-                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Purpose of Visit</label>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Purpose of Visit</label>
                     <textarea placeholder="Enter purpose of visit" style={{
                       width: '100%',
                       padding: '12px',
-                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
                       borderRadius: '8px',
-                      color: '#d7bb91',
+                      color: '#F1F5F9',
                       fontSize: '14px',
                       minHeight: '80px',
                       resize: 'vertical'
                     }} />
                   </div>
                   <button type="submit" style={{
-                    backgroundColor: 'rgba(75, 101, 129, 0.8)',
-                    color: '#d7bb91',
-                    border: '1px solid rgba(75, 101, 129, 0.3)',
+                    backgroundColor: '#3B82F6',
+                    color: '#F1F5F9',
+                    border: 'none',
                     borderRadius: '8px',
                     padding: '12px 24px',
                     fontWeight: '500',
                     cursor: 'pointer',
                     marginTop: '16px'
-                  }}>Send Invitation</button>
+                  }}>Schedule Visit</button>
                 </form>
               </div>
             )}
 
-            {activeSection === 'manageTemplates' && (
-              <div>
-                <div style={{ marginBottom: '20px' }}>
-                  <button style={{
-                    backgroundColor: 'rgba(75, 101, 129, 0.6)',
-                    color: '#d7bb91',
-                    border: '1px solid rgba(75, 101, 129, 0.3)',
-                    borderRadius: '8px',
-                    padding: '8px 16px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}>+ New Template</button>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {[
-                    { name: 'Standard Meeting Invitation', type: 'Meeting', lastUsed: '2 days ago' },
-                    { name: 'Visitor Access Badge', type: 'Access', lastUsed: '1 week ago' },
-                    { name: 'Interview Invitation', type: 'Interview', lastUsed: '3 days ago' },
-                    { name: 'Vendor Visit', type: 'Business', lastUsed: '1 day ago' }
-                  ].map((template, index) => (
-                    <div key={index} style={{
-                      padding: '16px',
-                      backgroundColor: 'rgba(51, 78, 104, 0.3)',
-                      borderRadius: '8px',
-                      border: '1px solid rgba(75, 101, 129, 0.3)',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}>
-                      <div>
-                        <h4 style={{ color: '#d7bb91', margin: '0 0 4px 0', fontSize: '16px' }}>{template.name}</h4>
-                        <p style={{ color: '#d7bb91', opacity: 0.7, margin: '0', fontSize: '12px' }}>{template.type} • Last used {template.lastUsed}</p>
-                      </div>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button style={{
-                          backgroundColor: 'rgba(75, 101, 129, 0.6)',
-                          color: '#d7bb91',
-                          border: '1px solid rgba(75, 101, 129, 0.3)',
-                          borderRadius: '6px',
-                          padding: '6px 12px',
-                          fontSize: '12px',
-                          cursor: 'pointer'
-                        }}>Edit</button>
-                        <button style={{
-                          backgroundColor: 'rgba(34, 197, 94, 0.6)',
-                          color: '#fff',
-                          border: '1px solid rgba(34, 197, 94, 0.3)',
-                          borderRadius: '6px',
-                          padding: '6px 12px',
-                          fontSize: '12px',
-                          cursor: 'pointer'
-                        }}>Use</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {activeModal === 'manageTemplates' && (
+              <p style={{ color: '#64748B', textAlign: 'center', padding: '40px' }}>Template management coming soon...</p>
             )}
 
-            {activeSection === 'viewReports' && (
-              <div>
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
-                  <select style={{
-                    padding: '8px 12px',
-                    backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                    border: '1px solid rgba(75, 101, 129, 0.3)',
-                    borderRadius: '8px',
-                    color: '#d7bb91',
-                    fontSize: '14px'
-                  }}>
-                    <option>Last 7 days</option>
-                    <option>Last 30 days</option>
-                    <option>Last 90 days</option>
-                  </select>
-                  <button style={{
-                    backgroundColor: 'rgba(75, 101, 129, 0.6)',
-                    color: '#d7bb91',
-                    border: '1px solid rgba(75, 101, 129, 0.3)',
-                    borderRadius: '8px',
-                    padding: '8px 16px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}>Export</button>
-                </div>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
-                  <div style={{
-                    padding: '16px',
-                    backgroundColor: 'rgba(51, 78, 104, 0.3)',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(75, 101, 129, 0.3)',
-                    textAlign: 'center'
-                  }}>
-                    <div style={{ color: '#d7bb91', fontSize: '24px', fontWeight: 'bold' }}>47</div>
-                    <div style={{ color: '#d7bb91', opacity: 0.7, fontSize: '14px' }}>Total Invitations</div>
-                  </div>
-                  <div style={{
-                    padding: '16px',
-                    backgroundColor: 'rgba(51, 78, 104, 0.3)',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(75, 101, 129, 0.3)',
-                    textAlign: 'center'
-                  }}>
-                    <div style={{ color: '#10b981', fontSize: '24px', fontWeight: 'bold' }}>32</div>
-                    <div style={{ color: '#d7bb91', opacity: 0.7, fontSize: '14px' }}>Accepted</div>
-                  </div>
-                </div>
-                
-                <div style={{ maxHeight: '250px', overflow: 'auto' }}>
-                  <h4 style={{ color: '#d7bb91', fontSize: '16px', marginBottom: '12px' }}>Recent Activity</h4>
-                  {[
-                    { name: 'John Smith', action: 'Accepted invitation', time: '2 hours ago', status: 'success' },
-                    { name: 'Sarah Johnson', action: 'Declined invitation', time: '4 hours ago', status: 'declined' },
-                    { name: 'Mike Davis', action: 'Invitation sent', time: '6 hours ago', status: 'pending' },
-                    { name: 'Lisa Wilson', action: 'Visited office', time: '1 day ago', status: 'completed' }
-                  ].map((activity, index) => (
-                    <div key={index} style={{
-                      padding: '12px',
-                      backgroundColor: 'rgba(51, 78, 104, 0.2)',
-                      borderRadius: '8px',
-                      border: '1px solid rgba(75, 101, 129, 0.2)',
-                      marginBottom: '8px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}>
-                      <div>
-                        <div style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500' }}>{activity.name}</div>
-                        <div style={{ color: '#d7bb91', opacity: 0.7, fontSize: '12px' }}>{activity.action} • {activity.time}</div>
-                      </div>
-                      <span style={{
-                        backgroundColor: activity.status === 'success' ? 'rgba(34, 197, 94, 0.3)' : 
-                                         activity.status === 'declined' ? 'rgba(239, 68, 68, 0.3)' :
-                                         activity.status === 'completed' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(234, 179, 8, 0.3)',
-                        color: activity.status === 'success' ? '#10b981' : 
-                               activity.status === 'declined' ? '#ef4444' :
-                               activity.status === 'completed' ? '#3b82f6' : '#eab308',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: '500',
-                        textTransform: 'capitalize'
-                      }}>{activity.status}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeSection === 'bulkUpload' && (
+            {activeModal === 'bulkUpload' && (
               <div>
                 <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
                   <h3 style={{ color: '#3b82f6', fontSize: '16px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
