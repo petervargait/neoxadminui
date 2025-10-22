@@ -27,6 +27,8 @@ export default function AdminPage() {
   const [selectedTenant, setSelectedTenant] = useState<string>('all')
   const [showUserModal, setShowUserModal] = useState(false)
   const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string} | null>(null)
+  const [userSortField, setUserSortField] = useState<'name' | 'email' | 'role' | 'department' | 'status'>('name')
+  const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc')
   const [moduleStates, setModuleStates] = useState<Record<string, boolean>>({
     'User Management': true,
     'Visitor Management': true,
@@ -725,11 +727,56 @@ export default function AdminPage() {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ backgroundColor: '#0F1629' }}>
-                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Name</th>
-                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Email</th>
-                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Role</th>
-                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Department</th>
-                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Status</th>
+                        <th onClick={() => {
+                          if (userSortField === 'name') {
+                            setUserSortDirection(userSortDirection === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setUserSortField('name');
+                            setUserSortDirection('asc');
+                          }
+                        }} style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                          Name {userSortField === 'name' && (userSortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th onClick={() => {
+                          if (userSortField === 'email') {
+                            setUserSortDirection(userSortDirection === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setUserSortField('email');
+                            setUserSortDirection('asc');
+                          }
+                        }} style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                          Email {userSortField === 'email' && (userSortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th onClick={() => {
+                          if (userSortField === 'role') {
+                            setUserSortDirection(userSortDirection === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setUserSortField('role');
+                            setUserSortDirection('asc');
+                          }
+                        }} style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                          Role {userSortField === 'role' && (userSortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th onClick={() => {
+                          if (userSortField === 'department') {
+                            setUserSortDirection(userSortDirection === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setUserSortField('department');
+                            setUserSortDirection('asc');
+                          }
+                        }} style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                          Department {userSortField === 'department' && (userSortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th onClick={() => {
+                          if (userSortField === 'status') {
+                            setUserSortDirection(userSortDirection === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setUserSortField('status');
+                            setUserSortDirection('asc');
+                          }
+                        }} style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
+                          Status {userSortField === 'status' && (userSortDirection === 'asc' ? '↑' : '↓')}
+                        </th>
                         <th style={{ padding: '12px 16px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Actions</th>
                       </tr>
                     </thead>
@@ -740,7 +787,15 @@ export default function AdminPage() {
                         { name: 'Mike Davis', email: 'mike.davis@company.com', role: 'User', department: 'Sales', status: 'Active' },
                         { name: 'Lisa Wilson', email: 'lisa.w@company.com', role: 'User', department: 'Marketing', status: 'Inactive' },
                         { name: 'Tom Brown', email: 'tom.brown@company.com', role: 'Manager', department: 'Operations', status: 'Active' },
-                      ].map((user, idx) => (
+                      ].sort((a, b) => {
+                        const aVal = a[userSortField].toLowerCase();
+                        const bVal = b[userSortField].toLowerCase();
+                        if (userSortDirection === 'asc') {
+                          return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+                        } else {
+                          return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+                        }
+                      }).map((user, idx) => (
                         <tr key={idx} style={{ borderBottom: '1px solid #1E293B' }}>
                           <td style={{ padding: '16px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{user.name}</td>
                           <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.email}</td>
