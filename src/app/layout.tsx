@@ -5,10 +5,7 @@ export const metadata: Metadata = {
   title: "NEOX Infinity - Multi-Tenant Admin Platform",
   description: "Production-ready multi-tenant administrative web application with comprehensive role-based access control, white-labeling, and OWASP security compliance.",
   icons: {
-    icon: [
-      { url: '/neoxfavicon.png', type: 'image/png' },
-      { url: '/favicon.ico' }
-    ],
+    icon: '/neoxfavicon.png',
     shortcut: '/neoxfavicon.png',
     apple: '/neoxfavicon.png',
   },
