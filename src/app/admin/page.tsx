@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { PersonRegular, AlertRegular, StatusRegular, TicketRegular } from '@fluentui/react-icons'
+import { PersonRegular, AlertRegular, StatusRegular, TaskListRegular } from '@fluentui/react-icons'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -214,7 +214,7 @@ export default function AdminPage() {
                 ) : item.iconType === 'status' ? (
                   <StatusRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : item.iconType === 'ticket' ? (
-                  <TicketRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                  <TaskListRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : (
                   <span style={{ fontSize: '18px' }}>{item.icon}</span>
                 )
