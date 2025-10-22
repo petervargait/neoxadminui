@@ -79,6 +79,7 @@ export default function TenantPage() {
             { icon: '◫', label: 'Invitations', action: () => setActiveSection('invitations') },
             { icon: '◧', label: 'Parking', action: () => setActiveSection('parking') },
             { icon: '◨', label: 'Templates', action: () => setActiveSection('templates') },
+            { icon: '📋', label: 'Policies', action: () => setActiveSection('policies') },
           ].map((item, index) => (
             <div key={index} 
               onClick={item.action}
@@ -185,6 +186,7 @@ export default function TenantPage() {
               {activeSection === 'invitations' && 'Invitation Management'}
               {activeSection === 'parking' && 'Parking Management'}
               {activeSection === 'templates' && 'Template Management'}
+              {activeSection === 'policies' && 'Company Policies'}
               {!activeSection && 'Tenant Admin Dashboard'}
             </h1>
             <p style={{ 
@@ -1084,6 +1086,90 @@ export default function TenantPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Policies Section */}
+          {activeSection === 'policies' && (
+            <div>
+              <div style={{ marginBottom: '24px' }}>
+                <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>
+                  Download company policy documents. These policies are managed by your system administrator.
+                </p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+                {[
+                  { name: 'GDPR', description: 'General Data Protection Regulation compliance policy', lastUpdated: '2025-10-15', size: '2.4 MB' },
+                  { name: 'Terms & Conditions', description: 'Platform terms and conditions of use', lastUpdated: '2025-10-12', size: '1.8 MB' },
+                  { name: 'Passwords', description: 'Password requirements and security guidelines', lastUpdated: '2025-10-10', size: '856 KB' },
+                  { name: 'Installation and Onboarding Guide', description: 'Complete setup and onboarding instructions', lastUpdated: '2025-10-08', size: '5.2 MB' },
+                ].map((policy) => (
+                  <div key={policy.name} style={{
+                    padding: '24px',
+                    backgroundColor: '#162032',
+                    borderRadius: '12px',
+                    border: '1px solid #1E293B'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', marginBottom: '20px' }}>
+                      <div style={{
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '12px',
+                        backgroundColor: '#3B82F6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '28px',
+                        flexShrink: 0
+                      }}>
+                        📄
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0' }}>
+                          {policy.name}
+                        </h3>
+                        <p style={{ color: '#94A3B8', fontSize: '14px', margin: '0 0 12px 0', lineHeight: '1.5' }}>
+                          {policy.description}
+                        </p>
+                        <div style={{ display: 'flex', gap: '16px', fontSize: '13px' }}>
+                          <span style={{ color: '#64748B' }}>
+                            <span style={{ color: '#94A3B8', fontWeight: '500' }}>Updated:</span> {policy.lastUpdated}
+                          </span>
+                          <span style={{ color: '#64748B' }}>
+                            <span style={{ color: '#94A3B8', fontWeight: '500' }}>Size:</span> {policy.size}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => alert(`Downloading ${policy.name} policy...`)}
+                      style={{
+                        width: '100%',
+                        padding: '12px 20px',
+                        backgroundColor: '#3B82F6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
+                    >
+                      <span>⬇️</span>
+                      <span>Download PDF</span>
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           )}

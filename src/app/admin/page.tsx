@@ -44,6 +44,13 @@ export default function AdminPage() {
     'Reporting': true
   })
 
+  const [policyFiles, setPolicyFiles] = useState<Record<string, {name: string; uploadDate: string} | null>>({
+    'GDPR': null,
+    'Terms & Conditions': null,
+    'Passwords': null,
+    'Installation and Onboarding Guide': null
+  })
+
   const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file && file.type === 'text/csv') {
@@ -56,6 +63,22 @@ export default function AdminPage() {
       reader.readAsText(file)
     } else {
       alert('Please select a valid CSV file')
+    }
+  }
+
+  const handlePolicyUpload = (policyName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.type === 'application/pdf') {
+      setPolicyFiles(prev => ({
+        ...prev,
+        [policyName]: {
+          name: file.name,
+          uploadDate: new Date().toLocaleDateString()
+        }
+      }))
+      alert(`${policyName} policy "${file.name}" uploaded successfully!`)
+    } else {
+      alert('Please select a valid PDF file')
     }
   }
 
@@ -143,6 +166,7 @@ export default function AdminPage() {
             { icon: '◧', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all' },
             { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all' },
             { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all' },
+            { icon: '📋', label: 'Policies', action: () => setActiveSection('policies'), enabled: true },
             { icon: '◫', label: 'Audit Logs', action: () => setActiveSection('auditLogs'), enabled: true },
             { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), enabled: true },
             { icon: '◦', label: 'System Settings', action: () => setActiveSection('systemSettings'), enabled: true },
@@ -235,6 +259,7 @@ export default function AdminPage() {
               {activeSection === 'modules' && 'Manage Modules'}
               {activeSection === 'bulkUpload' && 'Bulk Upload Users'}
               {activeSection === 'whiteLabel' && 'White Label Settings'}
+              {activeSection === 'policies' && 'Policy Management'}
               {activeSection === 'auditLogs' && 'System Audit Logs'}
               {activeSection === 'analytics' && 'Analytics Dashboard'}
               {activeSection === 'systemSettings' && 'System Settings'}
@@ -1108,6 +1133,111 @@ export default function AdminPage() {
                     minWidth: '200px'
                   }}>Save White Label Settings</button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Policies */}
+          {activeSection === 'policies' && (
+            <div>
+              <div style={{ marginBottom: '24px' }}>
+                <p style={{ color: '#d7bb91', fontSize: '14px', marginBottom: '24px' }}>
+                  Upload and manage policy documents. These policies will be available for download by all tenants.
+                </p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+                {Object.keys(policyFiles).map((policyName) => (
+                  <div key={policyName} style={{
+                    padding: '24px',
+                    backgroundColor: 'rgba(51, 78, 104, 0.3)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(75, 101, 129, 0.3)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                      <div style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '8px',
+                        backgroundColor: 'rgba(75, 101, 129, 0.6)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '24px'
+                      }}>
+                        📄
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{ color: '#d7bb91', fontSize: '18px', fontWeight: '600', margin: '0 0 4px 0' }}>
+                          {policyName}
+                        </h3>
+                        {policyFiles[policyName] ? (
+                          <p style={{ color: '#64748B', fontSize: '13px', margin: 0 }}>
+                            Uploaded: {policyFiles[policyName]?.uploadDate}
+                          </p>
+                        ) : (
+                          <p style={{ color: '#64748B', fontSize: '13px', margin: 0 }}>
+                            No file uploaded
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {policyFiles[policyName] && (
+                      <div style={{
+                        padding: '12px',
+                        backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                        borderRadius: '8px',
+                        marginBottom: '12px'
+                      }}>
+                        <p style={{ color: '#d7bb91', fontSize: '14px', margin: '0 0 4px 0', fontWeight: '500' }}>
+                          Current File:
+                        </p>
+                        <p style={{ color: '#d7bb91', fontSize: '13px', margin: 0, opacity: 0.8 }}>
+                          {policyFiles[policyName]?.name}
+                        </p>
+                      </div>
+                    )}
+
+                    <div style={{
+                      border: '2px dashed rgba(75, 101, 129, 0.5)',
+                      borderRadius: '8px',
+                      padding: '20px',
+                      textAlign: 'center',
+                      backgroundColor: 'rgba(51, 78, 104, 0.1)'
+                    }}>
+                      <input
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        style={{ display: 'none' }}
+                        id={`policy-${policyName.replace(/\s+/g, '-')}`}
+                        onChange={(e) => handlePolicyUpload(policyName, e)}
+                      />
+                      <label
+                        htmlFor={`policy-${policyName.replace(/\s+/g, '-')}`}
+                        style={{
+                          backgroundColor: 'rgba(75, 101, 129, 0.8)',
+                          color: '#d7bb91',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '6px',
+                          padding: '10px 20px',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          display: 'inline-block',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(75, 101, 129, 1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(75, 101, 129, 0.8)'}
+                      >
+                        {policyFiles[policyName] ? 'Replace File' : 'Upload PDF'}
+                      </label>
+                      <p style={{ color: '#d7bb91', opacity: 0.7, margin: '8px 0 0 0', fontSize: '12px' }}>
+                        PDF files only (max 10MB)
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
