@@ -9,6 +9,7 @@ export default function Home() {
   const router = useRouter()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [username, setUsername] = useState('')
+  const [showTenantModal, setShowTenantModal] = useState(false)
 
   useEffect(() => {
     const authStatus = sessionStorage.getItem('isAuthenticated')
@@ -185,15 +186,14 @@ export default function Home() {
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage tenants, users, and system-wide settings</p>
             </Link>
 
-            <Link
-              href="/tenant"
+            <div
+              onClick={() => setShowTenantModal(true)}
               style={{
                 display: 'block',
                 padding: '40px 32px',
                 backgroundColor: '#162032',
                 border: '1px solid #1E293B',
                 borderRadius: '12px',
-                textDecoration: 'none',
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                 transition: 'all 0.2s ease',
                 cursor: 'pointer'
@@ -224,6 +224,47 @@ export default function Home() {
               </div>
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Tenant Admin</h2>
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage your organization&apos;s users and settings</p>
+            </div>
+
+            <Link
+              href="/api-docs"
+              style={{
+                display: 'block',
+                padding: '40px 32px',
+                backgroundColor: '#162032',
+                border: '1px solid #1E293B',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E293B'
+                e.currentTarget.style.transform = 'translateY(-4px)'
+                e.currentTarget.style.boxShadow = '0 8px 25px -3px rgba(0, 0, 0, 0.2)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#162032'
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(148, 163, 184, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px auto',
+                boxShadow: '0 0 20px rgba(148, 163, 184, 0.5), 0 0 40px rgba(148, 163, 184, 0.3)'
+              }}>
+                <span style={{ fontSize: '32px', color: '#94A3B8' }}>▨</span>
+              </div>
+              <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>API Documentation</h2>
+              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Access comprehensive API docs and integration guides</p>
             </Link>
           </div>
 
@@ -258,6 +299,114 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Tenant Selection Modal */}
+      {showTenantModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => setShowTenantModal(false)}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            border: '1px solid #1E293B'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '16px' }}>
+              Select Tenant
+            </h2>
+            <p style={{ color: '#64748B', fontSize: '14px', marginBottom: '24px' }}>
+              Choose an organization to manage
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '400px', overflow: 'auto' }}>
+              {[
+                { id: 'acme', name: 'Acme Corporation', logo: '🏢', users: 245 },
+                { id: 'techflow', name: 'TechFlow Industries', logo: '🚀', users: 128 },
+                { id: 'global', name: 'Global Solutions Ltd', logo: '🌍', users: 87 },
+                { id: 'innovation', name: 'Innovation Labs', logo: '🔬', users: 156 },
+                { id: 'digital', name: 'Digital Dynamics', logo: '⚡', users: 93 },
+              ].map((tenant) => (
+                <div
+                  key={tenant.id}
+                  onClick={() => {
+                    sessionStorage.setItem('selectedTenant', tenant.id);
+                    sessionStorage.setItem('selectedTenantName', tenant.name);
+                    router.push('/tenant');
+                  }}
+                  style={{
+                    padding: '16px',
+                    backgroundColor: '#1E293B',
+                    borderRadius: '8px',
+                    border: '1px solid #334155',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#334155'
+                    e.currentTarget.style.borderColor = '#60A5FA'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#1E293B'
+                    e.currentTarget.style.borderColor = '#334155'
+                  }}
+                >
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '8px',
+                    backgroundColor: '#162032',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px'
+                  }}>
+                    {tenant.logo}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>
+                      {tenant.name}
+                    </div>
+                    <div style={{ color: '#64748B', fontSize: '13px' }}>
+                      {tenant.users} users
+                    </div>
+                  </div>
+                  <div style={{ color: '#60A5FA', fontSize: '18px' }}>→</div>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowTenantModal(false)}
+              style={{
+                marginTop: '24px',
+                width: '100%',
+                padding: '12px',
+                backgroundColor: 'transparent',
+                border: '1px solid #334155',
+                borderRadius: '8px',
+                color: '#F1F5F9',
+                fontSize: '14px',
+                fontWeight: '500',
+                cursor: 'pointer'
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

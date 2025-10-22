@@ -9,16 +9,19 @@ export default function TenantPage() {
   const router = useRouter()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [username, setUsername] = useState('')
+  const [tenantName, setTenantName] = useState('Organization')
 
   useEffect(() => {
     const authStatus = sessionStorage.getItem('isAuthenticated')
     const storedUsername = sessionStorage.getItem('username') || ''
+    const storedTenantName = sessionStorage.getItem('selectedTenantName') || 'Organization'
     
     if (authStatus !== 'true') {
       router.push('/login')
     } else {
       setIsAuthenticated(true)
       setUsername(storedUsername)
+      setTenantName(storedTenantName)
     }
   }, [router])
 
@@ -198,14 +201,14 @@ export default function TenantPage() {
               {activeSection === 'policies' && 'Company Policies'}
               {activeSection === 'support' && 'Support & Help'}
               {activeSection === 'notifications' && 'Notifications'}
-              {!activeSection && 'Tenant Admin Dashboard'}
+              {!activeSection && `${tenantName} - Tenant Admin Dashboard`}
             </h1>
             <p style={{ 
               color: '#64748B', 
               fontSize: '14px', 
               margin: '4px 0 0 0' 
             }}>
-              {activeSection ? 'Manage your organization' : 'Welcome to your organization'}
+              {activeSection ? `Manage ${tenantName}` : `Welcome to ${tenantName}`}
             </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
