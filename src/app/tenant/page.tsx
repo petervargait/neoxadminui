@@ -89,6 +89,7 @@ export default function TenantPage() {
             { icon: '◎', label: 'Users', action: () => setActiveSection('users') },
             { icon: '◫', label: 'Invitations', action: () => setActiveSection('invitations') },
             { icon: '◧', label: 'Parking', action: () => setActiveSection('parking') },
+            { icon: '▨', label: 'Digital Badges', action: () => setActiveSection('digitalBadges') },
             { icon: '◨', label: 'Templates', action: () => setActiveSection('templates') },
             { icon: '◪', label: 'Policies', action: () => setActiveSection('policies') },
             { icon: '◭', label: 'Support', action: () => setActiveSection('support') },
@@ -197,6 +198,7 @@ export default function TenantPage() {
               {activeSection === 'users' && 'User Management'}
               {activeSection === 'invitations' && 'Invitation Management'}
               {activeSection === 'parking' && 'Parking Management'}
+              {activeSection === 'digitalBadges' && 'Digital Badges Management'}
               {activeSection === 'templates' && 'Template Management'}
               {activeSection === 'policies' && 'Company Policies'}
               {activeSection === 'support' && 'Support & Help'}
@@ -1074,6 +1076,319 @@ export default function TenantPage() {
                       }}>Release</button>
                     </div>
                   ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Digital Badges Section */}
+          {activeSection === 'digitalBadges' && (
+            <div>
+              {/* Stats Cards */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: '20px',
+                marginBottom: '32px'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: '#162032',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>245</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Total Badges Issued</div>
+                </div>
+                <div style={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: '#162032',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>128</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Sent</div>
+                </div>
+                <div style={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: '#162032',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>87</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Activated</div>
+                </div>
+                <div style={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: '#162032',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>3</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Suspended</div>
+                </div>
+              </div>
+
+              {/* Badge Management Table */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderBottom: '1px solid #1E293B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Digital Badge Users</h2>
+                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Manage and distribute digital wallet badges for {tenantName}</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button style={{
+                      backgroundColor: '#3B82F6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer'
+                    }}>
+                      + Add Badge User
+                    </button>
+                    <button style={{
+                      backgroundColor: '#10B981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer'
+                    }}>
+                      📤 Import Users
+                    </button>
+                  </div>
+                </div>
+
+                {/* Filters */}
+                <div style={{ padding: '20px 24px', borderBottom: '1px solid #1E293B', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  <input
+                    type="search"
+                    placeholder="Search by name or email"
+                    style={{
+                      flex: '1 1 200px',
+                      padding: '10px 16px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }}
+                  />
+                  <select style={{
+                    padding: '10px 16px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}>
+                    <option>All Statuses</option>
+                    <option>New</option>
+                    <option>Sent</option>
+                    <option>Downloaded</option>
+                    <option>Suspended</option>
+                  </select>
+                  <select style={{
+                    padding: '10px 16px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}>
+                    <option>All Card Types</option>
+                    <option>Mifare EV3</option>
+                    <option>LEGIC</option>
+                    <option>HID</option>
+                    <option>NFC</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+
+                {/* Table */}
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#0F1629' }}>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>
+                          <input type="checkbox" style={{ accentColor: '#3B82F6' }} />
+                        </th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Name</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Email</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Department</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Card Type</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Status</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { name: 'John Smith', email: 'john.smith@company.com', department: 'IT', cardType: 'Mifare EV3', status: 'Downloaded' },
+                        { name: 'Sarah Johnson', email: 'sarah.j@company.com', department: 'HR', cardType: 'HID', status: 'Sent' },
+                        { name: 'Mike Davis', email: 'mike.d@company.com', department: 'Sales', cardType: 'NFC', status: 'New' },
+                        { name: 'Lisa Wilson', email: 'lisa.w@company.com', department: 'Marketing', cardType: 'LEGIC', status: 'Downloaded' },
+                        { name: 'Tom Brown', email: 'tom.b@company.com', department: 'Operations', cardType: 'Mifare EV3', status: 'Suspended' },
+                      ].map((user, index) => (
+                        <tr key={index} style={{ borderBottom: '1px solid #1E293B' }}>
+                          <td style={{ padding: '16px 24px' }}>
+                            <input type="checkbox" style={{ accentColor: '#3B82F6' }} />
+                          </td>
+                          <td style={{ padding: '16px 24px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{user.name}</td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>{user.email}</td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>{user.department}</td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '12px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: '#1E293B',
+                              color: '#94A3B8',
+                              border: '1px solid #334155'
+                            }}>
+                              {user.cardType}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: 
+                                user.status === 'Downloaded' ? 'rgba(16, 185, 129, 0.1)' :
+                                user.status === 'Sent' ? 'rgba(59, 130, 246, 0.1)' :
+                                user.status === 'Suspended' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                              color: 
+                                user.status === 'Downloaded' ? '#10B981' :
+                                user.status === 'Sent' ? '#3B82F6' :
+                                user.status === 'Suspended' ? '#EF4444' : '#64748B'
+                            }}>
+                              {user.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              {user.status === 'New' && (
+                                <>
+                                  <button style={{
+                                    backgroundColor: '#3B82F6',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    color: '#FFFFFF',
+                                    fontSize: '12px',
+                                    padding: '6px 12px',
+                                    cursor: 'pointer'
+                                  }}>📧 Email</button>
+                                  <button style={{
+                                    backgroundColor: '#10B981',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    color: '#FFFFFF',
+                                    fontSize: '12px',
+                                    padding: '6px 12px',
+                                    cursor: 'pointer'
+                                  }}>🔔 Push</button>
+                                </>
+                              )}
+                              {user.status === 'Downloaded' && (
+                                <button style={{
+                                  backgroundColor: '#F59E0B',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  color: '#FFFFFF',
+                                  fontSize: '12px',
+                                  padding: '6px 12px',
+                                  cursor: 'pointer'
+                                }}>⏸️ Suspend</button>
+                              )}
+                              {user.status === 'Suspended' && (
+                                <button style={{
+                                  backgroundColor: '#10B981',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  color: '#FFFFFF',
+                                  fontSize: '12px',
+                                  padding: '6px 12px',
+                                  cursor: 'pointer'
+                                }}>✅ Recover</button>
+                              )}
+                              <button style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #334155',
+                                borderRadius: '6px',
+                                color: '#EF4444',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer'
+                              }}>Delete</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination */}
+                <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Showing 1-5 of 245 users</div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #334155',
+                      borderRadius: '6px',
+                      color: '#94A3B8',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}>Previous</button>
+                    <button style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#3B82F6',
+                      border: 'none',
+                      borderRadius: '6px',
+                      color: '#FFFFFF',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}>1</button>
+                    <button style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #334155',
+                      borderRadius: '6px',
+                      color: '#94A3B8',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}>2</button>
+                    <button style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #334155',
+                      borderRadius: '6px',
+                      color: '#94A3B8',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}>Next</button>
+                  </div>
                 </div>
               </div>
             </div>

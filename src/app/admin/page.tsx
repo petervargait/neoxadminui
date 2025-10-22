@@ -168,6 +168,7 @@ export default function AdminPage() {
             { icon: 'person', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'person' },
             { icon: '◧', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '▨', label: 'Digital Badges', action: () => setActiveSection('digitalBadges'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), enabled: true, isFluentIcon: false, iconType: null },
             { icon: 'ticket', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: true, iconType: 'ticket' },
@@ -302,6 +303,7 @@ export default function AdminPage() {
               {activeSection === 'users' && 'User Management'}
               {activeSection === 'modules' && 'Manage Modules'}
               {activeSection === 'bulkUpload' && 'Bulk Upload Users'}
+              {activeSection === 'digitalBadges' && 'Digital Badges Management'}
               {activeSection === 'whiteLabel' && 'White Label Settings'}
               {activeSection === 'policies' && 'Policy Management'}
               {activeSection === 'ticketManagement' && 'Ticket Management'}
@@ -1019,6 +1021,328 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* Digital Badges Section */}
+          {activeSection === 'digitalBadges' && (
+            <div>
+              {/* Stats Cards */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: '20px',
+                marginBottom: '32px'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: '#162032',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>847</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Total Badges Issued</div>
+                </div>
+                <div style={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: '#162032',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>512</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Sent</div>
+                </div>
+                <div style={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: '#162032',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>423</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Activated</div>
+                </div>
+                <div style={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: '#162032',
+                  border: '1px solid #1E293B'
+                }}>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>12</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Suspended</div>
+                </div>
+              </div>
+
+              {/* Badge Management Table */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderBottom: '1px solid #1E293B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Digital Badge Users</h2>
+                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Manage and distribute digital wallet badges</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button style={{
+                      backgroundColor: '#3B82F6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer'
+                    }}>
+                      + Add Badge User
+                    </button>
+                    <button style={{
+                      backgroundColor: '#10B981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer'
+                    }}>
+                      📤 Import Users
+                    </button>
+                  </div>
+                </div>
+
+                {/* Filters */}
+                <div style={{ padding: '20px 24px', borderBottom: '1px solid #1E293B', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  <input
+                    type="search"
+                    placeholder="Search by name or email"
+                    style={{
+                      flex: '1 1 200px',
+                      padding: '10px 16px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }}
+                  />
+                  <select style={{
+                    padding: '10px 16px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}>
+                    <option>All Statuses</option>
+                    <option>New</option>
+                    <option>Sent</option>
+                    <option>Downloaded</option>
+                    <option>Suspended</option>
+                  </select>
+                  <select style={{
+                    padding: '10px 16px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}>
+                    <option>All Card Types</option>
+                    <option>Mifare EV3</option>
+                    <option>LEGIC</option>
+                    <option>HID</option>
+                    <option>NFC</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+
+                {/* Table */}
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#0F1629' }}>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>
+                          <input type="checkbox" style={{ accentColor: '#3B82F6' }} />
+                        </th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Name</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Email</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Company</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Card Type</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Status</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { name: 'John Smith', email: 'john.smith@acme.com', company: 'Acme Corp', cardType: 'Mifare EV3', status: 'Downloaded', imei: '123456789012345' },
+                        { name: 'Sarah Johnson', email: 'sarah.j@techflow.com', company: 'TechFlow Industries', cardType: 'HID', status: 'Sent', imei: '234567890123456' },
+                        { name: 'Mike Davis', email: 'mike.d@global.com', company: 'Global Solutions', cardType: 'NFC', status: 'New', imei: '345678901234567' },
+                        { name: 'Lisa Wilson', email: 'lisa.w@innovation.com', company: 'Innovation Labs', cardType: 'LEGIC', status: 'Downloaded', imei: '456789012345678' },
+                        { name: 'Tom Brown', email: 'tom.b@digital.com', company: 'Digital Dynamics', cardType: 'Mifare EV3', status: 'Suspended', imei: '567890123456789' },
+                      ].map((user, index) => (
+                        <tr key={index} style={{ borderBottom: '1px solid #1E293B' }}>
+                          <td style={{ padding: '16px 24px' }}>
+                            <input type="checkbox" style={{ accentColor: '#3B82F6' }} />
+                          </td>
+                          <td style={{ padding: '16px 24px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{user.name}</td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>{user.email}</td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>{user.company}</td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '12px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: '#1E293B',
+                              color: '#94A3B8',
+                              border: '1px solid #334155'
+                            }}>
+                              {user.cardType}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: 
+                                user.status === 'Downloaded' ? 'rgba(16, 185, 129, 0.1)' :
+                                user.status === 'Sent' ? 'rgba(59, 130, 246, 0.1)' :
+                                user.status === 'Suspended' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                              color: 
+                                user.status === 'Downloaded' ? '#10B981' :
+                                user.status === 'Sent' ? '#3B82F6' :
+                                user.status === 'Suspended' ? '#EF4444' : '#64748B'
+                            }}>
+                              {user.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              {user.status === 'New' && (
+                                <>
+                                  <button style={{
+                                    backgroundColor: '#3B82F6',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    color: '#FFFFFF',
+                                    fontSize: '12px',
+                                    padding: '6px 12px',
+                                    cursor: 'pointer'
+                                  }}>📧 Email</button>
+                                  <button style={{
+                                    backgroundColor: '#10B981',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    color: '#FFFFFF',
+                                    fontSize: '12px',
+                                    padding: '6px 12px',
+                                    cursor: 'pointer'
+                                  }}>🔔 Push</button>
+                                </>
+                              )}
+                              {user.status === 'Downloaded' && (
+                                <button style={{
+                                  backgroundColor: '#F59E0B',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  color: '#FFFFFF',
+                                  fontSize: '12px',
+                                  padding: '6px 12px',
+                                  cursor: 'pointer'
+                                }}>⏸️ Suspend</button>
+                              )}
+                              {user.status === 'Suspended' && (
+                                <button style={{
+                                  backgroundColor: '#10B981',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  color: '#FFFFFF',
+                                  fontSize: '12px',
+                                  padding: '6px 12px',
+                                  cursor: 'pointer'
+                                }}>✅ Recover</button>
+                              )}
+                              <button style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #334155',
+                                borderRadius: '6px',
+                                color: '#EF4444',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer'
+                              }}>Delete</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination */}
+                <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Showing 1-5 of 847 users</div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #334155',
+                      borderRadius: '6px',
+                      color: '#94A3B8',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}>Previous</button>
+                    <button style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#3B82F6',
+                      border: 'none',
+                      borderRadius: '6px',
+                      color: '#FFFFFF',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}>1</button>
+                    <button style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #334155',
+                      borderRadius: '6px',
+                      color: '#94A3B8',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}>2</button>
+                    <button style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #334155',
+                      borderRadius: '6px',
+                      color: '#94A3B8',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}>3</button>
+                    <button style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #334155',
+                      borderRadius: '6px',
+                      color: '#94A3B8',
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}>Next</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Close main content div and other closing tags will be added next */}
 
           {/* Analytics Section */}
@@ -1036,9 +1360,19 @@ export default function AdminPage() {
                   <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 8.2% from last month</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Digital Badges Issued</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#D7BB91', marginBottom: '8px' }}>847</div>
+                  <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 18.3% from last month</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Invitations</h4>
                   <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B', marginBottom: '8px' }}>2,186</div>
                   <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 15.7% from last month</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Badges Activated</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>423</div>
+                  <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 24.1% from last month</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>System Uptime</h4>
