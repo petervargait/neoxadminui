@@ -23,7 +23,7 @@ export default function Home() {
         padding: '0 32px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <NeoxLogo width="120px" height="32px" />
+          <NeoxLogo width="240px" height="64px" />
           <div style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600' }}>NEOX</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>

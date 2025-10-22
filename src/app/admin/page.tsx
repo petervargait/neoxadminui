@@ -75,7 +75,7 @@ export default function AdminPage() {
           alignItems: 'center',
           gap: '12px'
         }}>
-          <NeoxLogo width={sidebarCollapsed ? '32px' : '120px'} height="32px" />
+          <NeoxLogo width={sidebarCollapsed ? '64px' : '240px'} height="64px" />
           {!sidebarCollapsed && (
             <div style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600' }}>NEOX</div>
           )}

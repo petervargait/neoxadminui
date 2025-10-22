@@ -54,7 +54,7 @@ export default function TenantPage() {
           alignItems: 'center',
           gap: '12px'
         }}>
-          <NeoxLogo width="32px" height="32px" />
+          <NeoxLogo width="64px" height="64px" />
           {sidebarExpanded && (
             <span style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600' }}>NEOX</span>
           )}
@@ -84,29 +84,68 @@ export default function TenantPage() {
         </button>
 
         {/* Navigation */}
-        <div style={{ padding: '20px 0' }}>
-          <Link href="/" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '12px 20px',
-            color: '#64748B',
-            textDecoration: 'none',
-            fontSize: '14px',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#1E293B'
-            e.currentTarget.style.color = '#F1F5F9'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent'
-            e.currentTarget.style.color = '#64748B'
-          }}>
-            <span style={{ fontSize: '16px' }}>🏠</span>
-            {sidebarExpanded && <span>Home</span>}
-          </Link>
-        </div>
+        <nav style={{ padding: '20px 0', flex: 1 }}>
+          {[
+            { icon: '📈', label: 'Dashboard', action: () => setActiveModal(null) },
+            { icon: '📈', label: 'Analytics', action: () => setActiveModal('analytics') },
+            { icon: '👥', label: 'Users', action: () => setActiveModal('users') },
+            { icon: '📬', label: 'Invitations', action: () => setActiveModal('invitations') },
+            { icon: '🏎️', label: 'Parking', action: () => setActiveModal('parking') },
+            { icon: '📝', label: 'Templates', action: () => setActiveModal('manageTemplates') },
+          ].map((item, index) => (
+            <div key={index} 
+              onClick={item.action}
+              style={{
+                padding: '12px 20px',
+                margin: '4px 12px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: '#94A3B8',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                (e.target as HTMLElement).style.backgroundColor = '#1E293B';
+                (e.target as HTMLElement).style.color = '#F1F5F9';
+              }}
+              onMouseLeave={(e) => {
+                (e.target as HTMLElement).style.backgroundColor = 'transparent';
+                (e.target as HTMLElement).style.color = '#94A3B8';
+              }}
+            >
+              <span style={{ fontSize: '16px' }}>{item.icon}</span>
+              {sidebarExpanded && <span>{item.label}</span>}
+            </div>
+          ))}
+        </nav>
+
+        {/* Back to Home Button */}
+        <Link href="/" style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '16px 20px',
+          color: '#64748B',
+          textDecoration: 'none',
+          fontSize: '14px',
+          borderTop: '1px solid #1E293B',
+          transition: 'all 0.2s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#1E293B'
+          e.currentTarget.style.color = '#F1F5F9'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent'
+          e.currentTarget.style.color = '#64748B'
+        }}>
+          <span style={{ fontSize: '16px' }}>←</span>
+          {sidebarExpanded && <span>Back to Home</span>}
+        </Link>
       </div>
 
       {/* Main Content */}
