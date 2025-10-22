@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#0B1426',
+      backgroundColor: '#08122E',
       fontFamily: 'Inter, system-ui, sans-serif',
       display: 'flex',
       flexDirection: 'column'
@@ -23,17 +23,29 @@ export default function Home() {
         padding: '0 32px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <NeoxLogo width="240px" height="64px" />
-          <div style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600' }}>NEOX</div>
+          <NeoxLogo width="480px" height="128px" />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ color: '#64748B', fontSize: '14px' }}>Production Ready</div>
+          {/* Empty - reserved for future use */}
         </div>
       </div>
 
       {/* Main Content */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 32px' }}>
-        <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 32px', position: 'relative' }}>
+        {/* Background Design Element */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundImage: 'url(/NEOXOfficeAi.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.15,
+          zIndex: 0
+        }} />
+        <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           {/* Hero Section */}
           <div style={{ marginBottom: '48px' }}>
             <h1 style={{

@@ -6,6 +6,10 @@ import { useState } from 'react'
 export default function TenantPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>(null)
+  const [showUserModal, setShowUserModal] = useState(false)
+  const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string} | null>(null)
+  const [showTemplateEditor, setShowTemplateEditor] = useState(false)
+  const [editingTemplate, setEditingTemplate] = useState<{name: string; subject?: string; status?: string} | null>(null)
 
   return (
     <div style={{ 
@@ -32,7 +36,7 @@ export default function TenantPage() {
           alignItems: 'center',
           justifyContent: 'center'
         }}>
-          <NeoxLogo width="64px" height="64px" />
+          <NeoxLogo width="128px" height="128px" />
         </div>
 
         {/* Navigation */}
@@ -441,7 +445,7 @@ export default function TenantPage() {
                   <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>User Management</h2>
                   <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Manage organization users and permissions</p>
                 </div>
-                <button style={{
+                <button onClick={() => { setEditingUser(null); setShowUserModal(true); }} style={{
                   backgroundColor: '#3B82F6',
                   color: 'white',
                   border: 'none',
@@ -531,7 +535,7 @@ export default function TenantPage() {
                             </span>
                           </td>
                           <td style={{ padding: '16px', textAlign: 'right' }}>
-                            <button style={{
+                            <button onClick={() => { setEditingUser(user); setShowUserModal(true); }} style={{
                               backgroundColor: 'transparent',
                               border: '1px solid #1E293B',
                               borderRadius: '6px',
@@ -541,7 +545,17 @@ export default function TenantPage() {
                               cursor: 'pointer',
                               marginRight: '8px'
                             }}>Edit</button>
-                            <button style={{
+                            <button onClick={() => { if (confirm(`${user.status === 'Active' ? 'Deactivate' : 'Reactivate'} ${user.name}?`)) { alert(`User ${user.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`); } }} style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #1E293B',
+                              borderRadius: '6px',
+                              color: user.status === 'Active' ? '#F59E0B' : '#10B981',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer',
+                              marginRight: '8px'
+                            }}>{user.status === 'Active' ? 'Deactivate' : 'Reactivate'}</button>
+                            <button onClick={() => { if (confirm(`Delete ${user.name}? This action cannot be undone.`)) { alert('User deleted successfully'); } }} style={{
                               backgroundColor: 'transparent',
                               border: '1px solid #1E293B',
                               borderRadius: '6px',
@@ -635,7 +649,7 @@ export default function TenantPage() {
                     }} />
                   </div>
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <button type="submit" style={{
+                    <button type="submit" onSubmit={(e) => { e.preventDefault(); alert('Invitation sent successfully!'); }} style={{
                       backgroundColor: '#3B82F6',
                       color: 'white',
                       border: 'none',
@@ -733,7 +747,7 @@ export default function TenantPage() {
               }}>
                 <div style={{ padding: '24px', borderBottom: '1px solid #1E293B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Parking Spaces</h3>
-                  <button style={{
+                  <button onClick={() => alert('Assign parking space: Select a user and an available space')} style={{
                     backgroundColor: '#3B82F6',
                     color: 'white',
                     border: 'none',
@@ -818,7 +832,7 @@ export default function TenantPage() {
                           <p style={{ color: '#64748B', margin: 0, fontSize: '12px' }}>{assignment.from} to {assignment.to}</p>
                         </div>
                       </div>
-                      <button style={{
+                      <button onClick={() => { if (confirm(`Release parking space ${assignment.space}?`)) { alert(`Parking space ${assignment.space} released successfully`); } }} style={{
                         backgroundColor: 'transparent',
                         border: '1px solid #475569',
                         borderRadius: '6px',
@@ -890,7 +904,7 @@ export default function TenantPage() {
                         }}>
                           {template.status}
                         </span>
-                        <button style={{
+                        <button onClick={() => { setEditingTemplate(template); setShowTemplateEditor(true); }} style={{
                           backgroundColor: 'transparent',
                           border: '1px solid #475569',
                           borderRadius: '6px',
@@ -993,6 +1007,213 @@ export default function TenantPage() {
           )}
         </div>
       </div>
+
+      {/* User Add/Edit Modal */}
+      {showUserModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => setShowUserModal(false)}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            border: '1px solid #1E293B'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
+              {editingUser ? 'Edit User' : 'Add New User'}
+            </h2>
+            <form onSubmit={(e) => { e.preventDefault(); alert(`User ${editingUser ? 'updated' : 'added'} successfully!`); setShowUserModal(false); }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Full Name *</label>
+                <input type="text" defaultValue={editingUser?.name} required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px'
+                }} />
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email *</label>
+                <input type="email" defaultValue={editingUser?.email} required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px'
+                }} />
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Role *</label>
+                <select defaultValue={editingUser?.role || 'User'} required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}>
+                  <option value="Admin">Admin</option>
+                  <option value="Manager">Manager</option>
+                  <option value="User">User</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Department</label>
+                <input type="text" defaultValue={editingUser?.department} style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px'
+                }} />
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>{editingUser ? 'Update User' : 'Add User'}</button>
+                <button type="button" onClick={() => setShowUserModal(false)} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Template Editor Modal */}
+      {showTemplateEditor && editingTemplate && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => setShowTemplateEditor(false)}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            border: '1px solid #1E293B'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
+              Edit Template: {editingTemplate.name}
+            </h2>
+            <form onSubmit={(e) => { e.preventDefault(); alert('Template saved successfully!'); setShowTemplateEditor(false); }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Template Name *</label>
+                <input type="text" defaultValue={editingTemplate.name} required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px'
+                }} />
+              </div>
+              {editingTemplate.subject && (
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Subject Line *</label>
+                  <input type="text" defaultValue={editingTemplate.subject} required style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} />
+                </div>
+              )}
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Template Content</label>
+                <textarea defaultValue={editingTemplate.subject || 'Template content here...'} style={
+{
+                  width: '100%',
+                  minHeight: '200px',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px',
+                  fontFamily: 'monospace',
+                  resize: 'vertical'
+                }} />
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Save Template</button>
+                <button type="button" onClick={() => setShowTemplateEditor(false)} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

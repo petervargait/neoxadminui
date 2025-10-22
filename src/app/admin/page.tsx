@@ -76,7 +76,7 @@ export default function AdminPage() {
           alignItems: 'center',
           justifyContent: 'center'
         }}>
-          <NeoxLogo width="64px" height="64px" />
+          <NeoxLogo width="128px" height="128px" />
         </div>
 
         {/* Tenant Selector */}
