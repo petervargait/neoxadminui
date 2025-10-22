@@ -589,11 +589,11 @@ export default function AdminPage() {
                     </thead>
                     <tbody>
                       {[
-                        { name: 'Acme Corporation', status: 'Active', users: 245, plan: 'Enterprise', created: '2024-01-15', logo: '🏢' },
-                        { name: 'TechFlow Industries', status: 'Active', users: 128, plan: 'Professional', created: '2024-01-10', logo: '🚀' },
-                        { name: 'Global Solutions Ltd', status: 'Pending', users: 0, plan: 'Starter', created: '2024-01-08', logo: '🌍' },
-                        { name: 'Innovation Labs', status: 'Active', users: 87, plan: 'Professional', created: '2024-01-05', logo: '🔬' },
-                        { name: 'Digital Dynamics', status: 'Suspended', users: 156, plan: 'Enterprise', created: '2024-01-03', logo: '⚡' },
+                        { name: 'Acme Corporation', status: 'Active', users: 245, plan: 'Enterprise', created: '2024-01-15', logo: '◎', color: '#D7BB91' },
+                        { name: 'TechFlow Industries', status: 'Active', users: 128, plan: 'Professional', created: '2024-01-10', logo: '◆', color: '#60A5FA' },
+                        { name: 'Global Solutions Ltd', status: 'Pending', users: 0, plan: 'Starter', created: '2024-01-08', logo: '◈', color: '#22C55E' },
+                        { name: 'Innovation Labs', status: 'Active', users: 87, plan: 'Professional', created: '2024-01-05', logo: '◧', color: '#A78BFA' },
+                        { name: 'Digital Dynamics', status: 'Suspended', users: 156, plan: 'Enterprise', created: '2024-01-03', logo: '■', color: '#F59E0B' },
                       ].map((tenant, index) => (
                         <tr key={index} style={{ borderBottom: '1px solid #1E293B' }}>
                           <td style={{ padding: '16px 24px' }}>
@@ -602,11 +602,14 @@ export default function AdminPage() {
                                 width: '40px',
                                 height: '40px',
                                 borderRadius: '8px',
-                                backgroundColor: '#1E293B',
+                                backgroundColor: `${tenant.color}15`,
+                                border: `1px solid ${tenant.color}40`,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                fontSize: '16px'
+                                fontSize: '18px',
+                                color: tenant.color,
+                                boxShadow: `0 0 10px ${tenant.color}30`
                               }}>
                                 {tenant.logo}
                               </div>
@@ -685,14 +688,24 @@ export default function AdminPage() {
                   <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Manage organization users and permissions</p>
                 </div>
                 <button onClick={() => { setEditingUser(null); setShowUserModal(true); }} style={{
-                  backgroundColor: '#3B82F6',
+                  backgroundColor: '#60A5FA',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',
                   padding: '10px 16px',
                   fontSize: '14px',
                   fontWeight: '500',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(96, 165, 250, 0.6), 0 0 35px rgba(96, 165, 250, 0.3)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}>
                   + Add User
                 </button>
@@ -828,33 +841,63 @@ export default function AdminPage() {
                           </td>
                           <td style={{ padding: '16px', textAlign: 'right' }}>
                             <button onClick={() => { setEditingUser(user); setShowUserModal(true); }} style={{
-                              backgroundColor: 'transparent',
-                              border: '1px solid #1E293B',
+                              backgroundColor: '#60A5FA',
+                              border: 'none',
                               borderRadius: '6px',
-                              color: '#3B82F6',
+                              color: 'white',
                               fontSize: '12px',
                               padding: '6px 12px',
                               cursor: 'pointer',
-                              marginRight: '8px'
+                              marginRight: '8px',
+                              boxShadow: '0 0 10px rgba(96, 165, 250, 0.3)',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.5)';
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.boxShadow = '0 0 10px rgba(96, 165, 250, 0.3)';
+                              e.currentTarget.style.transform = 'translateY(0)';
                             }}>Edit</button>
                             <button onClick={() => { if (confirm(`${user.status === 'Active' ? 'Deactivate' : 'Reactivate'} ${user.name}?`)) { alert(`User ${user.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`); } }} style={{
-                              backgroundColor: 'transparent',
-                              border: '1px solid #1E293B',
+                              backgroundColor: user.status === 'Active' ? '#F59E0B' : '#10B981',
+                              border: 'none',
                               borderRadius: '6px',
-                              color: user.status === 'Active' ? '#F59E0B' : '#10B981',
+                              color: 'white',
                               fontSize: '12px',
                               padding: '6px 12px',
                               cursor: 'pointer',
-                              marginRight: '8px'
+                              marginRight: '8px',
+                              boxShadow: user.status === 'Active' ? '0 0 10px rgba(245, 158, 11, 0.3)' : '0 0 10px rgba(16, 185, 129, 0.3)',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.boxShadow = user.status === 'Active' ? '0 0 15px rgba(245, 158, 11, 0.5)' : '0 0 15px rgba(16, 185, 129, 0.5)';
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.boxShadow = user.status === 'Active' ? '0 0 10px rgba(245, 158, 11, 0.3)' : '0 0 10px rgba(16, 185, 129, 0.3)';
+                              e.currentTarget.style.transform = 'translateY(0)';
                             }}>{user.status === 'Active' ? 'Deactivate' : 'Reactivate'}</button>
                             <button onClick={() => { if (confirm(`Delete ${user.name}? This action cannot be undone.`)) { alert('User deleted successfully'); } }} style={{
-                              backgroundColor: 'transparent',
-                              border: '1px solid #1E293B',
+                              backgroundColor: '#EF4444',
+                              border: 'none',
                               borderRadius: '6px',
-                              color: '#EF4444',
+                              color: 'white',
                               fontSize: '12px',
                               padding: '6px 12px',
-                              cursor: 'pointer'
+                              cursor: 'pointer',
+                              boxShadow: '0 0 10px rgba(239, 68, 68, 0.3)',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.5)';
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.3)';
+                              e.currentTarget.style.transform = 'translateY(0)';
                             }}>Delete</button>
                           </td>
                         </tr>
@@ -1089,14 +1132,24 @@ export default function AdminPage() {
                   </div>
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <button style={{
-                      backgroundColor: '#3B82F6',
+                      backgroundColor: '#60A5FA',
                       color: 'white',
                       border: 'none',
                       borderRadius: '8px',
                       padding: '10px 16px',
                       fontSize: '14px',
                       fontWeight: '500',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 20px rgba(96, 165, 250, 0.6), 0 0 35px rgba(96, 165, 250, 0.3)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)';
+                      e.currentTarget.style.transform = 'translateY(0)';
                     }}>
                       + Add Badge User
                     </button>
@@ -1108,7 +1161,17 @@ export default function AdminPage() {
                       padding: '10px 16px',
                       fontSize: '14px',
                       fontWeight: '500',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      boxShadow: '0 0 15px rgba(16, 185, 129, 0.4), 0 0 25px rgba(16, 185, 129, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.6), 0 0 35px rgba(16, 185, 129, 0.3)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.4), 0 0 25px rgba(16, 185, 129, 0.2)';
+                      e.currentTarget.style.transform = 'translateY(0)';
                     }}>
                       📤 Import Users
                     </button>
@@ -1230,13 +1293,23 @@ export default function AdminPage() {
                               {user.status === 'New' && (
                                 <>
                                   <button style={{
-                                    backgroundColor: '#3B82F6',
+                                    backgroundColor: '#60A5FA',
                                     border: 'none',
                                     borderRadius: '6px',
                                     color: '#FFFFFF',
                                     fontSize: '12px',
                                     padding: '6px 12px',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    boxShadow: '0 0 10px rgba(96, 165, 250, 0.3)',
+                                    transition: 'all 0.2s ease'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.5)';
+                                    e.currentTarget.style.transform = 'translateY(-1px)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.boxShadow = '0 0 10px rgba(96, 165, 250, 0.3)';
+                                    e.currentTarget.style.transform = 'translateY(0)';
                                   }}>📧 Email</button>
                                   <button style={{
                                     backgroundColor: '#10B981',
@@ -1245,7 +1318,17 @@ export default function AdminPage() {
                                     color: '#FFFFFF',
                                     fontSize: '12px',
                                     padding: '6px 12px',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)',
+                                    transition: 'all 0.2s ease'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.5)';
+                                    e.currentTarget.style.transform = 'translateY(-1px)';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.3)';
+                                    e.currentTarget.style.transform = 'translateY(0)';
                                   }}>🔔 Push</button>
                                 </>
                               )}
@@ -1257,7 +1340,17 @@ export default function AdminPage() {
                                   color: '#FFFFFF',
                                   fontSize: '12px',
                                   padding: '6px 12px',
-                                  cursor: 'pointer'
+                                  cursor: 'pointer',
+                                  boxShadow: '0 0 10px rgba(245, 158, 11, 0.3)',
+                                  transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.boxShadow = '0 0 15px rgba(245, 158, 11, 0.5)';
+                                  e.currentTarget.style.transform = 'translateY(-1px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.boxShadow = '0 0 10px rgba(245, 158, 11, 0.3)';
+                                  e.currentTarget.style.transform = 'translateY(0)';
                                 }}>⏸️ Suspend</button>
                               )}
                               {user.status === 'Suspended' && (
@@ -1268,17 +1361,37 @@ export default function AdminPage() {
                                   color: '#FFFFFF',
                                   fontSize: '12px',
                                   padding: '6px 12px',
-                                  cursor: 'pointer'
+                                  cursor: 'pointer',
+                                  boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)',
+                                  transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.5)';
+                                  e.currentTarget.style.transform = 'translateY(-1px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.3)';
+                                  e.currentTarget.style.transform = 'translateY(0)';
                                 }}>✅ Recover</button>
                               )}
                               <button style={{
-                                backgroundColor: 'transparent',
-                                border: '1px solid #334155',
+                                backgroundColor: '#EF4444',
+                                border: 'none',
                                 borderRadius: '6px',
-                                color: '#EF4444',
+                                color: 'white',
                                 fontSize: '12px',
                                 padding: '6px 12px',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                boxShadow: '0 0 10px rgba(239, 68, 68, 0.3)',
+                                transition: 'all 0.2s ease'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.5)';
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.3)';
+                                e.currentTarget.style.transform = 'translateY(0)';
                               }}>Delete</button>
                             </div>
                           </td>

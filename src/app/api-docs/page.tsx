@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
+import { PersonRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, BookRegular } from '@fluentui/react-icons'
 
 export default function APIDocsPage() {
   const router = useRouter()
@@ -33,11 +34,11 @@ export default function APIDocsPage() {
   }
 
   const apiCategories = [
-    { id: 'overview', name: 'Overview', icon: '📋' },
-    { id: 'user-management', name: 'User Management', icon: '👥' },
-    { id: 'visitor-management', name: 'Visitor Management', icon: '🚶' },
-    { id: 'parking', name: 'Parking Management', icon: '🅿️' },
-    { id: 'digital-badge', name: 'Digital Badge Management', icon: '🎫' },
+    { id: 'overview', name: 'Overview', icon: 'book', isFluentIcon: true },
+    { id: 'user-management', name: 'User Management', icon: 'people', isFluentIcon: true },
+    { id: 'visitor-management', name: 'Visitor Management', icon: 'person', isFluentIcon: true },
+    { id: 'parking', name: 'Parking Management', icon: 'vehicle', isFluentIcon: true },
+    { id: 'digital-badge', name: 'Digital Badge Management', icon: 'document', isFluentIcon: true },
   ]
 
   return (
@@ -102,7 +103,23 @@ export default function APIDocsPage() {
                 }
               }}
             >
-              <span style={{ fontSize: '18px' }}>{category.icon}</span>
+              {category.isFluentIcon ? (
+                category.icon === 'book' ? (
+                  <BookRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'people' ? (
+                  <PeopleRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'person' ? (
+                  <PersonRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'vehicle' ? (
+                  <VehicleCarRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'document' ? (
+                  <DocumentRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : (
+                  <span style={{ fontSize: '18px' }}>{category.icon}</span>
+                )
+              ) : (
+                <span style={{ fontSize: '18px' }}>{category.icon}</span>
+              )}
               <span>{category.name}</span>
             </div>
           ))}
