@@ -479,54 +479,214 @@ export default function AdminPage() {
 
             {activeSection === 'createTenant' && (
               <div>
-                <form style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <form style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  {/* Company Data */}
                   <div>
-                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Tenant Name</label>
-                    <input type="text" placeholder="Enter tenant name" style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                      border: '1px solid rgba(75, 101, 129, 0.3)',
-                      borderRadius: '8px',
-                      color: '#d7bb91',
-                      fontSize: '14px'
-                    }} />
+                    <h3 style={{ color: '#d7bb91', fontSize: '16px', marginBottom: '12px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Company Information</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Company Name *</label>
+                        <input type="text" placeholder="Enter company name" style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                      </div>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Company Address</label>
+                        <input type="text" placeholder="Street address" style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                        <input type="text" placeholder="City" style={{
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                        <input type="text" placeholder="State/Province" style={{
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                        <input type="text" placeholder="Postal Code" style={{
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Contact Persons */}
                   <div>
-                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Admin Email</label>
-                    <input type="email" placeholder="admin@company.com" style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                      border: '1px solid rgba(75, 101, 129, 0.3)',
-                      borderRadius: '8px',
-                      color: '#d7bb91',
-                      fontSize: '14px'
-                    }} />
+                    <h3 style={{ color: '#d7bb91', fontSize: '16px', marginBottom: '12px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Contact Persons</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Primary Contact Name *</label>
+                        <input type="text" placeholder="Full name" style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div>
+                          <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email *</label>
+                          <input type="email" placeholder="email@company.com" style={{
+                            width: '100%',
+                            padding: '12px',
+                            backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                            border: '1px solid rgba(75, 101, 129, 0.3)',
+                            borderRadius: '8px',
+                            color: '#d7bb91',
+                            fontSize: '14px'
+                          }} />
+                        </div>
+                        <div>
+                          <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Phone</label>
+                          <input type="tel" placeholder="+1 (555) 000-0000" style={{
+                            width: '100%',
+                            padding: '12px',
+                            backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                            border: '1px solid rgba(75, 101, 129, 0.3)',
+                            borderRadius: '8px',
+                            color: '#d7bb91',
+                            fontSize: '14px'
+                          }} />
+                        </div>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Locations */}
                   <div>
-                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Features</label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <h3 style={{ color: '#d7bb91', fontSize: '16px', marginBottom: '12px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Locations</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Location Name</label>
+                        <input type="text" placeholder="e.g., Main Office, Building A" style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                      </div>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Location Address</label>
+                        <input type="text" placeholder="Physical location address" style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Invoicing Data */}
+                  <div>
+                    <h3 style={{ color: '#d7bb91', fontSize: '16px', marginBottom: '12px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Invoicing Information</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div>
+                          <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Tax ID</label>
+                          <input type="text" placeholder="Tax identification number" style={{
+                            width: '100%',
+                            padding: '12px',
+                            backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                            border: '1px solid rgba(75, 101, 129, 0.3)',
+                            borderRadius: '8px',
+                            color: '#d7bb91',
+                            fontSize: '14px'
+                          }} />
+                        </div>
+                        <div>
+                          <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>IBAN</label>
+                          <input type="text" placeholder="Bank account number" style={{
+                            width: '100%',
+                            padding: '12px',
+                            backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                            border: '1px solid rgba(75, 101, 129, 0.3)',
+                            borderRadius: '8px',
+                            color: '#d7bb91',
+                            fontSize: '14px'
+                          }} />
+                        </div>
+                      </div>
+                      <div>
+                        <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Billing Email</label>
+                        <input type="email" placeholder="billing@company.com" style={{
+                          width: '100%',
+                          padding: '12px',
+                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                          border: '1px solid rgba(75, 101, 129, 0.3)',
+                          borderRadius: '8px',
+                          color: '#d7bb91',
+                          fontSize: '14px'
+                        }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Features */}
+                  <div>
+                    <h3 style={{ color: '#d7bb91', fontSize: '16px', marginBottom: '12px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Enabled Features</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                       <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
-                        <input type="checkbox" /> User Management
+                        <input type="checkbox" defaultChecked /> User Management
                       </label>
                       <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
-                        <input type="checkbox" /> Invitation System
+                        <input type="checkbox" defaultChecked /> Invitation System
                       </label>
                       <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
-                        <input type="checkbox" /> Parking Management
+                        <input type="checkbox" defaultChecked /> Parking Management
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
+                        <input type="checkbox" /> Templates
                       </label>
                     </div>
                   </div>
+
                   <button type="submit" style={{
                     backgroundColor: 'rgba(75, 101, 129, 0.8)',
                     color: '#d7bb91',
                     border: '1px solid rgba(75, 101, 129, 0.3)',
                     borderRadius: '8px',
-                    padding: '12px 24px',
-                    fontWeight: '500',
+                    padding: '14px 24px',
+                    fontWeight: '600',
                     cursor: 'pointer',
-                    marginTop: '16px'
+                    fontSize: '16px',
+                    marginTop: '8px'
                   }}>Create Tenant</button>
                 </form>
               </div>
@@ -1016,16 +1176,64 @@ export default function AdminPage() {
             )}
 
             {activeSection === 'tenantsList' && (
-              <div style={{ padding: '20px', textAlign: 'center' }}>
-                <p style={{ color: '#64748B', fontSize: '16px' }}>Detailed tenant list interface coming soon...</p>
+              <div>
+                <div style={{ marginBottom: '20px', display: 'flex', gap: '12px' }}>
+                  <input type="search" placeholder="Search tenants..." style={{
+                    flex: 1,
+                    padding: '12px',
+                    backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                    border: '1px solid rgba(75, 101, 129, 0.3)',
+                    borderRadius: '8px',
+                    color: '#d7bb91',
+                    fontSize: '14px'
+                  }} />
+                  <button onClick={handleCreateTenant} style={{
+                    backgroundColor: 'rgba(75, 101, 129, 0.8)',
+                    color: '#d7bb91',
+                    border: '1px solid rgba(75, 101, 129, 0.3)',
+                    borderRadius: '8px',
+                    padding: '12px 24px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}>+ Create Tenant</button>
+                </div>
+                <div style={{ maxHeight: '400px', overflow: 'auto' }}>
+                  {[
+                    { name: 'Acme Corporation', status: 'Active', users: 245, contact: 'John Doe', email: 'john@acme.com' },
+                    { name: 'TechFlow Industries', status: 'Active', users: 128, contact: 'Jane Smith', email: 'jane@techflow.com' },
+                    { name: 'Global Solutions Ltd', status: 'Pending', users: 0, contact: 'Bob Johnson', email: 'bob@global.com' },
+                    { name: 'Innovation Labs', status: 'Active', users: 87, contact: 'Alice Brown', email: 'alice@innovation.com' },
+                  ].map((tenant, idx) => (
+                    <div key={idx} style={{
+                      padding: '16px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.3)',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      marginBottom: '12px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div>
+                        <h4 style={{ color: '#d7bb91', margin: '0 0 4px 0', fontSize: '16px' }}>{tenant.name}</h4>
+                        <p style={{ color: '#d7bb91', opacity: 0.7, margin: '0 0 4px 0', fontSize: '13px' }}>{tenant.contact} • {tenant.email}</p>
+                        <p style={{ color: '#64748B', margin: 0, fontSize: '13px' }}>{tenant.users} users • {tenant.status}</p>
+                      </div>
+                      <button onClick={handleCreateTenant} style={{
+                        backgroundColor: 'rgba(75, 101, 129, 0.6)',
+                        color: '#d7bb91',
+                        border: '1px solid rgba(75, 101, 129, 0.3)',
+                        borderRadius: '6px',
+                        padding: '8px 16px',
+                        fontSize: '13px',
+                        cursor: 'pointer'
+                      }}>Edit</button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
-            {activeSection === 'organizations' && (
-              <div style={{ padding: '20px', textAlign: 'center' }}>
-                <p style={{ color: '#64748B', fontSize: '16px' }}>Organization management interface coming soon...</p>
-              </div>
-            )}
 
             {activeSection === 'analytics' && (
               <div>
