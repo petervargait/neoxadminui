@@ -1,0 +1,801 @@
+'use client'
+import Link from 'next/link'
+import NeoxLogo from '../../components/NeoxLogo'
+import { useState } from 'react'
+
+export default function TenantPage() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [activeSection, setActiveSection] = useState<string | null>(null)
+  
+  const toggleSidebar = () => {
+    setSidebarExpanded(!sidebarExpanded)
+  }
+
+  const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.type === 'text/csv') {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const csv = e.target?.result as string
+        console.log('CSV uploaded:', csv)
+        alert(`CSV file "${file.name}" uploaded successfully! Processing ${csv.split('\n').length - 1} users.`)
+      }
+      reader.readAsText(file)
+    } else {
+      alert('Please select a valid CSV file')
+    }
+  }
+
+  return (
+    <div style={{ 
+      minHeight: '100vh',
+      backgroundColor: '#0B1426',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      display: 'flex'
+    }}>
+      {/* Sidebar */}
+      <div style={{
+        width: sidebarExpanded ? '280px' : '70px',
+        height: '100vh',
+        backgroundColor: '#162032',
+        borderRight: '1px solid #1E293B',
+        transition: 'width 0.3s ease',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        zIndex: 100,
+        overflow: 'hidden'
+      }}>
+        {/* Logo */}
+        <div style={{
+          padding: '20px',
+          borderBottom: '1px solid #1E293B',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <NeoxLogo width="64px" height="64px" />
+        </div>
+
+        {/* Menu Toggle */}
+        <button 
+          onClick={toggleSidebar}
+          style={{
+            width: '100%',
+            padding: '16px 20px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: '#64748B',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            fontSize: '14px',
+            borderBottom: '1px solid #1E293B'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1E293B'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+          <span style={{ fontSize: '16px' }}>☰</span>
+          {sidebarExpanded && <span>Menu</span>}
+        </button>
+
+        {/* Navigation */}
+        <nav style={{ padding: '20px 0', flex: 1 }}>
+          {[
+            { icon: '◈', label: 'Dashboard', action: () => setActiveModal(null) },
+            { icon: '◐', label: 'Analytics', action: () => setActiveModal('analytics') },
+            { icon: '◎', label: 'Users', action: () => setActiveModal('users') },
+            { icon: '◫', label: 'Invitations', action: () => setActiveModal('invitations') },
+            { icon: '◧', label: 'Parking', action: () => setActiveModal('parking') },
+            { icon: '◨', label: 'Templates', action: () => setActiveModal('manageTemplates') },
+          ].map((item, index) => (
+            <div key={index} 
+              onClick={item.action}
+              style={{
+                padding: '12px 20px',
+                margin: '4px 12px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: '#94A3B8',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                const target = e.currentTarget;
+                target.style.backgroundColor = '#1E293B';
+                target.style.color = '#F1F5F9';
+              }}
+              onMouseLeave={(e) => {
+                const target = e.currentTarget;
+                target.style.backgroundColor = 'transparent';
+                target.style.color = '#94A3B8';
+              }}
+            >
+              <span style={{ fontSize: '18px' }}>{item.icon}</span>
+              {sidebarExpanded && <span>{item.label}</span>}
+            </div>
+          ))}
+        </nav>
+
+        {/* Back to Home Button */}
+        <Link href="/" style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '16px 20px',
+          color: '#64748B',
+          textDecoration: 'none',
+          fontSize: '14px',
+          borderTop: '1px solid #1E293B',
+          marginTop: 'auto',
+          transition: 'all 0.2s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#1E293B'
+          e.currentTarget.style.color = '#F1F5F9'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent'
+          e.currentTarget.style.color = '#64748B'
+        }}>
+          <span style={{ fontSize: '18px' }}>◄</span>
+          {sidebarExpanded && <span>Back to Home</span>}
+        </Link>
+      </div>
+
+      {/* Main Content */}
+      <div style={{
+        marginLeft: sidebarExpanded ? '280px' : '70px',
+        flex: 1,
+        transition: 'margin-left 0.3s ease',
+        minHeight: '100vh'
+      }}>
+        {/* Top Navigation */}
+        <div style={{
+          height: '70px',
+          backgroundColor: '#162032',
+          borderBottom: '1px solid #1E293B',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 32px'
+        }}>
+          <h1 style={{
+            fontSize: '24px',
+            fontWeight: '600',
+            color: '#F1F5F9',
+            margin: 0
+          }}>
+            Tenant Admin Dashboard
+          </h1>
+          <div style={{ color: '#64748B', fontSize: '14px' }}>Welcome to your organization</div>
+        </div>
+
+        {/* Dashboard Content */}
+        <div style={{ padding: '32px' }}>
+          {/* Stats Cards */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '24px',
+            marginBottom: '32px'
+          }}>
+            {/* Users Card */}
+            <div style={{
+              backgroundColor: '#162032',
+              border: '1px solid #1E293B',
+              borderRadius: '12px',
+              padding: '24px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '12px'
+              }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '500', color: '#64748B', margin: 0 }}>Total Users</h3>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  backgroundColor: '#3B82F6',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '20px' }}>👥</span>
+                </div>
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>147</div>
+              <div style={{ fontSize: '14px', color: '#10B981' }}>+12% from last month</div>
+            </div>
+
+            {/* Invitations Card */}
+            <div style={{
+              backgroundColor: '#162032',
+              border: '1px solid #1E293B',
+              borderRadius: '12px',
+              padding: '24px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '12px'
+              }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '500', color: '#64748B', margin: 0 }}>Active Invitations</h3>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  backgroundColor: '#10B981',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '20px' }}>📬</span>
+                </div>
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>23</div>
+              <div style={{ fontSize: '14px', color: '#64748B' }}>8 pending responses</div>
+            </div>
+
+            {/* Parking Card */}
+            <div style={{
+              backgroundColor: '#162032',
+              border: '1px solid #1E293B',
+              borderRadius: '12px',
+              padding: '24px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '12px'
+              }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '500', color: '#64748B', margin: 0 }}>Parking Spaces</h3>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  backgroundColor: '#F59E0B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '20px' }}>🏎️</span>
+                </div>
+              </div>
+              <div style={{ fontSize: '28px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>12/50</div>
+              <div style={{ fontSize: '14px', color: '#10B981' }}>38 spaces available</div>
+            </div>
+          </div>
+
+          {/* Quick Actions Panel */}
+          <div style={{
+            backgroundColor: '#162032',
+            border: '1px solid #1E293B',
+            borderRadius: '12px',
+            padding: '24px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#F1F5F9', marginBottom: '20px' }}>Quick Actions</h2>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '12px'
+            }}>
+              <button 
+                onClick={() => setActiveModal('inviteUser')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#1E293B',
+                  color: '#F1F5F9',
+                  border: '2px solid #D7BB91',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#D7BB91'
+                  e.currentTarget.style.color = '#0B1426'
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(215, 187, 145, 0.6), 0 0 40px rgba(215, 187, 145, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1E293B'
+                  e.currentTarget.style.color = '#F1F5F9'
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '18px' }}>✉️</span>
+                Invite User
+              </button>
+              
+              <button 
+                onClick={() => setActiveModal('sendInvitation')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#1E293B',
+                  color: '#F1F5F9',
+                  border: '2px solid #D7BB91',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#D7BB91'
+                  e.currentTarget.style.color = '#0B1426'
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(215, 187, 145, 0.6), 0 0 40px rgba(215, 187, 145, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1E293B'
+                  e.currentTarget.style.color = '#F1F5F9'
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '18px' }}>📅</span>
+                Schedule Visit
+              </button>
+              
+              <button 
+                onClick={() => setActiveModal('manageTemplates')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#1E293B',
+                  color: '#F1F5F9',
+                  border: '2px solid #D7BB91',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#D7BB91'
+                  e.currentTarget.style.color = '#0B1426'
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(215, 187, 145, 0.6), 0 0 40px rgba(215, 187, 145, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1E293B'
+                  e.currentTarget.style.color = '#F1F5F9'
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '18px' }}>📄</span>
+                Templates
+              </button>
+              
+              <button 
+                onClick={() => setActiveModal('bulkUpload')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#1E293B',
+                  color: '#F1F5F9',
+                  border: '2px solid #D7BB91',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#D7BB91'
+                  e.currentTarget.style.color = '#0B1426'
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(215, 187, 145, 0.6), 0 0 40px rgba(215, 187, 145, 0.4)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1E293B'
+                  e.currentTarget.style.color = '#F1F5F9'
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(215, 187, 145, 0.3)'
+                }}
+              >
+                <span style={{ fontSize: '18px' }}>📤</span>
+                Bulk Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal Overlays for Different Sections */}
+      {activeModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#162032',
+            border: '1px solid #1E293B',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '100%',
+            maxHeight: '80vh',
+            overflow: 'auto',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#F1F5F9', margin: 0 }}>
+            {activeModal === 'inviteUser' && 'Invite New User'}
+                {activeModal === 'sendInvitation' && 'Schedule Visitor'}
+                {activeModal === 'manageTemplates' && 'Manage Templates'}
+                {activeModal === 'viewReports' && 'View Reports'}
+                {activeModal === 'bulkUpload' && 'Bulk Upload Users'}
+                {activeModal === 'analytics' && 'Analytics Dashboard'}
+                {activeModal === 'users' && 'Manage Users'}
+                {activeModal === 'invitations' && 'Manage Invitations'}
+                {activeModal === 'parking' && 'Parking Management'}
+              </h2>
+              <button onClick={() => setActiveModal(null)} style={{
+                background: 'none',
+                border: '1px solid #64748B',
+                borderRadius: '8px',
+                color: '#F1F5F9',
+                fontSize: '20px',
+                width: '40px',
+                height: '40px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>×</button>
+            </div>
+
+            {activeModal === 'inviteUser' && (
+              <div>
+                <form style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div>
+                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Full Name</label>
+                    <input type="text" placeholder="Enter full name" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      borderRadius: '8px',
+                      color: '#d7bb91',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email Address</label>
+                    <input type="email" placeholder="user@company.com" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      borderRadius: '8px',
+                      color: '#d7bb91',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Role</label>
+                    <select style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      borderRadius: '8px',
+                      color: '#d7bb91',
+                      fontSize: '14px'
+                    }}>
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                      <option value="manager">Manager</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Department</label>
+                    <input type="text" placeholder="Enter department" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.5)',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      borderRadius: '8px',
+                      color: '#d7bb91',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <button type="submit" style={{
+                    backgroundColor: 'rgba(75, 101, 129, 0.8)',
+                    color: '#d7bb91',
+                    border: '1px solid rgba(75, 101, 129, 0.3)',
+                    borderRadius: '8px',
+                    padding: '12px 24px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    marginTop: '16px'
+                  }}>Send Invitation</button>
+                </form>
+              </div>
+            )}
+
+            {activeModal === 'sendInvitation' && (
+              <div>
+                <form style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Name</label>
+                    <input type="text" placeholder="Enter visitor name" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <div>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Email</label>
+                    <input type="email" placeholder="visitor@email.com" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} />
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div>
+                      <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Date</label>
+                      <input type="date" style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: '#1E293B',
+                        border: '1px solid #475569',
+                        borderRadius: '8px',
+                        color: '#F1F5F9',
+                        fontSize: '14px'
+                      }} />
+                    </div>
+                    <div>
+                      <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Time</label>
+                      <input type="time" style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: '#1E293B',
+                        border: '1px solid #475569',
+                        borderRadius: '8px',
+                        color: '#F1F5F9',
+                        fontSize: '14px'
+                      }} />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Purpose of Visit</label>
+                    <textarea placeholder="Enter purpose of visit" style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      minHeight: '80px',
+                      resize: 'vertical'
+                    }} />
+                  </div>
+                  <button type="submit" style={{
+                    backgroundColor: '#3B82F6',
+                    color: '#F1F5F9',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '12px 24px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    marginTop: '16px'
+                  }}>Schedule Visit</button>
+                </form>
+              </div>
+            )}
+
+            {activeModal === 'manageTemplates' && (
+              <p style={{ color: '#64748B', textAlign: 'center', padding: '40px' }}>Template management coming soon...</p>
+            )}
+
+            {activeModal === 'analytics' && (
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '24px' }}>
+                  <div style={{ padding: '20px', backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #475569' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Users</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>147</div>
+                    <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 12% from last month</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #475569' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Active Invitations</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#3B82F6', marginBottom: '8px' }}>23</div>
+                    <div style={{ fontSize: '12px', color: '#64748B' }}>8 pending responses</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #475569' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Parking Usage</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B', marginBottom: '8px' }}>24%</div>
+                    <div style={{ fontSize: '12px', color: '#10B981' }}>12 of 50 spaces</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #475569' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Monthly Growth</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>+18%</div>
+                    <div style={{ fontSize: '12px', color: '#64748B' }}>vs previous month</div>
+                  </div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#1E293B', borderRadius: '12px', border: '1px solid #475569' }}>
+                  <h4 style={{ color: '#F1F5F9', fontSize: '16px', margin: '0 0 16px 0' }}>Recent Activity</h4>
+                  {[
+                    { action: 'New user registered', user: 'John Smith', time: '2 hours ago' },
+                    { action: 'Invitation sent', user: 'Sarah Johnson', time: '4 hours ago' },
+                    { action: 'Parking reserved', user: 'Mike Davis', time: '6 hours ago' },
+                    { action: 'Visit scheduled', user: 'Lisa Wilson', time: '1 day ago' },
+                  ].map((activity, idx) => (
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: idx < 3 ? '1px solid #475569' : 'none' }}>
+                      <div>
+                        <div style={{ color: '#F1F5F9', fontSize: '14px', marginBottom: '4px' }}>{activity.action}</div>
+                        <div style={{ color: '#64748B', fontSize: '12px' }}>{activity.user}</div>
+                      </div>
+                      <span style={{ color: '#64748B', fontSize: '12px' }}>{activity.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeModal === 'users' && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <p style={{ color: '#64748B', fontSize: '16px' }}>User management interface coming soon...</p>
+              </div>
+            )}
+
+            {activeModal === 'invitations' && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <p style={{ color: '#64748B', fontSize: '16px' }}>Invitation management interface coming soon...</p>
+              </div>
+            )}
+
+            {activeModal === 'parking' && (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <p style={{ color: '#64748B', fontSize: '16px' }}>Parking management interface coming soon...</p>
+              </div>
+            )}
+
+            {activeModal === 'bulkUpload' && (
+              <div>
+                <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                  <h3 style={{ color: '#3b82f6', fontSize: '16px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '18px' }}>ℹ️</span> CSV Format Requirements
+                  </h3>
+                  <p style={{ color: '#d7bb91', fontSize: '14px', margin: '0 0 12px 0' }}>
+                    Your CSV file should include the following columns (in order):
+                  </p>
+                  <div style={{ fontFamily: 'monospace', backgroundColor: 'rgba(51, 78, 104, 0.5)', padding: '12px', borderRadius: '6px', color: '#d7bb91', fontSize: '12px' }}>
+                    name,email,role,department
+                  </div>
+                  <div style={{ marginTop: '12px' }}>
+                    <button style={{
+                      backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                      color: '#fff',
+                      border: '1px solid rgba(59, 130, 246, 0.3)',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      textDecoration: 'none'
+                    }} onClick={() => {
+                      const csvContent = "name,email,role,department\nJohn Smith,john@company.com,user,IT\nJane Doe,jane@company.com,admin,HR\nBob Johnson,bob@company.com,manager,Sales"
+                      const blob = new Blob([csvContent], { type: 'text/csv' })
+                      const url = window.URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url
+                      a.download = 'tenant_users_template.csv'
+                      a.click()
+                      window.URL.revokeObjectURL(url)
+                    }}>Download Sample CSV</button>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Upload CSV File</label>
+                  <div style={{ 
+                    border: '2px dashed rgba(75, 101, 129, 0.5)', 
+                    borderRadius: '12px', 
+                    padding: '32px', 
+                    textAlign: 'center',
+                    backgroundColor: 'rgba(51, 78, 104, 0.1)'
+                  }}>
+                    <input 
+                      type="file" 
+                      accept=".csv"
+                      onChange={handleCSVUpload}
+                      style={{ display: 'none' }}
+                      id="csv-upload-tenant"
+                    />
+                    <label htmlFor="csv-upload-tenant" style={{
+                      backgroundColor: 'rgba(75, 101, 129, 0.8)',
+                      color: '#d7bb91',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      borderRadius: '8px',
+                      padding: '12px 24px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'inline-block'
+                    }}>Choose CSV File</label>
+                    <p style={{ color: '#d7bb91', opacity: 0.7, marginTop: '12px', fontSize: '14px' }}>
+                      Select a CSV file to upload multiple users to your tenant
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                  <div style={{ padding: '16px', backgroundColor: 'rgba(34, 197, 94, 0.1)', borderRadius: '8px', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
+                    <h3 style={{ color: '#10b981', fontSize: '16px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '18px' }}>✅</span> Supported Features
+                    </h3>
+                    <ul style={{ color: '#d7bb91', fontSize: '14px', margin: 0, paddingLeft: '20px' }}>
+                      <li>Automatic email validation</li>
+                      <li>Role assignment (user/admin/manager)</li>
+                      <li>Department categorization</li>
+                      <li>Duplicate detection</li>
+                    </ul>
+                  </div>
+                  
+                  <div style={{ padding: '16px', backgroundColor: 'rgba(234, 179, 8, 0.1)', borderRadius: '8px', border: '1px solid rgba(234, 179, 8, 0.3)' }}>
+                    <h3 style={{ color: '#eab308', fontSize: '16px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '18px' }}>⚠️</span> Upload Process
+                    </h3>
+                    <ul style={{ color: '#d7bb91', fontSize: '14px', margin: 0, paddingLeft: '20px' }}>
+                      <li>Users are added to current tenant</li>
+                      <li>Welcome emails sent automatically</li>
+                      <li>Invalid entries skipped</li>
+                      <li>Progress report generated</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
