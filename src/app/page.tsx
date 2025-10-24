@@ -330,11 +330,11 @@ export default function Home() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '400px', overflow: 'auto' }}>
               {[
-                { id: 'acme', name: 'Acme Corporation', logo: '🏢', users: 245 },
-                { id: 'techflow', name: 'TechFlow Industries', logo: '🚀', users: 128 },
-                { id: 'global', name: 'Global Solutions Ltd', logo: '🌍', users: 87 },
-                { id: 'innovation', name: 'Innovation Labs', logo: '🔬', users: 156 },
-                { id: 'digital', name: 'Digital Dynamics', logo: '⚡', users: 93 },
+                { id: 'acme', name: 'Acme Corporation', logo: '◎', color: '#D7BB91', users: 245 },
+                { id: 'techflow', name: 'TechFlow Industries', logo: '◆', color: '#60A5FA', users: 128 },
+                { id: 'global', name: 'Global Solutions Ltd', logo: '◈', color: '#22C55E', users: 87 },
+                { id: 'innovation', name: 'Innovation Labs', logo: '◧', color: '#A78BFA', users: 156 },
+                { id: 'digital', name: 'Digital Dynamics', logo: '■', color: '#F59E0B', users: 93 },
               ].map((tenant) => (
                 <div
                   key={tenant.id}
@@ -367,11 +367,14 @@ export default function Home() {
                     width: '48px',
                     height: '48px',
                     borderRadius: '8px',
-                    backgroundColor: '#162032',
+                    backgroundColor: `${tenant.color}15`,
+                    border: `1px solid ${tenant.color}40`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '24px'
+                    fontSize: '20px',
+                    color: tenant.color,
+                    boxShadow: `0 0 12px ${tenant.color}35`
                   }}>
                     {tenant.logo}
                   </div>
