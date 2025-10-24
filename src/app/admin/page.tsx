@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { PersonRegular, AlertRegular, StatusRegular, DocumentBulletListRegular } from '@fluentui/react-icons'
+import { PersonRegular, AlertRegular, StatusRegular, DocumentBulletListRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular } from '@fluentui/react-icons'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -54,6 +54,21 @@ export default function AdminPage() {
     'Installation and Onboarding Guide': null
   })
 
+  // Digital Badges state
+  const [badgeUsers, setBadgeUsers] = useState([
+    { id: 1, name: 'John Smith', email: 'john.smith@acme.com', company: 'Acme Corp', cardType: 'Mifare EV3', status: 'Downloaded', imei: '123456789012345' },
+    { id: 2, name: 'Sarah Johnson', email: 'sarah.j@techflow.com', company: 'TechFlow Industries', cardType: 'HID', status: 'Sent', imei: '234567890123456' },
+    { id: 3, name: 'Mike Davis', email: 'mike.d@global.com', company: 'Global Solutions', cardType: 'NFC', status: 'New', imei: '345678901234567' },
+    { id: 4, name: 'Lisa Wilson', email: 'lisa.w@innovation.com', company: 'Innovation Labs', cardType: 'LEGIC', status: 'Downloaded', imei: '456789012345678' },
+    { id: 5, name: 'Tom Brown', email: 'tom.b@digital.com', company: 'Digital Dynamics', cardType: 'Mifare EV3', status: 'Suspended', imei: '567890123456789' },
+  ])
+  const [showBadgeModal, setShowBadgeModal] = useState(false)
+  const [editingBadge, setEditingBadge] = useState<{id?: number; name: string; email: string; company: string; cardType: string; imei: string} | null>(null)
+  const [badgeSearchTerm, setBadgeSearchTerm] = useState('')
+  const [badgeStatusFilter, setBadgeStatusFilter] = useState('All Statuses')
+  const [badgeCardTypeFilter, setBadgeCardTypeFilter] = useState('All Card Types')
+  const [showBadgeImportModal, setShowBadgeImportModal] = useState(false)
+
   const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file && file.type === 'text/csv') {
@@ -84,6 +99,121 @@ export default function AdminPage() {
       alert('Please select a valid PDF file')
     }
   }
+
+  // Digital Badges handlers
+  const handleAddBadgeUser = () => {
+    setEditingBadge({ name: '', email: '', company: '', cardType: 'Mifare EV3', imei: '' })
+    setShowBadgeModal(true)
+  }
+
+  const handleEditBadgeUser = (user: typeof badgeUsers[0]) => {
+    setEditingBadge(user)
+    setShowBadgeModal(true)
+  }
+
+  const handleSaveBadgeUser = () => {
+    if (!editingBadge) return
+    
+    if (!editingBadge.name || !editingBadge.email || !editingBadge.company || !editingBadge.imei) {
+      alert('Please fill in all required fields')
+      return
+    }
+
+    if (editingBadge.id) {
+      // Update existing
+      setBadgeUsers(prev => prev.map(u => u.id === editingBadge.id ? { ...editingBadge, id: editingBadge.id, status: u.status } as typeof u : u))
+      alert('Badge user updated successfully')
+    } else {
+      // Add new
+      const newUser = { ...editingBadge, id: Math.max(...badgeUsers.map(u => u.id)) + 1, status: 'New' as const }
+      setBadgeUsers(prev => [...prev, newUser])
+      alert('Badge user added successfully')
+    }
+    
+    setShowBadgeModal(false)
+    setEditingBadge(null)
+  }
+
+  const handleDeleteBadgeUser = (userId: number) => {
+    const user = badgeUsers.find(u => u.id === userId)
+    if (user && confirm(`Delete badge for ${user.name}? This action cannot be undone.`)) {
+      setBadgeUsers(prev => prev.filter(u => u.id !== userId))
+      alert('Badge user deleted successfully')
+    }
+  }
+
+  const handleSendBadgeEmail = (userId: number) => {
+    const user = badgeUsers.find(u => u.id === userId)
+    if (user) {
+      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Sent' as const } : u))
+      alert(`Badge email sent to ${user.email}`)
+    }
+  }
+
+  const handleSendBadgePush = (userId: number) => {
+    const user = badgeUsers.find(u => u.id === userId)
+    if (user) {
+      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Sent' as const } : u))
+      alert(`Push notification sent to ${user.name}`)
+    }
+  }
+
+  const handleSuspendBadge = (userId: number) => {
+    const user = badgeUsers.find(u => u.id === userId)
+    if (user && confirm(`Suspend badge for ${user.name}?`)) {
+      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Suspended' as const } : u))
+      alert('Badge suspended successfully')
+    }
+  }
+
+  const handleRecoverBadge = (userId: number) => {
+    const user = badgeUsers.find(u => u.id === userId)
+    if (user && confirm(`Recover badge for ${user.name}?`)) {
+      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Downloaded' as const } : u))
+      alert('Badge recovered successfully')
+    }
+  }
+
+  const handleBadgeImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.type === 'text/csv') {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const csv = e.target?.result as string
+        const lines = csv.split('\n').filter(line => line.trim())
+        const headers = lines[0].split(',')
+        
+        const newUsers = lines.slice(1).map((line, index) => {
+          const values = line.split(',')
+          return {
+            id: Math.max(...badgeUsers.map(u => u.id)) + index + 1,
+            name: values[0]?.trim() || '',
+            email: values[1]?.trim() || '',
+            company: values[2]?.trim() || '',
+            cardType: values[3]?.trim() || 'NFC',
+            imei: values[4]?.trim() || '',
+            status: 'New' as const
+          }
+        })
+        
+        setBadgeUsers(prev => [...prev, ...newUsers])
+        alert(`Successfully imported ${newUsers.length} badge users`)
+        setShowBadgeImportModal(false)
+      }
+      reader.readAsText(file)
+    } else {
+      alert('Please select a valid CSV file')
+    }
+  }
+
+  const filteredBadgeUsers = badgeUsers.filter(user => {
+    const matchesSearch = badgeSearchTerm === '' || 
+      user.name.toLowerCase().includes(badgeSearchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(badgeSearchTerm.toLowerCase())
+    const matchesStatus = badgeStatusFilter === 'All Statuses' || user.status === badgeStatusFilter
+    const matchesCardType = badgeCardTypeFilter === 'All Card Types' || user.cardType === badgeCardTypeFilter
+    return matchesSearch && matchesStatus && matchesCardType
+  })
 
   const handleLogout = () => {
     sessionStorage.clear()
@@ -1080,7 +1210,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>847</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>{badgeUsers.length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Total Badges Issued</div>
                 </div>
                 <div style={{
@@ -1089,7 +1219,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>512</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>{badgeUsers.filter(u => u.status === 'Sent').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Sent</div>
                 </div>
                 <div style={{
@@ -1098,7 +1228,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>423</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>{badgeUsers.filter(u => u.status === 'Downloaded').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Activated</div>
                 </div>
                 <div style={{
@@ -1107,7 +1237,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>12</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>{badgeUsers.filter(u => u.status === 'Suspended').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Suspended</div>
                 </div>
               </div>
@@ -1131,7 +1261,7 @@ export default function AdminPage() {
                     <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Manage and distribute digital wallet badges</p>
                   </div>
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    <button style={{
+                    <button onClick={handleAddBadgeUser} style={{
                       backgroundColor: '#60A5FA',
                       color: 'white',
                       border: 'none',
@@ -1141,7 +1271,10 @@ export default function AdminPage() {
                       fontWeight: '500',
                       cursor: 'pointer',
                       boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.boxShadow = '0 0 20px rgba(96, 165, 250, 0.6), 0 0 35px rgba(96, 165, 250, 0.3)';
@@ -1151,9 +1284,10 @@ export default function AdminPage() {
                       e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)';
                       e.currentTarget.style.transform = 'translateY(0)';
                     }}>
-                      + Add Badge User
+                      <AddRegular style={{ fontSize: '16px' }} />
+                      Add Badge User
                     </button>
-                    <button style={{
+                    <button onClick={() => setShowBadgeImportModal(true)} style={{
                       backgroundColor: '#10B981',
                       color: 'white',
                       border: 'none',
@@ -1163,7 +1297,10 @@ export default function AdminPage() {
                       fontWeight: '500',
                       cursor: 'pointer',
                       boxShadow: '0 0 15px rgba(16, 185, 129, 0.4), 0 0 25px rgba(16, 185, 129, 0.2)',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.6), 0 0 35px rgba(16, 185, 129, 0.3)';
@@ -1173,7 +1310,8 @@ export default function AdminPage() {
                       e.currentTarget.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.4), 0 0 25px rgba(16, 185, 129, 0.2)';
                       e.currentTarget.style.transform = 'translateY(0)';
                     }}>
-                      📤 Import Users
+                      <ArrowUploadRegular style={{ fontSize: '16px' }} />
+                      Import Users
                     </button>
                   </div>
                 </div>
@@ -1183,6 +1321,8 @@ export default function AdminPage() {
                   <input
                     type="search"
                     placeholder="Search by name or email"
+                    value={badgeSearchTerm}
+                    onChange={(e) => setBadgeSearchTerm(e.target.value)}
                     style={{
                       flex: '1 1 200px',
                       padding: '10px 16px',
@@ -1193,30 +1333,36 @@ export default function AdminPage() {
                       fontSize: '14px'
                     }}
                   />
-                  <select style={{
-                    padding: '10px 16px',
-                    backgroundColor: '#1E293B',
-                    border: '1px solid #475569',
-                    borderRadius: '8px',
-                    color: '#F1F5F9',
-                    fontSize: '14px',
-                    cursor: 'pointer'
-                  }}>
+                  <select 
+                    value={badgeStatusFilter}
+                    onChange={(e) => setBadgeStatusFilter(e.target.value)}
+                    style={{
+                      padding: '10px 16px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}>
                     <option>All Statuses</option>
                     <option>New</option>
                     <option>Sent</option>
                     <option>Downloaded</option>
                     <option>Suspended</option>
                   </select>
-                  <select style={{
-                    padding: '10px 16px',
-                    backgroundColor: '#1E293B',
-                    border: '1px solid #475569',
-                    borderRadius: '8px',
-                    color: '#F1F5F9',
-                    fontSize: '14px',
-                    cursor: 'pointer'
-                  }}>
+                  <select 
+                    value={badgeCardTypeFilter}
+                    onChange={(e) => setBadgeCardTypeFilter(e.target.value)}
+                    style={{
+                      padding: '10px 16px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}>
                     <option>All Card Types</option>
                     <option>Mifare EV3</option>
                     <option>LEGIC</option>
@@ -1243,14 +1389,8 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        { name: 'John Smith', email: 'john.smith@acme.com', company: 'Acme Corp', cardType: 'Mifare EV3', status: 'Downloaded', imei: '123456789012345' },
-                        { name: 'Sarah Johnson', email: 'sarah.j@techflow.com', company: 'TechFlow Industries', cardType: 'HID', status: 'Sent', imei: '234567890123456' },
-                        { name: 'Mike Davis', email: 'mike.d@global.com', company: 'Global Solutions', cardType: 'NFC', status: 'New', imei: '345678901234567' },
-                        { name: 'Lisa Wilson', email: 'lisa.w@innovation.com', company: 'Innovation Labs', cardType: 'LEGIC', status: 'Downloaded', imei: '456789012345678' },
-                        { name: 'Tom Brown', email: 'tom.b@digital.com', company: 'Digital Dynamics', cardType: 'Mifare EV3', status: 'Suspended', imei: '567890123456789' },
-                      ].map((user, index) => (
-                        <tr key={index} style={{ borderBottom: '1px solid #1E293B' }}>
+                      {filteredBadgeUsers.map((user) => (
+                        <tr key={user.id} style={{ borderBottom: '1px solid #1E293B' }}>
                           <td style={{ padding: '16px 24px' }}>
                             <input type="checkbox" style={{ accentColor: '#3B82F6' }} />
                           </td>
@@ -1289,29 +1429,96 @@ export default function AdminPage() {
                             </span>
                           </td>
                           <td style={{ padding: '16px 24px', textAlign: 'right' }}>
-                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
                               {user.status === 'New' && (
                                 <>
-                                  <button style={{
-                                    backgroundColor: '#60A5FA',
+                                  <button 
+                                    onClick={() => handleSendBadgeEmail(user.id)}
+                                    title="Send Email"
+                                    style={{
+                                      backgroundColor: '#60A5FA',
+                                      border: 'none',
+                                      borderRadius: '6px',
+                                      color: '#FFFFFF',
+                                      fontSize: '12px',
+                                      padding: '8px',
+                                      cursor: 'pointer',
+                                      boxShadow: '0 0 10px rgba(96, 165, 250, 0.3)',
+                                      transition: 'all 0.2s ease',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.5)';
+                                      e.currentTarget.style.transform = 'translateY(-1px)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.boxShadow = '0 0 10px rgba(96, 165, 250, 0.3)';
+                                      e.currentTarget.style.transform = 'translateY(0)';
+                                    }}>
+                                    <MailRegular style={{ fontSize: '16px' }} />
+                                  </button>
+                                  <button 
+                                    onClick={() => handleSendBadgePush(user.id)}
+                                    title="Send Push Notification"
+                                    style={{
+                                      backgroundColor: '#10B981',
+                                      border: 'none',
+                                      borderRadius: '6px',
+                                      color: '#FFFFFF',
+                                      fontSize: '12px',
+                                      padding: '8px',
+                                      cursor: 'pointer',
+                                      boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)',
+                                      transition: 'all 0.2s ease',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.5)';
+                                      e.currentTarget.style.transform = 'translateY(-1px)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.3)';
+                                      e.currentTarget.style.transform = 'translateY(0)';
+                                    }}>
+                                    <AlertOnRegular style={{ fontSize: '16px' }} />
+                                  </button>
+                                </>
+                              )}
+                              {user.status === 'Downloaded' && (
+                                <button 
+                                  onClick={() => handleSuspendBadge(user.id)}
+                                  title="Suspend Badge"
+                                  style={{
+                                    backgroundColor: '#F59E0B',
                                     border: 'none',
                                     borderRadius: '6px',
                                     color: '#FFFFFF',
                                     fontSize: '12px',
                                     padding: '6px 12px',
                                     cursor: 'pointer',
-                                    boxShadow: '0 0 10px rgba(96, 165, 250, 0.3)',
+                                    boxShadow: '0 0 10px rgba(245, 158, 11, 0.3)',
                                     transition: 'all 0.2s ease'
                                   }}
                                   onMouseEnter={(e) => {
-                                    e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.5)';
+                                    e.currentTarget.style.boxShadow = '0 0 15px rgba(245, 158, 11, 0.5)';
                                     e.currentTarget.style.transform = 'translateY(-1px)';
                                   }}
                                   onMouseLeave={(e) => {
-                                    e.currentTarget.style.boxShadow = '0 0 10px rgba(96, 165, 250, 0.3)';
+                                    e.currentTarget.style.boxShadow = '0 0 10px rgba(245, 158, 11, 0.3)';
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                  }}>📧 Email</button>
-                                  <button style={{
+                                  }}>
+                                  Suspend
+                                </button>
+                              )}
+                              {user.status === 'Suspended' && (
+                                <button 
+                                  onClick={() => handleRecoverBadge(user.id)}
+                                  title="Recover Badge"
+                                  style={{
                                     backgroundColor: '#10B981',
                                     border: 'none',
                                     borderRadius: '6px',
@@ -1329,70 +1536,37 @@ export default function AdminPage() {
                                   onMouseLeave={(e) => {
                                     e.currentTarget.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.3)';
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                  }}>🔔 Push</button>
-                                </>
+                                  }}>
+                                  Recover
+                                </button>
                               )}
-                              {user.status === 'Downloaded' && (
-                                <button style={{
-                                  backgroundColor: '#F59E0B',
+                              <button 
+                                onClick={() => handleDeleteBadgeUser(user.id)}
+                                title="Delete Badge"
+                                style={{
+                                  backgroundColor: '#EF4444',
                                   border: 'none',
                                   borderRadius: '6px',
-                                  color: '#FFFFFF',
+                                  color: 'white',
                                   fontSize: '12px',
-                                  padding: '6px 12px',
+                                  padding: '8px',
                                   cursor: 'pointer',
-                                  boxShadow: '0 0 10px rgba(245, 158, 11, 0.3)',
-                                  transition: 'all 0.2s ease'
+                                  boxShadow: '0 0 10px rgba(239, 68, 68, 0.3)',
+                                  transition: 'all 0.2s ease',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
                                 }}
                                 onMouseEnter={(e) => {
-                                  e.currentTarget.style.boxShadow = '0 0 15px rgba(245, 158, 11, 0.5)';
+                                  e.currentTarget.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.5)';
                                   e.currentTarget.style.transform = 'translateY(-1px)';
                                 }}
                                 onMouseLeave={(e) => {
-                                  e.currentTarget.style.boxShadow = '0 0 10px rgba(245, 158, 11, 0.3)';
+                                  e.currentTarget.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.3)';
                                   e.currentTarget.style.transform = 'translateY(0)';
-                                }}>⏸️ Suspend</button>
-                              )}
-                              {user.status === 'Suspended' && (
-                                <button style={{
-                                  backgroundColor: '#10B981',
-                                  border: 'none',
-                                  borderRadius: '6px',
-                                  color: '#FFFFFF',
-                                  fontSize: '12px',
-                                  padding: '6px 12px',
-                                  cursor: 'pointer',
-                                  boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)',
-                                  transition: 'all 0.2s ease'
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.5)';
-                                  e.currentTarget.style.transform = 'translateY(-1px)';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.3)';
-                                  e.currentTarget.style.transform = 'translateY(0)';
-                                }}>✅ Recover</button>
-                              )}
-                              <button style={{
-                                backgroundColor: '#EF4444',
-                                border: 'none',
-                                borderRadius: '6px',
-                                color: 'white',
-                                fontSize: '12px',
-                                padding: '6px 12px',
-                                cursor: 'pointer',
-                                boxShadow: '0 0 10px rgba(239, 68, 68, 0.3)',
-                                transition: 'all 0.2s ease'
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.5)';
-                                e.currentTarget.style.transform = 'translateY(-1px)';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.3)';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                              }}>Delete</button>
+                                }}>
+                                <DeleteRegular style={{ fontSize: '16px' }} />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -1403,7 +1577,7 @@ export default function AdminPage() {
 
                 {/* Pagination */}
                 <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ color: '#64748B', fontSize: '14px' }}>Showing 1-5 of 847 users</div>
+                  <div style={{ color: '#64748B', fontSize: '14px' }}>Showing 1-{Math.min(filteredBadgeUsers.length, 5)} of {filteredBadgeUsers.length} users</div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button style={{
                       padding: '6px 12px',
@@ -2669,6 +2843,290 @@ export default function AdminPage() {
                 }}>Cancel</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Badge Add/Edit Modal */}
+      {showBadgeModal && editingBadge && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => setShowBadgeModal(false)}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            border: '1px solid #1E293B'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
+              {editingBadge.id ? 'Edit Badge User' : 'Add New Badge User'}
+            </h2>
+            <form onSubmit={(e) => { e.preventDefault(); handleSaveBadgeUser(); }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Full Name *</label>
+                <input 
+                  type="text" 
+                  value={editingBadge.name}
+                  onChange={(e) => setEditingBadge({ ...editingBadge, name: e.target.value })}
+                  required 
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} 
+                />
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email *</label>
+                <input 
+                  type="email" 
+                  value={editingBadge.email}
+                  onChange={(e) => setEditingBadge({ ...editingBadge, email: e.target.value })}
+                  required 
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} 
+                />
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Company *</label>
+                <input 
+                  type="text" 
+                  value={editingBadge.company}
+                  onChange={(e) => setEditingBadge({ ...editingBadge, company: e.target.value })}
+                  required 
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} 
+                />
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Card Type *</label>
+                <select 
+                  value={editingBadge.cardType}
+                  onChange={(e) => setEditingBadge({ ...editingBadge, cardType: e.target.value })}
+                  required 
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}>
+                  <option value="Mifare EV3">Mifare EV3</option>
+                  <option value="LEGIC">LEGIC</option>
+                  <option value="HID">HID</option>
+                  <option value="NFC">NFC</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>IMEI Number *</label>
+                <input 
+                  type="text" 
+                  value={editingBadge.imei}
+                  onChange={(e) => setEditingBadge({ ...editingBadge, imei: e.target.value })}
+                  placeholder="123456789012345"
+                  required 
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} 
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>{editingBadge.id ? 'Update Badge User' : 'Add Badge User'}</button>
+                <button type="button" onClick={() => { setShowBadgeModal(false); setEditingBadge(null); }} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Badge Import Modal */}
+      {showBadgeImportModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => setShowBadgeImportModal(false)}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '90%',
+            border: '1px solid #1E293B'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
+              Import Badge Users
+            </h2>
+            
+            <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+              <h3 style={{ color: '#3b82f6', fontSize: '16px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '18px' }}>ℹ️</span> CSV Format Requirements
+              </h3>
+              <p style={{ color: '#F1F5F9', fontSize: '14px', margin: '0 0 12px 0' }}>
+                Your CSV file should include the following columns (in order):
+              </p>
+              <div style={{ fontFamily: 'monospace', backgroundColor: '#1E293B', padding: '12px', borderRadius: '6px', color: '#F1F5F9', fontSize: '12px' }}>
+                name,email,company,cardType,imei
+              </div>
+              <div style={{ marginTop: '12px' }}>
+                <button style={{
+                  backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                  color: '#fff',
+                  border: '1px solid rgba(59, 130, 246, 0.3)',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }} onClick={() => {
+                  const csvContent = "name,email,company,cardType,imei\nJohn Doe,john@company.com,Acme Corp,Mifare EV3,123456789012345\nJane Smith,jane@company.com,TechFlow,NFC,234567890123456"
+                  const blob = new Blob([csvContent], { type: 'text/csv' })
+                  const url = window.URL.createObjectURL(blob)
+                  const a = document.createElement('a')
+                  a.href = url
+                  a.download = 'badge_users_template.csv'
+                  a.click()
+                  window.URL.revokeObjectURL(url)
+                }}>
+                  <ArrowDownloadRegular style={{ fontSize: '14px' }} />
+                  Download Sample CSV
+                </button>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Upload CSV File</label>
+              <div style={{ 
+                border: '2px dashed #475569', 
+                borderRadius: '12px', 
+                padding: '32px', 
+                textAlign: 'center',
+                backgroundColor: '#1E293B'
+              }}>
+                <input 
+                  type="file" 
+                  accept=".csv"
+                  onChange={handleBadgeImport}
+                  style={{ display: 'none' }}
+                  id="badge-csv-upload"
+                />
+                <label htmlFor="badge-csv-upload" style={{
+                  backgroundColor: '#3B82F6',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>
+                  <ArrowUploadRegular style={{ fontSize: '16px' }} />
+                  Choose CSV File
+                </label>
+                <p style={{ color: '#64748B', marginTop: '12px', fontSize: '14px' }}>
+                  Select a CSV file to import multiple badge users at once
+                </p>
+              </div>
+            </div>
+
+            <div style={{ padding: '16px', backgroundColor: 'rgba(234, 179, 8, 0.1)', borderRadius: '8px', border: '1px solid rgba(234, 179, 8, 0.3)' }}>
+              <h3 style={{ color: '#eab308', fontSize: '16px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '18px' }}>⚠️</span> Import Process
+              </h3>
+              <ul style={{ color: '#F1F5F9', fontSize: '14px', margin: 0, paddingLeft: '20px' }}>
+                <li>Users will be validated before creation</li>
+                <li>Duplicate emails will be reported</li>
+                <li>Invalid entries will be flagged</li>
+                <li>All imported users will have "New" status</li>
+              </ul>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+              <button type="button" onClick={() => setShowBadgeImportModal(false)} style={{
+                flex: 1,
+                backgroundColor: 'transparent',
+                color: '#F1F5F9',
+                border: '1px solid #475569',
+                borderRadius: '8px',
+                padding: '12px 24px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}>Close</button>
+            </div>
           </div>
         </div>
       )}
