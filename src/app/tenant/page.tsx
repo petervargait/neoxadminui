@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { AlertRegular } from '@fluentui/react-icons'
+import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular } from '@fluentui/react-icons'
 
 export default function TenantPage() {
   const router = useRouter()
@@ -43,6 +43,136 @@ export default function TenantPage() {
   const [showTicketModal, setShowTicketModal] = useState(false)
   const [systemOnline, setSystemOnline] = useState(true)
   const [notificationCount, setNotificationCount] = useState(3)
+
+  // Digital Badges state
+  const [badgeUsers, setBadgeUsers] = useState([
+    { id: 1, name: 'John Smith', email: 'john.smith@company.com', department: 'IT', cardType: 'Mifare EV3', status: 'Downloaded', imei: '123456789012345' },
+    { id: 2, name: 'Sarah Johnson', email: 'sarah.j@company.com', department: 'HR', cardType: 'HID', status: 'Sent', imei: '234567890123456' },
+    { id: 3, name: 'Mike Davis', email: 'mike.d@company.com', department: 'Sales', cardType: 'NFC', status: 'New', imei: '345678901234567' },
+    { id: 4, name: 'Lisa Wilson', email: 'lisa.w@company.com', department: 'Marketing', cardType: 'LEGIC', status: 'Downloaded', imei: '456789012345678' },
+    { id: 5, name: 'Tom Brown', email: 'tom.brown@company.com', department: 'Operations', cardType: 'Mifare EV3', status: 'Suspended', imei: '567890123456789' },
+  ])
+  const [showBadgeModal, setShowBadgeModal] = useState(false)
+  const [editingBadge, setEditingBadge] = useState<{id?: number; name: string; email: string; department: string; cardType: string; imei: string} | null>(null)
+  const [badgeSearchTerm, setBadgeSearchTerm] = useState('')
+  const [badgeStatusFilter, setBadgeStatusFilter] = useState('All Statuses')
+  const [badgeCardTypeFilter, setBadgeCardTypeFilter] = useState('All Card Types')
+  const [showBadgeImportModal, setShowBadgeImportModal] = useState(false)
+
+  // Digital Badges handlers
+  const handleAddBadgeUser = () => {
+    setEditingBadge({ name: '', email: '', department: '', cardType: 'Mifare EV3', imei: '' })
+    setShowBadgeModal(true)
+  }
+
+  const handleEditBadgeUser = (user: typeof badgeUsers[0]) => {
+    setEditingBadge(user)
+    setShowBadgeModal(true)
+  }
+
+  const handleSaveBadgeUser = () => {
+    if (!editingBadge) return
+    
+    if (!editingBadge.name || !editingBadge.email || !editingBadge.department || !editingBadge.imei) {
+      alert('Please fill in all required fields')
+      return
+    }
+
+    if (editingBadge.id) {
+      // Update existing
+      setBadgeUsers(prev => prev.map(u => u.id === editingBadge.id ? { ...editingBadge, id: editingBadge.id, status: u.status } as typeof u : u))
+      alert('Badge user updated successfully')
+    } else {
+      // Add new
+      const newUser = { ...editingBadge, id: Math.max(...badgeUsers.map(u => u.id)) + 1, status: 'New' as const }
+      setBadgeUsers(prev => [...prev, newUser])
+      alert('Badge user added successfully')
+    }
+    
+    setShowBadgeModal(false)
+    setEditingBadge(null)
+  }
+
+  const handleDeleteBadgeUser = (userId: number) => {
+    const user = badgeUsers.find(u => u.id === userId)
+    if (user && confirm(`Delete badge for ${user.name}? This action cannot be undone.`)) {
+      setBadgeUsers(prev => prev.filter(u => u.id !== userId))
+      alert('Badge user deleted successfully')
+    }
+  }
+
+  const handleSendBadgeEmail = (userId: number) => {
+    const user = badgeUsers.find(u => u.id === userId)
+    if (user) {
+      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Sent' as const } : u))
+      alert(`Badge email sent to ${user.email}`)
+    }
+  }
+
+  const handleSendBadgePush = (userId: number) => {
+    const user = badgeUsers.find(u => u.id === userId)
+    if (user) {
+      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Sent' as const } : u))
+      alert(`Push notification sent to ${user.name}`)
+    }
+  }
+
+  const handleSuspendBadge = (userId: number) => {
+    const user = badgeUsers.find(u => u.id === userId)
+    if (user && confirm(`Suspend badge for ${user.name}?`)) {
+      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Suspended' as const } : u))
+      alert('Badge suspended successfully')
+    }
+  }
+
+  const handleRecoverBadge = (userId: number) => {
+    const user = badgeUsers.find(u => u.id === userId)
+    if (user && confirm(`Recover badge for ${user.name}?`)) {
+      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Downloaded' as const } : u))
+      alert('Badge recovered successfully')
+    }
+  }
+
+  const handleBadgeImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.type === 'text/csv') {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const csv = e.target?.result as string
+        const lines = csv.split('\n').filter(line => line.trim())
+        const headers = lines[0].split(',')
+        
+        const newUsers = lines.slice(1).map((line, index) => {
+          const values = line.split(',')
+          return {
+            id: Math.max(...badgeUsers.map(u => u.id)) + index + 1,
+            name: values[0]?.trim() || '',
+            email: values[1]?.trim() || '',
+            department: values[2]?.trim() || '',
+            cardType: values[3]?.trim() || 'NFC',
+            imei: values[4]?.trim() || '',
+            status: 'New' as const
+          }
+        })
+        
+        setBadgeUsers(prev => [...prev, ...newUsers])
+        alert(`Successfully imported ${newUsers.length} badge users`)
+        setShowBadgeImportModal(false)
+      }
+      reader.readAsText(file)
+    } else {
+      alert('Please select a valid CSV file')
+    }
+  }
+
+  const filteredBadgeUsers = badgeUsers.filter(user => {
+    const matchesSearch = badgeSearchTerm === '' || 
+      user.name.toLowerCase().includes(badgeSearchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(badgeSearchTerm.toLowerCase())
+    const matchesStatus = badgeStatusFilter === 'All Statuses' || user.status === badgeStatusFilter
+    const matchesCardType = badgeCardTypeFilter === 'All Card Types' || user.cardType === badgeCardTypeFilter
+    return matchesSearch && matchesStatus && matchesCardType
+  })
 
   if (!isAuthenticated) {
     return null
