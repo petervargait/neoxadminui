@@ -26,7 +26,7 @@ export default function AdminPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [selectedTenant, setSelectedTenant] = useState<string>('all')
   const [showUserModal, setShowUserModal] = useState(false)
-  const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string; modules?: Record<string, boolean>} | null>(null)
+  const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string; profileId?: string} | null>(null)
   const [userSortField, setUserSortField] = useState<'name' | 'email' | 'role' | 'department' | 'status'>('name')
   const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc')
   const [expandedUserRow, setExpandedUserRow] = useState<number | null>(null)
@@ -70,15 +70,14 @@ export default function AdminPage() {
   const [badgeCardTypeFilter, setBadgeCardTypeFilter] = useState('All Card Types')
   const [showBadgeImportModal, setShowBadgeImportModal] = useState(false)
 
-  // Module Profiles state
-  const [moduleProfiles, setModuleProfiles] = useState<Record<string, Array<{id: string; name: string; description: string; settings: Record<string, unknown>}>>>({
-    'User Management': [{ id: 'ump1', name: 'Standard', description: 'Basic user management features', settings: { allowSelfRegistration: true, requireApproval: false } }],
-    'Visitor Management': [{ id: 'vmp1', name: 'Standard', description: 'Standard visitor check-in', settings: { requirePhotoID: true, maxVisitDuration: 8 } }],
-    'Parking': [],
-    'Emergency': [{ id: 'emp1', name: 'Full Access', description: 'All emergency features', settings: { alertAllUsers: true, enablePanicButton: true } }],
-  })
+  // Global Profiles state - profiles can have multiple modules assigned
+  const [profiles, setProfiles] = useState<Array<{id: string; name: string; description: string; modules: string[]}>>([
+    { id: 'prof1', name: 'Administrator', description: 'Full access to all modules', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'] },
+    { id: 'prof2', name: 'Manager', description: 'Access to core management modules', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'Reporting'] },
+    { id: 'prof3', name: 'Receptionist', description: 'Front desk and visitor management', modules: ['Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Lockers', 'News'] },
+  ])
   const [showProfileModal, setShowProfileModal] = useState(false)
-  const [editingProfile, setEditingProfile] = useState<{moduleName: string; profile?: {id: string; name: string; description: string; settings: Record<string, unknown>}} | null>(null)
+  const [editingProfile, setEditingProfile] = useState<{id?: string; name: string; description: string; modules: string[]} | null>(null)
 
   const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -1199,176 +1198,132 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Modules Section */}
+          {/* Profile Management Section */}
           {activeSection === 'modules' && selectedTenant !== 'all' && (
             <div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {[
-                  'User Management', 
-                  'Visitor Management', 
-                  'Parking', 
-                  'Emergency', 
-                  'Map', 
-                  'Restaurant', 
-                  'Ticketing', 
-                  'Service Hub', 
-                  'Lockers', 
-                  'News', 
-                  'AI Assistant', 
-                  'Space Management', 
-                  'Private Delivery',
-                  'Authentication',
-                  'Reporting'
-                ].map((module, index) => {
-                  const isEnabled = moduleStates[module];
-                  const profiles = moduleProfiles[module] || [];
-                  return (
-                    <div key={index} style={{
-                      padding: '20px',
-                      backgroundColor: '#162032',
-                      borderRadius: '12px',
-                      border: '1px solid #1E293B'
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden',
+                marginBottom: '24px'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderBottom: '1px solid #1E293B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Access Profiles</h2>
+                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Create profiles that define module access for users</p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setEditingProfile({ name: '', description: '', modules: [] });
+                      setShowProfileModal(true);
+                    }}
+                    style={{
+                      backgroundColor: '#60A5FA',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 20px rgba(96, 165, 250, 0.6), 0 0 35px rgba(96, 165, 250, 0.3)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)';
+                      e.currentTarget.style.transform = 'translateY(0)';
                     }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                        <div>
-                          <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '18px', fontWeight: '600' }}>{module}</h4>
-                          <p style={{ color: '#94A3B8', margin: 0, fontSize: '14px' }}>{profiles.length} profile(s) configured</p>
+                    + Create Profile
+                  </button>
+                </div>
+
+                <div style={{ padding: '24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+                    {profiles.map((profile) => (
+                      <div key={profile.id} style={{
+                        padding: '20px',
+                        backgroundColor: '#1E293B',
+                        borderRadius: '12px',
+                        border: '1px solid #475569',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#3B82F6';
+                        e.currentTarget.style.backgroundColor = '#0F1629';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = '#475569';
+                        e.currentTarget.style.backgroundColor = '#1E293B';
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
+                          <h5 style={{ color: '#F1F5F9', margin: 0, fontSize: '16px', fontWeight: '600' }}>{profile.name}</h5>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button 
+                              onClick={() => {
+                                setEditingProfile(profile);
+                                setShowProfileModal(true);
+                              }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #475569',
+                                borderRadius: '4px',
+                                color: '#3B82F6',
+                                fontSize: '11px',
+                                padding: '4px 8px',
+                                cursor: 'pointer'
+                              }}>Edit</button>
+                            <button 
+                              onClick={() => {
+                                if (confirm(`Delete profile "${profile.name}"? This action cannot be undone.`)) {
+                                  setProfiles(prev => prev.filter(p => p.id !== profile.id));
+                                  alert('Profile deleted successfully');
+                                }
+                              }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #475569',
+                                borderRadius: '4px',
+                                color: '#EF4444',
+                                fontSize: '11px',
+                                padding: '4px 8px',
+                                cursor: 'pointer'
+                              }}>Delete</button>
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <button 
-                            onClick={() => {
-                              setEditingProfile({ moduleName: module });
-                              setShowProfileModal(true);
-                            }}
-                            style={{
-                              backgroundColor: '#10B981',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '6px',
-                              padding: '8px 16px',
-                              fontSize: '13px',
-                              fontWeight: '500',
-                              cursor: 'pointer',
-                              boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.5)';
-                              e.currentTarget.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.3)';
-                              e.currentTarget.style.transform = 'translateY(0)';
-                            }}>+ Add Profile</button>
-                          <button 
-                            onClick={() => {
-                              setModuleStates(prev => ({
-                                ...prev,
-                                [module]: !prev[module]
-                              }));
-                            }}
-                            style={{
-                              backgroundColor: isEnabled ? '#EF4444' : '#3B82F6',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '6px',
-                              padding: '8px 16px',
-                              fontSize: '13px',
-                              fontWeight: '500',
-                              cursor: 'pointer',
-                              boxShadow: isEnabled ? '0 0 10px rgba(239, 68, 68, 0.3)' : '0 0 10px rgba(59, 130, 246, 0.3)',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.boxShadow = isEnabled ? '0 0 15px rgba(239, 68, 68, 0.5)' : '0 0 15px rgba(59, 130, 246, 0.5)';
-                              e.currentTarget.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.boxShadow = isEnabled ? '0 0 10px rgba(239, 68, 68, 0.3)' : '0 0 10px rgba(59, 130, 246, 0.3)';
-                              e.currentTarget.style.transform = 'translateY(0)';
-                            }}>
-                            {isEnabled ? 'Disable' : 'Enable'}
-                          </button>
+                        <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 12px 0' }}>{profile.description}</p>
+                        
+                        <div style={{ marginTop: '12px' }}>
+                          <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Assigned Modules ({profile.modules.length})</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxHeight: '120px', overflowY: 'auto' }}>
+                            {profile.modules.map((module) => (
+                              <span key={module} style={{
+                                padding: '4px 10px',
+                                backgroundColor: '#0F1629',
+                                borderRadius: '12px',
+                                fontSize: '11px',
+                                color: '#10B981',
+                                border: '1px solid rgba(16, 185, 129, 0.3)'
+                              }}>
+                                {module}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                      
-                      {profiles.length > 0 && (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px', marginTop: '12px' }}>
-                          {profiles.map((profile) => (
-                            <div key={profile.id} style={{
-                              padding: '16px',
-                              backgroundColor: '#1E293B',
-                              borderRadius: '8px',
-                              border: '1px solid #475569',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.borderColor = '#3B82F6';
-                              e.currentTarget.style.backgroundColor = '#0F1629';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.borderColor = '#475569';
-                              e.currentTarget.style.backgroundColor = '#1E293B';
-                            }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
-                                <h5 style={{ color: '#F1F5F9', margin: 0, fontSize: '15px', fontWeight: '600' }}>{profile.name}</h5>
-                                <div style={{ display: 'flex', gap: '4px' }}>
-                                  <button 
-                                    onClick={() => {
-                                      setEditingProfile({ moduleName: module, profile });
-                                      setShowProfileModal(true);
-                                    }}
-                                    style={{
-                                      backgroundColor: 'transparent',
-                                      border: '1px solid #475569',
-                                      borderRadius: '4px',
-                                      color: '#3B82F6',
-                                      fontSize: '11px',
-                                      padding: '4px 8px',
-                                      cursor: 'pointer'
-                                    }}>Edit</button>
-                                  <button 
-                                    onClick={() => {
-                                      if (confirm(`Delete profile "${profile.name}"?`)) {
-                                        setModuleProfiles(prev => ({
-                                          ...prev,
-                                          [module]: (prev[module] || []).filter(p => p.id !== profile.id)
-                                        }));
-                                        alert('Profile deleted successfully');
-                                      }
-                                    }}
-                                    style={{
-                                      backgroundColor: 'transparent',
-                                      border: '1px solid #475569',
-                                      borderRadius: '4px',
-                                      color: '#EF4444',
-                                      fontSize: '11px',
-                                      padding: '4px 8px',
-                                      cursor: 'pointer'
-                                    }}>Delete</button>
-                                </div>
-                              </div>
-                              <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 8px 0' }}>{profile.description}</p>
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                                {Object.entries(profile.settings).slice(0, 3).map(([key, value]) => (
-                                  <span key={key} style={{
-                                    padding: '2px 8px',
-                                    backgroundColor: '#0F1629',
-                                    borderRadius: '12px',
-                                    fontSize: '11px',
-                                    color: '#64748B'
-                                  }}>
-                                    {key.replace(/([A-Z])/g, ' $1').trim()}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -3047,78 +3002,52 @@ export default function AdminPage() {
                 }} />
               </div>
               <div>
-                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Module Access</label>
-                <div style={{ 
-                  padding: '16px', 
-                  backgroundColor: '#1E293B', 
-                  borderRadius: '8px', 
-                  border: '1px solid #475569',
-                  maxHeight: '300px',
-                  overflowY: 'auto'
-                }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
-                    {[
-                      'User Management', 
-                      'Visitor Management', 
-                      'Parking', 
-                      'Emergency', 
-                      'Map', 
-                      'Restaurant', 
-                      'Ticketing', 
-                      'Service Hub', 
-                      'Lockers', 
-                      'News', 
-                      'AI Assistant', 
-                      'Space Management', 
-                      'Private Delivery',
-                      'Authentication',
-                      'Reporting'
-                    ].map((module) => {
-                      const isEnabled = editingUser?.modules?.[module] ?? false;
-                      return (
-                        <div key={module} style={{
-                          padding: '12px',
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Access Profile *</label>
+                <select 
+                  value={editingUser?.profileId || ''}
+                  onChange={(e) => {
+                    if (editingUser) {
+                      setEditingUser({
+                        ...editingUser,
+                        profileId: e.target.value
+                      });
+                    }
+                  }}
+                  required 
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}>
+                  <option value="" disabled>Select an access profile</option>
+                  {profiles.map((profile) => (
+                    <option key={profile.id} value={profile.id}>{profile.name} ({profile.modules.length} modules)</option>
+                  ))}
+                </select>
+                {editingUser?.profileId && (
+                  <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #475569' }}>
+                    <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Modules from {profiles.find(p => p.id === editingUser.profileId)?.name}:</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      {profiles.find(p => p.id === editingUser.profileId)?.modules.map((module) => (
+                        <span key={module} style={{
+                          padding: '4px 10px',
                           backgroundColor: '#0F1629',
-                          borderRadius: '6px',
-                          border: `1px solid ${isEnabled ? '#10B981' : '#475569'}`,
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
-                        }}
-                        onClick={() => {
-                          if (editingUser) {
-                            setEditingUser({
-                              ...editingUser,
-                              modules: {
-                                ...editingUser.modules,
-                                [module]: !isEnabled
-                              }
-                            });
-                          }
+                          borderRadius: '12px',
+                          fontSize: '11px',
+                          color: '#10B981',
+                          border: '1px solid rgba(16, 185, 129, 0.3)'
                         }}>
-                          <span style={{ color: '#F1F5F9', fontSize: '14px' }}>{module}</span>
-                          <button 
-                            type="button"
-                            style={{
-                              backgroundColor: isEnabled ? '#10B981' : '#475569',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '6px',
-                              padding: '4px 12px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s'
-                            }}>
-                            {isEnabled ? 'Enabled' : 'Disabled'}
-                          </button>
-                        </div>
-                      );
-                    })}
+                          {module}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
@@ -3433,7 +3362,7 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Module Profile Modal */}
+      {/* Profile Modal */}
       {showProfileModal && editingProfile && (
         <div style={{
           position: 'fixed',
@@ -3451,16 +3380,16 @@ export default function AdminPage() {
             backgroundColor: '#162032',
             borderRadius: '12px',
             padding: '32px',
-            maxWidth: '600px',
+            maxWidth: '700px',
             width: '90%',
             border: '1px solid #1E293B',
             maxHeight: '90vh',
             overflow: 'auto'
           }} onClick={(e) => e.stopPropagation()}>
             <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '8px' }}>
-              {editingProfile.profile ? 'Edit' : 'Create'} Profile
+              {editingProfile.id ? 'Edit' : 'Create'} Access Profile
             </h2>
-            <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Module: {editingProfile.moduleName}</p>
+            <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Define which modules this profile can access</p>
             
             <form onSubmit={(e) => {
               e.preventDefault();
@@ -3469,27 +3398,19 @@ export default function AdminPage() {
               const description = formData.get('description') as string;
               
               const newProfile = {
-                id: editingProfile.profile?.id || `prof_${Date.now()}`,
+                id: editingProfile.id || `prof_${Date.now()}`,
                 name: profileName,
                 description: description,
-                settings: editingProfile.profile?.settings || {}
+                modules: editingProfile.modules
               };
               
-              if (editingProfile.profile) {
+              if (editingProfile.id) {
                 // Update existing
-                setModuleProfiles(prev => ({
-                  ...prev,
-                  [editingProfile.moduleName]: (prev[editingProfile.moduleName] || []).map(p => 
-                    p.id === editingProfile.profile!.id ? newProfile : p
-                  )
-                }));
+                setProfiles(prev => prev.map(p => p.id === editingProfile.id ? newProfile : p));
                 alert('Profile updated successfully');
               } else {
                 // Create new
-                setModuleProfiles(prev => ({
-                  ...prev,
-                  [editingProfile.moduleName]: [...(prev[editingProfile.moduleName] || []), newProfile]
-                }));
+                setProfiles(prev => [...prev, newProfile]);
                 alert('Profile created successfully');
               }
               
@@ -3501,9 +3422,9 @@ export default function AdminPage() {
                 <input 
                   type="text" 
                   name="profileName"
-                  defaultValue={editingProfile.profile?.name}
+                  defaultValue={editingProfile.name}
                   required 
-                  placeholder="e.g., Standard, Advanced, Custom"
+                  placeholder="e.g., Administrator, Manager, Receptionist"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -3520,9 +3441,9 @@ export default function AdminPage() {
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Description *</label>
                 <textarea 
                   name="description"
-                  defaultValue={editingProfile.profile?.description}
+                  defaultValue={editingProfile.description}
                   required 
-                  placeholder="Describe this profile configuration"
+                  placeholder="Describe the purpose and access level of this profile"
                   rows={3}
                   style={{
                     width: '100%',
@@ -3538,13 +3459,72 @@ export default function AdminPage() {
                 />
               </div>
               
-              <div style={{ padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
-                <h3 style={{ color: '#3b82f6', fontSize: '14px', marginBottom: '8px', fontWeight: '600' }}>
-                  ℹ️ Profile Settings
-                </h3>
-                <p style={{ color: '#94A3B8', fontSize: '13px', margin: 0 }}>
-                  Profile settings can be configured after creation through the module configuration panel.
-                </p>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Assigned Modules *</label>
+                <div style={{ 
+                  padding: '16px', 
+                  backgroundColor: '#1E293B', 
+                  borderRadius: '8px', 
+                  border: '1px solid #475569',
+                  maxHeight: '300px',
+                  overflowY: 'auto'
+                }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    {[
+                      'User Management', 
+                      'Visitor Management', 
+                      'Parking', 
+                      'Emergency', 
+                      'Map', 
+                      'Restaurant', 
+                      'Ticketing', 
+                      'Service Hub', 
+                      'Lockers', 
+                      'News', 
+                      'AI Assistant', 
+                      'Space Management', 
+                      'Private Delivery',
+                      'Authentication',
+                      'Reporting'
+                    ].map((module) => {
+                      const isEnabled = editingProfile.modules.includes(module);
+                      return (
+                        <label key={module} style={{
+                          padding: '10px',
+                          backgroundColor: '#0F1629',
+                          borderRadius: '6px',
+                          border: `1px solid ${isEnabled ? '#10B981' : '#475569'}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}>
+                          <input 
+                            type="checkbox" 
+                            checked={isEnabled}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setEditingProfile({
+                                  ...editingProfile,
+                                  modules: [...editingProfile.modules, module]
+                                });
+                              } else {
+                                setEditingProfile({
+                                  ...editingProfile,
+                                  modules: editingProfile.modules.filter(m => m !== module)
+                                });
+                              }
+                            }}
+                            style={{ accentColor: '#10B981', cursor: 'pointer' }} 
+                          />
+                          <span style={{ color: '#F1F5F9', fontSize: '13px' }}>{module}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+                <p style={{ color: '#64748B', fontSize: '12px', marginTop: '8px', fontStyle: 'italic' }}>Selected: {editingProfile.modules.length} module(s)</p>
               </div>
               
               <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
@@ -3559,7 +3539,7 @@ export default function AdminPage() {
                   cursor: 'pointer',
                   fontSize: '14px',
                   boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
-                }}>{editingProfile.profile ? 'Update Profile' : 'Create Profile'}</button>
+                }}>{editingProfile.id ? 'Update Profile' : 'Create Profile'}</button>
                 <button type="button" onClick={() => { setShowProfileModal(false); setEditingProfile(null); }} style={{
                   flex: 1,
                   backgroundColor: 'transparent',

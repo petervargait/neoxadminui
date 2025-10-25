@@ -32,8 +32,14 @@ export default function TenantPage() {
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>(null)
+  // Global Profiles inherited from admin - in a real app, this would be fetched from API/context
+  const [profiles] = useState<Array<{id: string; name: string; description: string; modules: string[]}>>([
+    { id: 'prof1', name: 'Administrator', description: 'Full access to all modules', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'] },
+    { id: 'prof2', name: 'Manager', description: 'Access to core management modules', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'Reporting'] },
+    { id: 'prof3', name: 'Receptionist', description: 'Front desk and visitor management', modules: ['Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Lockers', 'News'] },
+  ])
   const [showUserModal, setShowUserModal] = useState(false)
-  const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string; modules?: Record<string, boolean>} | null>(null)
+  const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string; profileId?: string} | null>(null)
   const [userSortField, setUserSortField] = useState<'name' | 'email' | 'role' | 'department' | 'status'>('name')
   const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc')
   const [expandedUserRow, setExpandedUserRow] = useState<number | null>(null)
@@ -1948,100 +1954,86 @@ export default function TenantPage() {
             </div>
           )}
 
-          {/* Modules Section */}
+          {/* Profile Management Section */}
           {activeSection === 'modules' && (
             <div>
               <div style={{ marginBottom: '20px', padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
                 <h3 style={{ color: '#3b82f6', fontSize: '16px', marginBottom: '8px', fontWeight: '600' }}>
-                  ℹ️ Module Management
+                  ℹ️ Access Profiles
                 </h3>
                 <p style={{ color: '#94A3B8', fontSize: '14px', margin: 0 }}>
-                  Gray modules are inherited from admin and cannot be disabled. Blue modules can be configured for your tenant.
+                  These profiles are configured by your global administrator. Assign them to users to control module access.
                 </p>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {[
-                  { name: 'User Management', inherited: true, enabled: true, description: 'Manage users, roles and permissions' },
-                  { name: 'Visitor Management', inherited: false, enabled: true, description: 'Guest check-in and invitation system' },
-                  { name: 'Parking', inherited: false, enabled: false, description: 'Parking space reservations' },
-                  { name: 'Emergency', inherited: true, enabled: true, description: 'Emergency alerts and procedures' },
-                  { name: 'Map', inherited: true, enabled: true, description: 'Interactive building maps' },
-                  { name: 'Restaurant', inherited: false, enabled: false, description: 'Cafeteria and food ordering' },
-                  { name: 'Ticketing', inherited: false, enabled: true, description: 'Help desk and support tickets' },
-                  { name: 'Service Hub', inherited: false, enabled: false, description: 'Facility service requests' },
-                  { name: 'Lockers', inherited: false, enabled: false, description: 'Locker management system' },
-                  { name: 'News', inherited: true, enabled: true, description: 'Company news and announcements' },
-                  { name: 'AI Assistant', inherited: false, enabled: false, description: 'AI-powered virtual assistant' },
-                  { name: 'Space Management', inherited: false, enabled: true, description: 'Room and desk booking' },
-                  { name: 'Private Delivery', inherited: false, enabled: false, description: 'Package tracking' },
-                  { name: 'Authentication', inherited: true, enabled: true, description: 'SSO and authentication' },
-                  { name: 'Reporting', inherited: true, enabled: true, description: 'Analytics and reports' },
-                ].map((module, index) => (
-                  <div key={index} style={{
-                    padding: '20px',
-                    backgroundColor: module.inherited ? '#1E293B' : '#162032',
-                    borderRadius: '12px',
-                    border: `1px solid ${module.inherited ? '#475569' : '#1E293B'}`,
-                    opacity: module.inherited ? 0.8 : 1
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                          <h4 style={{ color: '#F1F5F9', margin: 0, fontSize: '18px', fontWeight: '600' }}>{module.name}</h4>
-                          {module.inherited && (
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderBottom: '1px solid #1E293B'
+                }}>
+                  <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Available Access Profiles</h2>
+                  <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Profiles inherited from global administration</p>
+                </div>
+
+                <div style={{ padding: '24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+                    {profiles.map((profile) => (
+                      <div key={profile.id} style={{
+                        padding: '20px',
+                        backgroundColor: '#1E293B',
+                        borderRadius: '12px',
+                        border: '1px solid #475569',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#3B82F6';
+                        e.currentTarget.style.backgroundColor = '#0F1629';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = '#475569';
+                        e.currentTarget.style.backgroundColor = '#1E293B';
+                      }}>
+                        <div style={{ marginBottom: '12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                            <h5 style={{ color: '#F1F5F9', margin: 0, fontSize: '16px', fontWeight: '600' }}>{profile.name}</h5>
                             <span style={{
-                              padding: '4px 12px',
+                              padding: '4px 8px',
                               borderRadius: '12px',
-                              fontSize: '11px',
+                              fontSize: '10px',
                               fontWeight: '600',
                               backgroundColor: 'rgba(100, 116, 139, 0.2)',
                               color: '#64748B'
-                            }}>Inherited</span>
-                          )}
+                            }}>Global</span>
+                          </div>
                         </div>
-                        <p style={{ color: '#94A3B8', margin: 0, fontSize: '14px' }}>{module.description}</p>
+                        <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 12px 0' }}>{profile.description}</p>
+                        
+                        <div style={{ marginTop: '12px' }}>
+                          <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Assigned Modules ({profile.modules.length})</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxHeight: '120px', overflowY: 'auto' }}>
+                            {profile.modules.map((module) => (
+                              <span key={module} style={{
+                                padding: '4px 10px',
+                                backgroundColor: '#0F1629',
+                                borderRadius: '12px',
+                                fontSize: '11px',
+                                color: '#10B981',
+                                border: '1px solid rgba(16, 185, 129, 0.3)'
+                              }}>
+                                {module}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        {!module.inherited && (
-                          <button 
-                            onClick={() => alert(`Configuring ${module.name}...`)}
-                            style={{
-                              backgroundColor: '#3B82F6',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '6px',
-                              padding: '8px 16px',
-                              fontSize: '13px',
-                              fontWeight: '500',
-                              cursor: 'pointer',
-                              boxShadow: '0 0 10px rgba(59, 130, 246, 0.3)',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.5)';
-                              e.currentTarget.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.3)';
-                              e.currentTarget.style.transform = 'translateY(0)';
-                            }}>Configure</button>
-                        )}
-                        <span style={{
-                          padding: '8px 16px',
-                          borderRadius: '6px',
-                          fontSize: '13px',
-                          fontWeight: '600',
-                          backgroundColor: module.enabled ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
-                          color: module.enabled ? '#10B981' : '#64748B',
-                          border: `1px solid ${module.enabled ? '#10B981' : '#475569'}`
-                        }}>
-                          {module.enabled ? 'Enabled' : 'Disabled'}
-                        </span>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           )}
@@ -2400,78 +2392,52 @@ export default function TenantPage() {
                 }} />
               </div>
               <div>
-                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Module Access</label>
-                <div style={{ 
-                  padding: '16px', 
-                  backgroundColor: '#1E293B', 
-                  borderRadius: '8px', 
-                  border: '1px solid #475569',
-                  maxHeight: '300px',
-                  overflowY: 'auto'
-                }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
-                    {[
-                      'User Management', 
-                      'Visitor Management', 
-                      'Parking', 
-                      'Emergency', 
-                      'Map', 
-                      'Restaurant', 
-                      'Ticketing', 
-                      'Service Hub', 
-                      'Lockers', 
-                      'News', 
-                      'AI Assistant', 
-                      'Space Management', 
-                      'Private Delivery',
-                      'Authentication',
-                      'Reporting'
-                    ].map((module) => {
-                      const isEnabled = editingUser?.modules?.[module] ?? false;
-                      return (
-                        <div key={module} style={{
-                          padding: '12px',
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Access Profile *</label>
+                <select 
+                  value={editingUser?.profileId || ''}
+                  onChange={(e) => {
+                    if (editingUser) {
+                      setEditingUser({
+                        ...editingUser,
+                        profileId: e.target.value
+                      });
+                    }
+                  }}
+                  required 
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}>
+                  <option value="" disabled>Select an access profile</option>
+                  {profiles.map((profile) => (
+                    <option key={profile.id} value={profile.id}>{profile.name} ({profile.modules.length} modules)</option>
+                  ))}
+                </select>
+                {editingUser?.profileId && (
+                  <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #475569' }}>
+                    <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Modules from {profiles.find(p => p.id === editingUser.profileId)?.name}:</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      {profiles.find(p => p.id === editingUser.profileId)?.modules.map((module) => (
+                        <span key={module} style={{
+                          padding: '4px 10px',
                           backgroundColor: '#0F1629',
-                          borderRadius: '6px',
-                          border: `1px solid ${isEnabled ? '#10B981' : '#475569'}`,
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
-                        }}
-                        onClick={() => {
-                          if (editingUser) {
-                            setEditingUser({
-                              ...editingUser,
-                              modules: {
-                                ...editingUser.modules,
-                                [module]: !isEnabled
-                              }
-                            });
-                          }
+                          borderRadius: '12px',
+                          fontSize: '11px',
+                          color: '#10B981',
+                          border: '1px solid rgba(16, 185, 129, 0.3)'
                         }}>
-                          <span style={{ color: '#F1F5F9', fontSize: '14px' }}>{module}</span>
-                          <button 
-                            type="button"
-                            style={{
-                              backgroundColor: isEnabled ? '#10B981' : '#475569',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '6px',
-                              padding: '4px 12px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s'
-                            }}>
-                            {isEnabled ? 'Enabled' : 'Disabled'}
-                          </button>
-                        </div>
-                      );
-                    })}
+                          {module}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
