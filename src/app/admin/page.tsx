@@ -72,9 +72,9 @@ export default function AdminPage() {
 
   // Global Profiles state - profiles can have multiple modules assigned
   const [profiles, setProfiles] = useState<Array<{id: string; name: string; description: string; modules: string[]}>>([
-    { id: 'prof1', name: 'Administrator', description: 'Full access to all modules', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'] },
-    { id: 'prof2', name: 'Manager', description: 'Access to core management modules', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'Reporting'] },
-    { id: 'prof3', name: 'Receptionist', description: 'Front desk and visitor management', modules: ['Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Lockers', 'News'] },
+    { id: 'prof1', name: 'Full Access', description: 'Complete access to all system modules', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'] },
+    { id: 'prof2', name: 'Limited Access', description: 'Access to core operational modules', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'Reporting'] },
+    { id: 'prof3', name: 'Visitor Management Only', description: 'Limited to front desk and visitor operations', modules: ['Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Lockers', 'News'] },
   ])
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [editingProfile, setEditingProfile] = useState<{id?: string; name: string; description: string; modules: string[]} | null>(null)
@@ -1199,7 +1199,7 @@ export default function AdminPage() {
           )}
 
           {/* Profile Management Section */}
-          {activeSection === 'modules' && selectedTenant !== 'all' && (
+          {activeSection === 'modules' && selectedTenant === 'all' && (
             <div>
               <div style={{
                 backgroundColor: '#162032',

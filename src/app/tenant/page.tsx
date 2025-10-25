@@ -33,11 +33,17 @@ export default function TenantPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>(null)
   // Global Profiles inherited from admin - in a real app, this would be fetched from API/context
-  const [profiles] = useState<Array<{id: string; name: string; description: string; modules: string[]}>>([
-    { id: 'prof1', name: 'Administrator', description: 'Full access to all modules', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'] },
-    { id: 'prof2', name: 'Manager', description: 'Access to core management modules', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'Reporting'] },
-    { id: 'prof3', name: 'Receptionist', description: 'Front desk and visitor management', modules: ['Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Lockers', 'News'] },
+  const [globalProfiles] = useState<Array<{id: string; name: string; description: string; modules: string[]; isGlobal: boolean}>>([
+    { id: 'prof1', name: 'Full Access', description: 'Complete access to all system modules', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'], isGlobal: true },
+    { id: 'prof2', name: 'Limited Access', description: 'Access to core operational modules', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'Reporting'], isGlobal: true },
+    { id: 'prof3', name: 'Visitor Management Only', description: 'Limited to front desk and visitor operations', modules: ['Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Lockers', 'News'], isGlobal: true },
   ])
+  // Tenant-specific profiles
+  const [tenantProfiles, setTenantProfiles] = useState<Array<{id: string; name: string; description: string; modules: string[]; isGlobal: boolean}>>([])
+  // Combined profiles (global + tenant-specific)
+  const profiles = [...globalProfiles, ...tenantProfiles]
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [editingProfile, setEditingProfile] = useState<{id?: string; name: string; description: string; modules: string[]} | null>(null)
   const [showUserModal, setShowUserModal] = useState(false)
   const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string; profileId?: string} | null>(null)
   const [userSortField, setUserSortField] = useState<'name' | 'email' | 'role' | 'department' | 'status'>('name')
@@ -1962,7 +1968,7 @@ export default function TenantPage() {
                   ℹ️ Access Profiles
                 </h3>
                 <p style={{ color: '#94A3B8', fontSize: '14px', margin: 0 }}>
-                  These profiles are configured by your global administrator. Assign them to users to control module access.
+                  Global profiles are inherited from admin. You can also create tenant-specific profiles for your organization.
                 </p>
               </div>
 
@@ -1974,10 +1980,42 @@ export default function TenantPage() {
               }}>
                 <div style={{
                   padding: '24px',
-                  borderBottom: '1px solid #1E293B'
+                  borderBottom: '1px solid #1E293B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
                 }}>
-                  <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Available Access Profiles</h2>
-                  <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Profiles inherited from global administration</p>
+                  <div>
+                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Access Profiles</h2>
+                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Global profiles from admin and tenant-specific profiles</p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setEditingProfile({ name: '', description: '', modules: [] });
+                      setShowProfileModal(true);
+                    }}
+                    style={{
+                      backgroundColor: '#60A5FA',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '10px 16px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 20px rgba(96, 165, 250, 0.6), 0 0 35px rgba(96, 165, 250, 0.3)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}>
+                    + Create Tenant Profile
+                  </button>
                 </div>
 
                 <div style={{ padding: '24px' }}>
@@ -1999,16 +2037,52 @@ export default function TenantPage() {
                         e.currentTarget.style.backgroundColor = '#1E293B';
                       }}>
                         <div style={{ marginBottom: '12px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                            <h5 style={{ color: '#F1F5F9', margin: 0, fontSize: '16px', fontWeight: '600' }}>{profile.name}</h5>
-                            <span style={{
-                              padding: '4px 8px',
-                              borderRadius: '12px',
-                              fontSize: '10px',
-                              fontWeight: '600',
-                              backgroundColor: 'rgba(100, 116, 139, 0.2)',
-                              color: '#64748B'
-                            }}>Global</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <h5 style={{ color: '#F1F5F9', margin: 0, fontSize: '16px', fontWeight: '600' }}>{profile.name}</h5>
+                              <span style={{
+                                padding: '4px 8px',
+                                borderRadius: '12px',
+                                fontSize: '10px',
+                                fontWeight: '600',
+                                backgroundColor: profile.isGlobal ? 'rgba(100, 116, 139, 0.2)' : 'rgba(96, 165, 250, 0.2)',
+                                color: profile.isGlobal ? '#64748B' : '#60A5FA'
+                              }}>{profile.isGlobal ? 'Global' : 'Tenant'}</span>
+                            </div>
+                            {!profile.isGlobal && (
+                              <div style={{ display: 'flex', gap: '4px' }}>
+                                <button 
+                                  onClick={() => {
+                                    setEditingProfile({ id: profile.id, name: profile.name, description: profile.description, modules: profile.modules });
+                                    setShowProfileModal(true);
+                                  }}
+                                  style={{
+                                    backgroundColor: 'transparent',
+                                    border: '1px solid #475569',
+                                    borderRadius: '4px',
+                                    color: '#3B82F6',
+                                    fontSize: '11px',
+                                    padding: '4px 8px',
+                                    cursor: 'pointer'
+                                  }}>Edit</button>
+                                <button 
+                                  onClick={() => {
+                                    if (confirm(`Delete profile "${profile.name}"? This action cannot be undone.`)) {
+                                      setTenantProfiles(prev => prev.filter(p => p.id !== profile.id));
+                                      alert('Profile deleted successfully');
+                                    }
+                                  }}
+                                  style={{
+                                    backgroundColor: 'transparent',
+                                    border: '1px solid #475569',
+                                    borderRadius: '4px',
+                                    color: '#EF4444',
+                                    fontSize: '11px',
+                                    padding: '4px 8px',
+                                    cursor: 'pointer'
+                                  }}>Delete</button>
+                              </div>
+                            )}
                           </div>
                         </div>
                         <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 12px 0' }}>{profile.description}</p>
@@ -3103,6 +3177,202 @@ export default function TenantPage() {
                 fontSize: '14px'
               }}>Close</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Modal */}
+      {showProfileModal && editingProfile && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => setShowProfileModal(false)}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '700px',
+            width: '90%',
+            border: '1px solid #1E293B',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '8px' }}>
+              {editingProfile.id ? 'Edit' : 'Create'} Tenant Profile
+            </h2>
+            <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Define which modules this tenant-specific profile can access</p>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const profileName = formData.get('profileName') as string;
+              const description = formData.get('description') as string;
+              
+              const newProfile = {
+                id: editingProfile.id || `tenant_prof_${Date.now()}`,
+                name: profileName,
+                description: description,
+                modules: editingProfile.modules,
+                isGlobal: false
+              };
+              
+              if (editingProfile.id) {
+                // Update existing
+                setTenantProfiles(prev => prev.map(p => p.id === editingProfile.id ? newProfile : p));
+                alert('Profile updated successfully');
+              } else {
+                // Create new
+                setTenantProfiles(prev => [...prev, newProfile]);
+                alert('Profile created successfully');
+              }
+              
+              setShowProfileModal(false);
+              setEditingProfile(null);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Profile Name *</label>
+                <input 
+                  type="text" 
+                  name="profileName"
+                  defaultValue={editingProfile.name}
+                  required 
+                  placeholder="e.g., Full Access, Limited Access, Custom Profile"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} 
+                />
+              </div>
+              
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Description *</label>
+                <textarea 
+                  name="description"
+                  defaultValue={editingProfile.description}
+                  required 
+                  placeholder="Describe the purpose and access level of this profile"
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    resize: 'vertical'
+                  }} 
+                />
+              </div>
+              
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Assigned Modules *</label>
+                <div style={{ 
+                  padding: '16px', 
+                  backgroundColor: '#1E293B', 
+                  borderRadius: '8px', 
+                  border: '1px solid #475569',
+                  maxHeight: '300px',
+                  overflowY: 'auto'
+                }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    {[
+                      'User Management', 
+                      'Visitor Management', 
+                      'Parking', 
+                      'Emergency', 
+                      'Map', 
+                      'Restaurant', 
+                      'Ticketing', 
+                      'Service Hub', 
+                      'Lockers', 
+                      'News', 
+                      'AI Assistant', 
+                      'Space Management', 
+                      'Private Delivery',
+                      'Authentication',
+                      'Reporting'
+                    ].map((module) => {
+                      const isEnabled = editingProfile.modules.includes(module);
+                      return (
+                        <label key={module} style={{
+                          padding: '10px',
+                          backgroundColor: '#0F1629',
+                          borderRadius: '6px',
+                          border: `1px solid ${isEnabled ? '#10B981' : '#475569'}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}>
+                          <input 
+                            type="checkbox" 
+                            checked={isEnabled}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setEditingProfile({
+                                  ...editingProfile,
+                                  modules: [...editingProfile.modules, module]
+                                });
+                              } else {
+                                setEditingProfile({
+                                  ...editingProfile,
+                                  modules: editingProfile.modules.filter(m => m !== module)
+                                });
+                              }
+                            }}
+                            style={{ accentColor: '#10B981', cursor: 'pointer' }} 
+                          />
+                          <span style={{ color: '#F1F5F9', fontSize: '13px' }}>{module}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+                <p style={{ color: '#64748B', fontSize: '12px', marginTop: '8px', fontStyle: 'italic' }}>Selected: {editingProfile.modules.length} module(s)</p>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>{editingProfile.id ? 'Update Profile' : 'Create Profile'}</button>
+                <button type="button" onClick={() => { setShowProfileModal(false); setEditingProfile(null); }} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
