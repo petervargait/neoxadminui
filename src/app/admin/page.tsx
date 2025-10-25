@@ -1198,7 +1198,7 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Profile Management Section */}
+          {/* Profile Management Section - Shows when All Tenants selected */}
           {activeSection === 'modules' && selectedTenant === 'all' && (
             <div>
               <div style={{
@@ -1300,6 +1300,85 @@ export default function AdminPage() {
                                 cursor: 'pointer'
                               }}>Delete</button>
                           </div>
+                        </div>
+                        <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 12px 0' }}>{profile.description}</p>
+                        
+                        <div style={{ marginTop: '12px' }}>
+                          <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Assigned Modules ({profile.modules.length})</div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxHeight: '120px', overflowY: 'auto' }}>
+                            {profile.modules.map((module) => (
+                              <span key={module} style={{
+                                padding: '4px 10px',
+                                backgroundColor: '#0F1629',
+                                borderRadius: '12px',
+                                fontSize: '11px',
+                                color: '#10B981',
+                                border: '1px solid rgba(16, 185, 129, 0.3)'
+                              }}>
+                                {module}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Profile Management Section - Shows when specific tenant selected */}
+          {activeSection === 'modules' && selectedTenant !== 'all' && (
+            <div>
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden',
+                marginBottom: '24px'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderBottom: '1px solid #1E293B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Access Profiles</h2>
+                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Global profiles available for this tenant</p>
+                  </div>
+                </div>
+
+                <div style={{ padding: '24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+                    {profiles.map((profile) => (
+                      <div key={profile.id} style={{
+                        padding: '20px',
+                        backgroundColor: '#1E293B',
+                        borderRadius: '12px',
+                        border: '1px solid #475569',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#3B82F6';
+                        e.currentTarget.style.backgroundColor = '#0F1629';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = '#475569';
+                        e.currentTarget.style.backgroundColor = '#1E293B';
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
+                          <h5 style={{ color: '#F1F5F9', margin: 0, fontSize: '16px', fontWeight: '600' }}>{profile.name}</h5>
+                          <span style={{
+                            padding: '4px 8px',
+                            borderRadius: '12px',
+                            fontSize: '10px',
+                            fontWeight: '600',
+                            backgroundColor: 'rgba(100, 116, 139, 0.2)',
+                            color: '#64748B'
+                          }}>Global</span>
                         </div>
                         <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 12px 0' }}>{profile.description}</p>
                         
