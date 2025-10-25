@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular } from '@fluentui/react-icons'
+import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular } from '@fluentui/react-icons'
 
 export default function TenantPage() {
   const router = useRouter()
@@ -2126,21 +2126,51 @@ export default function TenantPage() {
                 <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', marginBottom: '20px' }}>NEOX Support</h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ fontSize: '24px' }}>📧</div>
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(96, 165, 250, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <MailRegular style={{ fontSize: '24px', color: '#60A5FA' }} />
+                    </div>
                     <div>
                       <div style={{ color: '#64748B', fontSize: '12px', marginBottom: '4px' }}>Email Support</div>
                       <a href="mailto:support@neox.team" style={{ color: '#60A5FA', fontSize: '14px', textDecoration: 'none' }}>support@neox.team</a>
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ fontSize: '24px' }}>📞</div>
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <PhoneRegular style={{ fontSize: '24px', color: '#10B981' }} />
+                    </div>
                     <div>
                       <div style={{ color: '#64748B', fontSize: '12px', marginBottom: '4px' }}>Phone Support</div>
                       <a href="tel:+3618888888" style={{ color: '#60A5FA', fontSize: '14px', textDecoration: 'none' }}>+36 1 888 888</a>
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ fontSize: '24px' }}>⏰</div>
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <ClockRegular style={{ fontSize: '24px', color: '#F59E0B' }} />
+                    </div>
                     <div>
                       <div style={{ color: '#64748B', fontSize: '12px', marginBottom: '4px' }}>Availability</div>
                       <div style={{ color: '#F1F5F9', fontSize: '14px' }}>Mon-Fri, 9:00-18:00 CET</div>
