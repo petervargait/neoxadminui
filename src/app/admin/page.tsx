@@ -71,11 +71,19 @@ export default function AdminPage() {
   const [showBadgeImportModal, setShowBadgeImportModal] = useState(false)
 
   // Global Profiles state - profiles can have multiple modules assigned
-  const [profiles, setProfiles] = useState<Array<{id: string; name: string; description: string; modules: string[]}>>([
-    { id: 'prof1', name: 'Full Access', description: 'Complete access to all system modules', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'] },
-    { id: 'prof2', name: 'Limited Access', description: 'Access to core operational modules', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'Reporting'] },
-    { id: 'prof3', name: 'Visitor Management Only', description: 'Limited to front desk and visitor operations', modules: ['Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Lockers', 'News'] },
+  const [globalProfiles, setGlobalProfiles] = useState<Array<{id: string; name: string; description: string; modules: string[]; isGlobal: boolean}>>([
+    { id: 'prof1', name: 'Full Access', description: 'Complete access to all system modules', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'], isGlobal: true },
+    { id: 'prof2', name: 'Limited Access', description: 'Access to core operational modules', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'Reporting'], isGlobal: true },
+    { id: 'prof3', name: 'Visitor Management Only', description: 'Limited to front desk and visitor operations', modules: ['Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Lockers', 'News'], isGlobal: true },
   ])
+  // Tenant-specific profiles (in real app, would be per-tenant)
+  const [tenantProfiles, setTenantProfiles] = useState<Record<string, Array<{id: string; name: string; description: string; modules: string[]; isGlobal: boolean}>>>({
+    'acme': [],
+    'techflow': [],
+    'global': [],
+    'innovation': [],
+    'digital': []
+  })
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [editingProfile, setEditingProfile] = useState<{id?: string; name: string; description: string; modules: string[]} | null>(null)
 
@@ -1198,214 +1206,170 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Profile Management Section - Shows when All Tenants selected */}
-          {activeSection === 'modules' && selectedTenant === 'all' && (
-            <div>
-              <div style={{
-                backgroundColor: '#162032',
-                borderRadius: '12px',
-                border: '1px solid #1E293B',
-                overflow: 'hidden',
-                marginBottom: '24px'
-              }}>
+          {/* Module Management Section - Context-aware: Global profiles or Tenant-specific profiles */}
+          {activeSection === 'modules' && (() => {
+            const isGlobalView = selectedTenant === 'all';
+            const currentProfiles = isGlobalView ? globalProfiles : (tenantProfiles[selectedTenant] || []);
+            
+            return (
+              <div>
                 <div style={{
-                  padding: '24px',
-                  borderBottom: '1px solid #1E293B',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
+                  backgroundColor: '#162032',
+                  borderRadius: '12px',
+                  border: '1px solid #1E293B',
+                  overflow: 'hidden',
+                  marginBottom: '24px'
                 }}>
-                  <div>
-                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Access Profiles</h2>
-                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Create profiles that define module access for users</p>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      setEditingProfile({ name: '', description: '', modules: [] });
-                      setShowProfileModal(true);
-                    }}
-                    style={{
-                      backgroundColor: '#60A5FA',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: '10px 16px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)',
-                      transition: 'all 0.3s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = '0 0 20px rgba(96, 165, 250, 0.6), 0 0 35px rgba(96, 165, 250, 0.3)';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}>
-                    + Create Profile
-                  </button>
-                </div>
-
-                <div style={{ padding: '24px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
-                    {profiles.map((profile) => (
-                      <div key={profile.id} style={{
-                        padding: '20px',
-                        backgroundColor: '#1E293B',
-                        borderRadius: '12px',
-                        border: '1px solid #475569',
-                        transition: 'all 0.2s'
+                  <div style={{
+                    padding: '24px',
+                    borderBottom: '1px solid #1E293B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    <div>
+                      <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>
+                        {isGlobalView ? 'Global Access Profiles' : `Tenant-Specific Profiles: ${selectedTenant}`}
+                      </h2>
+                      <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>
+                        {isGlobalView 
+                          ? 'Global profiles inherited by all tenants' 
+                          : 'Tenant-specific profiles for this organization'}
+                      </p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setEditingProfile({ name: '', description: '', modules: [] });
+                        setShowProfileModal(true);
+                      }}
+                      style={{
+                        backgroundColor: '#60A5FA',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '10px 16px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)',
+                        transition: 'all 0.3s ease'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = '#3B82F6';
-                        e.currentTarget.style.backgroundColor = '#0F1629';
+                        e.currentTarget.style.boxShadow = '0 0 20px rgba(96, 165, 250, 0.6), 0 0 35px rgba(96, 165, 250, 0.3)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = '#475569';
-                        e.currentTarget.style.backgroundColor = '#1E293B';
+                        e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.4), 0 0 25px rgba(96, 165, 250, 0.2)';
+                        e.currentTarget.style.transform = 'translateY(0)';
                       }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
-                          <h5 style={{ color: '#F1F5F9', margin: 0, fontSize: '16px', fontWeight: '600' }}>{profile.name}</h5>
-                          <div style={{ display: 'flex', gap: '4px' }}>
-                            <button 
-                              onClick={() => {
-                                setEditingProfile(profile);
-                                setShowProfileModal(true);
-                              }}
-                              style={{
-                                backgroundColor: 'transparent',
-                                border: '1px solid #475569',
-                                borderRadius: '4px',
-                                color: '#3B82F6',
-                                fontSize: '11px',
-                                padding: '4px 8px',
-                                cursor: 'pointer'
-                              }}>Edit</button>
-                            <button 
-                              onClick={() => {
-                                if (confirm(`Delete profile "${profile.name}"? This action cannot be undone.`)) {
-                                  setProfiles(prev => prev.filter(p => p.id !== profile.id));
-                                  alert('Profile deleted successfully');
-                                }
-                              }}
-                              style={{
-                                backgroundColor: 'transparent',
-                                border: '1px solid #475569',
-                                borderRadius: '4px',
-                                color: '#EF4444',
-                                fontSize: '11px',
-                                padding: '4px 8px',
-                                cursor: 'pointer'
-                              }}>Delete</button>
-                          </div>
-                        </div>
-                        <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 12px 0' }}>{profile.description}</p>
-                        
-                        <div style={{ marginTop: '12px' }}>
-                          <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Assigned Modules ({profile.modules.length})</div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxHeight: '120px', overflowY: 'auto' }}>
-                            {profile.modules.map((module) => (
-                              <span key={module} style={{
-                                padding: '4px 10px',
-                                backgroundColor: '#0F1629',
-                                borderRadius: '12px',
-                                fontSize: '11px',
-                                color: '#10B981',
-                                border: '1px solid rgba(16, 185, 129, 0.3)'
-                              }}>
-                                {module}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
+                      + Create {isGlobalView ? 'Global' : 'Tenant'} Profile
+                    </button>
+                  </div>
+
+                  <div style={{ padding: '24px' }}>
+                    {currentProfiles.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '40px', color: '#64748B' }}>
+                        <p style={{ fontSize: '16px', marginBottom: '8px' }}>No profiles created yet</p>
+                        <p style={{ fontSize: '14px' }}>Create a profile to define module access for users</p>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Profile Management Section - Shows when specific tenant selected */}
-          {activeSection === 'modules' && selectedTenant !== 'all' && (
-            <div>
-              <div style={{
-                backgroundColor: '#162032',
-                borderRadius: '12px',
-                border: '1px solid #1E293B',
-                overflow: 'hidden',
-                marginBottom: '24px'
-              }}>
-                <div style={{
-                  padding: '24px',
-                  borderBottom: '1px solid #1E293B',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}>
-                  <div>
-                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Access Profiles</h2>
-                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Global profiles available for this tenant</p>
-                  </div>
-                </div>
-
-                <div style={{ padding: '24px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
-                    {profiles.map((profile) => (
-                      <div key={profile.id} style={{
-                        padding: '20px',
-                        backgroundColor: '#1E293B',
-                        borderRadius: '12px',
-                        border: '1px solid #475569',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = '#3B82F6';
-                        e.currentTarget.style.backgroundColor = '#0F1629';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = '#475569';
-                        e.currentTarget.style.backgroundColor = '#1E293B';
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
-                          <h5 style={{ color: '#F1F5F9', margin: 0, fontSize: '16px', fontWeight: '600' }}>{profile.name}</h5>
-                          <span style={{
-                            padding: '4px 8px',
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+                        {currentProfiles.map((profile) => (
+                          <div key={profile.id} style={{
+                            padding: '20px',
+                            backgroundColor: '#1E293B',
                             borderRadius: '12px',
-                            fontSize: '10px',
-                            fontWeight: '600',
-                            backgroundColor: 'rgba(100, 116, 139, 0.2)',
-                            color: '#64748B'
-                          }}>Global</span>
-                        </div>
-                        <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 12px 0' }}>{profile.description}</p>
-                        
-                        <div style={{ marginTop: '12px' }}>
-                          <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Assigned Modules ({profile.modules.length})</div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxHeight: '120px', overflowY: 'auto' }}>
-                            {profile.modules.map((module) => (
-                              <span key={module} style={{
-                                padding: '4px 10px',
-                                backgroundColor: '#0F1629',
-                                borderRadius: '12px',
-                                fontSize: '11px',
-                                color: '#10B981',
-                                border: '1px solid rgba(16, 185, 129, 0.3)'
-                              }}>
-                                {module}
-                              </span>
-                            ))}
+                            border: '1px solid #475569',
+                            transition: 'all 0.2s'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = '#3B82F6';
+                            e.currentTarget.style.backgroundColor = '#0F1629';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = '#475569';
+                            e.currentTarget.style.backgroundColor = '#1E293B';
+                          }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '12px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <h5 style={{ color: '#F1F5F9', margin: 0, fontSize: '16px', fontWeight: '600' }}>{profile.name}</h5>
+                                <span style={{
+                                  padding: '4px 8px',
+                                  borderRadius: '12px',
+                                  fontSize: '10px',
+                                  fontWeight: '600',
+                                  backgroundColor: isGlobalView ? 'rgba(100, 116, 139, 0.2)' : 'rgba(96, 165, 250, 0.2)',
+                                  color: isGlobalView ? '#64748B' : '#60A5FA'
+                                }}>{isGlobalView ? 'Global' : 'Tenant'}</span>
+                              </div>
+                              <div style={{ display: 'flex', gap: '4px' }}>
+                                <button 
+                                  onClick={() => {
+                                    setEditingProfile({ id: profile.id, name: profile.name, description: profile.description, modules: profile.modules });
+                                    setShowProfileModal(true);
+                                  }}
+                                  style={{
+                                    backgroundColor: 'transparent',
+                                    border: '1px solid #475569',
+                                    borderRadius: '4px',
+                                    color: '#3B82F6',
+                                    fontSize: '11px',
+                                    padding: '4px 8px',
+                                    cursor: 'pointer'
+                                  }}>Edit</button>
+                                <button 
+                                  onClick={() => {
+                                    if (confirm(`Delete profile "${profile.name}"? This action cannot be undone.`)) {
+                                      if (isGlobalView) {
+                                        setGlobalProfiles(prev => prev.filter(p => p.id !== profile.id));
+                                      } else {
+                                        setTenantProfiles(prev => ({
+                                          ...prev,
+                                          [selectedTenant]: prev[selectedTenant].filter(p => p.id !== profile.id)
+                                        }));
+                                      }
+                                      alert('Profile deleted successfully');
+                                    }
+                                  }}
+                                  style={{
+                                    backgroundColor: 'transparent',
+                                    border: '1px solid #475569',
+                                    borderRadius: '4px',
+                                    color: '#EF4444',
+                                    fontSize: '11px',
+                                    padding: '4px 8px',
+                                    cursor: 'pointer'
+                                  }}>Delete</button>
+                              </div>
+                            </div>
+                            <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 12px 0' }}>{profile.description}</p>
+                            
+                            <div style={{ marginTop: '12px' }}>
+                              <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Assigned Modules ({profile.modules.length})</div>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxHeight: '120px', overflowY: 'auto' }}>
+                                {profile.modules.map((module) => (
+                                  <span key={module} style={{
+                                    padding: '4px 10px',
+                                    backgroundColor: '#0F1629',
+                                    borderRadius: '12px',
+                                    fontSize: '11px',
+                                    color: '#10B981',
+                                    border: '1px solid rgba(16, 185, 129, 0.3)'
+                                  }}>
+                                    {module}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Digital Badges Section */}
           {activeSection === 'digitalBadges' && (
@@ -3104,15 +3068,18 @@ export default function AdminPage() {
                     cursor: 'pointer'
                   }}>
                   <option value="" disabled>Select an access profile</option>
-                  {profiles.map((profile) => (
-                    <option key={profile.id} value={profile.id}>{profile.name} ({profile.modules.length} modules)</option>
+                  {[...globalProfiles, ...(selectedTenant !== 'all' ? (tenantProfiles[selectedTenant] || []) : [])].map((profile) => (
+                    <option key={profile.id} value={profile.id}>{profile.name} ({profile.modules.length} modules) - {profile.isGlobal ? 'Global' : 'Tenant'}</option>
                   ))}
                 </select>
-                {editingUser?.profileId && (
-                  <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #475569' }}>
-                    <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Modules from {profiles.find(p => p.id === editingUser.profileId)?.name}:</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {profiles.find(p => p.id === editingUser.profileId)?.modules.map((module) => (
+                {editingUser?.profileId && (() => {
+                  const allProfiles = [...globalProfiles, ...(selectedTenant !== 'all' ? (tenantProfiles[selectedTenant] || []) : [])];
+                  const selectedProfile = allProfiles.find(p => p.id === editingUser.profileId);
+                  return selectedProfile ? (
+                    <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #475569' }}>
+                      <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Modules from {selectedProfile.name}:</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                        {selectedProfile.modules.map((module) => (
                         <span key={module} style={{
                           padding: '4px 10px',
                           backgroundColor: '#0F1629',
@@ -3123,10 +3090,11 @@ export default function AdminPage() {
                         }}>
                           {module}
                         </span>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  ) : null;
+                })()}
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
@@ -3476,20 +3444,36 @@ export default function AdminPage() {
               const profileName = formData.get('profileName') as string;
               const description = formData.get('description') as string;
               
+              const isGlobalView = selectedTenant === 'all';
               const newProfile = {
-                id: editingProfile.id || `prof_${Date.now()}`,
+                id: editingProfile.id || `${isGlobalView ? 'global' : selectedTenant}_prof_${Date.now()}`,
                 name: profileName,
                 description: description,
-                modules: editingProfile.modules
+                modules: editingProfile.modules,
+                isGlobal: isGlobalView
               };
               
               if (editingProfile.id) {
                 // Update existing
-                setProfiles(prev => prev.map(p => p.id === editingProfile.id ? newProfile : p));
+                if (isGlobalView) {
+                  setGlobalProfiles(prev => prev.map(p => p.id === editingProfile.id ? newProfile : p));
+                } else {
+                  setTenantProfiles(prev => ({
+                    ...prev,
+                    [selectedTenant]: prev[selectedTenant].map(p => p.id === editingProfile.id ? newProfile : p)
+                  }));
+                }
                 alert('Profile updated successfully');
               } else {
                 // Create new
-                setProfiles(prev => [...prev, newProfile]);
+                if (isGlobalView) {
+                  setGlobalProfiles(prev => [...prev, newProfile]);
+                } else {
+                  setTenantProfiles(prev => ({
+                    ...prev,
+                    [selectedTenant]: [...prev[selectedTenant], newProfile]
+                  }));
+                }
                 alert('Profile created successfully');
               }
               
