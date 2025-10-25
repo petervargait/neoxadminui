@@ -314,7 +314,7 @@ export default function AdminPage() {
             { icon: '◈', label: 'Dashboard', action: () => setActiveSection('dashboard'), enabled: true, isFluentIcon: false, iconType: null },
             { icon: 'building', label: 'Tenants', action: () => setActiveSection('tenantsList'), enabled: true, isFluentIcon: true, iconType: 'building' },
             { icon: 'people', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'people' },
-            { icon: 'settings', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'settings' },
+            { icon: 'settings', label: 'Modules', action: () => setActiveSection('modules'), enabled: true, isFluentIcon: true, iconType: 'settings' },
             { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: 'document', label: 'Digital Badges', action: () => setActiveSection('digitalBadges'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'document' },
             { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
