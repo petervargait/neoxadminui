@@ -71,14 +71,14 @@ export default function AdminPage() {
   const [showBadgeImportModal, setShowBadgeImportModal] = useState(false)
 
   // Module Profiles state
-  const [moduleProfiles, setModuleProfiles] = useState<Record<string, Array<{id: string; name: string; description: string; settings: Record<string, any>}>>>({
+  const [moduleProfiles, setModuleProfiles] = useState<Record<string, Array<{id: string; name: string; description: string; settings: Record<string, unknown>}>>>({
     'User Management': [{ id: 'ump1', name: 'Standard', description: 'Basic user management features', settings: { allowSelfRegistration: true, requireApproval: false } }],
     'Visitor Management': [{ id: 'vmp1', name: 'Standard', description: 'Standard visitor check-in', settings: { requirePhotoID: true, maxVisitDuration: 8 } }],
     'Parking': [],
     'Emergency': [{ id: 'emp1', name: 'Full Access', description: 'All emergency features', settings: { alertAllUsers: true, enablePanicButton: true } }],
   })
   const [showProfileModal, setShowProfileModal] = useState(false)
-  const [editingProfile, setEditingProfile] = useState<{moduleName: string; profile?: {id: string; name: string; description: string; settings: Record<string, any>}} | null>(null)
+  const [editingProfile, setEditingProfile] = useState<{moduleName: string; profile?: {id: string; name: string; description: string; settings: Record<string, unknown>}} | null>(null)
 
   const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
