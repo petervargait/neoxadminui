@@ -1209,7 +1209,7 @@ export default function AdminPage() {
           {/* Module Management Section - Context-aware: Global profiles or Tenant-specific profiles */}
           {activeSection === 'modules' && (() => {
             const isGlobalView = selectedTenant === 'all';
-            const currentProfiles = isGlobalView ? globalProfiles : (tenantProfiles[selectedTenant] || []);
+            const currentProfiles = isGlobalView ? globalProfiles : [...globalProfiles, ...(tenantProfiles[selectedTenant] || [])];
             
             return (
               <div>
@@ -1229,12 +1229,12 @@ export default function AdminPage() {
                   }}>
                     <div>
                       <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>
-                        {isGlobalView ? 'Global Access Profiles' : `Tenant-Specific Profiles: ${selectedTenant}`}
+                        {isGlobalView ? 'Global Access Profiles' : `Access Profiles: ${selectedTenant}`}
                       </h2>
                       <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>
                         {isGlobalView 
                           ? 'Global profiles inherited by all tenants' 
-                          : 'Tenant-specific profiles for this organization'}
+                          : 'Global profiles (inherited) and tenant-specific profiles'}
                       </p>
                     </div>
                     <button 
@@ -1298,49 +1298,47 @@ export default function AdminPage() {
                                   borderRadius: '12px',
                                   fontSize: '10px',
                                   fontWeight: '600',
-                                  backgroundColor: isGlobalView ? 'rgba(100, 116, 139, 0.2)' : 'rgba(96, 165, 250, 0.2)',
-                                  color: isGlobalView ? '#64748B' : '#60A5FA'
-                                }}>{isGlobalView ? 'Global' : 'Tenant'}</span>
+                                  backgroundColor: profile.isGlobal ? 'rgba(100, 116, 139, 0.2)' : 'rgba(96, 165, 250, 0.2)',
+                                  color: profile.isGlobal ? '#64748B' : '#60A5FA'
+                                }}>{profile.isGlobal ? 'Global' : 'Tenant'}</span>
                               </div>
-                              <div style={{ display: 'flex', gap: '4px' }}>
-                                <button 
-                                  onClick={() => {
-                                    setEditingProfile({ id: profile.id, name: profile.name, description: profile.description, modules: profile.modules });
-                                    setShowProfileModal(true);
-                                  }}
-                                  style={{
-                                    backgroundColor: 'transparent',
-                                    border: '1px solid #475569',
-                                    borderRadius: '4px',
-                                    color: '#3B82F6',
-                                    fontSize: '11px',
-                                    padding: '4px 8px',
-                                    cursor: 'pointer'
-                                  }}>Edit</button>
-                                <button 
-                                  onClick={() => {
-                                    if (confirm(`Delete profile "${profile.name}"? This action cannot be undone.`)) {
-                                      if (isGlobalView) {
-                                        setGlobalProfiles(prev => prev.filter(p => p.id !== profile.id));
-                                      } else {
+                              {!profile.isGlobal && (
+                                <div style={{ display: 'flex', gap: '4px' }}>
+                                  <button 
+                                    onClick={() => {
+                                      setEditingProfile({ id: profile.id, name: profile.name, description: profile.description, modules: profile.modules });
+                                      setShowProfileModal(true);
+                                    }}
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      border: '1px solid #475569',
+                                      borderRadius: '4px',
+                                      color: '#3B82F6',
+                                      fontSize: '11px',
+                                      padding: '4px 8px',
+                                      cursor: 'pointer'
+                                    }}>Edit</button>
+                                  <button 
+                                    onClick={() => {
+                                      if (confirm(`Delete profile "${profile.name}"? This action cannot be undone.`)) {
                                         setTenantProfiles(prev => ({
                                           ...prev,
                                           [selectedTenant]: prev[selectedTenant].filter(p => p.id !== profile.id)
                                         }));
+                                        alert('Profile deleted successfully');
                                       }
-                                      alert('Profile deleted successfully');
-                                    }
-                                  }}
-                                  style={{
-                                    backgroundColor: 'transparent',
-                                    border: '1px solid #475569',
-                                    borderRadius: '4px',
-                                    color: '#EF4444',
-                                    fontSize: '11px',
-                                    padding: '4px 8px',
-                                    cursor: 'pointer'
-                                  }}>Delete</button>
-                              </div>
+                                    }}
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      border: '1px solid #475569',
+                                      borderRadius: '4px',
+                                      color: '#EF4444',
+                                      fontSize: '11px',
+                                      padding: '4px 8px',
+                                      cursor: 'pointer'
+                                    }}>Delete</button>
+                                </div>
+                              )}
                             </div>
                             <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 12px 0' }}>{profile.description}</p>
                             
