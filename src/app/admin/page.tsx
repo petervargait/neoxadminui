@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { PersonRegular, AlertRegular, StatusRegular, DocumentBulletListRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular } from '@fluentui/react-icons'
+import { PersonRegular, AlertRegular, StatusRegular, DocumentBulletListRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, BuildingRegular, SettingsRegular } from '@fluentui/react-icons'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -26,9 +26,10 @@ export default function AdminPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [selectedTenant, setSelectedTenant] = useState<string>('all')
   const [showUserModal, setShowUserModal] = useState(false)
-  const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string} | null>(null)
+  const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string; modules?: Record<string, boolean>} | null>(null)
   const [userSortField, setUserSortField] = useState<'name' | 'email' | 'role' | 'department' | 'status'>('name')
   const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [expandedUserRow, setExpandedUserRow] = useState<number | null>(null)
   const [moduleStates, setModuleStates] = useState<Record<string, boolean>>({
     'User Management': true,
     'Visitor Management': true,
@@ -68,6 +69,16 @@ export default function AdminPage() {
   const [badgeStatusFilter, setBadgeStatusFilter] = useState('All Statuses')
   const [badgeCardTypeFilter, setBadgeCardTypeFilter] = useState('All Card Types')
   const [showBadgeImportModal, setShowBadgeImportModal] = useState(false)
+
+  // Module Profiles state
+  const [moduleProfiles, setModuleProfiles] = useState<Record<string, Array<{id: string; name: string; description: string; settings: Record<string, any>}>>>({
+    'User Management': [{ id: 'ump1', name: 'Standard', description: 'Basic user management features', settings: { allowSelfRegistration: true, requireApproval: false } }],
+    'Visitor Management': [{ id: 'vmp1', name: 'Standard', description: 'Standard visitor check-in', settings: { requirePhotoID: true, maxVisitDuration: 8 } }],
+    'Parking': [],
+    'Emergency': [{ id: 'emp1', name: 'Full Access', description: 'All emergency features', settings: { alertAllUsers: true, enablePanicButton: true } }],
+  })
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [editingProfile, setEditingProfile] = useState<{moduleName: string; profile?: {id: string; name: string; description: string; settings: Record<string, any>}} | null>(null)
 
   const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -283,10 +294,10 @@ export default function AdminPage() {
             >
               <option value="all">All Tenants</option>
               <option value="acme">Acme Corporation</option>
-              <option value="techflow">TechFlow Industries</option>
+              <option value="digital">Digital Dynamics</option>
               <option value="global">Global Solutions Ltd</option>
               <option value="innovation">Innovation Labs</option>
-              <option value="digital">Digital Dynamics</option>
+              <option value="techflow">TechFlow Industries</option>
             </select>
           </div>
         )}
@@ -294,11 +305,11 @@ export default function AdminPage() {
         <nav style={{ padding: '20px 0', flex: 1 }}>
           {[
             { icon: '◈', label: 'Dashboard', action: () => setActiveSection('dashboard'), enabled: true, isFluentIcon: false, iconType: null },
-            { icon: '◎', label: 'Tenants', action: () => setActiveSection('tenantsList'), enabled: true, isFluentIcon: false, iconType: null },
-            { icon: 'person', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'person' },
-            { icon: '◧', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: 'building', label: 'Tenants', action: () => setActiveSection('tenantsList'), enabled: true, isFluentIcon: true, iconType: 'building' },
+            { icon: 'people', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'people' },
+            { icon: 'settings', label: 'Modules', action: () => setActiveSection('modules'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'settings' },
             { icon: '◨', label: 'Bulk Upload', action: () => setActiveSection('bulkUpload'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
-            { icon: '▨', label: 'Digital Badges', action: () => setActiveSection('digitalBadges'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: 'document', label: 'Digital Badges', action: () => setActiveSection('digitalBadges'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'document' },
             { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), enabled: true, isFluentIcon: false, iconType: null },
             { icon: 'ticket', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: true, iconType: 'ticket' },
@@ -340,8 +351,14 @@ export default function AdminPage() {
               }}
             >
               {item.isFluentIcon ? (
-                item.iconType === 'person' ? (
-                  <PersonRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                item.iconType === 'people' ? (
+                  <PeopleRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'building' ? (
+                  <BuildingRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'settings' ? (
+                  <SettingsRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'document' ? (
+                  <DocumentRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : item.iconType === 'alert' ? (
                   <AlertRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : item.iconType === 'status' ? (
@@ -864,6 +881,7 @@ export default function AdminPage() {
                     <option>All Roles</option>
                     <option>Admin</option>
                     <option>Manager</option>
+                    <option>Receptionist</option>
                     <option>User</option>
                   </select>
                 </div>
@@ -922,16 +940,17 @@ export default function AdminPage() {
                         }} style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
                           Status {userSortField === 'status' && (userSortDirection === 'asc' ? '↑' : '↓')}
                         </th>
+                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Modules</th>
                         <th style={{ padding: '12px 16px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {[
-                        { name: 'John Smith', email: 'john.smith@company.com', role: 'Admin', department: 'IT', status: 'Active' },
-                        { name: 'Sarah Johnson', email: 'sarah.j@company.com', role: 'Manager', department: 'HR', status: 'Active' },
-                        { name: 'Mike Davis', email: 'mike.davis@company.com', role: 'User', department: 'Sales', status: 'Active' },
-                        { name: 'Lisa Wilson', email: 'lisa.w@company.com', role: 'User', department: 'Marketing', status: 'Inactive' },
-                        { name: 'Tom Brown', email: 'tom.brown@company.com', role: 'Manager', department: 'Operations', status: 'Active' },
+                        { name: 'John Smith', email: 'john.smith@company.com', role: 'Admin', department: 'IT', status: 'Active', modules: { 'User Management': true, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': true, 'Ticketing': true, 'Service Hub': true, 'Lockers': true, 'News': true, 'AI Assistant': true, 'Space Management': true, 'Private Delivery': true, 'Authentication': true, 'Reporting': true } },
+                        { name: 'Sarah Johnson', email: 'sarah.j@company.com', role: 'Manager', department: 'HR', status: 'Active', modules: { 'User Management': true, 'Visitor Management': true, 'Parking': false, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': false, 'Lockers': false, 'News': true, 'AI Assistant': false, 'Space Management': true, 'Private Delivery': false, 'Authentication': false, 'Reporting': true } },
+                        { name: 'Mike Davis', email: 'mike.davis@company.com', role: 'User', department: 'Sales', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': false, 'Emergency': true, 'Map': true, 'Restaurant': true, 'Ticketing': false, 'Service Hub': false, 'Lockers': false, 'News': true, 'AI Assistant': false, 'Space Management': false, 'Private Delivery': false, 'Authentication': false, 'Reporting': false } },
+                        { name: 'Lisa Wilson', email: 'lisa.w@company.com', role: 'Receptionist', department: 'Reception', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': false, 'Lockers': true, 'News': true, 'AI Assistant': false, 'Space Management': false, 'Private Delivery': false, 'Authentication': false, 'Reporting': false } },
+                        { name: 'Tom Brown', email: 'tom.brown@company.com', role: 'Manager', department: 'Operations', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': true, 'Lockers': true, 'News': true, 'AI Assistant': false, 'Space Management': true, 'Private Delivery': true, 'Authentication': false, 'Reporting': true } },
                       ].sort((a, b) => {
                         const aVal = a[userSortField].toLowerCase();
                         const bVal = b[userSortField].toLowerCase();
@@ -941,96 +960,154 @@ export default function AdminPage() {
                           return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
                         }
                       }).map((user, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid #1E293B' }}>
-                          <td style={{ padding: '16px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{user.name}</td>
-                          <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.email}</td>
-                          <td style={{ padding: '16px' }}>
-                            <span style={{
-                              padding: '4px 12px',
-                              borderRadius: '20px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              backgroundColor: user.role === 'Admin' ? 'rgba(239, 68, 68, 0.1)' : user.role === 'Manager' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                              color: user.role === 'Admin' ? '#EF4444' : user.role === 'Manager' ? '#F59E0B' : '#3B82F6'
-                            }}>
-                              {user.role}
-                            </span>
-                          </td>
-                          <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.department}</td>
-                          <td style={{ padding: '16px' }}>
-                            <span style={{
-                              padding: '4px 12px',
-                              borderRadius: '20px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              backgroundColor: user.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
-                              color: user.status === 'Active' ? '#10B981' : '#64748B'
-                            }}>
-                              {user.status}
-                            </span>
-                          </td>
-                          <td style={{ padding: '16px', textAlign: 'right' }}>
-                            <button onClick={() => { setEditingUser(user); setShowUserModal(true); }} style={{
-                              backgroundColor: '#60A5FA',
-                              border: 'none',
-                              borderRadius: '6px',
-                              color: 'white',
-                              fontSize: '12px',
-                              padding: '6px 12px',
-                              cursor: 'pointer',
-                              marginRight: '8px',
-                              boxShadow: '0 0 10px rgba(96, 165, 250, 0.3)',
-                              transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.5)';
-                              e.currentTarget.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.boxShadow = '0 0 10px rgba(96, 165, 250, 0.3)';
-                              e.currentTarget.style.transform = 'translateY(0)';
-                            }}>Edit</button>
-                            <button onClick={() => { if (confirm(`${user.status === 'Active' ? 'Deactivate' : 'Reactivate'} ${user.name}?`)) { alert(`User ${user.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`); } }} style={{
-                              backgroundColor: user.status === 'Active' ? '#F59E0B' : '#10B981',
-                              border: 'none',
-                              borderRadius: '6px',
-                              color: 'white',
-                              fontSize: '12px',
-                              padding: '6px 12px',
-                              cursor: 'pointer',
-                              marginRight: '8px',
-                              boxShadow: user.status === 'Active' ? '0 0 10px rgba(245, 158, 11, 0.3)' : '0 0 10px rgba(16, 185, 129, 0.3)',
-                              transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.boxShadow = user.status === 'Active' ? '0 0 15px rgba(245, 158, 11, 0.5)' : '0 0 15px rgba(16, 185, 129, 0.5)';
-                              e.currentTarget.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.boxShadow = user.status === 'Active' ? '0 0 10px rgba(245, 158, 11, 0.3)' : '0 0 10px rgba(16, 185, 129, 0.3)';
-                              e.currentTarget.style.transform = 'translateY(0)';
-                            }}>{user.status === 'Active' ? 'Deactivate' : 'Reactivate'}</button>
-                            <button onClick={() => { if (confirm(`Delete ${user.name}? This action cannot be undone.`)) { alert('User deleted successfully'); } }} style={{
-                              backgroundColor: '#EF4444',
-                              border: 'none',
-                              borderRadius: '6px',
-                              color: 'white',
-                              fontSize: '12px',
-                              padding: '6px 12px',
-                              cursor: 'pointer',
-                              boxShadow: '0 0 10px rgba(239, 68, 68, 0.3)',
-                              transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.5)';
-                              e.currentTarget.style.transform = 'translateY(-1px)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.3)';
-                              e.currentTarget.style.transform = 'translateY(0)';
-                            }}>Delete</button>
-                          </td>
-                        </tr>
+                        <>
+                          <tr key={idx} style={{ borderBottom: expandedUserRow === idx ? 'none' : '1px solid #1E293B' }}>
+                            <td style={{ padding: '16px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{user.name}</td>
+                            <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.email}</td>
+                            <td style={{ padding: '16px' }}>
+                              <span style={{
+                                padding: '4px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                backgroundColor: user.role === 'Admin' ? 'rgba(239, 68, 68, 0.1)' : user.role === 'Manager' ? 'rgba(245, 158, 11, 0.1)' : user.role === 'Receptionist' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                                color: user.role === 'Admin' ? '#EF4444' : user.role === 'Manager' ? '#F59E0B' : user.role === 'Receptionist' ? '#8B5CF6' : '#3B82F6'
+                              }}>
+                                {user.role}
+                              </span>
+                            </td>
+                            <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.department}</td>
+                            <td style={{ padding: '16px' }}>
+                              <span style={{
+                                padding: '4px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                backgroundColor: user.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                                color: user.status === 'Active' ? '#10B981' : '#64748B'
+                              }}>
+                                {user.status}
+                              </span>
+                            </td>
+                            <td style={{ padding: '16px' }}>
+                              <button 
+                                onClick={() => setExpandedUserRow(expandedUserRow === idx ? null : idx)}
+                                style={{
+                                  backgroundColor: '#3B82F6',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  color: 'white',
+                                  fontSize: '12px',
+                                  padding: '6px 12px',
+                                  cursor: 'pointer',
+                                  boxShadow: '0 0 10px rgba(59, 130, 246, 0.3)',
+                                  transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.5)';
+                                  e.currentTarget.style.transform = 'translateY(-1px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.3)';
+                                  e.currentTarget.style.transform = 'translateY(0)';
+                                }}>
+                                {expandedUserRow === idx ? 'Hide' : 'View'} ({Object.values(user.modules || {}).filter(Boolean).length}/{Object.keys(user.modules || {}).length})
+                              </button>
+                            </td>
+                            <td style={{ padding: '16px', textAlign: 'right' }}>
+                              <button onClick={() => { setEditingUser(user); setShowUserModal(true); }} style={{
+                                backgroundColor: '#60A5FA',
+                                border: 'none',
+                                borderRadius: '6px',
+                                color: 'white',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                marginRight: '8px',
+                                boxShadow: '0 0 10px rgba(96, 165, 250, 0.3)',
+                                transition: 'all 0.2s ease'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.boxShadow = '0 0 15px rgba(96, 165, 250, 0.5)';
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.boxShadow = '0 0 10px rgba(96, 165, 250, 0.3)';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                              }}>Edit</button>
+                              <button onClick={() => { if (confirm(`${user.status === 'Active' ? 'Deactivate' : 'Reactivate'} ${user.name}?`)) { alert(`User ${user.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`); } }} style={{
+                                backgroundColor: user.status === 'Active' ? '#F59E0B' : '#10B981',
+                                border: 'none',
+                                borderRadius: '6px',
+                                color: 'white',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                marginRight: '8px',
+                                boxShadow: user.status === 'Active' ? '0 0 10px rgba(245, 158, 11, 0.3)' : '0 0 10px rgba(16, 185, 129, 0.3)',
+                                transition: 'all 0.2s ease'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.boxShadow = user.status === 'Active' ? '0 0 15px rgba(245, 158, 11, 0.5)' : '0 0 15px rgba(16, 185, 129, 0.5)';
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.boxShadow = user.status === 'Active' ? '0 0 10px rgba(245, 158, 11, 0.3)' : '0 0 10px rgba(16, 185, 129, 0.3)';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                              }}>{user.status === 'Active' ? 'Deactivate' : 'Reactivate'}</button>
+                              <button onClick={() => { if (confirm(`Delete ${user.name}? This action cannot be undone.`)) { alert('User deleted successfully'); } }} style={{
+                                backgroundColor: '#EF4444',
+                                border: 'none',
+                                borderRadius: '6px',
+                                color: 'white',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                boxShadow: '0 0 10px rgba(239, 68, 68, 0.3)',
+                                transition: 'all 0.2s ease'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.5)';
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.3)';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                              }}>Delete</button>
+                            </td>
+                          </tr>
+                          {expandedUserRow === idx && (
+                            <tr key={`${idx}-modules`} style={{ borderBottom: '1px solid #1E293B' }}>
+                              <td colSpan={7} style={{ padding: '16px', backgroundColor: '#0F1629' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '8px' }}>
+                                  {Object.entries(user.modules || {}).map(([module, enabled]) => (
+                                    <div key={module} style={{
+                                      padding: '8px 12px',
+                                      backgroundColor: '#1E293B',
+                                      borderRadius: '6px',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      border: `1px solid ${enabled ? '#10B981' : '#475569'}`
+                                    }}>
+                                      <span style={{ color: '#F1F5F9', fontSize: '13px' }}>{module}</span>
+                                      <span style={{
+                                        padding: '2px 8px',
+                                        borderRadius: '12px',
+                                        fontSize: '11px',
+                                        fontWeight: '500',
+                                        backgroundColor: enabled ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                                        color: enabled ? '#10B981' : '#64748B'
+                                      }}>
+                                        {enabled ? 'Enabled' : 'Disabled'}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </>
                       ))}
                     </tbody>
                   </table>
@@ -1144,49 +1221,151 @@ export default function AdminPage() {
                   'Reporting'
                 ].map((module, index) => {
                   const isEnabled = moduleStates[module];
+                  const profiles = moduleProfiles[module] || [];
                   return (
                     <div key={index} style={{
-                      padding: '16px',
-                      backgroundColor: '#1E293B',
-                      borderRadius: '8px',
-                      border: '1px solid #475569',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
+                      padding: '20px',
+                      backgroundColor: '#162032',
+                      borderRadius: '12px',
+                      border: '1px solid #1E293B'
                     }}>
-                      <div>
-                        <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '16px' }}>{module}</h4>
-                        <p style={{ color: '#94A3B8', margin: 0, fontSize: '14px' }}>Module configuration and settings</p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <div>
+                          <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '18px', fontWeight: '600' }}>{module}</h4>
+                          <p style={{ color: '#94A3B8', margin: 0, fontSize: '14px' }}>{profiles.length} profile(s) configured</p>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button 
+                            onClick={() => {
+                              setEditingProfile({ moduleName: module });
+                              setShowProfileModal(true);
+                            }}
+                            style={{
+                              backgroundColor: '#10B981',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '8px 16px',
+                              fontSize: '13px',
+                              fontWeight: '500',
+                              cursor: 'pointer',
+                              boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.5)';
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.3)';
+                              e.currentTarget.style.transform = 'translateY(0)';
+                            }}>+ Add Profile</button>
+                          <button 
+                            onClick={() => {
+                              setModuleStates(prev => ({
+                                ...prev,
+                                [module]: !prev[module]
+                              }));
+                            }}
+                            style={{
+                              backgroundColor: isEnabled ? '#EF4444' : '#3B82F6',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '8px 16px',
+                              fontSize: '13px',
+                              fontWeight: '500',
+                              cursor: 'pointer',
+                              boxShadow: isEnabled ? '0 0 10px rgba(239, 68, 68, 0.3)' : '0 0 10px rgba(59, 130, 246, 0.3)',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.boxShadow = isEnabled ? '0 0 15px rgba(239, 68, 68, 0.5)' : '0 0 15px rgba(59, 130, 246, 0.5)';
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.boxShadow = isEnabled ? '0 0 10px rgba(239, 68, 68, 0.3)' : '0 0 10px rgba(59, 130, 246, 0.3)';
+                              e.currentTarget.style.transform = 'translateY(0)';
+                            }}>
+                            {isEnabled ? 'Disable' : 'Enable'}
+                          </button>
+                        </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button style={{
-                          backgroundColor: '#3B82F6',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '6px',
-                          padding: '6px 12px',
-                          fontSize: '12px',
-                          cursor: 'pointer'
-                        }}>Configure</button>
-                        <button 
-                          onClick={() => {
-                            setModuleStates(prev => ({
-                              ...prev,
-                              [module]: !prev[module]
-                            }));
-                          }}
-                          style={{
-                            backgroundColor: isEnabled ? '#EF4444' : '#10B981',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '6px 12px',
-                            fontSize: '12px',
-                            cursor: 'pointer'
-                          }}>
-                          {isEnabled ? 'Disable' : 'Enable'}
-                        </button>
-                      </div>
+                      
+                      {profiles.length > 0 && (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px', marginTop: '12px' }}>
+                          {profiles.map((profile) => (
+                            <div key={profile.id} style={{
+                              padding: '16px',
+                              backgroundColor: '#1E293B',
+                              borderRadius: '8px',
+                              border: '1px solid #475569',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = '#3B82F6';
+                              e.currentTarget.style.backgroundColor = '#0F1629';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = '#475569';
+                              e.currentTarget.style.backgroundColor = '#1E293B';
+                            }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
+                                <h5 style={{ color: '#F1F5F9', margin: 0, fontSize: '15px', fontWeight: '600' }}>{profile.name}</h5>
+                                <div style={{ display: 'flex', gap: '4px' }}>
+                                  <button 
+                                    onClick={() => {
+                                      setEditingProfile({ moduleName: module, profile });
+                                      setShowProfileModal(true);
+                                    }}
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      border: '1px solid #475569',
+                                      borderRadius: '4px',
+                                      color: '#3B82F6',
+                                      fontSize: '11px',
+                                      padding: '4px 8px',
+                                      cursor: 'pointer'
+                                    }}>Edit</button>
+                                  <button 
+                                    onClick={() => {
+                                      if (confirm(`Delete profile "${profile.name}"?`)) {
+                                        setModuleProfiles(prev => ({
+                                          ...prev,
+                                          [module]: (prev[module] || []).filter(p => p.id !== profile.id)
+                                        }));
+                                        alert('Profile deleted successfully');
+                                      }
+                                    }}
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      border: '1px solid #475569',
+                                      borderRadius: '4px',
+                                      color: '#EF4444',
+                                      fontSize: '11px',
+                                      padding: '4px 8px',
+                                      cursor: 'pointer'
+                                    }}>Delete</button>
+                                </div>
+                              </div>
+                              <p style={{ color: '#94A3B8', fontSize: '13px', margin: '0 0 8px 0' }}>{profile.description}</p>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                {Object.entries(profile.settings).slice(0, 3).map(([key, value]) => (
+                                  <span key={key} style={{
+                                    padding: '2px 8px',
+                                    backgroundColor: '#0F1629',
+                                    borderRadius: '12px',
+                                    fontSize: '11px',
+                                    color: '#64748B'
+                                  }}>
+                                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -2466,53 +2645,99 @@ export default function AdminPage() {
               <div style={{ marginBottom: '20px', display: 'flex', gap: '12px' }}>
                 <input type="search" placeholder="Search tenants..." style={{
                   flex: 1,
-                  padding: '12px',
-                  backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                  border: '1px solid rgba(75, 101, 129, 0.3)',
+                  padding: '10px 16px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
                   borderRadius: '8px',
-                  color: '#d7bb91',
-                  fontSize: '14px'
+                  color: '#F1F5F9',
+                  fontSize: '14px',
+                  outline: 'none'
                 }} />
                 <button onClick={() => { setSelectedTenant('all'); setActiveSection('tenantCreate'); }} style={{
-                  backgroundColor: 'rgba(75, 101, 129, 0.8)',
-                  color: '#d7bb91',
-                  border: '1px solid rgba(75, 101, 129, 0.3)',
+                  backgroundColor: '#3B82F6',
+                  color: '#fff',
+                  border: 'none',
                   borderRadius: '8px',
-                  padding: '12px 24px',
+                  padding: '10px 20px',
                   cursor: 'pointer',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  fontWeight: '500',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.6)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.4)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}>+ Create Tenant</button>
               </div>
-              <div style={{ maxHeight: '400px', overflow: 'auto' }}>
+              <div style={{ maxHeight: '600px', overflow: 'auto' }}>
                 {[
                   { name: 'Acme Corporation', status: 'Active', users: 245, contact: 'John Doe', email: 'john@acme.com' },
-                  { name: 'TechFlow Industries', status: 'Active', users: 128, contact: 'Jane Smith', email: 'jane@techflow.com' },
+                  { name: 'Digital Dynamics', status: 'Active', users: 156, contact: 'Tom Wilson', email: 'tom@digital.com' },
                   { name: 'Global Solutions Ltd', status: 'Pending', users: 0, contact: 'Bob Johnson', email: 'bob@global.com' },
                   { name: 'Innovation Labs', status: 'Active', users: 87, contact: 'Alice Brown', email: 'alice@innovation.com' },
-                ].map((tenant, idx) => (
+                  { name: 'TechFlow Industries', status: 'Active', users: 128, contact: 'Jane Smith', email: 'jane@techflow.com' },
+                ].sort((a, b) => a.name.localeCompare(b.name)).map((tenant, idx) => (
                   <div key={idx} style={{
-                    padding: '16px',
-                    backgroundColor: 'rgba(51, 78, 104, 0.3)',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(75, 101, 129, 0.3)',
+                    padding: '20px',
+                    backgroundColor: '#162032',
+                    borderRadius: '12px',
+                    border: '1px solid #1E293B',
                     marginBottom: '12px',
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#1E293B';
+                    e.currentTarget.style.borderColor = '#334155';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#162032';
+                    e.currentTarget.style.borderColor = '#1E293B';
                   }}>
                     <div>
-                      <h4 style={{ color: '#d7bb91', margin: '0 0 4px 0', fontSize: '16px' }}>{tenant.name}</h4>
-                      <p style={{ color: '#d7bb91', opacity: 0.7, margin: '0 0 4px 0', fontSize: '13px' }}>{tenant.contact} • {tenant.email}</p>
-                      <p style={{ color: '#64748B', margin: 0, fontSize: '13px' }}>{tenant.users} users • {tenant.status}</p>
+                      <h4 style={{ color: '#F1F5F9', margin: '0 0 8px 0', fontSize: '18px', fontWeight: '600' }}>{tenant.name}</h4>
+                      <p style={{ color: '#94A3B8', margin: '0 0 8px 0', fontSize: '14px' }}>{tenant.contact} • {tenant.email}</p>
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <span style={{
+                          padding: '4px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          backgroundColor: tenant.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                          color: tenant.status === 'Active' ? '#10B981' : '#F59E0B'
+                        }}>
+                          {tenant.status}
+                        </span>
+                        <span style={{ color: '#64748B', fontSize: '13px' }}>{tenant.users} users</span>
+                      </div>
                     </div>
                     <button onClick={() => { setSelectedTenant('all'); setActiveSection('tenantEdit'); }} style={{
-                      backgroundColor: 'rgba(75, 101, 129, 0.6)',
-                      color: '#d7bb91',
-                      border: '1px solid rgba(75, 101, 129, 0.3)',
-                      borderRadius: '6px',
-                      padding: '8px 16px',
-                      fontSize: '13px',
-                      cursor: 'pointer'
+                      backgroundColor: '#3B82F6',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '10px 20px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      boxShadow: '0 0 10px rgba(59, 130, 246, 0.3)',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.5)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.3)';
+                      e.currentTarget.style.transform = 'translateY(0)';
                     }}>Edit</button>
                   </div>
                 ))}
@@ -2757,9 +2982,11 @@ export default function AdminPage() {
             backgroundColor: '#162032',
             borderRadius: '12px',
             padding: '32px',
-            maxWidth: '500px',
+            maxWidth: '700px',
             width: '90%',
-            border: '1px solid #1E293B'
+            border: '1px solid #1E293B',
+            maxHeight: '90vh',
+            overflow: 'auto'
           }} onClick={(e) => e.stopPropagation()}>
             <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
               {editingUser ? 'Edit User' : 'Add New User'}
@@ -2803,6 +3030,7 @@ export default function AdminPage() {
                 }}>
                   <option value="Admin">Admin</option>
                   <option value="Manager">Manager</option>
+                  <option value="Receptionist">Receptionist</option>
                   <option value="User">User</option>
                 </select>
               </div>
@@ -2817,6 +3045,80 @@ export default function AdminPage() {
                   color: '#F1F5F9',
                   fontSize: '14px'
                 }} />
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Module Access</label>
+                <div style={{ 
+                  padding: '16px', 
+                  backgroundColor: '#1E293B', 
+                  borderRadius: '8px', 
+                  border: '1px solid #475569',
+                  maxHeight: '300px',
+                  overflowY: 'auto'
+                }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
+                    {[
+                      'User Management', 
+                      'Visitor Management', 
+                      'Parking', 
+                      'Emergency', 
+                      'Map', 
+                      'Restaurant', 
+                      'Ticketing', 
+                      'Service Hub', 
+                      'Lockers', 
+                      'News', 
+                      'AI Assistant', 
+                      'Space Management', 
+                      'Private Delivery',
+                      'Authentication',
+                      'Reporting'
+                    ].map((module) => {
+                      const isEnabled = editingUser?.modules?.[module] ?? false;
+                      return (
+                        <div key={module} style={{
+                          padding: '12px',
+                          backgroundColor: '#0F1629',
+                          borderRadius: '6px',
+                          border: `1px solid ${isEnabled ? '#10B981' : '#475569'}`,
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                        onClick={() => {
+                          if (editingUser) {
+                            setEditingUser({
+                              ...editingUser,
+                              modules: {
+                                ...editingUser.modules,
+                                [module]: !isEnabled
+                              }
+                            });
+                          }
+                        }}>
+                          <span style={{ color: '#F1F5F9', fontSize: '14px' }}>{module}</span>
+                          <button 
+                            type="button"
+                            style={{
+                              backgroundColor: isEnabled ? '#10B981' : '#475569',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '4px 12px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}>
+                            {isEnabled ? 'Enabled' : 'Disabled'}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
@@ -3110,7 +3412,7 @@ export default function AdminPage() {
                 <li>Users will be validated before creation</li>
                 <li>Duplicate emails will be reported</li>
                 <li>Invalid entries will be flagged</li>
-                <li>All imported users will have "New" status</li>
+                <li>All imported users will have &quot;New&quot; status</li>
               </ul>
             </div>
 
@@ -3127,6 +3429,150 @@ export default function AdminPage() {
                 fontSize: '14px'
               }}>Close</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Module Profile Modal */}
+      {showProfileModal && editingProfile && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => setShowProfileModal(false)}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '90%',
+            border: '1px solid #1E293B',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '8px' }}>
+              {editingProfile.profile ? 'Edit' : 'Create'} Profile
+            </h2>
+            <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Module: {editingProfile.moduleName}</p>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const profileName = formData.get('profileName') as string;
+              const description = formData.get('description') as string;
+              
+              const newProfile = {
+                id: editingProfile.profile?.id || `prof_${Date.now()}`,
+                name: profileName,
+                description: description,
+                settings: editingProfile.profile?.settings || {}
+              };
+              
+              if (editingProfile.profile) {
+                // Update existing
+                setModuleProfiles(prev => ({
+                  ...prev,
+                  [editingProfile.moduleName]: (prev[editingProfile.moduleName] || []).map(p => 
+                    p.id === editingProfile.profile!.id ? newProfile : p
+                  )
+                }));
+                alert('Profile updated successfully');
+              } else {
+                // Create new
+                setModuleProfiles(prev => ({
+                  ...prev,
+                  [editingProfile.moduleName]: [...(prev[editingProfile.moduleName] || []), newProfile]
+                }));
+                alert('Profile created successfully');
+              }
+              
+              setShowProfileModal(false);
+              setEditingProfile(null);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Profile Name *</label>
+                <input 
+                  type="text" 
+                  name="profileName"
+                  defaultValue={editingProfile.profile?.name}
+                  required 
+                  placeholder="e.g., Standard, Advanced, Custom"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} 
+                />
+              </div>
+              
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Description *</label>
+                <textarea 
+                  name="description"
+                  defaultValue={editingProfile.profile?.description}
+                  required 
+                  placeholder="Describe this profile configuration"
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    resize: 'vertical'
+                  }} 
+                />
+              </div>
+              
+              <div style={{ padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                <h3 style={{ color: '#3b82f6', fontSize: '14px', marginBottom: '8px', fontWeight: '600' }}>
+                  ℹ️ Profile Settings
+                </h3>
+                <p style={{ color: '#94A3B8', fontSize: '13px', margin: 0 }}>
+                  Profile settings can be configured after creation through the module configuration panel.
+                </p>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>{editingProfile.profile ? 'Update Profile' : 'Create Profile'}</button>
+                <button type="button" onClick={() => { setShowProfileModal(false); setEditingProfile(null); }} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

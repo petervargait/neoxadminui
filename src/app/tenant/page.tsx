@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular } from '@fluentui/react-icons'
+import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular } from '@fluentui/react-icons'
 
 export default function TenantPage() {
   const router = useRouter()
@@ -33,9 +33,10 @@ export default function TenantPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeSection, setActiveSection] = useState<string | null>(null)
   const [showUserModal, setShowUserModal] = useState(false)
-  const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string} | null>(null)
+  const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string; modules?: Record<string, boolean>} | null>(null)
   const [userSortField, setUserSortField] = useState<'name' | 'email' | 'role' | 'department' | 'status'>('name')
   const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [expandedUserRow, setExpandedUserRow] = useState<number | null>(null)
   const [showTemplateEditor, setShowTemplateEditor] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<{name: string; subject?: string; status?: string} | null>(null)
   const [showParkingModal, setShowParkingModal] = useState(false)
@@ -214,15 +215,16 @@ export default function TenantPage() {
         {/* Navigation */}
         <nav style={{ padding: '20px 0', flex: 1 }}>
           {[
-            { icon: '◈', label: 'Dashboard', action: () => setActiveSection(null) },
-            { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics') },
-            { icon: '◎', label: 'Users', action: () => setActiveSection('users') },
-            { icon: '◫', label: 'Invitations', action: () => setActiveSection('invitations') },
-            { icon: '◧', label: 'Parking', action: () => setActiveSection('parking') },
-            { icon: '▨', label: 'Digital Badges', action: () => setActiveSection('digitalBadges') },
-            { icon: '◨', label: 'Templates', action: () => setActiveSection('templates') },
-            { icon: '◪', label: 'Policies', action: () => setActiveSection('policies') },
-            { icon: '◭', label: 'Support', action: () => setActiveSection('support') },
+            { icon: '◈', label: 'Dashboard', action: () => setActiveSection(null), isFluentIcon: false, iconType: null },
+            { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), isFluentIcon: false, iconType: null },
+            { icon: 'people', label: 'Users', action: () => setActiveSection('users'), isFluentIcon: true, iconType: 'people' },
+            { icon: 'person', label: 'Invitations', action: () => setActiveSection('invitations'), isFluentIcon: true, iconType: 'person' },
+            { icon: 'vehicle', label: 'Parking', action: () => setActiveSection('parking'), isFluentIcon: true, iconType: 'vehicle' },
+            { icon: 'document', label: 'Digital Badges', action: () => setActiveSection('digitalBadges'), isFluentIcon: true, iconType: 'document' },
+            { icon: '◨', label: 'Templates', action: () => setActiveSection('templates'), isFluentIcon: false, iconType: null },
+            { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), isFluentIcon: false, iconType: null },
+            { icon: 'settings', label: 'Modules', action: () => setActiveSection('modules'), isFluentIcon: true, iconType: 'settings' },
+            { icon: '◭', label: 'Support', action: () => setActiveSection('support'), isFluentIcon: false, iconType: null },
           ].map((item, index) => (
             <div key={index} 
               onClick={item.action}
@@ -250,7 +252,23 @@ export default function TenantPage() {
                 target.style.color = '#94A3B8';
               }}
             >
-              <span style={{ fontSize: '18px' }}>{item.icon}</span>
+              {item.isFluentIcon ? (
+                item.iconType === 'people' ? (
+                  <PeopleRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'person' ? (
+                  <PersonRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'vehicle' ? (
+                  <VehicleCarRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'document' ? (
+                  <DocumentRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'settings' ? (
+                  <SettingsRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : (
+                  <span style={{ fontSize: '18px' }}>{item.icon}</span>
+                )
+              ) : (
+                <span style={{ fontSize: '18px' }}>{item.icon}</span>
+              )}
               {!sidebarCollapsed && <span>{item.label}</span>}
             </div>
           ))}
@@ -784,6 +802,7 @@ export default function TenantPage() {
                     <option>All Roles</option>
                     <option>Admin</option>
                     <option>Manager</option>
+                    <option>Receptionist</option>
                     <option>User</option>
                   </select>
                 </div>
@@ -842,16 +861,17 @@ export default function TenantPage() {
                         }} style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', cursor: 'pointer', userSelect: 'none' }}>
                           Status {userSortField === 'status' && (userSortDirection === 'asc' ? '↑' : '↓')}
                         </th>
+                        <th style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Modules</th>
                         <th style={{ padding: '12px 16px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {[
-                        { name: 'John Smith', email: 'john.smith@company.com', role: 'Admin', department: 'IT', status: 'Active' },
-                        { name: 'Sarah Johnson', email: 'sarah.j@company.com', role: 'Manager', department: 'HR', status: 'Active' },
-                        { name: 'Mike Davis', email: 'mike.davis@company.com', role: 'User', department: 'Sales', status: 'Active' },
-                        { name: 'Lisa Wilson', email: 'lisa.w@company.com', role: 'User', department: 'Marketing', status: 'Inactive' },
-                        { name: 'Tom Brown', email: 'tom.brown@company.com', role: 'Manager', department: 'Operations', status: 'Active' },
+                        { name: 'John Smith', email: 'john.smith@company.com', role: 'Admin', department: 'IT', status: 'Active', modules: { 'User Management': true, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': true, 'Ticketing': true, 'Service Hub': true, 'Lockers': true, 'News': true, 'AI Assistant': true, 'Space Management': true, 'Private Delivery': true, 'Authentication': true, 'Reporting': true } },
+                        { name: 'Sarah Johnson', email: 'sarah.j@company.com', role: 'Manager', department: 'HR', status: 'Active', modules: { 'User Management': true, 'Visitor Management': true, 'Parking': false, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': false, 'Lockers': false, 'News': true, 'AI Assistant': false, 'Space Management': true, 'Private Delivery': false, 'Authentication': false, 'Reporting': true } },
+                        { name: 'Mike Davis', email: 'mike.davis@company.com', role: 'User', department: 'Sales', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': false, 'Emergency': true, 'Map': true, 'Restaurant': true, 'Ticketing': false, 'Service Hub': false, 'Lockers': false, 'News': true, 'AI Assistant': false, 'Space Management': false, 'Private Delivery': false, 'Authentication': false, 'Reporting': false } },
+                        { name: 'Lisa Wilson', email: 'lisa.w@company.com', role: 'Receptionist', department: 'Reception', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': false, 'Lockers': true, 'News': true, 'AI Assistant': false, 'Space Management': false, 'Private Delivery': false, 'Authentication': false, 'Reporting': false } },
+                        { name: 'Tom Brown', email: 'tom.brown@company.com', role: 'Manager', department: 'Operations', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': true, 'Lockers': true, 'News': true, 'AI Assistant': false, 'Space Management': true, 'Private Delivery': true, 'Authentication': false, 'Reporting': true } },
                       ].sort((a, b) => {
                         const aVal = a[userSortField].toLowerCase();
                         const bVal = b[userSortField].toLowerCase();
@@ -861,35 +881,51 @@ export default function TenantPage() {
                           return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
                         }
                       }).map((user, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid #1E293B' }}>
-                          <td style={{ padding: '16px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{user.name}</td>
-                          <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.email}</td>
-                          <td style={{ padding: '16px' }}>
-                            <span style={{
-                              padding: '4px 12px',
-                              borderRadius: '20px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              backgroundColor: user.role === 'Admin' ? 'rgba(239, 68, 68, 0.1)' : user.role === 'Manager' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                              color: user.role === 'Admin' ? '#EF4444' : user.role === 'Manager' ? '#F59E0B' : '#3B82F6'
-                            }}>
-                              {user.role}
-                            </span>
-                          </td>
-                          <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.department}</td>
-                          <td style={{ padding: '16px' }}>
-                            <span style={{
-                              padding: '4px 12px',
-                              borderRadius: '20px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              backgroundColor: user.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
-                              color: user.status === 'Active' ? '#10B981' : '#64748B'
-                            }}>
-                              {user.status}
-                            </span>
-                          </td>
-                          <td style={{ padding: '16px', textAlign: 'right' }}>
+                        <>
+                          <tr key={idx} style={{ borderBottom: expandedUserRow === idx ? 'none' : '1px solid #1E293B' }}>
+                            <td style={{ padding: '16px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{user.name}</td>
+                            <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.email}</td>
+                            <td style={{ padding: '16px' }}>
+                              <span style={{
+                                padding: '4px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                backgroundColor: user.role === 'Admin' ? 'rgba(239, 68, 68, 0.1)' : user.role === 'Manager' ? 'rgba(245, 158, 11, 0.1)' : user.role === 'Receptionist' ? 'rgba(139, 92, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                                color: user.role === 'Admin' ? '#EF4444' : user.role === 'Manager' ? '#F59E0B' : user.role === 'Receptionist' ? '#8B5CF6' : '#3B82F6'
+                              }}>
+                                {user.role}
+                              </span>
+                            </td>
+                            <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.department}</td>
+                            <td style={{ padding: '16px' }}>
+                              <span style={{
+                                padding: '4px 12px',
+                                borderRadius: '20px',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                backgroundColor: user.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                                color: user.status === 'Active' ? '#10B981' : '#64748B'
+                              }}>
+                                {user.status}
+                              </span>
+                            </td>
+                            <td style={{ padding: '16px' }}>
+                              <button 
+                                onClick={() => setExpandedUserRow(expandedUserRow === idx ? null : idx)}
+                                style={{
+                                  backgroundColor: '#3B82F6',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  color: 'white',
+                                  fontSize: '12px',
+                                  padding: '6px 12px',
+                                  cursor: 'pointer'
+                                }}>
+                                {expandedUserRow === idx ? 'Hide' : 'View'} ({Object.values(user.modules || {}).filter(Boolean).length}/{Object.keys(user.modules || {}).length})
+                              </button>
+                            </td>
+                            <td style={{ padding: '16px', textAlign: 'right' }}>
                             <button onClick={() => { setEditingUser(user); setShowUserModal(true); }} style={{
                               backgroundColor: 'transparent',
                               border: '1px solid #1E293B',
@@ -919,8 +955,40 @@ export default function TenantPage() {
                               padding: '6px 12px',
                               cursor: 'pointer'
                             }}>Delete</button>
-                          </td>
-                        </tr>
+                            </td>
+                          </tr>
+                          {expandedUserRow === idx && (
+                            <tr key={`${idx}-modules`} style={{ borderBottom: '1px solid #1E293B' }}>
+                              <td colSpan={7} style={{ padding: '16px', backgroundColor: '#0F1629' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '8px' }}>
+                                  {Object.entries(user.modules || {}).map(([module, enabled]) => (
+                                    <div key={module} style={{
+                                      padding: '8px 12px',
+                                      backgroundColor: '#1E293B',
+                                      borderRadius: '6px',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      border: `1px solid ${enabled ? '#10B981' : '#475569'}`
+                                    }}>
+                                      <span style={{ color: '#F1F5F9', fontSize: '13px' }}>{module}</span>
+                                      <span style={{
+                                        padding: '2px 8px',
+                                        borderRadius: '12px',
+                                        fontSize: '11px',
+                                        fontWeight: '500',
+                                        backgroundColor: enabled ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                                        color: enabled ? '#10B981' : '#64748B'
+                                      }}>
+                                        {enabled ? 'Enabled' : 'Disabled'}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </>
                       ))}
                     </tbody>
                   </table>
@@ -1880,6 +1948,104 @@ export default function TenantPage() {
             </div>
           )}
 
+          {/* Modules Section */}
+          {activeSection === 'modules' && (
+            <div>
+              <div style={{ marginBottom: '20px', padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                <h3 style={{ color: '#3b82f6', fontSize: '16px', marginBottom: '8px', fontWeight: '600' }}>
+                  ℹ️ Module Management
+                </h3>
+                <p style={{ color: '#94A3B8', fontSize: '14px', margin: 0 }}>
+                  Gray modules are inherited from admin and cannot be disabled. Blue modules can be configured for your tenant.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {[
+                  { name: 'User Management', inherited: true, enabled: true, description: 'Manage users, roles and permissions' },
+                  { name: 'Visitor Management', inherited: false, enabled: true, description: 'Guest check-in and invitation system' },
+                  { name: 'Parking', inherited: false, enabled: false, description: 'Parking space reservations' },
+                  { name: 'Emergency', inherited: true, enabled: true, description: 'Emergency alerts and procedures' },
+                  { name: 'Map', inherited: true, enabled: true, description: 'Interactive building maps' },
+                  { name: 'Restaurant', inherited: false, enabled: false, description: 'Cafeteria and food ordering' },
+                  { name: 'Ticketing', inherited: false, enabled: true, description: 'Help desk and support tickets' },
+                  { name: 'Service Hub', inherited: false, enabled: false, description: 'Facility service requests' },
+                  { name: 'Lockers', inherited: false, enabled: false, description: 'Locker management system' },
+                  { name: 'News', inherited: true, enabled: true, description: 'Company news and announcements' },
+                  { name: 'AI Assistant', inherited: false, enabled: false, description: 'AI-powered virtual assistant' },
+                  { name: 'Space Management', inherited: false, enabled: true, description: 'Room and desk booking' },
+                  { name: 'Private Delivery', inherited: false, enabled: false, description: 'Package tracking' },
+                  { name: 'Authentication', inherited: true, enabled: true, description: 'SSO and authentication' },
+                  { name: 'Reporting', inherited: true, enabled: true, description: 'Analytics and reports' },
+                ].map((module, index) => (
+                  <div key={index} style={{
+                    padding: '20px',
+                    backgroundColor: module.inherited ? '#1E293B' : '#162032',
+                    borderRadius: '12px',
+                    border: `1px solid ${module.inherited ? '#475569' : '#1E293B'}`,
+                    opacity: module.inherited ? 0.8 : 1
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                          <h4 style={{ color: '#F1F5F9', margin: 0, fontSize: '18px', fontWeight: '600' }}>{module.name}</h4>
+                          {module.inherited && (
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '12px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              backgroundColor: 'rgba(100, 116, 139, 0.2)',
+                              color: '#64748B'
+                            }}>Inherited</span>
+                          )}
+                        </div>
+                        <p style={{ color: '#94A3B8', margin: 0, fontSize: '14px' }}>{module.description}</p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        {!module.inherited && (
+                          <button 
+                            onClick={() => alert(`Configuring ${module.name}...`)}
+                            style={{
+                              backgroundColor: '#3B82F6',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '8px 16px',
+                              fontSize: '13px',
+                              fontWeight: '500',
+                              cursor: 'pointer',
+                              boxShadow: '0 0 10px rgba(59, 130, 246, 0.3)',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.5)';
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.3)';
+                              e.currentTarget.style.transform = 'translateY(0)';
+                            }}>Configure</button>
+                        )}
+                        <span style={{
+                          padding: '8px 16px',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          backgroundColor: module.enabled ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                          color: module.enabled ? '#10B981' : '#64748B',
+                          border: `1px solid ${module.enabled ? '#10B981' : '#475569'}`
+                        }}>
+                          {module.enabled ? 'Enabled' : 'Disabled'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Support Section */}
           {activeSection === 'support' && (
             <div>
@@ -2169,9 +2335,11 @@ export default function TenantPage() {
             backgroundColor: '#162032',
             borderRadius: '12px',
             padding: '32px',
-            maxWidth: '500px',
+            maxWidth: '700px',
             width: '90%',
-            border: '1px solid #1E293B'
+            border: '1px solid #1E293B',
+            maxHeight: '90vh',
+            overflow: 'auto'
           }} onClick={(e) => e.stopPropagation()}>
             <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
               {editingUser ? 'Edit User' : 'Add New User'}
@@ -2215,6 +2383,7 @@ export default function TenantPage() {
                 }}>
                   <option value="Admin">Admin</option>
                   <option value="Manager">Manager</option>
+                  <option value="Receptionist">Receptionist</option>
                   <option value="User">User</option>
                 </select>
               </div>
@@ -2229,6 +2398,80 @@ export default function TenantPage() {
                   color: '#F1F5F9',
                   fontSize: '14px'
                 }} />
+              </div>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Module Access</label>
+                <div style={{ 
+                  padding: '16px', 
+                  backgroundColor: '#1E293B', 
+                  borderRadius: '8px', 
+                  border: '1px solid #475569',
+                  maxHeight: '300px',
+                  overflowY: 'auto'
+                }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
+                    {[
+                      'User Management', 
+                      'Visitor Management', 
+                      'Parking', 
+                      'Emergency', 
+                      'Map', 
+                      'Restaurant', 
+                      'Ticketing', 
+                      'Service Hub', 
+                      'Lockers', 
+                      'News', 
+                      'AI Assistant', 
+                      'Space Management', 
+                      'Private Delivery',
+                      'Authentication',
+                      'Reporting'
+                    ].map((module) => {
+                      const isEnabled = editingUser?.modules?.[module] ?? false;
+                      return (
+                        <div key={module} style={{
+                          padding: '12px',
+                          backgroundColor: '#0F1629',
+                          borderRadius: '6px',
+                          border: `1px solid ${isEnabled ? '#10B981' : '#475569'}`,
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                        onClick={() => {
+                          if (editingUser) {
+                            setEditingUser({
+                              ...editingUser,
+                              modules: {
+                                ...editingUser.modules,
+                                [module]: !isEnabled
+                              }
+                            });
+                          }
+                        }}>
+                          <span style={{ color: '#F1F5F9', fontSize: '14px' }}>{module}</span>
+                          <button 
+                            type="button"
+                            style={{
+                              backgroundColor: isEnabled ? '#10B981' : '#475569',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '4px 12px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}>
+                            {isEnabled ? 'Enabled' : 'Disabled'}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
@@ -2877,7 +3120,7 @@ export default function TenantPage() {
                 <li>Users will be validated before creation</li>
                 <li>Duplicate emails will be reported</li>
                 <li>Invalid entries will be flagged</li>
-                <li>All imported users will have "New" status</li>
+                <li>All imported users will have &quot;New&quot; status</li>
               </ul>
             </div>
 
