@@ -30,6 +30,61 @@ export default function TenantPage() {
     }
   }, [router])
 
+  // Secret cleanup function - Press Ctrl+Shift+C to clean orphaned data
+  useEffect(() => {
+    const handleSecretCleanup = (e: KeyboardEvent) => {
+      // Trigger with Ctrl+Shift+C (or Cmd+Shift+C on Mac)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        
+        const storedState = localStorage.getItem('neox_global_state');
+        if (!storedState) {
+          console.log('⚠️ No stored state found.');
+          return;
+        }
+        
+        const state = JSON.parse(storedState);
+        let totalRemoved = 0;
+        
+        // Clean parking spaces without tenantId
+        const parkingBefore = state.parkingSpaces.length;
+        state.parkingSpaces = state.parkingSpaces.filter((p: {tenantId?: string}) => p.tenantId);
+        const parkingRemoved = parkingBefore - state.parkingSpaces.length;
+        totalRemoved += parkingRemoved;
+        
+        // Clean lockers without tenantId
+        const lockersBefore = state.lockers.length;
+        state.lockers = state.lockers.filter((l: {tenantId?: string}) => l.tenantId);
+        const lockersRemoved = lockersBefore - state.lockers.length;
+        totalRemoved += lockersRemoved;
+        
+        // Clean spaces without tenantId
+        const spacesBefore = state.spaces.length;
+        state.spaces = state.spaces.filter((s: {tenantId?: string}) => s.tenantId);
+        const spacesRemoved = spacesBefore - state.spaces.length;
+        totalRemoved += spacesRemoved;
+        
+        // Save back to localStorage
+        localStorage.setItem('neox_global_state', JSON.stringify(state));
+        
+        console.log('🧹 Cleanup Complete:');
+        console.log(`  - Removed ${parkingRemoved} parking spaces without tenantId`);
+        console.log(`  - Removed ${lockersRemoved} lockers without tenantId`);
+        console.log(`  - Removed ${spacesRemoved} spaces without tenantId`);
+        console.log(`  - Total: ${totalRemoved} orphaned items removed`);
+        
+        if (totalRemoved > 0) {
+          alert(`🧹 Cleanup Complete!\n\nRemoved ${totalRemoved} orphaned items:\n- ${parkingRemoved} parking spaces\n- ${lockersRemoved} lockers\n- ${spacesRemoved} spaces\n\nPlease refresh the page.`);
+        } else {
+          alert('✅ No orphaned data found. All items have proper tenant assignments.');
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleSecretCleanup);
+    return () => window.removeEventListener('keydown', handleSecretCleanup);
+  }, [])
+
   const handleLogout = () => {
     sessionStorage.clear()
     router.push('/login')
