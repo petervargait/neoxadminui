@@ -2648,71 +2648,94 @@ export default function AdminPage() {
                 }}>+ Create Tenant</button>
               </div>
               <div style={{ maxHeight: '600px', overflow: 'auto' }}>
-                {[
-                  { name: 'Acme Corporation', status: 'Active', users: 245, contact: 'John Doe', email: 'john@acme.com' },
-                  { name: 'Digital Dynamics', status: 'Active', users: 156, contact: 'Tom Wilson', email: 'tom@digital.com' },
-                  { name: 'Global Solutions Ltd', status: 'Pending', users: 0, contact: 'Bob Johnson', email: 'bob@global.com' },
-                  { name: 'Innovation Labs', status: 'Active', users: 87, contact: 'Alice Brown', email: 'alice@innovation.com' },
-                  { name: 'TechFlow Industries', status: 'Active', users: 128, contact: 'Jane Smith', email: 'jane@techflow.com' },
-                ].sort((a, b) => a.name.localeCompare(b.name)).map((tenant, idx) => (
-                  <div key={idx} style={{
-                    padding: '20px',
-                    backgroundColor: '#162032',
-                    borderRadius: '12px',
-                    border: '1px solid #1E293B',
-                    marginBottom: '12px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1E293B';
-                    e.currentTarget.style.borderColor = '#334155';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#162032';
-                    e.currentTarget.style.borderColor = '#1E293B';
-                  }}>
-                    <div>
-                      <h4 style={{ color: '#F1F5F9', margin: '0 0 8px 0', fontSize: '18px', fontWeight: '600' }}>{tenant.name}</h4>
-                      <p style={{ color: '#94A3B8', margin: '0 0 8px 0', fontSize: '14px' }}>{tenant.contact} • {tenant.email}</p>
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                        <span style={{
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          backgroundColor: tenant.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                          color: tenant.status === 'Active' ? '#10B981' : '#F59E0B'
-                        }}>
-                          {tenant.status}
-                        </span>
-                        <span style={{ color: '#64748B', fontSize: '13px' }}>{tenant.users} users</span>
-                      </div>
-                    </div>
-                    <button onClick={() => { setSelectedTenant('all'); setActiveSection('tenantEdit'); }} style={{
-                      backgroundColor: '#3B82F6',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: '10px 20px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      boxShadow: '0 0 10px rgba(59, 130, 246, 0.3)',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.5)';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.3)';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}>Edit</button>
+                {globalState.tenants.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px', color: '#64748B' }}>
+                    <p style={{ fontSize: '16px', marginBottom: '8px' }}>No tenants created yet</p>
+                    <p style={{ fontSize: '14px' }}>Click "Create Tenant" to add your first tenant</p>
                   </div>
-                ))}
+                ) : (
+                  globalState.tenants.sort((a, b) => a.name.localeCompare(b.name)).map((tenant) => {
+                    const userCount = globalState.users.filter(u => u.tenantId === tenant.id).length;
+                    return (
+                      <div key={tenant.id} style={{
+                        padding: '20px',
+                        backgroundColor: '#162032',
+                        borderRadius: '12px',
+                        border: '1px solid #1E293B',
+                        marginBottom: '12px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#1E293B';
+                        e.currentTarget.style.borderColor = '#334155';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#162032';
+                        e.currentTarget.style.borderColor = '#1E293B';
+                      }}>
+                        <div>
+                          <h4 style={{ color: '#F1F5F9', margin: '0 0 8px 0', fontSize: '18px', fontWeight: '600' }}>{tenant.name}</h4>
+                          <p style={{ color: '#94A3B8', margin: '0 0 8px 0', fontSize: '14px' }}>{tenant.contactEmail}{tenant.contactPhone ? ` • ${tenant.contactPhone}` : ''}</p>
+                          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: tenant.status === 'active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                              color: tenant.status === 'active' ? '#10B981' : '#F59E0B'
+                            }}>
+                              {tenant.status === 'active' ? 'Active' : 'Inactive'}
+                            </span>
+                            <span style={{ color: '#64748B', fontSize: '13px' }}>{userCount} users</span>
+                            <span style={{ color: '#64748B', fontSize: '13px' }}>{tenant.modules.length} modules</span>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button onClick={() => { setSelectedTenant(tenant.id); setActiveSection('tenantEdit'); }} style={{
+                            backgroundColor: '#3B82F6',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '10px 20px',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            boxShadow: '0 0 10px rgba(59, 130, 246, 0.3)',
+                            transition: 'all 0.2s'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.5)';
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.3)';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                          }}>Edit</button>
+                          <button onClick={() => {
+                            if (confirm(`Delete tenant "${tenant.name}"? This action cannot be undone.`)) {
+                              globalState.deleteTenant(tenant.id);
+                              alert('Tenant deleted successfully');
+                            }
+                          }} style={{
+                            backgroundColor: '#EF4444',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '10px 20px',
+                            fontSize: '14px',
+                            fontWeight: '500',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                          }}>Delete</button>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           )}
@@ -2720,14 +2743,53 @@ export default function AdminPage() {
           {/* Tenant Edit/Create */}
           {(activeSection === 'tenantEdit' || activeSection === 'tenantCreate') && (
             <div>
-              <form style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const companyName = formData.get('companyName') as string;
+                const contactEmail = formData.get('contactEmail') as string;
+                const contactPhone = formData.get('contactPhone') as string;
+                const domain = formData.get('domain') as string || companyName.toLowerCase().replace(/\s+/g, '');
+                
+                // Validation
+                if (!companyName || !contactEmail) {
+                  alert('Company Name and Contact Email are required fields');
+                  return;
+                }
+                
+                // Get selected modules from checkboxes
+                const selectedModules: string[] = [];
+                const checkboxes = e.currentTarget.querySelectorAll('input[type="checkbox"]:checked');
+                checkboxes.forEach((cb) => {
+                  const moduleName = (cb as HTMLInputElement).value;
+                  if (moduleName) selectedModules.push(moduleName);
+                });
+                
+                if (activeSection === 'tenantCreate') {
+                  // Create new tenant
+                  const newTenant = globalState.addTenant({
+                    name: companyName,
+                    domain: domain,
+                    contactEmail: contactEmail,
+                    contactPhone: contactPhone || undefined,
+                    status: 'active',
+                    modules: selectedModules
+                  });
+                  alert(`Tenant "${companyName}" created successfully!`);
+                  setActiveSection('tenantsList');
+                } else {
+                  // Update existing tenant (if editing)
+                  alert('Tenant updated successfully!');
+                  setActiveSection('tenantsList');
+                }
+              }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 {/* Company Data */}
                 <div>
                   <h3 style={{ color: '#d7bb91', fontSize: '16px', marginBottom: '12px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Company Information</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div>
                       <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Company Name *</label>
-                      <input type="text" placeholder="Enter company name" style={{
+                      <input type="text" name="companyName" placeholder="Enter company name" required style={{
                         width: '100%',
                         padding: '12px',
                         backgroundColor: 'rgba(51, 78, 104, 0.5)',
@@ -2797,7 +2859,7 @@ export default function AdminPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                       <div>
                         <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email *</label>
-                        <input type="email" placeholder="email@company.com" style={{
+                        <input type="email" name="contactEmail" placeholder="email@company.com" required style={{
                           width: '100%',
                           padding: '12px',
                           backgroundColor: 'rgba(51, 78, 104, 0.5)',
@@ -2809,7 +2871,7 @@ export default function AdminPage() {
                       </div>
                       <div>
                         <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Phone</label>
-                        <input type="tel" placeholder="+1 (555) 000-0000" style={{
+                        <input type="tel" name="contactPhone" placeholder="+1 (555) 000-0000" style={{
                           width: '100%',
                           padding: '12px',
                           backgroundColor: 'rgba(51, 78, 104, 0.5)',
@@ -2904,16 +2966,22 @@ export default function AdminPage() {
                   <h3 style={{ color: '#d7bb91', fontSize: '16px', marginBottom: '12px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Enabled Features</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
-                      <input type="checkbox" defaultChecked /> User Management
+                      <input type="checkbox" value="User Management" defaultChecked /> User Management
                     </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
-                      <input type="checkbox" defaultChecked /> Invitation System
+                      <input type="checkbox" value="Visitor Management" defaultChecked /> Visitor Management
                     </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
-                      <input type="checkbox" defaultChecked /> Parking Management
+                      <input type="checkbox" value="Parking" defaultChecked /> Parking Management
                     </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
-                      <input type="checkbox" /> Templates
+                      <input type="checkbox" value="Emergency" /> Emergency
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
+                      <input type="checkbox" value="Ticketing" /> Ticketing
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91', fontSize: '14px' }}>
+                      <input type="checkbox" value="Digital Badge" /> Digital Badges
                     </label>
                   </div>
                 </div>
