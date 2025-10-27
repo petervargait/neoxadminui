@@ -61,6 +61,16 @@ export default function TenantPage() {
   const [showTicketModal, setShowTicketModal] = useState(false)
   const [systemOnline, setSystemOnline] = useState(true)
   const [notificationCount, setNotificationCount] = useState(3)
+  const [invitationForm, setInvitationForm] = useState({
+    visitorName: '',
+    visitorEmail: '',
+    visitorCompany: '',
+    visitDate: '',
+    visitTime: '',
+    purpose: '',
+    location: 'Main Office'
+  })
+  const [editingInvitation, setEditingInvitation] = useState<string | null>(null)
 
   // Digital Badges state
   const [badgeUsers, setBadgeUsers] = useState([
@@ -1024,11 +1034,55 @@ export default function TenantPage() {
                 padding: '24px',
                 marginBottom: '24px'
               }}>
-                <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', marginBottom: '20px' }}>Send New Invitation</h2>
-                <form style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', marginBottom: '20px' }}>{editingInvitation ? 'Edit Invitation' : 'Send New Invitation'}</h2>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!invitationForm.visitorName || !invitationForm.visitorEmail || !invitationForm.visitDate || !invitationForm.visitTime) {
+                    alert('Please fill in all required fields');
+                    return;
+                  }
+                  
+                  if (editingInvitation) {
+                    globalState.updateInvitation(editingInvitation, {
+                      visitorName: invitationForm.visitorName,
+                      visitorEmail: invitationForm.visitorEmail,
+                      visitorCompany: invitationForm.visitorCompany,
+                      visitDate: invitationForm.visitDate,
+                      visitTime: invitationForm.visitTime,
+                      purpose: invitationForm.purpose,
+                      location: invitationForm.location
+                    });
+                    alert('Invitation updated successfully!');
+                    setEditingInvitation(null);
+                  } else {
+                    globalState.addInvitation({
+                      visitorName: invitationForm.visitorName,
+                      visitorEmail: invitationForm.visitorEmail,
+                      visitorCompany: invitationForm.visitorCompany,
+                      hostId: username,
+                      hostName: username,
+                      visitDate: invitationForm.visitDate,
+                      visitTime: invitationForm.visitTime,
+                      purpose: invitationForm.purpose,
+                      location: invitationForm.location,
+                      status: 'pending'
+                    });
+                    alert('Invitation sent successfully!');
+                  }
+                  
+                  setInvitationForm({
+                    visitorName: '',
+                    visitorEmail: '',
+                    visitorCompany: '',
+                    visitDate: '',
+                    visitTime: '',
+                    purpose: '',
+                    location: 'Main Office'
+                  });
+                }} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
                     <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Name *</label>
-                    <input type="text" placeholder="Full name" style={{
+                    <input type="text" placeholder="Full name" required value={invitationForm.visitorName} onChange={(e) => setInvitationForm({...invitationForm, visitorName: e.target.value})} style={{
                       width: '100%',
                       padding: '12px',
                       backgroundColor: '#1E293B',
@@ -1040,7 +1094,7 @@ export default function TenantPage() {
                   </div>
                   <div>
                     <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email *</label>
-                    <input type="email" placeholder="visitor@email.com" style={{
+                    <input type="email" placeholder="visitor@email.com" required value={invitationForm.visitorEmail} onChange={(e) => setInvitationForm({...invitationForm, visitorEmail: e.target.value})} style={{
                       width: '100%',
                       padding: '12px',
                       backgroundColor: '#1E293B',
@@ -1052,7 +1106,7 @@ export default function TenantPage() {
                   </div>
                   <div>
                     <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Date *</label>
-                    <input type="date" style={{
+                    <input type="date" required value={invitationForm.visitDate} onChange={(e) => setInvitationForm({...invitationForm, visitDate: e.target.value})} style={{
                       width: '100%',
                       padding: '12px',
                       backgroundColor: '#1E293B',
@@ -1064,7 +1118,7 @@ export default function TenantPage() {
                   </div>
                   <div>
                     <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Time *</label>
-                    <input type="time" style={{
+                    <input type="time" required value={invitationForm.visitTime} onChange={(e) => setInvitationForm({...invitationForm, visitTime: e.target.value})} style={{
                       width: '100%',
                       padding: '12px',
                       backgroundColor: '#1E293B',
@@ -1076,7 +1130,7 @@ export default function TenantPage() {
                   </div>
                   <div style={{ gridColumn: '1 / -1' }}>
                     <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Purpose of Visit</label>
-                    <textarea placeholder="Enter purpose of visit" style={{
+                    <textarea placeholder="Enter purpose of visit" value={invitationForm.purpose} onChange={(e) => setInvitationForm({...invitationForm, purpose: e.target.value})} style={{
                       width: '100%',
                       padding: '12px',
                       backgroundColor: '#1E293B',
@@ -1088,8 +1142,9 @@ export default function TenantPage() {
                       resize: 'vertical'
                     }} />
                   </div>
-                  <div style={{ gridColumn: '1 / -1' }}>
-                    <button type="submit" onSubmit={(e) => { e.preventDefault(); alert('Invitation sent successfully!'); }} style={{
+                  <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '12px' }}>
+                    <button type="submit" style={{
+                      flex: 1,
                       backgroundColor: '#3B82F6',
                       color: 'white',
                       border: 'none',
@@ -1098,7 +1153,31 @@ export default function TenantPage() {
                       fontWeight: '500',
                       cursor: 'pointer',
                       fontSize: '14px'
-                    }}>Send Invitation</button>
+                    }}>{editingInvitation ? 'Update Invitation' : 'Send Invitation'}</button>
+                    {editingInvitation && (
+                      <button type="button" onClick={() => {
+                        setEditingInvitation(null);
+                        setInvitationForm({
+                          visitorName: '',
+                          visitorEmail: '',
+                          visitorCompany: '',
+                          visitDate: '',
+                          visitTime: '',
+                          purpose: '',
+                          location: 'Main Office'
+                        });
+                      }} style={{
+                        flex: 1,
+                        backgroundColor: 'transparent',
+                        color: '#F1F5F9',
+                        border: '1px solid #475569',
+                        borderRadius: '8px',
+                        padding: '12px 24px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}>Cancel Edit</button>
+                    )}
                   </div>
                 </form>
               </div>
@@ -1113,13 +1192,14 @@ export default function TenantPage() {
                   <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Active Invitations</h3>
                 </div>
                 <div style={{ padding: '24px' }}>
-                  {[
-                    { visitor: 'Alice Cooper', email: 'alice@email.com', date: '2025-10-25', time: '10:00 AM', status: 'Pending', purpose: 'Business Meeting' },
-                    { visitor: 'Bob Martin', email: 'bob@email.com', date: '2025-10-24', time: '2:00 PM', status: 'Confirmed', purpose: 'Interview' },
-                    { visitor: 'Carol White', email: 'carol@email.com', date: '2025-10-23', time: '11:30 AM', status: 'Declined', purpose: 'Consultation' },
-                    { visitor: 'David Lee', email: 'david@email.com', date: '2025-10-26', time: '3:00 PM', status: 'Pending', purpose: 'Product Demo' },
-                  ].map((inv, idx) => (
-                    <div key={idx} style={{
+                  {globalState.invitations.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '48px 24px', color: '#64748B' }}>
+                      <div style={{ fontSize: '48px', marginBottom: '16px' }}>📧</div>
+                      <div style={{ fontSize: '16px', fontWeight: '500' }}>No Invitations</div>
+                      <div style={{ fontSize: '14px', marginTop: '8px' }}>Send your first visitor invitation above</div>
+                    </div>
+                  ) : globalState.invitations.map((inv) => (
+                    <div key={inv.id} style={{
                       padding: '16px',
                       backgroundColor: '#1E293B',
                       borderRadius: '8px',
@@ -1129,22 +1209,34 @@ export default function TenantPage() {
                       alignItems: 'center'
                     }}>
                       <div style={{ flex: 1 }}>
-                        <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '16px', fontWeight: '600' }}>{inv.visitor}</h4>
-                        <p style={{ color: '#94A3B8', margin: '0 0 4px 0', fontSize: '13px' }}>{inv.email}</p>
-                        <p style={{ color: '#64748B', margin: 0, fontSize: '13px' }}>{inv.date} at {inv.time} • {inv.purpose}</p>
+                        <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '16px', fontWeight: '600' }}>{inv.visitorName}</h4>
+                        <p style={{ color: '#94A3B8', margin: '0 0 4px 0', fontSize: '13px' }}>{inv.visitorEmail}</p>
+                        <p style={{ color: '#64748B', margin: 0, fontSize: '13px' }}>{inv.visitDate} at {inv.visitTime} • {inv.purpose || 'No purpose specified'}</p>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span style={{
                           padding: '6px 12px',
                           borderRadius: '20px',
                           fontSize: '12px',
                           fontWeight: '500',
-                          backgroundColor: inv.status === 'Confirmed' ? 'rgba(16, 185, 129, 0.1)' : inv.status === 'Declined' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
-                          color: inv.status === 'Confirmed' ? '#10B981' : inv.status === 'Declined' ? '#EF4444' : '#F59E0B'
+                          backgroundColor: inv.status === 'approved' ? 'rgba(16, 185, 129, 0.1)' : inv.status === 'rejected' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                          color: inv.status === 'approved' ? '#10B981' : inv.status === 'rejected' ? '#EF4444' : '#F59E0B'
                         }}>
-                          {inv.status}
+                          {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
                         </span>
-                        <button style={{
+                        <button onClick={() => {
+                          setInvitationForm({
+                            visitorName: inv.visitorName,
+                            visitorEmail: inv.visitorEmail,
+                            visitorCompany: inv.visitorCompany || '',
+                            visitDate: inv.visitDate,
+                            visitTime: inv.visitTime,
+                            purpose: inv.purpose,
+                            location: inv.location
+                          });
+                          setEditingInvitation(inv.id);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }} style={{
                           backgroundColor: 'transparent',
                           border: '1px solid #475569',
                           borderRadius: '6px',
@@ -1152,7 +1244,21 @@ export default function TenantPage() {
                           fontSize: '12px',
                           padding: '6px 12px',
                           cursor: 'pointer'
-                        }}>View</button>
+                        }}>Edit</button>
+                        <button onClick={() => {
+                          if (confirm(`Delete invitation for ${inv.visitorName}?`)) {
+                            globalState.deleteInvitation(inv.id);
+                            alert('Invitation deleted successfully');
+                          }
+                        }} style={{
+                          backgroundColor: 'transparent',
+                          border: '1px solid #475569',
+                          borderRadius: '6px',
+                          color: '#EF4444',
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          cursor: 'pointer'
+                        }}>Delete</button>
                       </div>
                     </div>
                   ))}
