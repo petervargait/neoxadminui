@@ -11,9 +11,9 @@ export const metadata: Metadata = {
     maximumScale: 1,
   },
   icons: {
-    icon: '/neoxfavicon.png',
-    shortcut: '/neoxfavicon.png',
-    apple: '/neoxfavicon.png',
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.png',
   },
   keywords: [
     "multi-tenant",
@@ -60,7 +60,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <head>
-        <link rel="icon" href="/neoxfavicon.png" type="image/png" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
       </head>
       <body className="h-full antialiased">
         <GlobalStateProvider>
