@@ -124,6 +124,19 @@ export default function AdminPage() {
     backgroundImageData: '',
     workflowManagementEnabled: false
   })
+  
+  // Integrations state
+  const [moduleIntegrations, setModuleIntegrations] = useState<Record<string, string>>({
+    'User Management': 'NEOX',
+    'Visitor Management': 'NEOX',
+    'Parking': 'NEOX',
+    'Emergency': 'NEOX',
+    'Restaurant': 'Delirest',
+    'Ticketing': 'NEOX',
+    'Service Hub': 'Life1',
+    'Lockers': 'Vecos',
+    'Space Management': 'NEOX'
+  })
 
   // Load white label settings when tenant changes
   useEffect(() => {
@@ -2453,8 +2466,72 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                {/* Integrations Panel - Only show when tenant is selected */}
+                {selectedTenant !== 'all' && (
+                  <div style={{ backgroundColor: '#162032', padding: '24px', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                    <h3 style={{ color: '#F1F5F9', fontSize: '18px', marginBottom: '8px', borderBottom: '1px solid #1E293B', paddingBottom: '12px' }}>Integrations</h3>
+                    <p style={{ color: '#94A3B8', fontSize: '13px', marginBottom: '20px' }}>Configure third-party integrations for each module</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      {/* Get enabled modules for this tenant */}
+                      {(() => {
+                        const tenant = globalState.tenants.find(t => t.id === selectedTenant);
+                        if (!tenant) return null;
+                        
+                        const integrationOptions: Record<string, string[]> = {
+                          'User Management': ['NEOX', 'Entra', 'Okta', 'JumpCloud', 'Ping Identity', 'CyberArk', 'OneLogin', 'Clerk'],
+                          'Visitor Management': ['NEOX', 'TDS', 'Tablog', 'Sine', 'Envoy', 'Eptura', 'VisitUs'],
+                          'Parking': ['NEOX', 'Parkl', 'SkiData'],
+                          'Emergency': ['NEOX', 'IBM Tririga'],
+                          'Restaurant': ['Delirest', 'Gundel'],
+                          'Ticketing': ['NEOX', 'IBM Tririga', 'IBM Maximo', 'ServiceNow', 'Jira'],
+                          'Service Hub': ['Life1', 'Luxuria', 'AYCM', 'EXOS'],
+                          'Lockers': ['Vecos', 'Digilock', 'Fleclock'],
+                          'Space Management': ['NEOX', 'IBM Tririga', 'Tablog']
+                        };
+                        
+                        return tenant.modules
+                          .filter(module => integrationOptions[module])
+                          .map((module) => (
+                          <div key={module} style={{
+                            padding: '16px',
+                            backgroundColor: '#0F172A',
+                            borderRadius: '8px',
+                            border: '1px solid #1E293B',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                          }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '4px' }}>{module}</div>
+                              <div style={{ color: '#64748B', fontSize: '12px' }}>Select integration provider</div>
+                            </div>
+                            <select
+                              value={moduleIntegrations[module] || integrationOptions[module][0]}
+                              onChange={(e) => setModuleIntegrations({ ...moduleIntegrations, [module]: e.target.value })}
+                              style={{
+                                padding: '8px 12px',
+                                backgroundColor: '#1E293B',
+                                border: '1px solid #334155',
+                                borderRadius: '6px',
+                                color: '#F1F5F9',
+                                fontSize: '14px',
+                                cursor: 'pointer',
+                                minWidth: '180px'
+                              }}
+                            >
+                              {integrationOptions[module].map(option => (
+                                <option key={option} value={option}>{option}</option>
+                              ))}
+                            </select>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                )}
+
                 {/* Save Button */}
-                <button 
+                <button
                   onClick={() => {
                     const tenantId = selectedTenant === 'all' ? 'global' : selectedTenant
                     globalState.updateSystemSettings(tenantId, systemSettingsForm)
