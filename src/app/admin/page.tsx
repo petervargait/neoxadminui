@@ -2482,11 +2482,28 @@ export default function AdminPage() {
                           'Visitor Management': ['NEOX', 'TDS', 'Tablog', 'Sine', 'Envoy', 'Eptura', 'VisitUs'],
                           'Parking': ['NEOX', 'Parkl', 'SkiData'],
                           'Emergency': ['NEOX', 'IBM Tririga'],
+                          'Map': ['NEOX', 'Mapbox', 'Google Maps', 'Azure Maps'],
                           'Restaurant': ['Delirest', 'Gundel'],
                           'Ticketing': ['NEOX', 'IBM Tririga', 'IBM Maximo', 'ServiceNow', 'Jira'],
                           'Service Hub': ['Life1', 'Luxuria', 'AYCM', 'EXOS'],
                           'Lockers': ['Vecos', 'Digilock', 'Fleclock'],
-                          'Space Management': ['NEOX', 'IBM Tririga', 'Tablog']
+                          'News': ['NEOX', 'SharePoint', 'Workplace', 'Simpplr'],
+                          'AI Assistant': ['NEOX', 'OpenAI', 'Azure OpenAI', 'Google AI'],
+                          'Space Management': ['NEOX', 'IBM Tririga', 'Tablog'],
+                          'Private Delivery': ['NEOX', 'Parcel Pending', 'Package Concierge', 'Luxer One'],
+                          'Building Automation': ['NEOX', 'Siemens', 'Schneider Electric', 'Nective'],
+                          'Smart Sensors': ['NEOX', 'bGrid', 'Haltian', 'Motorola'],
+                          'Access Management': ['NEOX', 'HID', 'ThirdMillennium', 'Avigilon', 'Seawing', 'Kantech']
+                        };
+                        
+                        // Logo colors/emojis for visual identification
+                        const providerLogos: Record<string, string> = {
+                          'NEOX': '🔷',
+                          'Entra': '🔵', 'Okta': '🔵', 'JumpCloud': '🟢',
+                          'Siemens': '🟢', 'Schneider Electric': '🟢', 'Nective': '🔵',
+                          'HID': '🔴', 'Avigilon': '🔴',
+                          'IBM Tririga': '🔵', 'IBM Maximo': '🔵', 'ServiceNow': '🟢', 'Jira': '🔵',
+                          'bGrid': '🟣', 'Haltian': '🔵', 'Motorola': '🔵'
                         };
                         
                         return tenant.modules
@@ -2505,24 +2522,27 @@ export default function AdminPage() {
                               <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '4px' }}>{module}</div>
                               <div style={{ color: '#64748B', fontSize: '12px' }}>Select integration provider</div>
                             </div>
-                            <select
-                              value={moduleIntegrations[module] || integrationOptions[module][0]}
-                              onChange={(e) => setModuleIntegrations({ ...moduleIntegrations, [module]: e.target.value })}
-                              style={{
-                                padding: '8px 12px',
-                                backgroundColor: '#1E293B',
-                                border: '1px solid #334155',
-                                borderRadius: '6px',
-                                color: '#F1F5F9',
-                                fontSize: '14px',
-                                cursor: 'pointer',
-                                minWidth: '180px'
-                              }}
-                            >
-                              {integrationOptions[module].map(option => (
-                                <option key={option} value={option}>{option}</option>
-                              ))}
-                            </select>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <span style={{ fontSize: '20px' }}>{providerLogos[moduleIntegrations[module] || integrationOptions[module][0]] || '🟦'}</span>
+                              <select
+                                value={moduleIntegrations[module] || integrationOptions[module][0]}
+                                onChange={(e) => setModuleIntegrations({ ...moduleIntegrations, [module]: e.target.value })}
+                                style={{
+                                  padding: '8px 12px',
+                                  backgroundColor: '#1E293B',
+                                  border: '1px solid #334155',
+                                  borderRadius: '6px',
+                                  color: '#F1F5F9',
+                                  fontSize: '14px',
+                                  cursor: 'pointer',
+                                  minWidth: '200px'
+                                }}
+                              >
+                                {integrationOptions[module].map(option => (
+                                  <option key={option} value={option}>{option}</option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
                         ));
                       })()}
