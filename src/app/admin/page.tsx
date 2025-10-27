@@ -284,11 +284,9 @@ export default function AdminPage() {
               }}
             >
               <option value="all">All Tenants</option>
-              <option value="acme">Acme Corporation</option>
-              <option value="digital">Digital Dynamics</option>
-              <option value="global">Global Solutions Ltd</option>
-              <option value="innovation">Innovation Labs</option>
-              <option value="techflow">TechFlow Industries</option>
+              {globalState.tenants.map(tenant => (
+                <option key={tenant.id} value={tenant.id}>{tenant.name}</option>
+              ))}
             </select>
           </div>
         )}
@@ -296,6 +294,7 @@ export default function AdminPage() {
         <nav style={{ padding: '20px 0', flex: 1 }}>
           {[
             { icon: '◈', label: 'Dashboard', action: () => setActiveSection('dashboard'), enabled: true, isFluentIcon: false, iconType: null },
+            { icon: '✓', label: 'Tasks', action: () => setActiveSection('tasks'), enabled: true, isFluentIcon: false, iconType: null },
             { icon: 'building', label: 'Tenants', action: () => setActiveSection('tenantsList'), enabled: true, isFluentIcon: true, iconType: 'building' },
             { icon: 'people', label: 'Users', action: () => setActiveSection('users'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'people' },
             { icon: 'settings', label: 'Modules', action: () => setActiveSection('modules'), enabled: true, isFluentIcon: true, iconType: 'settings' },
@@ -435,6 +434,7 @@ export default function AdminPage() {
               margin: 0 
             }}>
               {activeSection === 'dashboard' && 'Global Admin Dashboard'}
+              {activeSection === 'tasks' && 'Approval Tasks'}
               {activeSection === 'tenantsList' && 'Tenants Management'}
               {activeSection === 'tenantEdit' && 'Edit Tenant'}
               {activeSection === 'tenantCreate' && 'Create New Tenant'}
@@ -808,6 +808,194 @@ export default function AdminPage() {
                 </div>
               </div>
             </>
+          )}
+
+          {/* Tasks Section */}
+          {activeSection === 'tasks' && (
+            <div>
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden',
+                marginBottom: '24px'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderBottom: '1px solid #1E293B'
+                }}>
+                  <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Approval Tasks</h2>
+                  <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Review and approve pending changes</p>
+                </div>
+
+                <div style={{ padding: '24px' }}>
+                  {globalState.tasks.filter(t => t.status === 'pending').length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '48px 24px', color: '#64748B' }}>
+                      <div style={{ fontSize: '48px', marginBottom: '16px' }}>✓</div>
+                      <div style={{ fontSize: '16px', fontWeight: '500' }}>No pending tasks</div>
+                      <div style={{ fontSize: '14px', marginTop: '8px' }}>All approval requests have been processed</div>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      {globalState.tasks.filter(t => t.status === 'pending').map(task => (
+                        <div key={task.id} style={{
+                          backgroundColor: '#1E293B',
+                          borderRadius: '8px',
+                          border: '1px solid #334155',
+                          padding: '20px'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                                <span style={{
+                                  padding: '4px 12px',
+                                  borderRadius: '20px',
+                                  fontSize: '12px',
+                                  fontWeight: '600',
+                                  backgroundColor: task.type === 'create' ? 'rgba(34, 197, 94, 0.1)' : task.type === 'update' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                  color: task.type === 'create' ? '#22C55E' : task.type === 'update' ? '#3B82F6' : '#EF4444'
+                                }}>
+                                  {task.type.toUpperCase()}
+                                </span>
+                                <span style={{
+                                  padding: '4px 12px',
+                                  borderRadius: '20px',
+                                  fontSize: '12px',
+                                  fontWeight: '600',
+                                  backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                  color: '#F59E0B'
+                                }}>
+                                  {task.entity.toUpperCase()}
+                                </span>
+                              </div>
+                              <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0' }}>
+                                {task.type === 'create' && `New ${task.entity}: ${task.entityName}`}
+                                {task.type === 'update' && `Update ${task.entity}: ${task.entityName}`}
+                                {task.type === 'delete' && `Delete ${task.entity}: ${task.entityName}`}
+                              </h3>
+                              <div style={{ color: '#64748B', fontSize: '14px' }}>
+                                Requested by <span style={{ color: '#94A3B8', fontWeight: '500' }}>{task.requestedByName}</span> • {new Date(task.createdAt).toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div style={{ marginBottom: '16px', padding: '16px', backgroundColor: '#0F1629', borderRadius: '6px' }}>
+                            <div style={{ color: '#64748B', fontSize: '13px', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase' }}>Details</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                              {Object.entries(task.data as Record<string, unknown>).slice(0, 6).map(([key, value]) => (
+                                <div key={key}>
+                                  <div style={{ color: '#64748B', fontSize: '12px', marginBottom: '4px' }}>{key}</div>
+                                  <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{String(value)}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '12px' }}>
+                            <button
+                              onClick={() => {
+                                globalState.approveTask(task.id, username);
+                                alert(`Task approved successfully`);
+                              }}
+                              style={{
+                                flex: 1,
+                                padding: '10px 20px',
+                                backgroundColor: '#22C55E',
+                                border: 'none',
+                                borderRadius: '6px',
+                                color: 'white',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#16A34A'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#22C55E'}
+                            >
+                              ✓ Approve
+                            </button>
+                            <button
+                              onClick={() => {
+                                const reason = prompt('Reason for rejection (optional):');
+                                globalState.rejectTask(task.id, username, reason || undefined);
+                                alert('Task rejected');
+                              }}
+                              style={{
+                                flex: 1,
+                                padding: '10px 20px',
+                                backgroundColor: 'transparent',
+                                border: '1px solid #EF4444',
+                                borderRadius: '6px',
+                                color: '#EF4444',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#EF4444';
+                                e.currentTarget.style.color = 'white';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                                e.currentTarget.style.color = '#EF4444';
+                              }}
+                            >
+                              ✗ Reject
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Recently Processed Tasks */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '24px',
+                  borderBottom: '1px solid #1E293B'
+                }}>
+                  <h2 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Recently Processed</h2>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  {globalState.tasks.filter(t => t.status !== 'pending').slice(0, 10).map(task => (
+                    <div key={task.id} style={{
+                      padding: '16px',
+                      borderBottom: '1px solid #1E293B',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div>
+                        <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '4px' }}>
+                          {task.type} {task.entity}: {task.entityName}
+                        </div>
+                        <div style={{ color: '#64748B', fontSize: '12px' }}>
+                          {task.requestedByName} • {new Date(task.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <span style={{
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        backgroundColor: task.status === 'approved' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                        color: task.status === 'approved' ? '#22C55E' : '#EF4444'
+                      }}>
+                        {task.status.toUpperCase()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
 
           {/* User Management Section */}

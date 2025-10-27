@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../components/NeoxLogo'
+import { useGlobalState } from '../context/GlobalStateContext'
 
 export default function Home() {
   const router = useRouter()
+  const globalState = useGlobalState()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [username, setUsername] = useState('')
   const [showTenantModal, setShowTenantModal] = useState(false)
@@ -329,66 +331,68 @@ export default function Home() {
               Choose an organization to manage
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '400px', overflow: 'auto' }}>
-              {[
-                { id: 'acme', name: 'Acme Corporation', logo: '◎', color: '#D7BB91', users: 245 },
-                { id: 'techflow', name: 'TechFlow Industries', logo: '◆', color: '#60A5FA', users: 128 },
-                { id: 'global', name: 'Global Solutions Ltd', logo: '◈', color: '#22C55E', users: 87 },
-                { id: 'innovation', name: 'Innovation Labs', logo: '◧', color: '#A78BFA', users: 156 },
-                { id: 'digital', name: 'Digital Dynamics', logo: '■', color: '#F59E0B', users: 93 },
-              ].map((tenant) => (
-                <div
-                  key={tenant.id}
-                  onClick={() => {
-                    sessionStorage.setItem('selectedTenant', tenant.id);
-                    sessionStorage.setItem('selectedTenantName', tenant.name);
-                    router.push('/tenant');
-                  }}
-                  style={{
-                    padding: '16px',
-                    backgroundColor: '#1E293B',
-                    borderRadius: '8px',
-                    border: '1px solid #334155',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#334155'
-                    e.currentTarget.style.borderColor = '#60A5FA'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#1E293B'
-                    e.currentTarget.style.borderColor = '#334155'
-                  }}
-                >
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '8px',
-                    backgroundColor: `${tenant.color}15`,
-                    border: `1px solid ${tenant.color}40`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '20px',
-                    color: tenant.color,
-                    boxShadow: `0 0 12px ${tenant.color}35`
-                  }}>
-                    {tenant.logo}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>
-                      {tenant.name}
+              {globalState.tenants.filter(t => t.status === 'active').map((tenant, idx) => {
+                const colors = ['#D7BB91', '#60A5FA', '#22C55E', '#A78BFA', '#F59E0B'];
+                const logos = ['◎', '◆', '◈', '◧', '■'];
+                const color = colors[idx % colors.length];
+                const logo = logos[idx % logos.length];
+                const userCount = globalState.users.filter(u => u.tenantId === tenant.id).length;
+                
+                return (
+                  <div
+                    key={tenant.id}
+                    onClick={() => {
+                      sessionStorage.setItem('selectedTenant', tenant.id);
+                      sessionStorage.setItem('selectedTenantName', tenant.name);
+                      router.push('/tenant');
+                    }}
+                    style={{
+                      padding: '16px',
+                      backgroundColor: '#1E293B',
+                      borderRadius: '8px',
+                      border: '1px solid #334155',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '16px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#334155'
+                      e.currentTarget.style.borderColor = '#60A5FA'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#1E293B'
+                      e.currentTarget.style.borderColor = '#334155'
+                    }}
+                  >
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '8px',
+                      backgroundColor: `${color}15`,
+                      border: `1px solid ${color}40`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '20px',
+                      color: color,
+                      boxShadow: `0 0 12px ${color}35`
+                    }}>
+                      {logo}
                     </div>
-                    <div style={{ color: '#64748B', fontSize: '13px' }}>
-                      {tenant.users} users
+                    <div style={{ flex: 1 }}>
+                      <div style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>
+                        {tenant.name}
+                      </div>
+                      <div style={{ color: '#64748B', fontSize: '13px' }}>
+                        {userCount} users
+                      </div>
                     </div>
+                    <div style={{ color: '#60A5FA', fontSize: '18px' }}>→</div>
                   </div>
-                  <div style={{ color: '#60A5FA', fontSize: '18px' }}>→</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <button
               onClick={() => setShowTenantModal(false)}
