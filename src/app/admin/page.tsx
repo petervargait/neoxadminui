@@ -4,9 +4,11 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
 import { PersonRegular, AlertRegular, StatusRegular, DocumentBulletListRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, BuildingRegular, SettingsRegular } from '@fluentui/react-icons'
+import { useGlobalState } from '../../context/GlobalStateContext'
 
 export default function AdminPage() {
   const router = useRouter()
+  const globalState = useGlobalState()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [username, setUsername] = useState('')
 
@@ -30,23 +32,6 @@ export default function AdminPage() {
   const [userSortField, setUserSortField] = useState<'name' | 'email' | 'role' | 'department' | 'status'>('name')
   const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc')
   const [expandedUserRow, setExpandedUserRow] = useState<number | null>(null)
-  const [moduleStates, setModuleStates] = useState<Record<string, boolean>>({
-    'User Management': true,
-    'Visitor Management': true,
-    'Parking': false,
-    'Emergency': true,
-    'Map': true,
-    'Restaurant': false,
-    'Ticketing': true,
-    'Service Hub': false,
-    'Lockers': false,
-    'News': true,
-    'AI Assistant': false,
-    'Space Management': true,
-    'Private Delivery': false,
-    'Authentication': true,
-    'Reporting': true
-  })
 
   const [policyFiles, setPolicyFiles] = useState<Record<string, {name: string; uploadDate: string} | null>>({
     'GDPR': null,
@@ -1931,51 +1916,34 @@ export default function AdminPage() {
                 }} />
               </div>
               <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '16px' }}>
-                {[
-                  { time: '2025-10-21 13:05:23', user: 'admin@system', action: 'Created tenant "Acme Corp"', status: 'Success' },
-                  { time: '2025-10-21 12:58:15', user: 'admin@system', action: 'Updated system configuration', status: 'Success' },
-                  { time: '2025-10-21 12:45:02', user: 'john@tenant1', action: 'Failed login attempt', status: 'Failed' },
-                  { time: '2025-10-21 12:30:18', user: 'admin@system', action: 'Enabled parking module', status: 'Success' },
-                  { time: '2025-10-21 12:15:44', user: 'jane@tenant2', action: 'Sent invitation to visitor', status: 'Success' },
-                  { time: '2025-10-21 12:00:33', user: 'admin@system', action: 'Disabled Restaurant module', status: 'Success' },
-                  { time: '2025-10-21 11:45:12', user: 'sarah@tenant3', action: 'Updated user profile', status: 'Success' },
-                  { time: '2025-10-21 11:30:56', user: 'admin@system', action: 'Created new user account', status: 'Success' },
-                  { time: '2025-10-21 11:15:22', user: 'mike@tenant1', action: 'Failed password reset', status: 'Failed' },
-                  { time: '2025-10-21 11:00:44', user: 'admin@system', action: 'Exported audit logs', status: 'Success' },
-                  { time: '2025-10-21 10:45:09', user: 'lisa@tenant2', action: 'Modified white label settings', status: 'Success' },
-                  { time: '2025-10-21 10:30:28', user: 'admin@system', action: 'System backup completed', status: 'Success' },
-                  { time: '2025-10-21 10:15:51', user: 'tom@tenant4', action: 'Uploaded policy document', status: 'Success' },
-                  { time: '2025-10-21 10:00:17', user: 'admin@system', action: 'Updated system settings', status: 'Success' },
-                  { time: '2025-10-21 09:45:33', user: 'emma@tenant1', action: 'Sent bulk invitations', status: 'Success' },
-                  { time: '2025-10-21 09:30:59', user: 'admin@system', action: 'Enabled AI Assistant module', status: 'Success' },
-                  { time: '2025-10-21 09:15:14', user: 'david@tenant3', action: 'Failed API authentication', status: 'Failed' },
-                  { time: '2025-10-21 09:00:48', user: 'admin@system', action: 'Created new tenant', status: 'Success' },
-                  { time: '2025-10-21 08:45:26', user: 'olivia@tenant2', action: 'Downloaded digital badge', status: 'Success' },
-                  { time: '2025-10-21 08:30:03', user: 'admin@system', action: 'Modified module permissions', status: 'Success' }
-                ].map((log, index) => (
-                  <div key={index} style={{
-                    padding: '12px',
-                    backgroundColor: 'rgba(51, 78, 104, 0.3)',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(75, 101, 129, 0.3)',
-                    marginBottom: '8px'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500' }}>{log.action}</div>
-                        <div style={{ color: '#d7bb91', opacity: 0.7, fontSize: '12px' }}>{log.user} - {log.time}</div>
+                {globalState.state.auditLogs.length === 0 ? (
+                  <div style={{ color: '#d7bb91', opacity: 0.7, textAlign: 'center', padding: '24px' }}>No audit logs available</div>
+                ) : (
+                  globalState.state.auditLogs.map((log) => (
+                    <div key={log.id} style={{
+                      padding: '12px',
+                      backgroundColor: 'rgba(51, 78, 104, 0.3)',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      marginBottom: '8px'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <div style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500' }}>{log.action}</div>
+                          <div style={{ color: '#d7bb91', opacity: 0.7, fontSize: '12px' }}>{log.user} - {new Date(log.timestamp).toLocaleString()}</div>
+                        </div>
+                        <span style={{
+                          backgroundColor: log.status === 'Success' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)',
+                          color: log.status === 'Success' ? '#10b981' : '#ef4444',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          fontSize: '12px',
+                          fontWeight: '500'
+                        }}>{log.status}</span>
                       </div>
-                      <span style={{
-                        backgroundColor: log.status === 'Success' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)',
-                        color: log.status === 'Success' ? '#10b981' : '#ef4444',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontSize: '12px',
-                        fontWeight: '500'
-                      }}>{log.status}</span>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           )}
