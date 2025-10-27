@@ -42,6 +42,15 @@ export default function AdminPage() {
   const [badgeStatusFilter, setBadgeStatusFilter] = useState('All Statuses')
   const [badgeCardTypeFilter, setBadgeCardTypeFilter] = useState('All Card Types')
   const [showBadgeImportModal, setShowBadgeImportModal] = useState(false)
+  
+  // White label state
+  const [whiteLabelForm, setWhiteLabelForm] = useState({
+    companyName: '',
+    logoData: '',
+    primaryColor: '#d7bb91',
+    secondaryColor: '#08122e',
+    accentColor: '#3b82f6'
+  })
 
   // Note: Profiles are now managed via global state (globalState.profiles)
   const [showProfileModal, setShowProfileModal] = useState(false)
@@ -1952,7 +1961,20 @@ export default function AdminPage() {
           )}
 
           {/* White Label */}
-          {activeSection === 'whiteLabel' && selectedTenant !== 'all' && (
+          {activeSection === 'whiteLabel' && selectedTenant !== 'all' && (() => {
+            // Load existing white label settings
+            const existingSettings = globalState.getWhiteLabel(selectedTenant);
+            if (existingSettings && !whiteLabelForm.companyName) {
+              setWhiteLabelForm({
+                companyName: existingSettings.companyName,
+                logoData: existingSettings.logoData || '',
+                primaryColor: existingSettings.primaryColor,
+                secondaryColor: existingSettings.secondaryColor,
+                accentColor: existingSettings.accentColor
+              });
+            }
+            
+            return (
             <div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 {/* Branding Section */}
@@ -1961,7 +1983,12 @@ export default function AdminPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <div>
                       <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Company Name</label>
-                      <input type="text" placeholder="Your Company Name" style={{
+                      <input 
+                        type="text" 
+                        placeholder="Your Company Name" 
+                        value={whiteLabelForm.companyName}
+                        onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, companyName: e.target.value })}
+                        style={{
                         width: '100%',
                         padding: '12px',
                         backgroundColor: 'rgba(51, 78, 104, 0.5)',
@@ -1980,7 +2007,24 @@ export default function AdminPage() {
                         textAlign: 'center',
                         backgroundColor: 'rgba(51, 78, 104, 0.1)'
                       }}>
-                        <input type="file" accept="image/*" style={{ display: 'none' }} id="logo-upload" />
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          style={{ display: 'none' }} 
+                          id="logo-upload"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                const base64 = ev.target?.result as string;
+                                setWhiteLabelForm({ ...whiteLabelForm, logoData: base64 });
+                                alert('Logo uploaded successfully!');
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
                         <label htmlFor="logo-upload" style={{
                           backgroundColor: 'rgba(75, 101, 129, 0.6)',
                           color: '#d7bb91',
@@ -2004,14 +2048,22 @@ export default function AdminPage() {
                     <div>
                       <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Primary Color</label>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <input type="color" defaultValue="#d7bb91" style={{
+                        <input 
+                          type="color" 
+                          value={whiteLabelForm.primaryColor}
+                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, primaryColor: e.target.value })}
+                          style={{
                           width: '40px',
                           height: '40px',
                           border: 'none',
                           borderRadius: '8px',
                           cursor: 'pointer'
                         }} />
-                        <input type="text" defaultValue="#d7bb91" style={{
+                        <input 
+                          type="text" 
+                          value={whiteLabelForm.primaryColor}
+                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, primaryColor: e.target.value })}
+                          style={{
                           flex: 1,
                           padding: '8px 12px',
                           backgroundColor: 'rgba(51, 78, 104, 0.5)',
@@ -2026,14 +2078,22 @@ export default function AdminPage() {
                     <div>
                       <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Secondary Color</label>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <input type="color" defaultValue="#08122e" style={{
+                        <input 
+                          type="color" 
+                          value={whiteLabelForm.secondaryColor}
+                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, secondaryColor: e.target.value })}
+                          style={{
                           width: '40px',
                           height: '40px',
                           border: 'none',
                           borderRadius: '8px',
                           cursor: 'pointer'
                         }} />
-                        <input type="text" defaultValue="#08122e" style={{
+                        <input 
+                          type="text" 
+                          value={whiteLabelForm.secondaryColor}
+                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, secondaryColor: e.target.value })}
+                          style={{
                           flex: 1,
                           padding: '8px 12px',
                           backgroundColor: 'rgba(51, 78, 104, 0.5)',
@@ -2048,14 +2108,22 @@ export default function AdminPage() {
                     <div>
                       <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Accent Color</label>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <input type="color" defaultValue="#3b82f6" style={{
+                        <input 
+                          type="color" 
+                          value={whiteLabelForm.accentColor}
+                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, accentColor: e.target.value })}
+                          style={{
                           width: '40px',
                           height: '40px',
                           border: 'none',
                           borderRadius: '8px',
                           cursor: 'pointer'
                         }} />
-                        <input type="text" defaultValue="#3b82f6" style={{
+                        <input 
+                          type="text" 
+                          value={whiteLabelForm.accentColor}
+                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, accentColor: e.target.value })}
+                          style={{
                           flex: 1,
                           padding: '8px 12px',
                           backgroundColor: 'rgba(51, 78, 104, 0.5)',
@@ -2072,21 +2140,41 @@ export default function AdminPage() {
 
                 {/* Save Button */}
                 <div style={{ textAlign: 'center', paddingTop: '20px', borderTop: '1px solid rgba(75, 101, 129, 0.3)' }}>
-                  <button style={{
-                    backgroundColor: 'rgba(75, 101, 129, 0.8)',
-                    color: '#d7bb91',
-                    border: '1px solid rgba(75, 101, 129, 0.3)',
-                    borderRadius: '8px',
-                    padding: '16px 32px',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    fontSize: '16px',
-                    minWidth: '200px'
-                  }}>Save White Label Settings</button>
+                  <button 
+                    onClick={() => {
+                      if (!whiteLabelForm.companyName) {
+                        alert('Company name is required');
+                        return;
+                      }
+                      globalState.updateWhiteLabel(selectedTenant, {
+                        companyName: whiteLabelForm.companyName,
+                        logoData: whiteLabelForm.logoData,
+                        primaryColor: whiteLabelForm.primaryColor,
+                        secondaryColor: whiteLabelForm.secondaryColor,
+                        accentColor: whiteLabelForm.accentColor
+                      });
+                      alert('White label settings saved successfully!');
+                    }}
+                    style={{
+                      backgroundColor: 'rgba(75, 101, 129, 0.8)',
+                      color: '#d7bb91',
+                      border: '1px solid rgba(75, 101, 129, 0.3)',
+                      borderRadius: '8px',
+                      padding: '16px 32px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      fontSize: '16px',
+                      minWidth: '200px',
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(75, 101, 129, 1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(75, 101, 129, 0.8)'}
+                  >Save White Label Settings</button>
                 </div>
               </div>
             </div>
-          )}
+            );
+          })()}
 
           {/* Ticket Management */}
           {activeSection === 'ticketManagement' && (
@@ -2573,12 +2661,47 @@ export default function AdminPage() {
                         borderRadius: '8px',
                         marginBottom: '12px'
                       }}>
-                        <p style={{ color: '#d7bb91', fontSize: '14px', margin: '0 0 4px 0', fontWeight: '500' }}>
-                          Current File:
-                        </p>
-                        <p style={{ color: '#d7bb91', fontSize: '13px', margin: 0, opacity: 0.8 }}>
-                          {globalState.policyFiles[policyName]?.name}
-                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <p style={{ color: '#d7bb91', fontSize: '14px', margin: '0 0 4px 0', fontWeight: '500' }}>
+                              Current File:
+                            </p>
+                            <p style={{ color: '#d7bb91', fontSize: '13px', margin: 0, opacity: 0.8 }}>
+                              {globalState.policyFiles[policyName]?.name}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const policy = globalState.downloadPolicy(policyName);
+                              if (policy && policy.fileData) {
+                                const link = document.createElement('a');
+                                link.href = policy.fileData;
+                                link.download = policy.name;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                alert(`Downloaded: ${policy.name}`);
+                              } else {
+                                alert('File not available for download');
+                              }
+                            }}
+                            style={{
+                              backgroundColor: '#10B981',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '8px 16px',
+                              fontSize: '13px',
+                              fontWeight: '500',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10B981'}
+                          >
+                            📥 Download
+                          </button>
+                        </div>
                       </div>
                     )}
 
