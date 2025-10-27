@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { PersonRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, BookRegular } from '@fluentui/react-icons'
+import { PersonRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, BookRegular, LockClosedRegular, BuildingRegular, SettingsRegular, TicketHorizontalRegular, AlertRegular, WarningRegular, FoodRegular, LocationRegular, LockMultipleRegular, DataUsageRegular, BotRegular } from '@fluentui/react-icons'
 
 export default function APIDocsPage() {
   const router = useRouter()
@@ -35,21 +35,21 @@ export default function APIDocsPage() {
 
   const apiCategories = [
     { id: 'overview', name: 'Overview', icon: 'book', isFluentIcon: true },
-    { id: 'authentication', name: 'Authentication', icon: '🔐', isFluentIcon: false },
+    { id: 'authentication', name: 'Authentication', icon: 'lock', isFluentIcon: true },
     { id: 'user-management', name: 'User Management', icon: 'people', isFluentIcon: true },
-    { id: 'tenant-management', name: 'Tenant Management', icon: '🏢', isFluentIcon: false },
+    { id: 'tenant-management', name: 'Tenant Management', icon: 'building', isFluentIcon: true },
     { id: 'visitor-management', name: 'Visitor Management', icon: 'person', isFluentIcon: true },
     { id: 'parking', name: 'Parking Management', icon: 'vehicle', isFluentIcon: true },
     { id: 'digital-badge', name: 'Digital Badge Management', icon: 'document', isFluentIcon: true },
-    { id: 'modules-profiles', name: 'Modules & Profiles', icon: '⚙️', isFluentIcon: false },
-    { id: 'tickets', name: 'Ticketing System', icon: '🎫', isFluentIcon: false },
-    { id: 'notifications', name: 'Notifications', icon: '🔔', isFluentIcon: false },
-    { id: 'emergency', name: 'Emergency Management', icon: '🚨', isFluentIcon: false },
-    { id: 'restaurant', name: 'Restaurant & Catering', icon: '🍽️', isFluentIcon: false },
-    { id: 'space-management', name: 'Space Management', icon: '📍', isFluentIcon: false },
-    { id: 'lockers', name: 'Locker Management', icon: '🔒', isFluentIcon: false },
-    { id: 'analytics', name: 'Analytics & Reporting', icon: '📊', isFluentIcon: false },
-    { id: 'ai-assistant', name: 'AI Assistant', icon: '🤖', isFluentIcon: false },
+    { id: 'modules-profiles', name: 'Modules & Profiles', icon: 'settings', isFluentIcon: true },
+    { id: 'tickets', name: 'Ticketing System', icon: 'ticket', isFluentIcon: true },
+    { id: 'notifications', name: 'Notifications', icon: 'alert', isFluentIcon: true },
+    { id: 'emergency', name: 'Emergency Management', icon: 'warning', isFluentIcon: true },
+    { id: 'restaurant', name: 'Restaurant & Catering', icon: 'food', isFluentIcon: true },
+    { id: 'space-management', name: 'Space Management', icon: 'location', isFluentIcon: true },
+    { id: 'lockers', name: 'Locker Management', icon: 'lock-multiple', isFluentIcon: true },
+    { id: 'analytics', name: 'Analytics & Reporting', icon: 'data-usage', isFluentIcon: true },
+    { id: 'ai-assistant', name: 'AI Assistant', icon: 'bot', isFluentIcon: true },
   ]
 
   return (
@@ -117,14 +117,36 @@ export default function APIDocsPage() {
               {category.isFluentIcon ? (
                 category.icon === 'book' ? (
                   <BookRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'lock' ? (
+                  <LockClosedRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : category.icon === 'people' ? (
                   <PeopleRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'building' ? (
+                  <BuildingRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : category.icon === 'person' ? (
                   <PersonRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : category.icon === 'vehicle' ? (
                   <VehicleCarRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : category.icon === 'document' ? (
                   <DocumentRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'settings' ? (
+                  <SettingsRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'ticket' ? (
+                  <TicketHorizontalRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'alert' ? (
+                  <AlertRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'warning' ? (
+                  <WarningRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'food' ? (
+                  <FoodRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'location' ? (
+                  <LocationRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'lock-multiple' ? (
+                  <LockMultipleRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'data-usage' ? (
+                  <DataUsageRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : category.icon === 'bot' ? (
+                  <BotRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : (
                   <span style={{ fontSize: '18px' }}>{category.icon}</span>
                 )
