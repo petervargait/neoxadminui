@@ -44,6 +44,7 @@ export interface Badge {
   name: string
   email: string
   company: string
+  department?: string
   cardType: string
   status: 'New' | 'Sent' | 'Downloaded' | 'Suspended'
   imei: string
@@ -69,12 +70,25 @@ export interface Invitation {
 export interface ParkingSpace {
   id: string
   spaceNumber: string
+  name?: string
+  building: string
   location: string
+  level?: string
+  floor?: string
   status: 'available' | 'occupied' | 'reserved'
+  isElectric?: boolean
+  isDisabled?: boolean
+  isSpecialNeed?: boolean
+  isVIP?: boolean
+  isReservedForVisitor?: boolean
+  notes?: string
+  tenantId?: string
   assignedTo?: string
   assignedToName?: string
   vehiclePlate?: string
   assignedDate?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface Ticket {
@@ -137,6 +151,18 @@ export interface WhiteLabelSettings {
   updatedAt: string
 }
 
+export interface SystemSettings {
+  tenantId: string // 'global' for global settings, or specific tenant ID
+  emailNotifications: boolean
+  autoApproveInvitations: boolean
+  maintenanceMode: boolean
+  sessionTimeout: number // in minutes
+  require2FA: boolean
+  backgroundImageData?: string // Base64 encoded background image
+  workflowManagementEnabled: boolean // If true, all actions require approval
+  updatedAt: string
+}
+
 interface GlobalState {
   users: User[]
   tenants: Tenant[]
@@ -149,6 +175,7 @@ interface GlobalState {
   auditLogs: AuditLog[]
   tasks: Task[]
   whiteLabelSettings: Record<string, WhiteLabelSettings>
+  systemSettings: Record<string, SystemSettings>
   moduleStates: Record<string, boolean>
 }
 
@@ -180,6 +207,8 @@ interface GlobalStateContextType extends GlobalState {
   rejectTask: (taskId: string, reviewedBy: string, comments?: string) => void
   updateWhiteLabel: (tenantId: string, settings: Partial<WhiteLabelSettings>) => void
   getWhiteLabel: (tenantId: string) => WhiteLabelSettings | undefined
+  updateSystemSettings: (tenantId: string, settings: Partial<SystemSettings>) => void
+  getSystemSettings: (tenantId: string) => SystemSettings | undefined
   toggleModule: (moduleName: string) => void
   clearAllData: () => void
 }
@@ -201,8 +230,22 @@ const getInitialState = (): GlobalState => {
   }
 
   return {
-    users: [],
-    tenants: [],
+    users: [
+      { id: 'usr_global_1', name: 'Admin User', email: 'admin@globaladmin.com', role: 'Admin', department: 'IT', status: 'active', profileId: 'prof1', tenantId: 'globaladmin', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+      { id: 'usr_global_2', name: 'John Manager', email: 'john@globaladmin.com', role: 'Manager', department: 'Operations', status: 'active', profileId: 'prof2', tenantId: 'globaladmin', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+      { id: 'usr_acme_1', name: 'Sarah Johnson', email: 'sarah@acme.com', role: 'Admin', department: 'HR', status: 'active', profileId: 'prof1', tenantId: 'acme', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+      { id: 'usr_techflow_1', name: 'Mike Chen', email: 'mike@techflow.com', role: 'Manager', department: 'Engineering', status: 'active', profileId: 'prof2', tenantId: 'techflow', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+    ],
+    tenants: [
+      { id: 'globaladmin', name: 'Global Admin', domain: 'globaladmin.neox.com', contactEmail: 'admin@globaladmin.com', contactPhone: '+1-555-0100', status: 'active', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'], createdAt: '2024-01-01T00:00:00.000Z', updatedAt: new Date().toISOString() },
+      { id: 'mbank', name: 'M Bank', domain: 'mbank.neox.com', contactEmail: 'contact@mbank.com', contactPhone: '+1-555-0105', status: 'active', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Ticketing', 'Service Hub', 'Space Management', 'Authentication', 'Reporting'], createdAt: '2024-02-01T00:00:00.000Z', updatedAt: new Date().toISOString() },
+      { id: 'eassetmanager', name: 'E Asset Manager', domain: 'eassetmanager.neox.com', contactEmail: 'contact@eassetmanager.com', contactPhone: '+1-555-0106', status: 'active', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'AI Assistant', 'Authentication', 'Reporting'], createdAt: '2024-02-05T00:00:00.000Z', updatedAt: new Date().toISOString() },
+      { id: 'moil', name: 'M Oil', domain: 'moil.neox.com', contactEmail: 'contact@moil.com', contactPhone: '+1-555-0107', status: 'active', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Authentication', 'Reporting'], createdAt: '2024-02-10T00:00:00.000Z', updatedAt: new Date().toISOString() },
+      { id: 'acme', name: 'ACME', domain: 'acme.neox.com', contactEmail: 'contact@acme.com', contactPhone: '+1-555-0108', status: 'active', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Ticketing', 'Service Hub', 'Space Management', 'Authentication', 'Reporting'], createdAt: '2024-01-15T00:00:00.000Z', updatedAt: new Date().toISOString() },
+      { id: 'techflow', name: 'TechFlow Industries', domain: 'techflow.neox.com', contactEmail: 'info@techflow.com', contactPhone: '+1-555-0102', status: 'active', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'News', 'Authentication', 'Reporting'], createdAt: '2024-01-10T00:00:00.000Z', updatedAt: new Date().toISOString() },
+      { id: 'globalsolutions', name: 'Global Solutions Ltd', domain: 'globalsolutions.neox.com', contactEmail: 'contact@globalsolutions.com', contactPhone: '+1-555-0103', status: 'active', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Authentication', 'Reporting'], createdAt: '2024-01-08T00:00:00.000Z', updatedAt: new Date().toISOString() },
+      { id: 'innovationlabs', name: 'Innovation Labs', domain: 'innovationlabs.neox.com', contactEmail: 'hello@innovationlabs.com', contactPhone: '+1-555-0104', status: 'active', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'AI Assistant', 'Authentication', 'Reporting'], createdAt: '2024-01-05T00:00:00.000Z', updatedAt: new Date().toISOString() },
+    ],
     profiles: [
       { id: 'prof1', name: 'Full Access', description: 'Complete access to all system modules', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'], isGlobal: true, createdAt: new Date().toISOString() },
       { id: 'prof2', name: 'Limited Access', description: 'Access to core operational modules', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'Reporting'], isGlobal: true, createdAt: new Date().toISOString() },
@@ -211,11 +254,121 @@ const getInitialState = (): GlobalState => {
     badges: [],
     invitations: [],
     parkingSpaces: [
-      { id: 'p1', spaceNumber: 'A-101', location: 'Building A - Level 1', status: 'available' },
-      { id: 'p2', spaceNumber: 'A-102', location: 'Building A - Level 1', status: 'available' },
-      { id: 'p3', spaceNumber: 'A-103', location: 'Building A - Level 1', status: 'available' },
-      { id: 'p4', spaceNumber: 'B-201', location: 'Building B - Level 2', status: 'available' },
-      { id: 'p5', spaceNumber: 'B-202', location: 'Building B - Level 2', status: 'available' },
+      // Building A - Level 1 (20 spaces)
+      { id: 'p1', spaceNumber: 'A-101', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p2', spaceNumber: 'A-102', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p3', spaceNumber: 'A-103', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p4', spaceNumber: 'A-104', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p5', spaceNumber: 'A-105', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p6', spaceNumber: 'A-106', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p7', spaceNumber: 'A-107', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p8', spaceNumber: 'A-108', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p9', spaceNumber: 'A-109', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p10', spaceNumber: 'A-110', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p11', spaceNumber: 'A-111', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p12', spaceNumber: 'A-112', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p13', spaceNumber: 'A-113', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p14', spaceNumber: 'A-114', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p15', spaceNumber: 'A-115', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p16', spaceNumber: 'A-116', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p17', spaceNumber: 'A-117', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p18', spaceNumber: 'A-118', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p19', spaceNumber: 'A-119', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      { id: 'p20', spaceNumber: 'A-120', building: 'Building A', location: 'Building A - Level 1', status: 'available' },
+      // Building A - Level 2 (20 spaces)
+      { id: 'p21', spaceNumber: 'A-201', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p22', spaceNumber: 'A-202', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p23', spaceNumber: 'A-203', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p24', spaceNumber: 'A-204', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p25', spaceNumber: 'A-205', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p26', spaceNumber: 'A-206', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p27', spaceNumber: 'A-207', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p28', spaceNumber: 'A-208', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p29', spaceNumber: 'A-209', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p30', spaceNumber: 'A-210', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p31', spaceNumber: 'A-211', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p32', spaceNumber: 'A-212', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p33', spaceNumber: 'A-213', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p34', spaceNumber: 'A-214', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p35', spaceNumber: 'A-215', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p36', spaceNumber: 'A-216', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p37', spaceNumber: 'A-217', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p38', spaceNumber: 'A-218', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p39', spaceNumber: 'A-219', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      { id: 'p40', spaceNumber: 'A-220', building: 'Building A', location: 'Building A - Level 2', status: 'available' },
+      // Building B - Level 1 (20 spaces)
+      { id: 'p41', spaceNumber: 'B-101', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p42', spaceNumber: 'B-102', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p43', spaceNumber: 'B-103', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p44', spaceNumber: 'B-104', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p45', spaceNumber: 'B-105', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p46', spaceNumber: 'B-106', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p47', spaceNumber: 'B-107', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p48', spaceNumber: 'B-108', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p49', spaceNumber: 'B-109', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p50', spaceNumber: 'B-110', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p51', spaceNumber: 'B-111', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p52', spaceNumber: 'B-112', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p53', spaceNumber: 'B-113', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p54', spaceNumber: 'B-114', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p55', spaceNumber: 'B-115', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p56', spaceNumber: 'B-116', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p57', spaceNumber: 'B-117', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p58', spaceNumber: 'B-118', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p59', spaceNumber: 'B-119', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      { id: 'p60', spaceNumber: 'B-120', building: 'Building B', location: 'Building B - Level 1', status: 'available' },
+      // Building B - Level 2 (20 spaces)
+      { id: 'p61', spaceNumber: 'B-201', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p62', spaceNumber: 'B-202', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p63', spaceNumber: 'B-203', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p64', spaceNumber: 'B-204', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p65', spaceNumber: 'B-205', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p66', spaceNumber: 'B-206', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p67', spaceNumber: 'B-207', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p68', spaceNumber: 'B-208', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p69', spaceNumber: 'B-209', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p70', spaceNumber: 'B-210', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p71', spaceNumber: 'B-211', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p72', spaceNumber: 'B-212', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p73', spaceNumber: 'B-213', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p74', spaceNumber: 'B-214', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p75', spaceNumber: 'B-215', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p76', spaceNumber: 'B-216', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p77', spaceNumber: 'B-217', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p78', spaceNumber: 'B-218', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p79', spaceNumber: 'B-219', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      { id: 'p80', spaceNumber: 'B-220', building: 'Building B', location: 'Building B - Level 2', status: 'available' },
+      // Building C - Underground (30 spaces)
+      { id: 'p81', spaceNumber: 'C-U01', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p82', spaceNumber: 'C-U02', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p83', spaceNumber: 'C-U03', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p84', spaceNumber: 'C-U04', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p85', spaceNumber: 'C-U05', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p86', spaceNumber: 'C-U06', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p87', spaceNumber: 'C-U07', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p88', spaceNumber: 'C-U08', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p89', spaceNumber: 'C-U09', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p90', spaceNumber: 'C-U10', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p91', spaceNumber: 'C-U11', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p92', spaceNumber: 'C-U12', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p93', spaceNumber: 'C-U13', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p94', spaceNumber: 'C-U14', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p95', spaceNumber: 'C-U15', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p96', spaceNumber: 'C-U16', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p97', spaceNumber: 'C-U17', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p98', spaceNumber: 'C-U18', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p99', spaceNumber: 'C-U19', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p100', spaceNumber: 'C-U20', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p101', spaceNumber: 'C-U21', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p102', spaceNumber: 'C-U22', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p103', spaceNumber: 'C-U23', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p104', spaceNumber: 'C-U24', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p105', spaceNumber: 'C-U25', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p106', spaceNumber: 'C-U26', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p107', spaceNumber: 'C-U27', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p108', spaceNumber: 'C-U28', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p109', spaceNumber: 'C-U29', building: 'Building C', location: 'Building C - Underground', status: 'available' },
+      { id: 'p110', spaceNumber: 'C-U30', building: 'Building C', location: 'Building C - Underground', status: 'available' },
     ],
     tickets: [],
     policyFiles: {
@@ -227,6 +380,18 @@ const getInitialState = (): GlobalState => {
     auditLogs: [],
     tasks: [],
     whiteLabelSettings: {},
+    systemSettings: {
+      'global': {
+        tenantId: 'global',
+        emailNotifications: true,
+        autoApproveInvitations: true,
+        maintenanceMode: false,
+        sessionTimeout: 30,
+        require2FA: true,
+        workflowManagementEnabled: false,
+        updatedAt: new Date().toISOString()
+      }
+    },
     moduleStates: {
       'User Management': true,
       'Visitor Management': true,
@@ -515,6 +680,33 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     return state.whiteLabelSettings[tenantId]
   }
 
+  const updateSystemSettings = (tenantId: string, settings: Partial<SystemSettings>) => {
+    setState(prev => ({
+      ...prev,
+      systemSettings: {
+        ...prev.systemSettings,
+        [tenantId]: {
+          ...(prev.systemSettings[tenantId] || {
+            tenantId,
+            emailNotifications: true,
+            autoApproveInvitations: true,
+            maintenanceMode: false,
+            sessionTimeout: 30,
+            require2FA: true,
+            workflowManagementEnabled: false
+          }),
+          ...settings,
+          updatedAt: new Date().toISOString()
+        }
+      }
+    }))
+    addAuditLog({ user: 'system', action: `Updated system settings for ${tenantId === 'global' ? 'global' : 'tenant ' + tenantId}`, status: 'Success' })
+  }
+
+  const getSystemSettings = (tenantId: string) => {
+    return state.systemSettings[tenantId]
+  }
+
   const toggleModule = (moduleName: string) => {
     setState(prev => ({
       ...prev,
@@ -527,11 +719,11 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const clearAllData = () => {
-    const initial = getInitialState()
-    setState(initial)
     if (typeof window !== 'undefined') {
       localStorage.removeItem(STORAGE_KEY)
     }
+    // Reload from defaults by calling getInitialState after clearing storage
+    window.location.reload()
   }
 
   const value: GlobalStateContextType = {
@@ -563,6 +755,8 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     rejectTask,
     updateWhiteLabel,
     getWhiteLabel,
+    updateSystemSettings,
+    getSystemSettings,
     toggleModule,
     clearAllData
   }

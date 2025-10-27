@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular } from '@fluentui/react-icons'
+import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular } from '@fluentui/react-icons'
 import { useGlobalState } from '../../context/GlobalStateContext'
 
 export default function TenantPage() {
@@ -50,14 +50,15 @@ export default function TenantPage() {
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [editingProfile, setEditingProfile] = useState<{id?: string; name: string; description: string; modules: string[]} | null>(null)
   const [showUserModal, setShowUserModal] = useState(false)
-  const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string; profileId?: string} | null>(null)
+  const [editingUser, setEditingUser] = useState<{id?: string; name: string; email: string; role: string; department: string; status: string; profileId?: string} | null>(null)
+  const [selectedProfileId, setSelectedProfileId] = useState<string>('')
   const [userSortField, setUserSortField] = useState<'name' | 'email' | 'role' | 'department' | 'status'>('name')
   const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc')
   const [expandedUserRow, setExpandedUserRow] = useState<number | null>(null)
   const [showTemplateEditor, setShowTemplateEditor] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<{name: string; subject?: string; status?: string} | null>(null)
   const [showParkingModal, setShowParkingModal] = useState(false)
-  const [selectedParkingSpace, setSelectedParkingSpace] = useState<number | null>(null)
+  const [selectedParkingSpace, setSelectedParkingSpace] = useState<string | null>(null)
   const [showTicketModal, setShowTicketModal] = useState(false)
   const [systemOnline, setSystemOnline] = useState(true)
   const [notificationCount, setNotificationCount] = useState(3)
@@ -73,15 +74,8 @@ export default function TenantPage() {
   const [editingInvitation, setEditingInvitation] = useState<string | null>(null)
 
   // Digital Badges state
-  const [badgeUsers, setBadgeUsers] = useState([
-    { id: 1, name: 'John Smith', email: 'john.smith@company.com', department: 'IT', cardType: 'Mifare EV3', status: 'Downloaded', imei: '123456789012345' },
-    { id: 2, name: 'Sarah Johnson', email: 'sarah.j@company.com', department: 'HR', cardType: 'HID', status: 'Sent', imei: '234567890123456' },
-    { id: 3, name: 'Mike Davis', email: 'mike.d@company.com', department: 'Sales', cardType: 'NFC', status: 'New', imei: '345678901234567' },
-    { id: 4, name: 'Lisa Wilson', email: 'lisa.w@company.com', department: 'Marketing', cardType: 'LEGIC', status: 'Downloaded', imei: '456789012345678' },
-    { id: 5, name: 'Tom Brown', email: 'tom.brown@company.com', department: 'Operations', cardType: 'Mifare EV3', status: 'Suspended', imei: '567890123456789' },
-  ])
   const [showBadgeModal, setShowBadgeModal] = useState(false)
-  const [editingBadge, setEditingBadge] = useState<{id?: number; name: string; email: string; department: string; cardType: string; imei: string} | null>(null)
+  const [editingBadge, setEditingBadge] = useState<{id?: number; name: string; email: string; company: string; cardType: string; imei: string} | null>(null)
   const [badgeSearchTerm, setBadgeSearchTerm] = useState('')
   const [badgeStatusFilter, setBadgeStatusFilter] = useState('All Statuses')
   const [badgeCardTypeFilter, setBadgeCardTypeFilter] = useState('All Card Types')
@@ -89,11 +83,11 @@ export default function TenantPage() {
 
   // Digital Badges handlers
   const handleAddBadgeUser = () => {
-    setEditingBadge({ name: '', email: '', department: '', cardType: 'Mifare EV3', imei: '' })
+    setEditingBadge({ name: '', email: '', company: '', cardType: 'Mifare EV3', imei: '' })
     setShowBadgeModal(true)
   }
 
-  const handleEditBadgeUser = (user: typeof badgeUsers[0]) => {
+  const handleEditBadgeUser = (user: typeof globalState.badges[0]) => {
     setEditingBadge(user)
     setShowBadgeModal(true)
   }
@@ -101,19 +95,31 @@ export default function TenantPage() {
   const handleSaveBadgeUser = () => {
     if (!editingBadge) return
     
-    if (!editingBadge.name || !editingBadge.email || !editingBadge.department || !editingBadge.imei) {
+    if (!editingBadge.name || !editingBadge.email || !editingBadge.company || !editingBadge.imei) {
       alert('Please fill in all required fields')
       return
     }
 
     if (editingBadge.id) {
       // Update existing
-      setBadgeUsers(prev => prev.map(u => u.id === editingBadge.id ? { ...editingBadge, id: editingBadge.id, status: u.status } as typeof u : u))
+      globalState.updateBadge(editingBadge.id, { 
+        name: editingBadge.name, 
+        email: editingBadge.email, 
+        company: editingBadge.company, 
+        cardType: editingBadge.cardType, 
+        imei: editingBadge.imei 
+      })
       alert('Badge user updated successfully')
     } else {
       // Add new
-      const newUser = { ...editingBadge, id: Math.max(...badgeUsers.map(u => u.id)) + 1, status: 'New' as const }
-      setBadgeUsers(prev => [...prev, newUser])
+      globalState.addBadge({ 
+        name: editingBadge.name, 
+        email: editingBadge.email, 
+        company: editingBadge.company, 
+        cardType: editingBadge.cardType, 
+        imei: editingBadge.imei,
+        status: 'New'
+      })
       alert('Badge user added successfully')
     }
     
@@ -122,41 +128,41 @@ export default function TenantPage() {
   }
 
   const handleDeleteBadgeUser = (userId: number) => {
-    const user = badgeUsers.find(u => u.id === userId)
+    const user = globalState.badges.find(u => u.id === userId)
     if (user && confirm(`Delete badge for ${user.name}? This action cannot be undone.`)) {
-      setBadgeUsers(prev => prev.filter(u => u.id !== userId))
+      globalState.deleteBadge(userId)
       alert('Badge user deleted successfully')
     }
   }
 
   const handleSendBadgeEmail = (userId: number) => {
-    const user = badgeUsers.find(u => u.id === userId)
+    const user = globalState.badges.find(u => u.id === userId)
     if (user) {
-      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Sent' as const } : u))
+      globalState.updateBadge(userId, { status: 'Sent' })
       alert(`Badge email sent to ${user.email}`)
     }
   }
 
   const handleSendBadgePush = (userId: number) => {
-    const user = badgeUsers.find(u => u.id === userId)
+    const user = globalState.badges.find(u => u.id === userId)
     if (user) {
-      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Sent' as const } : u))
+      globalState.updateBadge(userId, { status: 'Sent' })
       alert(`Push notification sent to ${user.name}`)
     }
   }
 
   const handleSuspendBadge = (userId: number) => {
-    const user = badgeUsers.find(u => u.id === userId)
+    const user = globalState.badges.find(u => u.id === userId)
     if (user && confirm(`Suspend badge for ${user.name}?`)) {
-      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Suspended' as const } : u))
+      globalState.updateBadge(userId, { status: 'Suspended' })
       alert('Badge suspended successfully')
     }
   }
 
   const handleRecoverBadge = (userId: number) => {
-    const user = badgeUsers.find(u => u.id === userId)
+    const user = globalState.badges.find(u => u.id === userId)
     if (user && confirm(`Recover badge for ${user.name}?`)) {
-      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Downloaded' as const } : u))
+      globalState.updateBadge(userId, { status: 'Downloaded' })
       alert('Badge recovered successfully')
     }
   }
@@ -168,23 +174,22 @@ export default function TenantPage() {
       reader.onload = (e) => {
         const csv = e.target?.result as string
         const lines = csv.split('\n').filter(line => line.trim())
-        const headers = lines[0].split(',')
         
-        const newUsers = lines.slice(1).map((line, index) => {
+        lines.slice(1).forEach((line) => {
           const values = line.split(',')
-          return {
-            id: Math.max(...badgeUsers.map(u => u.id)) + index + 1,
-            name: values[0]?.trim() || '',
-            email: values[1]?.trim() || '',
-            department: values[2]?.trim() || '',
-            cardType: values[3]?.trim() || 'NFC',
-            imei: values[4]?.trim() || '',
-            status: 'New' as const
+          if (values[0]?.trim()) {
+            globalState.addBadge({
+              name: values[0]?.trim() || '',
+              email: values[1]?.trim() || '',
+              company: values[2]?.trim() || '',
+              cardType: values[3]?.trim() || 'NFC',
+              imei: values[4]?.trim() || '',
+              status: 'New'
+            })
           }
         })
         
-        setBadgeUsers(prev => [...prev, ...newUsers])
-        alert(`Successfully imported ${newUsers.length} badge users`)
+        alert(`Successfully imported badge users`)
         setShowBadgeImportModal(false)
       }
       reader.readAsText(file)
@@ -193,7 +198,7 @@ export default function TenantPage() {
     }
   }
 
-  const filteredBadgeUsers = badgeUsers.filter(user => {
+  const filteredBadgeUsers = globalState.badges.filter(user => {
     const matchesSearch = badgeSearchTerm === '' || 
       user.name.toLowerCase().includes(badgeSearchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(badgeSearchTerm.toLowerCase())
@@ -243,6 +248,7 @@ export default function TenantPage() {
         <nav style={{ padding: '20px 0', flex: 1 }}>
           {[
             { icon: '◈', label: 'Dashboard', action: () => setActiveSection(null), isFluentIcon: false, iconType: null },
+            { icon: '✓', label: 'Tasks', action: () => setActiveSection('tasks'), isFluentIcon: false, iconType: null, badge: globalState.tasks.filter(t => t.status === 'pending' && (t.data as {tenantId?: string}).tenantId === selectedTenantId).length },
             { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), isFluentIcon: false, iconType: null },
             { icon: 'people', label: 'Users', action: () => setActiveSection('users'), isFluentIcon: true, iconType: 'people' },
             { icon: 'person', label: 'Invitations', action: () => setActiveSection('invitations'), isFluentIcon: true, iconType: 'person' },
@@ -296,7 +302,25 @@ export default function TenantPage() {
               ) : (
                 <span style={{ fontSize: '18px' }}>{item.icon}</span>
               )}
-              {!sidebarCollapsed && <span>{item.label}</span>}
+              {!sidebarCollapsed && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                  <span>{item.label}</span>
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span style={{
+                      backgroundColor: '#EF4444',
+                      color: 'white',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      padding: '2px 6px',
+                      borderRadius: '10px',
+                      minWidth: '18px',
+                      textAlign: 'center'
+                    }}>
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </nav>
@@ -369,6 +393,7 @@ export default function TenantPage() {
               fontWeight: '600', 
               margin: 0 
             }}>
+              {activeSection === 'tasks' && 'Approval Tasks'}
               {activeSection === 'analytics' && 'Analytics Dashboard'}
               {activeSection === 'users' && 'User Management'}
               {activeSection === 'invitations' && 'Invitation Management'}
@@ -728,50 +753,229 @@ export default function TenantPage() {
             </>
           )}
 
+          {/* Tasks Section */}
+          {activeSection === 'tasks' && (() => {
+            const tenantTasks = globalState.tasks.filter(t => (t.data as {tenantId?: string}).tenantId === selectedTenantId);
+            const pendingTasks = tenantTasks.filter(t => t.status === 'pending');
+            const approvedTasks = tenantTasks.filter(t => t.status === 'approved');
+            const rejectedTasks = tenantTasks.filter(t => t.status === 'rejected');
+
+            return (
+            <div>
+              {/* Info Banner */}
+              <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #334155', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <InfoRegular style={{ color: '#3B82F6', fontSize: '20px' }} />
+                <div>
+                  <h4 style={{ color: '#F1F5F9', fontSize: '14px', margin: '0 0 4px 0', fontWeight: '600' }}>Approval Workflow</h4>
+                  <p style={{ color: '#94A3B8', fontSize: '13px', margin: 0 }}>
+                    {pendingTasks.length > 0 
+                      ? `You have ${pendingTasks.length} pending task${pendingTasks.length > 1 ? 's' : ''} that require${pendingTasks.length === 1 ? 's' : ''} approval.`
+                      : 'No pending approval tasks at the moment.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Pending</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{pendingTasks.length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Approved</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>{approvedTasks.length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Rejected</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{rejectedTasks.length}</div>
+                </div>
+              </div>
+
+              {/* Tasks List */}
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', overflow: 'hidden' }}>
+                {tenantTasks.length === 0 ? (
+                  <div style={{ padding: '48px', textAlign: 'center', color: '#64748B' }}>
+                    <CheckmarkCircleRegular style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.5 }} />
+                    <p style={{ fontSize: '16px', margin: 0 }}>No approval tasks yet</p>
+                  </div>
+                ) : (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: '#0F1629' }}>
+                          <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Type</th>
+                          <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Entity</th>
+                          <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Requested By</th>
+                          <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Date</th>
+                          <th style={{ padding: '16px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Status</th>
+                          <th style={{ padding: '16px 24px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {tenantTasks.map((task) => (
+                          <tr key={task.id} style={{ borderBottom: '1px solid #1E293B' }}>
+                            <td style={{ padding: '16px 24px' }}>
+                              <span style={{
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                backgroundColor: task.type === 'create' ? 'rgba(16, 185, 129, 0.1)' : task.type === 'update' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                color: task.type === 'create' ? '#10B981' : task.type === 'update' ? '#3B82F6' : '#EF4444'
+                              }}>
+                                {task.type.toUpperCase()}
+                              </span>
+                            </td>
+                            <td style={{ padding: '16px 24px' }}>
+                              <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{task.entityName}</div>
+                              <div style={{ color: '#64748B', fontSize: '12px' }}>{task.entity}</div>
+                            </td>
+                            <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>{task.requestedByName}</td>
+                            <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>{new Date(task.createdAt).toLocaleDateString()}</td>
+                            <td style={{ padding: '16px 24px' }}>
+                              <span style={{
+                                padding: '4px 12px',
+                                borderRadius: '12px',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                backgroundColor: task.status === 'pending' ? 'rgba(245, 158, 11, 0.1)' : task.status === 'approved' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                color: task.status === 'pending' ? '#F59E0B' : task.status === 'approved' ? '#10B981' : '#EF4444'
+                              }}>
+                                {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                              </span>
+                            </td>
+                            <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                              {task.status === 'pending' ? (
+                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                  <button
+                                    onClick={() => {
+                                      if (confirm(`Approve this ${task.type} ${task.entity} request?`)) {
+                                        globalState.approveTask(task.id, username)
+                                        alert('Task approved successfully')
+                                      }
+                                    }}
+                                    style={{
+                                      padding: '6px 12px',
+                                      backgroundColor: '#10B981',
+                                      color: 'white',
+                                      border: 'none',
+                                      borderRadius: '6px',
+                                      fontSize: '13px',
+                                      fontWeight: '500',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    ✓ Approve
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      const comments = prompt('Reason for rejection (optional):')
+                                      if (comments !== null) {
+                                        globalState.rejectTask(task.id, username, comments || undefined)
+                                        alert('Task rejected successfully')
+                                      }
+                                    }}
+                                    style={{
+                                      padding: '6px 12px',
+                                      backgroundColor: '#1E293B',
+                                      color: '#EF4444',
+                                      border: '1px solid #EF4444',
+                                      borderRadius: '6px',
+                                      fontSize: '13px',
+                                      fontWeight: '500',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    ✗ Reject
+                                  </button>
+                                </div>
+                              ) : (
+                                <div style={{ color: '#64748B', fontSize: '13px' }}>
+                                  {task.reviewedBy && `By ${task.reviewedBy}`}
+                                  {task.reviewedAt && ` on ${new Date(task.reviewedAt).toLocaleDateString()}`}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          );})()}
+
           {/* Analytics Section */}
-          {activeSection === 'analytics' && (
+          {activeSection === 'analytics' && (() => {
+            // Filter data for current tenant
+            const tenantUsers = globalState.users.filter(u => u.tenantId === selectedTenantId);
+            const tenantInvitations = globalState.invitations;
+            const tenantTickets = globalState.tickets.filter(t => t.tenantId === selectedTenantId);
+            const tenantBadges = globalState.badges;
+            
+            const activeUsers = tenantUsers.filter(u => u.status === 'active').length;
+            const pendingInvitations = tenantInvitations.filter(i => i.status === 'pending').length;
+            const totalParkingSpaces = globalState.parkingSpaces.length;
+            const occupiedSpaces = globalState.parkingSpaces.filter(p => p.status === 'occupied' || p.status === 'reserved').length;
+            const parkingUsagePercent = totalParkingSpaces > 0 ? Math.round((occupiedSpaces / totalParkingSpaces) * 100) : 0;
+            const openTickets = tenantTickets.filter(t => t.status === 'open' || t.status === 'in-progress').length;
+            
+            // Get recent audit logs for this tenant
+            const recentLogs = globalState.auditLogs.slice(0, 5);
+            
+            return (
             <div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px', marginBottom: '32px' }}>
                 <div style={{ padding: '24px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Users</h4>
-                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>147</div>
-                  <div style={{ fontSize: '14px', color: '#10B981' }}>↑ 12% from last month</div>
+                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>{tenantUsers.length}</div>
+                  <div style={{ fontSize: '14px', color: '#10B981' }}>{activeUsers} active</div>
                 </div>
                 <div style={{ padding: '24px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
-                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Active Invitations</h4>
-                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#3B82F6', marginBottom: '8px' }}>23</div>
-                  <div style={{ fontSize: '14px', color: '#64748B' }}>8 pending responses</div>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Invitations</h4>
+                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#3B82F6', marginBottom: '8px' }}>{tenantInvitations.length}</div>
+                  <div style={{ fontSize: '14px', color: '#64748B' }}>{pendingInvitations} pending</div>
                 </div>
                 <div style={{ padding: '24px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Parking Usage</h4>
-                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#F59E0B', marginBottom: '8px' }}>24%</div>
-                  <div style={{ fontSize: '14px', color: '#10B981' }}>12 of 50 spaces</div>
+                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#F59E0B', marginBottom: '8px' }}>{parkingUsagePercent}%</div>
+                  <div style={{ fontSize: '14px', color: '#64748B' }}>{occupiedSpaces} of {totalParkingSpaces} spaces</div>
                 </div>
                 <div style={{ padding: '24px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
-                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Monthly Growth</h4>
-                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>+18%</div>
-                  <div style={{ fontSize: '14px', color: '#64748B' }}>vs previous month</div>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Support Tickets</h4>
+                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: tenantTickets.length === 0 ? '#10B981' : '#3B82F6', marginBottom: '8px' }}>{tenantTickets.length}</div>
+                  <div style={{ fontSize: '14px', color: openTickets > 0 ? '#F59E0B' : '#10B981' }}>{openTickets} open</div>
+                </div>
+                <div style={{ padding: '24px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Digital Badges</h4>
+                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#D7BB91', marginBottom: '8px' }}>{tenantBadges.length}</div>
+                  <div style={{ fontSize: '14px', color: '#10B981' }}>{tenantBadges.filter(b => b.status === 'Downloaded').length} activated</div>
+                </div>
+                <div style={{ padding: '24px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>User Status</h4>
+                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>{activeUsers}</div>
+                  <div style={{ fontSize: '14px', color: '#64748B' }}>{tenantUsers.filter(u => u.status === 'pending').length} pending</div>
                 </div>
               </div>
               <div style={{ padding: '24px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
                 <h4 style={{ color: '#F1F5F9', fontSize: '18px', margin: '0 0 20px 0' }}>Recent Activity</h4>
-                {[
-                  { action: 'New user registered', user: 'John Smith', time: '2 hours ago' },
-                  { action: 'Invitation sent', user: 'Sarah Johnson', time: '4 hours ago' },
-                  { action: 'Parking reserved', user: 'Mike Davis', time: '6 hours ago' },
-                  { action: 'Visit scheduled', user: 'Lisa Wilson', time: '1 day ago' },
-                ].map((activity, idx) => (
-                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', borderBottom: idx < 3 ? '1px solid #1E293B' : 'none' }}>
-                    <div>
-                      <div style={{ color: '#F1F5F9', fontSize: '14px', marginBottom: '4px', fontWeight: '500' }}>{activity.action}</div>
-                      <div style={{ color: '#64748B', fontSize: '13px' }}>{activity.user}</div>
+                {recentLogs.length === 0 ? (
+                  <div style={{ color: '#64748B', textAlign: 'center', padding: '24px' }}>No recent activity</div>
+                ) : (
+                  recentLogs.map((log, idx) => (
+                    <div key={log.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0', borderBottom: idx < recentLogs.length - 1 ? '1px solid #1E293B' : 'none' }}>
+                      <div>
+                        <div style={{ color: '#F1F5F9', fontSize: '14px', marginBottom: '4px', fontWeight: '500' }}>{log.action}</div>
+                        <div style={{ color: '#64748B', fontSize: '13px' }}>{log.user}</div>
+                      </div>
+                      <span style={{ color: '#64748B', fontSize: '13px' }}>{new Date(log.timestamp).toLocaleString()}</span>
                     </div>
-                    <span style={{ color: '#64748B', fontSize: '13px' }}>{activity.time}</span>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
-          )}
+          );})()}
 
           {/* User Management Section */}
           {activeSection === 'users' && (
@@ -792,7 +996,11 @@ export default function TenantPage() {
                   <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>User Management</h2>
                   <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Manage organization users and permissions</p>
                 </div>
-                <button onClick={() => { setEditingUser(null); setShowUserModal(true); }} style={{
+                <button onClick={() => { 
+                  setEditingUser(null); 
+                  setSelectedProfileId(''); 
+                  setShowUserModal(true); 
+                }} style={{
                   backgroundColor: '#3B82F6',
                   color: 'white',
                   border: 'none',
@@ -893,13 +1101,9 @@ export default function TenantPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        { name: 'John Smith', email: 'john.smith@company.com', role: 'Admin', department: 'IT', status: 'Active', modules: { 'User Management': true, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': true, 'Ticketing': true, 'Service Hub': true, 'Lockers': true, 'News': true, 'AI Assistant': true, 'Space Management': true, 'Private Delivery': true, 'Authentication': true, 'Reporting': true } },
-                        { name: 'Sarah Johnson', email: 'sarah.j@company.com', role: 'Manager', department: 'HR', status: 'Active', modules: { 'User Management': true, 'Visitor Management': true, 'Parking': false, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': false, 'Lockers': false, 'News': true, 'AI Assistant': false, 'Space Management': true, 'Private Delivery': false, 'Authentication': false, 'Reporting': true } },
-                        { name: 'Mike Davis', email: 'mike.davis@company.com', role: 'User', department: 'Sales', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': false, 'Emergency': true, 'Map': true, 'Restaurant': true, 'Ticketing': false, 'Service Hub': false, 'Lockers': false, 'News': true, 'AI Assistant': false, 'Space Management': false, 'Private Delivery': false, 'Authentication': false, 'Reporting': false } },
-                        { name: 'Lisa Wilson', email: 'lisa.w@company.com', role: 'Receptionist', department: 'Reception', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': false, 'Lockers': true, 'News': true, 'AI Assistant': false, 'Space Management': false, 'Private Delivery': false, 'Authentication': false, 'Reporting': false } },
-                        { name: 'Tom Brown', email: 'tom.brown@company.com', role: 'Manager', department: 'Operations', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': true, 'Lockers': true, 'News': true, 'AI Assistant': false, 'Space Management': true, 'Private Delivery': true, 'Authentication': false, 'Reporting': true } },
-                      ].sort((a, b) => {
+                      {globalState.users
+                        .filter(u => u.tenantId === selectedTenantId)
+                        .sort((a, b) => {
                         const aVal = a[userSortField].toLowerCase();
                         const bVal = b[userSortField].toLowerCase();
                         if (userSortDirection === 'asc') {
@@ -931,10 +1135,10 @@ export default function TenantPage() {
                                 borderRadius: '20px',
                                 fontSize: '12px',
                                 fontWeight: '500',
-                                backgroundColor: user.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
-                                color: user.status === 'Active' ? '#10B981' : '#64748B'
+                                backgroundColor: user.status === 'active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                                color: user.status === 'active' ? '#10B981' : '#64748B'
                               }}>
-                                {user.status}
+                                {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                               </span>
                             </td>
                             <td style={{ padding: '16px' }}>
@@ -949,46 +1153,77 @@ export default function TenantPage() {
                                   padding: '6px 12px',
                                   cursor: 'pointer'
                                 }}>
-                                {expandedUserRow === idx ? 'Hide' : 'View'} ({Object.values(user.modules || {}).filter(Boolean).length}/{Object.keys(user.modules || {}).length})
+                                {expandedUserRow === idx ? 'Hide' : 'View'} ({profiles.find(p => p.id === user.profileId)?.modules.length || 0} modules)
                               </button>
                             </td>
                             <td style={{ padding: '16px', textAlign: 'right' }}>
-                            <button onClick={() => { setEditingUser(user); setShowUserModal(true); }} style={{
-                              backgroundColor: 'transparent',
-                              border: '1px solid #1E293B',
-                              borderRadius: '6px',
-                              color: '#3B82F6',
-                              fontSize: '12px',
-                              padding: '6px 12px',
-                              cursor: 'pointer',
-                              marginRight: '8px'
-                            }}>Edit</button>
-                            <button onClick={() => { if (confirm(`${user.status === 'Active' ? 'Deactivate' : 'Reactivate'} ${user.name}?`)) { alert(`User ${user.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`); } }} style={{
-                              backgroundColor: 'transparent',
-                              border: '1px solid #1E293B',
-                              borderRadius: '6px',
-                              color: user.status === 'Active' ? '#F59E0B' : '#10B981',
-                              fontSize: '12px',
-                              padding: '6px 12px',
-                              cursor: 'pointer',
-                              marginRight: '8px'
-                            }}>{user.status === 'Active' ? 'Deactivate' : 'Reactivate'}</button>
-                            <button onClick={() => { if (confirm(`Delete ${user.name}? This action cannot be undone.`)) { alert('User deleted successfully'); } }} style={{
-                              backgroundColor: 'transparent',
-                              border: '1px solid #1E293B',
-                              borderRadius: '6px',
-                              color: '#EF4444',
-                              fontSize: '12px',
-                              padding: '6px 12px',
-                              cursor: 'pointer'
-                            }}>Delete</button>
+                            {/* Check if user is a tenant admin - tenant admins cannot be edited or deleted on tenant site */}
+                            {user.role === 'Admin' ? (
+                              <span style={{
+                                color: '#64748B',
+                                fontSize: '12px',
+                                fontStyle: 'italic'
+                              }}>Admin (Managed by System)</span>
+                            ) : (
+                              <>
+                                <button onClick={() => { 
+                                  setEditingUser(user); 
+                                  setSelectedProfileId(user.profileId || ''); 
+                                  setShowUserModal(true); 
+                                }} style={{
+                                  backgroundColor: 'transparent',
+                                  border: '1px solid #1E293B',
+                                  borderRadius: '6px',
+                                  color: '#3B82F6',
+                                  fontSize: '12px',
+                                  padding: '6px 12px',
+                                  cursor: 'pointer',
+                                  marginRight: '8px'
+                                }}>Edit</button>
+                                <button onClick={() => { 
+                                  if (confirm(`${user.status === 'active' ? 'Deactivate' : 'Reactivate'} ${user.name}?`)) { 
+                                    globalState.updateUser(user.id, { status: user.status === 'active' ? 'inactive' : 'active' });
+                                    alert(`User ${user.status === 'active' ? 'deactivated' : 'reactivated'} successfully`); 
+                                  } 
+                                }} style={{
+                                  backgroundColor: 'transparent',
+                                  border: '1px solid #1E293B',
+                                  borderRadius: '6px',
+                                  color: user.status === 'active' ? '#F59E0B' : '#10B981',
+                                  fontSize: '12px',
+                                  padding: '6px 12px',
+                                  cursor: 'pointer',
+                                  marginRight: '8px'
+                                }}>{user.status === 'active' ? 'Deactivate' : 'Reactivate'}</button>
+                                <button onClick={() => { 
+                                  if (confirm(`Delete ${user.name}? This action cannot be undone.`)) { 
+                                    globalState.deleteUser(user.id);
+                                    alert('User deleted successfully'); 
+                                  } 
+                                }} style={{
+                                  backgroundColor: 'transparent',
+                                  border: '1px solid #1E293B',
+                                  borderRadius: '6px',
+                                  color: '#EF4444',
+                                  fontSize: '12px',
+                                  padding: '6px 12px',
+                                  cursor: 'pointer'
+                                }}>Delete</button>
+                              </>
+                            )}
                             </td>
                           </tr>
                           {expandedUserRow === idx && (
                             <tr key={`${idx}-modules`} style={{ borderBottom: '1px solid #1E293B' }}>
                               <td colSpan={7} style={{ padding: '16px', backgroundColor: '#0F1629' }}>
+                                <div style={{ marginBottom: '12px', padding: '12px', backgroundColor: '#1E293B', borderRadius: '8px' }}>
+                                  <div style={{ color: '#64748B', fontSize: '12px', marginBottom: '4px' }}>Access Profile:</div>
+                                  <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>
+                                    {profiles.find(p => p.id === user.profileId)?.name || 'No profile assigned'}
+                                  </div>
+                                </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '8px' }}>
-                                  {Object.entries(user.modules || {}).map(([module, enabled]) => (
+                                  {(profiles.find(p => p.id === user.profileId)?.modules || []).map((module) => (
                                     <div key={module} style={{
                                       padding: '8px 12px',
                                       backgroundColor: '#1E293B',
@@ -996,7 +1231,7 @@ export default function TenantPage() {
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'space-between',
-                                      border: `1px solid ${enabled ? '#10B981' : '#475569'}`
+                                      border: '1px solid #10B981'
                                     }}>
                                       <span style={{ color: '#F1F5F9', fontSize: '13px' }}>{module}</span>
                                       <span style={{
@@ -1004,10 +1239,10 @@ export default function TenantPage() {
                                         borderRadius: '12px',
                                         fontSize: '11px',
                                         fontWeight: '500',
-                                        backgroundColor: enabled ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
-                                        color: enabled ? '#10B981' : '#64748B'
+                                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                        color: '#10B981'
                                       }}>
-                                        {enabled ? 'Enabled' : 'Disabled'}
+                                        Enabled
                                       </span>
                                     </div>
                                   ))}
@@ -1268,20 +1503,26 @@ export default function TenantPage() {
           )}
 
           {/* Parking Management Section */}
-          {activeSection === 'parking' && (
+          {activeSection === 'parking' && (() => {
+            // Filter parking spaces for this tenant (either assigned to this tenant or global spaces without tenantId)
+            const tenantParkingSpaces = globalState.parkingSpaces.filter(p => !p.tenantId || p.tenantId === selectedTenantId);
+            const occupiedSpaces = tenantParkingSpaces.filter(p => p.status === 'occupied');
+            const availableSpaces = tenantParkingSpaces.filter(p => p.status === 'available');
+
+            return (
             <div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '24px' }}>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Spaces</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F1F5F9' }}>50</div>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F1F5F9' }}>{tenantParkingSpaces.length}</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Occupied</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>12</div>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{occupiedSpaces.length}</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Available</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>38</div>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>{availableSpaces.length}</div>
                 </div>
               </div>
 
@@ -1306,34 +1547,37 @@ export default function TenantPage() {
                 </div>
                 <div style={{ padding: '24px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
-                    {Array.from({ length: 50 }, (_, i) => {
-                      const occupied = [2, 5, 8, 12, 15, 18, 23, 27, 31, 38, 42, 47].includes(i + 1);
+                    {tenantParkingSpaces.map((space) => {
+                      const isOccupied = space.status === 'occupied';
                       return (
-                        <div key={i} 
+                        <div key={space.id} 
                           onClick={() => {
-                            if (!occupied) {
-                              setSelectedParkingSpace(i + 1);
+                            if (!isOccupied) {
+                              setSelectedParkingSpace(space.spaceNumber);
                               setShowParkingModal(true);
                             }
                           }}
                           style={{
                           padding: '20px',
-                          backgroundColor: occupied ? '#1E293B' : '#0F1629',
-                          border: `2px solid ${occupied ? '#EF4444' : '#10B981'}`,
+                          backgroundColor: isOccupied ? '#1E293B' : '#0F1629',
+                          border: `2px solid ${isOccupied ? '#EF4444' : '#10B981'}`,
                           borderRadius: '8px',
                           textAlign: 'center',
-                          cursor: occupied ? 'not-allowed' : 'pointer',
+                          cursor: isOccupied ? 'not-allowed' : 'pointer',
                           transition: 'all 0.2s',
-                          opacity: occupied ? 0.6 : 1
+                          opacity: isOccupied ? 0.6 : 1
                         }}
                         onMouseEnter={(e) => {
-                          if (!occupied) e.currentTarget.style.transform = 'scale(1.05)';
+                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1.05)';
                         }}
                         onMouseLeave={(e) => {
-                          if (!occupied) e.currentTarget.style.transform = 'scale(1)';
+                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1)';
                         }}>
-                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: occupied ? '#EF4444' : '#10B981', marginBottom: '4px' }}>{i + 1}</div>
-                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{occupied ? 'Occupied' : 'Available'}</div>
+                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: isOccupied ? '#EF4444' : '#10B981', marginBottom: '4px' }}>{space.spaceNumber}</div>
+                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{isOccupied ? 'Occupied' : 'Available'}</div>
+                          {isOccupied && space.assignedToName && (
+                            <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '4px' }}>{space.assignedToName}</div>
+                          )}
                         </div>
                       );
                     })}
@@ -1352,13 +1596,14 @@ export default function TenantPage() {
                   <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Current Assignments</h3>
                 </div>
                 <div style={{ padding: '24px' }}>
-                  {[
-                    { space: 'A-02', user: 'John Smith', vehicle: 'Tesla Model 3', plate: 'ABC-1234', from: '2025-10-22', to: '2025-10-25' },
-                    { space: 'A-05', user: 'Sarah Johnson', vehicle: 'BMW X5', plate: 'XYZ-5678', from: '2025-10-21', to: '2025-10-24' },
-                    { space: 'B-08', user: 'Mike Davis', vehicle: 'Audi A4', plate: 'DEF-9012', from: '2025-10-22', to: '2025-10-26' },
-                    { space: 'B-12', user: 'Lisa Wilson', vehicle: 'Honda Civic', plate: 'GHI-3456', from: '2025-10-20', to: '2025-10-23' },
-                  ].map((assignment, idx) => (
-                    <div key={idx} style={{
+                  {occupiedSpaces.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '48px 24px', color: '#64748B' }}>
+                      <div style={{ fontSize: '16px', fontWeight: '500' }}>No parking assignments yet</div>
+                      <div style={{ fontSize: '14px', marginTop: '8px' }}>Assign parking spaces to users from the available spaces above</div>
+                    </div>
+                  ) : (
+                    occupiedSpaces.map((assignment) => (
+                    <div key={assignment.id} style={{
                       padding: '16px',
                       backgroundColor: '#1E293B',
                       borderRadius: '8px',
@@ -1379,14 +1624,22 @@ export default function TenantPage() {
                           fontSize: '14px',
                           fontWeight: 'bold',
                           color: '#3B82F6'
-                        }}>{assignment.space}</div>
+                        }}>{assignment.spaceNumber}</div>
                         <div>
-                          <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600' }}>{assignment.user}</h4>
-                          <p style={{ color: '#94A3B8', margin: '0 0 2px 0', fontSize: '13px' }}>{assignment.vehicle} • {assignment.plate}</p>
-                          <p style={{ color: '#64748B', margin: 0, fontSize: '12px' }}>{assignment.from} to {assignment.to}</p>
+                          <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600' }}>{assignment.assignedToName || 'Unknown User'}</h4>
+                          <p style={{ color: '#94A3B8', margin: '0 0 2px 0', fontSize: '13px' }}>{assignment.vehiclePlate || 'No vehicle info'}</p>
+                          <p style={{ color: '#64748B', margin: 0, fontSize: '12px' }}>{assignment.location}</p>
+                          {assignment.assignedDate && (
+                            <p style={{ color: '#64748B', margin: 0, fontSize: '11px', marginTop: '2px' }}>Assigned: {new Date(assignment.assignedDate).toLocaleDateString()}</p>
+                          )}
                         </div>
                       </div>
-                      <button onClick={() => { if (confirm(`Release parking space ${assignment.space}?`)) { alert(`Parking space ${assignment.space} released successfully`); } }} style={{
+                      <button onClick={() => { 
+                        if (confirm(`Release parking space ${assignment.spaceNumber}?`)) { 
+                          globalState.updateParkingSpace(assignment.id, { status: 'available', assignedTo: undefined, assignedToName: undefined, vehiclePlate: undefined, assignedDate: undefined });
+                          alert(`Parking space ${assignment.spaceNumber} released successfully`); 
+                        } 
+                      }} style={{
                         backgroundColor: 'transparent',
                         border: '1px solid #475569',
                         borderRadius: '6px',
@@ -1396,11 +1649,12 @@ export default function TenantPage() {
                         cursor: 'pointer'
                       }}>Release</button>
                     </div>
-                  ))}
+                  ))
+                  )}
                 </div>
               </div>
             </div>
-          )}
+          );})()}
 
           {/* Digital Badges Section */}
           {activeSection === 'digitalBadges' && (
@@ -1418,7 +1672,7 @@ export default function TenantPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>{badgeUsers.length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>{globalState.badges.length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Total Badges Issued</div>
                 </div>
                 <div style={{
@@ -1427,7 +1681,7 @@ export default function TenantPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>{badgeUsers.filter(u => u.status === 'Sent').length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>{globalState.badges.filter(u => u.status === 'Sent').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Sent</div>
                 </div>
                 <div style={{
@@ -1436,7 +1690,7 @@ export default function TenantPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>{badgeUsers.filter(u => u.status === 'Downloaded').length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>{globalState.badges.filter(u => u.status === 'Downloaded').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Activated</div>
                 </div>
                 <div style={{
@@ -1445,7 +1699,7 @@ export default function TenantPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>{badgeUsers.filter(u => u.status === 'Suspended').length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>{globalState.badges.filter(u => u.status === 'Suspended').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Suspended</div>
                 </div>
               </div>
@@ -2339,89 +2593,95 @@ export default function TenantPage() {
                   <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>My Support Tickets</h3>
                 </div>
                 <div style={{ padding: '24px' }}>
-                  {[
-                    { id: 'TKT-1001', subject: 'Login issue on mobile app', category: 'Technical', severity: 'High', status: 'Open', created: '2025-10-22', lastUpdate: '2 hours ago' },
-                    { id: 'TKT-0998', subject: 'Request for additional user licenses', category: 'Billing', severity: 'Medium', status: 'In Progress', created: '2025-10-20', lastUpdate: '1 day ago' },
-                    { id: 'TKT-0995', subject: 'Feature request: Dark mode', category: 'Feature Request', severity: 'Low', status: 'Resolved', created: '2025-10-18', lastUpdate: '3 days ago' },
-                  ].map((ticket) => (
-                    <div key={ticket.id} style={{
-                      padding: '16px',
-                      backgroundColor: '#1E293B',
-                      borderRadius: '8px',
-                      marginBottom: '12px',
-                      border: '1px solid #475569'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                            <span style={{ color: '#60A5FA', fontSize: '14px', fontWeight: '600' }}>{ticket.id}</span>
-                            <span style={{
-                              padding: '4px 8px',
-                              borderRadius: '4px',
-                              fontSize: '11px',
-                              fontWeight: '600',
-                              backgroundColor: ticket.severity === 'High' ? 'rgba(239, 68, 68, 0.2)' : ticket.severity === 'Medium' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(34, 197, 94, 0.2)',
-                              color: ticket.severity === 'High' ? '#EF4444' : ticket.severity === 'Medium' ? '#F59E0B' : '#22C55E'
-                            }}>
-                              {ticket.severity}
-                            </span>
-                            <span style={{
-                              padding: '4px 8px',
-                              borderRadius: '4px',
-                              fontSize: '11px',
-                              fontWeight: '600',
-                              backgroundColor: ticket.status === 'Open' ? 'rgba(59, 130, 246, 0.2)' : ticket.status === 'In Progress' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(34, 197, 94, 0.2)',
-                              color: ticket.status === 'Open' ? '#3B82F6' : ticket.status === 'In Progress' ? '#F59E0B' : '#22C55E'
-                            }}>
-                              {ticket.status}
-                            </span>
-                          </div>
-                          <h4 style={{ color: '#F1F5F9', margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600' }}>{ticket.subject}</h4>
-                          <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: '#64748B' }}>
-                            <span>Category: {ticket.category}</span>
-                            <span>Created: {ticket.created}</span>
-                            <span>Updated: {ticket.lastUpdate}</span>
+                  {globalState.tickets.filter(t => t.tenantId === selectedTenantId).length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '48px 24px', color: '#64748B' }}>
+                      <div style={{ fontSize: '16px', fontWeight: '500' }}>No support tickets yet</div>
+                      <div style={{ fontSize: '14px', marginTop: '8px' }}>Create a ticket above if you need help</div>
+                    </div>
+                  ) : (
+                    globalState.tickets.filter(t => t.tenantId === selectedTenantId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((ticket) => (
+                      <div key={ticket.id} style={{
+                        padding: '16px',
+                        backgroundColor: '#1E293B',
+                        borderRadius: '8px',
+                        marginBottom: '12px',
+                        border: '1px solid #475569'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                              <span style={{ color: '#60A5FA', fontSize: '14px', fontWeight: '600' }}>{ticket.ticketNumber}</span>
+                              <span style={{
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                backgroundColor: ticket.priority === 'critical' ? 'rgba(239, 68, 68, 0.2)' : ticket.priority === 'high' ? 'rgba(239, 68, 68, 0.2)' : ticket.priority === 'medium' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(34, 197, 94, 0.2)',
+                                color: ticket.priority === 'critical' ? '#EF4444' : ticket.priority === 'high' ? '#EF4444' : ticket.priority === 'medium' ? '#F59E0B' : '#22C55E'
+                              }}>
+                                {ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}
+                              </span>
+                              <span style={{
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                backgroundColor: ticket.status === 'open' ? 'rgba(59, 130, 246, 0.2)' : ticket.status === 'in-progress' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(34, 197, 94, 0.2)',
+                                color: ticket.status === 'open' ? '#3B82F6' : ticket.status === 'in-progress' ? '#F59E0B' : '#22C55E'
+                              }}>
+                                {ticket.status === 'in-progress' ? 'In Progress' : ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1)}
+                              </span>
+                            </div>
+                            <h4 style={{ color: '#F1F5F9', margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600' }}>{ticket.title}</h4>
+                            <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: '#64748B' }}>
+                              <span>Category: {ticket.category}</span>
+                              <span>Created: {new Date(ticket.createdAt).toLocaleDateString()}</span>
+                              <span>By: {ticket.createdByName}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button onClick={() => alert(`Viewing ticket ${ticket.id}`)} style={{
-                          padding: '6px 12px',
-                          backgroundColor: '#3B82F6',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '6px',
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          cursor: 'pointer'
-                        }}>View</button>
-                        {ticket.status !== 'Resolved' && (
-                          <button onClick={() => alert(`Adding reply to ${ticket.id}`)} style={{
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button onClick={() => alert(`Viewing ticket ${ticket.ticketNumber}`)} style={{
                             padding: '6px 12px',
-                            backgroundColor: 'transparent',
-                            color: '#94A3B8',
-                            border: '1px solid #475569',
+                            backgroundColor: '#3B82F6',
+                            color: 'white',
+                            border: 'none',
                             borderRadius: '6px',
                             fontSize: '12px',
                             fontWeight: '500',
                             cursor: 'pointer'
-                          }}>Reply</button>
-                        )}
-                        {ticket.status === 'Resolved' && (
-                          <button onClick={() => alert(`Reopening ticket ${ticket.id}`)} style={{
-                            padding: '6px 12px',
-                            backgroundColor: 'transparent',
-                            color: '#F59E0B',
-                            border: '1px solid #475569',
-                            borderRadius: '6px',
-                            fontSize: '12px',
-                            fontWeight: '500',
-                            cursor: 'pointer'
-                          }}>Reopen</button>
-                        )}
+                          }}>View</button>
+                          {ticket.status !== 'resolved' && ticket.status !== 'closed' && (
+                            <button onClick={() => alert(`Adding reply to ${ticket.ticketNumber}`)} style={{
+                              padding: '6px 12px',
+                              backgroundColor: 'transparent',
+                              color: '#94A3B8',
+                              border: '1px solid #475569',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              cursor: 'pointer'
+                            }}>Reply</button>
+                          )}
+                          {ticket.status === 'resolved' && (
+                            <button onClick={() => {
+                              globalState.updateTicket(ticket.id, { status: 'open' });
+                              alert(`Ticket ${ticket.ticketNumber} reopened`);
+                            }} style={{
+                              padding: '6px 12px',
+                              backgroundColor: 'transparent',
+                              color: '#F59E0B',
+                              border: '1px solid #475569',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              cursor: 'pointer'
+                            }}>Reopen</button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             </div>
@@ -2486,11 +2746,17 @@ export default function TenantPage() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '20px',
-                          flexShrink: 0
+                          fontSize: '24px',
+                          flexShrink: 0,
+                          boxShadow: 
+                            notification.type === 'Warning' ? '0 0 20px rgba(245, 158, 11, 0.5)' :
+                            notification.type === 'Success' ? '0 0 20px rgba(16, 185, 129, 0.5)' : '0 0 20px rgba(59, 130, 246, 0.5)',
+                          color: 
+                            notification.type === 'Warning' ? '#F59E0B' :
+                            notification.type === 'Success' ? '#10B981' : '#3B82F6'
                         }}>
-                          {notification.type === 'Warning' ? '⚠️' : 
-                           notification.type === 'Success' ? '✅' : 'ℹ️'}
+                          {notification.type === 'Warning' ? <WarningRegular /> : 
+                           notification.type === 'Success' ? <CheckmarkCircleRegular /> : <InfoRegular />}
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
@@ -2570,10 +2836,57 @@ export default function TenantPage() {
             <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
               {editingUser ? 'Edit User' : 'Add New User'}
             </h2>
-            <form onSubmit={(e) => { e.preventDefault(); alert(`User ${editingUser ? 'updated' : 'added'} successfully!`); setShowUserModal(false); }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={(e) => { 
+              e.preventDefault(); 
+              const formData = new FormData(e.currentTarget);
+              const name = formData.get('name') as string;
+              const email = formData.get('email') as string;
+              const role = formData.get('role') as string;
+              const department = formData.get('department') as string;
+              const profileId = selectedProfileId;
+              
+              // Prevent creation of Admin users from tenant site
+              if (!editingUser && role === 'Admin') {
+                alert('Cannot create Admin users from tenant site. Admin users must be created from the admin dashboard.');
+                return;
+              }
+              
+              // Prevent changing existing user to Admin from tenant site
+              if (editingUser && editingUser.role !== 'Admin' && role === 'Admin') {
+                alert('Cannot assign Admin role from tenant site.');
+                return;
+              }
+              
+              if (editingUser && editingUser.id) {
+                // Update existing user
+                globalState.updateUser(editingUser.id, {
+                  name,
+                  email,
+                  role,
+                  department,
+                  profileId
+                });
+                alert('User updated successfully!');
+              } else {
+                // Add new user
+                globalState.addUser({
+                  name,
+                  email,
+                  role,
+                  department,
+                  status: 'active',
+                  profileId,
+                  tenantId: selectedTenantId
+                });
+                alert('User added successfully!');
+              }
+              setShowUserModal(false);
+              setEditingUser(null);
+              setSelectedProfileId('');
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Full Name *</label>
-                <input type="text" defaultValue={editingUser?.name} required style={{
+                <input type="text" name="name" defaultValue={editingUser?.name} required style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -2585,7 +2898,7 @@ export default function TenantPage() {
               </div>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email *</label>
-                <input type="email" defaultValue={editingUser?.email} required style={{
+                <input type="email" name="email" defaultValue={editingUser?.email} required style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -2597,25 +2910,30 @@ export default function TenantPage() {
               </div>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Role *</label>
-                <select defaultValue={editingUser?.role || 'User'} required style={{
+                <select name="role" defaultValue={editingUser?.role || 'User'} required disabled={editingUser?.role === 'Admin'} style={{
                   width: '100%',
                   padding: '12px',
-                  backgroundColor: '#1E293B',
+                  backgroundColor: editingUser?.role === 'Admin' ? '#0F1629' : '#1E293B',
                   border: '1px solid #475569',
                   borderRadius: '8px',
-                  color: '#F1F5F9',
+                  color: editingUser?.role === 'Admin' ? '#64748B' : '#F1F5F9',
                   fontSize: '14px',
-                  cursor: 'pointer'
+                  cursor: editingUser?.role === 'Admin' ? 'not-allowed' : 'pointer'
                 }}>
-                  <option value="Admin">Admin</option>
+                  <option value="Admin" disabled={!editingUser || editingUser.role !== 'Admin'}>Admin (System Only)</option>
                   <option value="Manager">Manager</option>
                   <option value="Receptionist">Receptionist</option>
                   <option value="User">User</option>
                 </select>
+                {editingUser?.role === 'Admin' && (
+                  <div style={{ marginTop: '8px', color: '#F59E0B', fontSize: '12px' }}>
+                    ⚠️ Admin users can only be managed from the system admin dashboard.
+                  </div>
+                )}
               </div>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Department</label>
-                <input type="text" defaultValue={editingUser?.department} style={{
+                <input type="text" name="department" defaultValue={editingUser?.department} style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -2628,36 +2946,33 @@ export default function TenantPage() {
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Access Profile *</label>
                 <select 
-                  value={editingUser?.profileId || ''}
+                  name="profileId"
+                  value={selectedProfileId}
                   onChange={(e) => {
-                    if (editingUser) {
-                      setEditingUser({
-                        ...editingUser,
-                        profileId: e.target.value
-                      });
-                    }
+                    setSelectedProfileId(e.target.value);
                   }}
+                  disabled={editingUser?.role === 'Admin'}
                   required 
                   style={{
                     width: '100%',
                     padding: '12px',
-                    backgroundColor: '#1E293B',
+                    backgroundColor: editingUser?.role === 'Admin' ? '#0F1629' : '#1E293B',
                     border: '1px solid #475569',
                     borderRadius: '8px',
-                    color: '#F1F5F9',
+                    color: editingUser?.role === 'Admin' ? '#64748B' : '#F1F5F9',
                     fontSize: '14px',
-                    cursor: 'pointer'
+                    cursor: editingUser?.role === 'Admin' ? 'not-allowed' : 'pointer'
                   }}>
                   <option value="" disabled>Select an access profile</option>
                   {profiles.map((profile) => (
                     <option key={profile.id} value={profile.id}>{profile.name} ({profile.modules.length} modules)</option>
                   ))}
                 </select>
-                {editingUser?.profileId && (
+                {selectedProfileId && (
                   <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #475569' }}>
-                    <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Modules from {profiles.find(p => p.id === editingUser.profileId)?.name}:</div>
+                    <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Modules from {profiles.find(p => p.id === selectedProfileId)?.name}:</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {profiles.find(p => p.id === editingUser.profileId)?.modules.map((module) => (
+                      {profiles.find(p => p.id === selectedProfileId)?.modules.map((module) => (
                         <span key={module} style={{
                           padding: '4px 10px',
                           backgroundColor: '#0F1629',
@@ -2685,7 +3000,11 @@ export default function TenantPage() {
                   cursor: 'pointer',
                   fontSize: '14px'
                 }}>{editingUser ? 'Update User' : 'Add User'}</button>
-                <button type="button" onClick={() => setShowUserModal(false)} style={{
+                <button type="button" onClick={() => { 
+                  setShowUserModal(false); 
+                  setEditingUser(null); 
+                  setSelectedProfileId(''); 
+                }} style={{
                   flex: 1,
                   backgroundColor: 'transparent',
                   color: '#F1F5F9',
@@ -2828,13 +3147,28 @@ export default function TenantPage() {
             </h2>
             <form onSubmit={(e) => { 
               e.preventDefault(); 
-              alert(`Parking space ${selectedParkingSpace} assigned successfully!`); 
+              const formData = new FormData(e.currentTarget);
+              const userId = formData.get('user') as string;
+              const userName = (e.currentTarget.elements.namedItem('user') as HTMLSelectElement).selectedOptions[0].text;
+              const vehiclePlate = formData.get('vehiclePlate') as string;
+              
+              const space = globalState.parkingSpaces.find(p => p.spaceNumber === selectedParkingSpace);
+              if (space) {
+                globalState.updateParkingSpace(space.id, {
+                  status: 'occupied',
+                  assignedTo: userId,
+                  assignedToName: userName,
+                  vehiclePlate: vehiclePlate,
+                  assignedDate: new Date().toISOString()
+                });
+                alert(`Parking space ${selectedParkingSpace} (${space.location}) assigned successfully to ${userName}!`);
+              }
               setShowParkingModal(false);
               setSelectedParkingSpace(null);
             }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Select User *</label>
-                <select required style={{
+                <select name="user" required style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -2845,28 +3179,14 @@ export default function TenantPage() {
                   cursor: 'pointer'
                 }}>
                   <option value="">Choose a user...</option>
-                  <option value="john">John Smith</option>
-                  <option value="sarah">Sarah Johnson</option>
-                  <option value="mike">Mike Davis</option>
-                  <option value="lisa">Lisa Wilson</option>
-                  <option value="tom">Tom Anderson</option>
+                  {globalState.users.map(user => (
+                    <option key={user.id} value={user.id}>{user.name} ({user.email})</option>
+                  ))}
                 </select>
               </div>
               <div>
-                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Vehicle Information *</label>
-                <input type="text" placeholder="e.g., Tesla Model 3" required style={{
-                  width: '100%',
-                  padding: '12px',
-                  backgroundColor: '#1E293B',
-                  border: '1px solid #475569',
-                  borderRadius: '8px',
-                  color: '#F1F5F9',
-                  fontSize: '14px'
-                }} />
-              </div>
-              <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>License Plate *</label>
-                <input type="text" placeholder="e.g., ABC-1234" required style={{
+                <input name="vehiclePlate" type="text" placeholder="e.g., ABC-1234" required style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -2875,32 +3195,6 @@ export default function TenantPage() {
                   color: '#F1F5F9',
                   fontSize: '14px'
                 }} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>From Date *</label>
-                  <input type="date" required style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: '#1E293B',
-                    border: '1px solid #475569',
-                    borderRadius: '8px',
-                    color: '#F1F5F9',
-                    fontSize: '14px'
-                  }} />
-                </div>
-                <div>
-                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>To Date *</label>
-                  <input type="date" required style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: '#1E293B',
-                    border: '1px solid #475569',
-                    borderRadius: '8px',
-                    color: '#F1F5F9',
-                    fontSize: '14px'
-                  }} />
-                </div>
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
@@ -2959,13 +3253,30 @@ export default function TenantPage() {
               Create Support Ticket
             </h2>
             <form onSubmit={(e) => { 
-              e.preventDefault(); 
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const title = formData.get('title') as string;
+              const category = formData.get('category') as string;
+              const priority = formData.get('priority') as string;
+              const description = formData.get('description') as string;
+              
+              globalState.addTicket({
+                title,
+                description,
+                category,
+                priority: priority as 'low' | 'medium' | 'high' | 'critical',
+                status: 'open',
+                createdBy: username,
+                createdByName: username,
+                tenantId: selectedTenantId
+              });
+              
               alert('Support ticket created successfully!');
               setShowTicketModal(false);
             }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Subject *</label>
-                <input type="text" placeholder="Brief description of the issue" required style={{
+                <input type="text" name="title" placeholder="Brief description of the issue" required style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -2977,7 +3288,7 @@ export default function TenantPage() {
               </div>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Category *</label>
-                <select required style={{
+                <select name="category" required style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -2996,8 +3307,8 @@ export default function TenantPage() {
                 </select>
               </div>
               <div>
-                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Severity *</label>
-                <select required style={{
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Priority *</label>
+                <select name="priority" required style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -3016,7 +3327,7 @@ export default function TenantPage() {
               </div>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Description *</label>
-                <textarea placeholder="Please provide detailed information about your issue..." required style={{
+                <textarea name="description" placeholder="Please provide detailed information about your issue..." required style={{
                   width: '100%',
                   minHeight: '150px',
                   padding: '12px',
@@ -3080,63 +3391,54 @@ export default function TenantPage() {
             border: '1px solid #1E293B'
           }} onClick={(e) => e.stopPropagation()}>
             <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
-              {editingBadge.id ? 'Edit Badge User' : 'Add New Badge User'}
+              {editingBadge.id ? 'Edit Digital Badge' : 'Create Digital Badge'}
             </h2>
             <form onSubmit={(e) => { e.preventDefault(); handleSaveBadgeUser(); }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Full Name *</label>
-                <input 
-                  type="text" 
-                  value={editingBadge.name}
-                  onChange={(e) => setEditingBadge({ ...editingBadge, name: e.target.value })}
-                  required 
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: '#1E293B',
-                    border: '1px solid #475569',
-                    borderRadius: '8px',
-                    color: '#F1F5F9',
-                    fontSize: '14px'
-                  }} 
-                />
-              </div>
-              <div>
-                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email *</label>
-                <input 
-                  type="email" 
-                  value={editingBadge.email}
-                  onChange={(e) => setEditingBadge({ ...editingBadge, email: e.target.value })}
-                  required 
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: '#1E293B',
-                    border: '1px solid #475569',
-                    borderRadius: '8px',
-                    color: '#F1F5F9',
-                    fontSize: '14px'
-                  }} 
-                />
-              </div>
-              <div>
-                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Department *</label>
-                <input 
-                  type="text" 
-                  value={editingBadge.department}
-                  onChange={(e) => setEditingBadge({ ...editingBadge, department: e.target.value })}
-                  required 
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: '#1E293B',
-                    border: '1px solid #475569',
-                    borderRadius: '8px',
-                    color: '#F1F5F9',
-                    fontSize: '14px'
-                  }} 
-                />
-              </div>
+              {!editingBadge.id && (
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Select User *</label>
+                  <select 
+                    value={editingBadge.email}
+                    onChange={(e) => {
+                      const user = globalState.users.find(u => u.email === e.target.value);
+                      if (user) {
+                        const tenant = globalState.tenants.find(t => t.id === user.tenantId);
+                        setEditingBadge({ 
+                          ...editingBadge, 
+                          name: user.name, 
+                          email: user.email, 
+                          company: tenant?.name || user.department 
+                        });
+                      }
+                    }}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}>
+                    <option value="">Choose a user...</option>
+                    {globalState.users.filter(u => u.tenantId === selectedTenantId).map(user => (
+                      <option key={user.id} value={user.email}>{user.name} ({user.email})</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {editingBadge.email && (
+                <>
+                  <div style={{ padding: '12px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #475569' }}>
+                    <div style={{ color: '#64748B', fontSize: '12px', marginBottom: '4px' }}>Selected User:</div>
+                    <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{editingBadge.name}</div>
+                    <div style={{ color: '#94A3B8', fontSize: '13px' }}>{editingBadge.email}</div>
+                    <div style={{ color: '#94A3B8', fontSize: '13px' }}>{editingBadge.company}</div>
+                  </div>
+                </>
+              )}
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Card Type *</label>
                 <select 

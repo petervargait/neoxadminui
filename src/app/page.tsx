@@ -81,6 +81,34 @@ export default function Home() {
             <span style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{username}</span>
           </div>
           <button
+            onClick={() => {
+              if (confirm('This will reset all data to defaults and reload the page. Continue?')) {
+                globalState.clearAllData();
+              }
+            }}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#1E293B',
+              border: '1px solid #334155',
+              borderRadius: '8px',
+              color: '#F1F5F9',
+              fontSize: '14px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#F59E0B'
+              e.currentTarget.style.borderColor = '#F59E0B'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#1E293B'
+              e.currentTarget.style.borderColor = '#334155'
+            }}
+          >
+            Reset Data
+          </button>
+          <button
             onClick={handleLogout}
             style={{
               padding: '8px 16px',

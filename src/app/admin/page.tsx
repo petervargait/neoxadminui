@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { PersonRegular, AlertRegular, StatusRegular, DocumentBulletListRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, BuildingRegular, SettingsRegular } from '@fluentui/react-icons'
+import { PersonRegular, AlertRegular, StatusRegular, DocumentBulletListRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, BuildingRegular, SettingsRegular, ErrorCircleRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular } from '@fluentui/react-icons'
 import { useGlobalState } from '../../context/GlobalStateContext'
 
 export default function AdminPage() {
@@ -44,6 +44,24 @@ export default function AdminPage() {
   const [badgeCardTypeFilter, setBadgeCardTypeFilter] = useState('All Card Types')
   const [showBadgeImportModal, setShowBadgeImportModal] = useState(false)
   
+  // Parking state
+  const [showParkingModal, setShowParkingModal] = useState(false)
+  const [editingParkingSpace, setEditingParkingSpace] = useState<{
+    id?: string
+    spaceNumber: string
+    name: string
+    building: string
+    location: string
+    level: string
+    floor: string
+    isElectric: boolean
+    isDisabled: boolean
+    isSpecialNeed: boolean
+    isVIP: boolean
+    isReservedForVisitor: boolean
+    notes: string
+  } | null>(null)
+  
   // White label state
   const [whiteLabelForm, setWhiteLabelForm] = useState({
     companyName: '',
@@ -52,6 +70,72 @@ export default function AdminPage() {
     secondaryColor: '#08122e',
     accentColor: '#3b82f6'
   })
+  
+  // System Settings state
+  const [systemSettingsForm, setSystemSettingsForm] = useState({
+    emailNotifications: true,
+    autoApproveInvitations: true,
+    maintenanceMode: false,
+    sessionTimeout: 30,
+    require2FA: true,
+    backgroundImageData: '',
+    workflowManagementEnabled: false
+  })
+
+  // Load white label settings when tenant changes
+  useEffect(() => {
+    if (selectedTenant !== 'all') {
+      const existingSettings = globalState.getWhiteLabel(selectedTenant)
+      if (existingSettings) {
+        setWhiteLabelForm({
+          companyName: existingSettings.companyName,
+          logoData: existingSettings.logoData || '',
+          primaryColor: existingSettings.primaryColor,
+          secondaryColor: existingSettings.secondaryColor,
+          accentColor: existingSettings.accentColor
+        })
+      } else {
+        // Reset to defaults for tenants without settings
+        setWhiteLabelForm({
+          companyName: '',
+          logoData: '',
+          primaryColor: '#d7bb91',
+          secondaryColor: '#08122e',
+          accentColor: '#3b82f6'
+        })
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTenant])
+
+  // Load system settings when tenant changes
+  useEffect(() => {
+    const tenantId = selectedTenant === 'all' ? 'global' : selectedTenant
+    const existingSettings = globalState.getSystemSettings(tenantId)
+    if (existingSettings) {
+      setSystemSettingsForm({
+        emailNotifications: existingSettings.emailNotifications,
+        autoApproveInvitations: existingSettings.autoApproveInvitations,
+        maintenanceMode: existingSettings.maintenanceMode,
+        sessionTimeout: existingSettings.sessionTimeout,
+        require2FA: existingSettings.require2FA,
+        backgroundImageData: existingSettings.backgroundImageData || '',
+        workflowManagementEnabled: existingSettings.workflowManagementEnabled
+      })
+    } else {
+      // Reset to defaults
+      setSystemSettingsForm({
+        emailNotifications: true,
+        autoApproveInvitations: true,
+        maintenanceMode: false,
+        sessionTimeout: 30,
+        require2FA: true,
+        backgroundImageData: '',
+        workflowManagementEnabled: false
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTenant])
 
   // Note: Profiles are now managed via global state (globalState.profiles)
   const [showProfileModal, setShowProfileModal] = useState(false)
@@ -209,12 +293,24 @@ export default function AdminPage() {
     }
   }
 
-  const filteredBadgeUsers = globalState.badges.filter(user => {
+  const filteredBadgeUsers = globalState.badges.filter(badge => {
+    // Filter by tenant
+    if (selectedTenant !== 'all') {
+      // Find the user associated with this badge
+      const associatedUser = globalState.users.find(u => 
+        u.email === badge.email || u.id === badge.userId
+      )
+      // Only show badges for users in the selected tenant
+      if (!associatedUser || associatedUser.tenantId !== selectedTenant) {
+        return false
+      }
+    }
+    
     const matchesSearch = badgeSearchTerm === '' || 
-      user.name.toLowerCase().includes(badgeSearchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(badgeSearchTerm.toLowerCase())
-    const matchesStatus = badgeStatusFilter === 'All Statuses' || user.status === badgeStatusFilter
-    const matchesCardType = badgeCardTypeFilter === 'All Card Types' || user.cardType === badgeCardTypeFilter
+      badge.name.toLowerCase().includes(badgeSearchTerm.toLowerCase()) ||
+      badge.email.toLowerCase().includes(badgeSearchTerm.toLowerCase())
+    const matchesStatus = badgeStatusFilter === 'All Statuses' || badge.status === badgeStatusFilter
+    const matchesCardType = badgeCardTypeFilter === 'All Card Types' || badge.cardType === badgeCardTypeFilter
     return matchesSearch && matchesStatus && matchesCardType
   })
 
@@ -303,6 +399,7 @@ export default function AdminPage() {
             { icon: 'document', label: 'Digital Badges', action: () => setActiveSection('digitalBadges'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'document' },
             { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), enabled: true, isFluentIcon: false, iconType: null },
+            { icon: '◧', label: 'Parking Management', action: () => setActiveSection('parkingManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: 'ticket', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: true, iconType: 'ticket' },
             { icon: 'alert', label: 'Notifications', action: () => setActiveSection('notifications'), enabled: true, isFluentIcon: true, iconType: 'alert' },
             { icon: 'status', label: 'System Status', action: () => setActiveSection('systemStatus'), enabled: true, isFluentIcon: true, iconType: 'status' },
@@ -445,6 +542,7 @@ export default function AdminPage() {
               {activeSection === 'digitalBadges' && 'Digital Badges Management'}
               {activeSection === 'whiteLabel' && 'White Label Settings'}
               {activeSection === 'policies' && 'Policy Management'}
+              {activeSection === 'parkingManagement' && 'Parking Management'}
               {activeSection === 'ticketManagement' && 'Ticket Management'}
               {activeSection === 'notifications' && 'Notifications'}
               {activeSection === 'systemStatus' && 'System Status'}
@@ -621,7 +719,7 @@ export default function AdminPage() {
                     }}>
                       <span style={{ fontSize: '24px', color: '#D7BB91' }}>◎</span>
                     </div>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>12</div>
+                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>{globalState.tenants.filter(t => t.status === 'active').length}</div>
                   </div>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Active Tenants</h3>
                   <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>Organizations using the platform</p>
@@ -647,7 +745,7 @@ export default function AdminPage() {
                     }}>
                       <span style={{ fontSize: '24px', color: '#60A5FA' }}>◧</span>
                     </div>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>2,847</div>
+                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>{globalState.users.length}</div>
                   </div>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Total Users</h3>
                   <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>Across all tenants</p>
@@ -731,34 +829,32 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        { name: 'Acme Corporation', status: 'Active', users: 245, plan: 'Enterprise', created: '2024-01-15', logo: '◎', color: '#D7BB91' },
-                        { name: 'TechFlow Industries', status: 'Active', users: 128, plan: 'Professional', created: '2024-01-10', logo: '◆', color: '#60A5FA' },
-                        { name: 'Global Solutions Ltd', status: 'Pending', users: 0, plan: 'Starter', created: '2024-01-08', logo: '◈', color: '#22C55E' },
-                        { name: 'Innovation Labs', status: 'Active', users: 87, plan: 'Professional', created: '2024-01-05', logo: '◧', color: '#A78BFA' },
-                        { name: 'Digital Dynamics', status: 'Suspended', users: 156, plan: 'Enterprise', created: '2024-01-03', logo: '■', color: '#F59E0B' },
-                      ].map((tenant, index) => (
-                        <tr key={index} style={{ borderBottom: '1px solid #1E293B' }}>
+                      {globalState.tenants.slice().reverse().slice(0, 5).map((tenant, index) => {
+                        const tenantUsers = globalState.users.filter(u => u.tenantId === tenant.id).length;
+                        const logos = ['◎', '◆', '◈', '◧', '■'];
+                        const colors = ['#D7BB91', '#60A5FA', '#22C55E', '#A78BFA', '#F59E0B'];
+                        return (
+                        <tr key={tenant.id} style={{ borderBottom: '1px solid #1E293B' }}>
                           <td style={{ padding: '16px 24px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                               <div style={{
                                 width: '40px',
                                 height: '40px',
                                 borderRadius: '8px',
-                                backgroundColor: `${tenant.color}15`,
-                                border: `1px solid ${tenant.color}40`,
+                                backgroundColor: `${colors[index % colors.length]}15`,
+                                border: `1px solid ${colors[index % colors.length]}40`,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 fontSize: '18px',
-                                color: tenant.color,
-                                boxShadow: `0 0 10px ${tenant.color}30`
+                                color: colors[index % colors.length],
+                                boxShadow: `0 0 10px ${colors[index % colors.length]}30`
                               }}>
-                                {tenant.logo}
+                                {logos[index % logos.length]}
                               </div>
                               <div>
                                 <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{tenant.name}</div>
-                                <div style={{ color: '#64748B', fontSize: '12px' }}>ID: {String(index + 1).padStart(3, '0')}</div>
+                                <div style={{ color: '#64748B', fontSize: '12px' }}>{tenant.domain}</div>
                               </div>
                             </div>
                           </td>
@@ -768,27 +864,18 @@ export default function AdminPage() {
                               borderRadius: '20px',
                               fontSize: '12px',
                               fontWeight: '500',
-                              backgroundColor: tenant.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 
-                                               tenant.status === 'Pending' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                              color: tenant.status === 'Active' ? '#10B981' : 
-                                     tenant.status === 'Pending' ? '#F59E0B' : '#EF4444'
+                              backgroundColor: tenant.status === 'active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                              color: tenant.status === 'active' ? '#10B981' : '#EF4444'
                             }}>
-                              {tenant.status}
+                              {tenant.status === 'active' ? 'Active' : 'Inactive'}
                             </span>
                           </td>
-                          <td style={{ padding: '16px 24px', color: '#F1F5F9', fontSize: '14px' }}>{tenant.users.toLocaleString()}</td>
-                          <td style={{ padding: '16px 24px', color: '#64748B', fontSize: '14px' }}>{tenant.plan}</td>
-                          <td style={{ padding: '16px 24px', color: '#64748B', fontSize: '14px' }}>{tenant.created}</td>
+                          <td style={{ padding: '16px 24px', color: '#F1F5F9', fontSize: '14px' }}>{tenantUsers}</td>
+                          <td style={{ padding: '16px 24px', color: '#64748B', fontSize: '14px' }}>{tenant.modules.length > 10 ? 'Enterprise' : tenant.modules.length > 5 ? 'Professional' : 'Starter'}</td>
+                          <td style={{ padding: '16px 24px', color: '#64748B', fontSize: '14px' }}>{new Date(tenant.createdAt).toLocaleDateString()}</td>
                           <td style={{ padding: '16px 24px', textAlign: 'right' }}>
                             <button onClick={() => {
-                              const tenantMap: Record<string, string> = {
-                                'Acme Corporation': 'acme',
-                                'TechFlow Industries': 'techflow',
-                                'Global Solutions Ltd': 'global',
-                                'Innovation Labs': 'innovation',
-                                'Digital Dynamics': 'digital'
-                              };
-                              setSelectedTenant(tenantMap[tenant.name] || 'all');
+                              setSelectedTenant(tenant.id);
                               setActiveSection('tenantEdit');
                             }} style={{
                               backgroundColor: 'transparent',
@@ -803,7 +890,7 @@ export default function AdminPage() {
                             </button>
                           </td>
                         </tr>
-                      ))}
+                      );})}
                     </tbody>
                   </table>
                 </div>
@@ -1130,7 +1217,7 @@ export default function AdminPage() {
                     </thead>
                     <tbody>
                       {globalState.users
-                        .filter(u => u.tenantId === selectedTenant)
+                        .filter(u => u.tenantId === selectedTenant || u.tenantId === 'globaladmin')
                         .sort((a, b) => {
                         const aVal = (a[userSortField] || '').toString().toLowerCase();
                         const bVal = (b[userSortField] || '').toString().toLowerCase();
@@ -1560,7 +1647,18 @@ export default function AdminPage() {
           })()}
 
           {/* Digital Badges Section */}
-          {activeSection === 'digitalBadges' && (
+          {activeSection === 'digitalBadges' && (() => {
+            // Filter badges by tenant
+            const tenantBadges = selectedTenant === 'all' 
+              ? globalState.badges
+              : globalState.badges.filter(badge => {
+                  const associatedUser = globalState.users.find(u => 
+                    u.email === badge.email || u.id === badge.userId
+                  )
+                  return associatedUser && associatedUser.tenantId === selectedTenant
+                })
+            
+            return (
             <div>
               {/* Stats Cards */}
               <div style={{
@@ -1575,7 +1673,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>{globalState.badges.length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>{tenantBadges.length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Total Badges Issued</div>
                 </div>
                 <div style={{
@@ -1584,7 +1682,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>{globalState.badges.filter(u => u.status === 'Sent').length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>{tenantBadges.filter(u => u.status === 'Sent').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Sent</div>
                 </div>
                 <div style={{
@@ -1593,7 +1691,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>{globalState.badges.filter(u => u.status === 'Downloaded').length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>{tenantBadges.filter(u => u.status === 'Downloaded').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Activated</div>
                 </div>
                 <div style={{
@@ -1602,7 +1700,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>{globalState.badges.filter(u => u.status === 'Suspended').length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>{tenantBadges.filter(u => u.status === 'Suspended').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Suspended</div>
                 </div>
               </div>
@@ -1993,111 +2091,336 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
-          )}
+          );})()}
 
           {/* Close main content div and other closing tags will be added next */}
 
           {/* Analytics Section */}
-          {activeSection === 'analytics' && (
+          {activeSection === 'analytics' && (() => {
+            const activeTenants = globalState.tenants.filter(t => t.status === 'active').length;
+            const totalUsers = globalState.users.length;
+            const activeUsers = globalState.users.filter(u => u.status === 'active').length;
+            const totalBadges = globalState.badges.length;
+            const activeBadges = globalState.badges.filter(b => b.status === 'Downloaded').length;
+            const totalInvitations = globalState.invitations.length;
+            const pendingInvitations = globalState.invitations.filter(i => i.status === 'pending').length;
+            const totalTickets = globalState.tickets.length;
+            const openTickets = globalState.tickets.filter(t => t.status === 'open' || t.status === 'in-progress').length;
+            
+            // Calculate tenant user counts
+            const tenantUserCounts = globalState.tenants.map(tenant => ({
+              name: tenant.name,
+              users: globalState.users.filter(u => u.tenantId === tenant.id).length,
+              tenant: tenant
+            })).sort((a, b) => b.users - a.users);
+            
+            return (
             <div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '24px' }}>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Tenants</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>847</div>
-                  <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 12.5% from last month</div>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>{globalState.tenants.length}</div>
+                  <div style={{ fontSize: '12px', color: '#10B981' }}>{activeTenants} active</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
-                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Active Users</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#3B82F6', marginBottom: '8px' }}>12,543</div>
-                  <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 8.2% from last month</div>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Users</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#3B82F6', marginBottom: '8px' }}>{totalUsers}</div>
+                  <div style={{ fontSize: '12px', color: '#10B981' }}>{activeUsers} active</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
-                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Digital Badges Issued</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#D7BB91', marginBottom: '8px' }}>847</div>
-                  <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 18.3% from last month</div>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Digital Badges</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#D7BB91', marginBottom: '8px' }}>{totalBadges}</div>
+                  <div style={{ fontSize: '12px', color: '#10B981' }}>{activeBadges} activated</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
-                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Invitations</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B', marginBottom: '8px' }}>2,186</div>
-                  <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 15.7% from last month</div>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Invitations</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B', marginBottom: '8px' }}>{totalInvitations}</div>
+                  <div style={{ fontSize: '12px', color: '#64748B' }}>{pendingInvitations} pending</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
-                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Badges Activated</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>423</div>
-                  <div style={{ fontSize: '12px', color: '#10B981' }}>↑ 24.1% from last month</div>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Support Tickets</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>{totalTickets}</div>
+                  <div style={{ fontSize: '12px', color: openTickets > 0 ? '#F59E0B' : '#10B981' }}>{openTickets} open</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
-                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>System Uptime</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>99.9%</div>
-                  <div style={{ fontSize: '12px', color: '#64748B' }}>Last 30 days</div>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Parking Spaces</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>{globalState.parkingSpaces.length}</div>
+                  <div style={{ fontSize: '12px', color: '#64748B' }}>{globalState.parkingSpaces.filter(p => p.status === 'available').length} available</div>
                 </div>
               </div>
               <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
-                <h4 style={{ color: '#F1F5F9', fontSize: '16px', margin: '0 0 16px 0' }}>Top Performing Tenants</h4>
-                {[
-                  { name: 'Acme Corporation', users: 245, growth: '+12%' },
-                  { name: 'TechFlow Industries', users: 228, growth: '+18%' },
-                  { name: 'Innovation Labs', users: 187, growth: '+9%' },
-                  { name: 'Digital Dynamics', users: 156, growth: '+23%' },
-                ].map((tenant, idx) => (
-                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: idx < 3 ? '1px solid #1E293B' : 'none' }}>
-                    <span style={{ color: '#F1F5F9', fontSize: '14px' }}>{tenant.name}</span>
+                <h4 style={{ color: '#F1F5F9', fontSize: '16px', margin: '0 0 16px 0' }}>Top Tenants by User Count</h4>
+                {tenantUserCounts.slice(0, 5).map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: idx < 4 ? '1px solid #1E293B' : 'none' }}>
+                    <span style={{ color: '#F1F5F9', fontSize: '14px' }}>{item.name}</span>
                     <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                      <span style={{ color: '#64748B', fontSize: '14px' }}>{tenant.users} users</span>
-                      <span style={{ color: '#10B981', fontSize: '14px', fontWeight: '600' }}>{tenant.growth}</span>
+                      <span style={{ color: '#64748B', fontSize: '14px' }}>{item.users} users</span>
+                      <span style={{
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        backgroundColor: item.tenant.status === 'active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                        color: item.tenant.status === 'active' ? '#10B981' : '#EF4444'
+                      }}>{item.tenant.status}</span>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-          )}
+          );})()}
 
           {/* System Settings */}
           {activeSection === 'systemSettings' && (
             <div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <div>
-                  <h3 style={{ color: '#d7bb91', fontSize: '18px', marginBottom: '16px' }}>General Settings</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91' }}>
-                      <input type="checkbox" defaultChecked /> Enable email notifications
+              <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #334155' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                  <InfoRegular style={{ color: '#3B82F6', fontSize: '20px' }} />
+                  <h4 style={{ color: '#F1F5F9', fontSize: '16px', margin: 0 }}>Settings Scope</h4>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px', margin: 0 }}>
+                  {selectedTenant === 'all' 
+                    ? 'You are viewing Global System Settings. These settings apply as defaults to all tenants unless overridden.'
+                    : `You are viewing settings for ${globalState.tenants.find(t => t.id === selectedTenant)?.name}. These settings override global defaults.`
+                  }
+                </p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                {/* General Settings */}
+                <div style={{ backgroundColor: '#162032', padding: '24px', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', marginBottom: '20px', borderBottom: '1px solid #1E293B', paddingBottom: '12px' }}>General Settings</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#F1F5F9', cursor: 'pointer' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={systemSettingsForm.emailNotifications}
+                        onChange={(e) => setSystemSettingsForm({ ...systemSettingsForm, emailNotifications: e.target.checked })}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                      /> 
+                      <div>
+                        <div style={{ fontWeight: '500' }}>Enable email notifications</div>
+                        <div style={{ color: '#94A3B8', fontSize: '13px' }}>Send email notifications for system events</div>
+                      </div>
                     </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91' }}>
-                      <input type="checkbox" defaultChecked /> Auto-approve invitations
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#F1F5F9', cursor: 'pointer' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={systemSettingsForm.autoApproveInvitations}
+                        onChange={(e) => setSystemSettingsForm({ ...systemSettingsForm, autoApproveInvitations: e.target.checked })}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                      /> 
+                      <div>
+                        <div style={{ fontWeight: '500' }}>Auto-approve invitations</div>
+                        <div style={{ color: '#94A3B8', fontSize: '13px' }}>Automatically approve visitor invitations</div>
+                      </div>
                     </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91' }}>
-                      <input type="checkbox" /> Maintenance mode
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#F1F5F9', cursor: 'pointer' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={systemSettingsForm.maintenanceMode}
+                        onChange={(e) => setSystemSettingsForm({ ...systemSettingsForm, maintenanceMode: e.target.checked })}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                      /> 
+                      <div>
+                        <div style={{ fontWeight: '500' }}>Maintenance mode</div>
+                        <div style={{ color: '#94A3B8', fontSize: '13px' }}>Disable system access for maintenance</div>
+                      </div>
                     </label>
                   </div>
                 </div>
-                <div>
-                  <h3 style={{ color: '#d7bb91', fontSize: '18px', marginBottom: '16px' }}>Security</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+                {/* Security Settings */}
+                <div style={{ backgroundColor: '#162032', padding: '24px', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', marginBottom: '20px', borderBottom: '1px solid #1E293B', paddingBottom: '12px' }}>Security</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <div>
-                      <label style={{ color: '#d7bb91', fontSize: '14px', marginBottom: '8px', display: 'block' }}>Session timeout (minutes)</label>
-                      <input type="number" defaultValue="30" style={{
-                        width: '100px',
-                        padding: '8px',
-                        backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                        border: '1px solid rgba(75, 101, 129, 0.3)',
+                      <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Session timeout (minutes)</label>
+                      <input 
+                        type="number" 
+                        min="5"
+                        max="1440"
+                        value={systemSettingsForm.sessionTimeout}
+                        onChange={(e) => setSystemSettingsForm({ ...systemSettingsForm, sessionTimeout: parseInt(e.target.value) || 30 })}
+                        style={{
+                        width: '120px',
+                        padding: '10px 12px',
+                        backgroundColor: '#0F172A',
+                        border: '1px solid #334155',
                         borderRadius: '8px',
-                        color: '#d7bb91'
+                        color: '#F1F5F9',
+                        fontSize: '14px'
                       }} />
+                      <div style={{ color: '#94A3B8', fontSize: '13px', marginTop: '6px' }}>Auto logout users after inactivity</div>
                     </div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d7bb91' }}>
-                      <input type="checkbox" defaultChecked /> Require 2FA for admins
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#F1F5F9', cursor: 'pointer' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={systemSettingsForm.require2FA}
+                        onChange={(e) => setSystemSettingsForm({ ...systemSettingsForm, require2FA: e.target.checked })}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                      /> 
+                      <div>
+                        <div style={{ fontWeight: '500' }}>Require 2FA for admins</div>
+                        <div style={{ color: '#94A3B8', fontSize: '13px' }}>Enforce two-factor authentication for admin users</div>
+                      </div>
                     </label>
                   </div>
                 </div>
-                <button style={{
-                  backgroundColor: 'rgba(75, 101, 129, 0.8)',
-                  color: '#d7bb91',
-                  border: '1px solid rgba(75, 101, 129, 0.3)',
-                  borderRadius: '8px',
-                  padding: '12px 24px',
-                  fontWeight: '500',
-                  cursor: 'pointer'
-                }}>Save Settings</button>
+
+                {/* Workflow Management */}
+                <div style={{ backgroundColor: '#162032', padding: '24px', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', marginBottom: '20px', borderBottom: '1px solid #1E293B', paddingBottom: '12px' }}>Workflow Management</h3>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#F1F5F9', cursor: 'pointer' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={systemSettingsForm.workflowManagementEnabled}
+                      onChange={(e) => setSystemSettingsForm({ ...systemSettingsForm, workflowManagementEnabled: e.target.checked })}
+                      style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    /> 
+                    <div>
+                      <div style={{ fontWeight: '500', fontSize: '15px' }}>Enable Approval Workflow</div>
+                      <div style={{ color: '#94A3B8', fontSize: '13px', marginTop: '4px' }}>
+                        When enabled, all actions on {selectedTenant === 'all' ? 'admin and tenant levels' : 'tenant level'} require approval from authorized users.
+                        <br />This adds an extra layer of control for sensitive operations like creating users, badges, invitations, and modifying settings.
+                      </div>
+                    </div>
+                  </label>
+                  {systemSettingsForm.workflowManagementEnabled && (
+                    <div style={{ marginTop: '16px', padding: '12px 16px', backgroundColor: '#0F172A', borderRadius: '8px', border: '1px solid #1E40AF' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#3B82F6', fontSize: '14px', fontWeight: '500', marginBottom: '6px' }}>
+                        <CheckmarkCircleRegular style={{ fontSize: '18px' }} />
+                        Approval workflow is active
+                      </div>
+                      <div style={{ color: '#94A3B8', fontSize: '13px' }}>
+                        All create, update, and delete operations will be queued for approval in the Tasks section.
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Background Image */}
+                <div style={{ backgroundColor: '#162032', padding: '24px', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', marginBottom: '20px', borderBottom: '1px solid #1E293B', paddingBottom: '12px' }}>Background Customization</h3>
+                  <div>
+                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Background Image</label>
+                    <div style={{
+                      border: '2px dashed #334155',
+                      borderRadius: '12px',
+                      padding: '24px',
+                      textAlign: 'center',
+                      backgroundColor: '#0F172A',
+                      cursor: 'pointer'
+                    }}>
+                      {systemSettingsForm.backgroundImageData ? (
+                        <div>
+                          <img 
+                            src={systemSettingsForm.backgroundImageData} 
+                            alt="Background preview" 
+                            style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px', marginBottom: '12px' }} 
+                          />
+                          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button
+                              onClick={() => document.getElementById('backgroundImageUpload')?.click()}
+                              style={{
+                                padding: '8px 16px',
+                                backgroundColor: '#1E293B',
+                                color: '#F1F5F9',
+                                border: '1px solid #334155',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '14px'
+                              }}
+                            >
+                              Change Image
+                            </button>
+                            <button
+                              onClick={() => setSystemSettingsForm({ ...systemSettingsForm, backgroundImageData: '' })}
+                              style={{
+                                padding: '8px 16px',
+                                backgroundColor: '#7F1D1D',
+                                color: '#FCA5A5',
+                                border: '1px solid #991B1B',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '14px'
+                              }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <ArrowUploadRegular style={{ fontSize: '32px', color: '#64748B', marginBottom: '8px' }} />
+                          <div style={{ color: '#F1F5F9', fontSize: '14px', marginBottom: '4px' }}>Upload Background Image</div>
+                          <div style={{ color: '#94A3B8', fontSize: '13px', marginBottom: '16px' }}>PNG, JPG up to 5MB</div>
+                          <button
+                            onClick={() => document.getElementById('backgroundImageUpload')?.click()}
+                            style={{
+                              padding: '8px 20px',
+                              backgroundColor: '#3B82F6',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              fontWeight: '500'
+                            }}
+                          >
+                            Choose File
+                          </button>
+                        </div>
+                      )}
+                      <input
+                        id="backgroundImageUpload"
+                        type="file"
+                        accept="image/png,image/jpeg,image/jpg"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            if (file.size > 5 * 1024 * 1024) {
+                              alert('File size must be less than 5MB')
+                              return
+                            }
+                            const reader = new FileReader()
+                            reader.onload = (event) => {
+                              setSystemSettingsForm({ ...systemSettingsForm, backgroundImageData: event.target?.result as string })
+                            }
+                            reader.readAsDataURL(file)
+                          }
+                        }}
+                      />
+                    </div>
+                    <div style={{ color: '#94A3B8', fontSize: '13px', marginTop: '8px' }}>
+                      This background will be displayed on login and dashboard screens for {selectedTenant === 'all' ? 'all tenants' : 'this tenant'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Save Button */}
+                <button 
+                  onClick={() => {
+                    const tenantId = selectedTenant === 'all' ? 'global' : selectedTenant
+                    globalState.updateSystemSettings(tenantId, systemSettingsForm)
+                    alert(`System settings ${selectedTenant === 'all' ? 'for global' : 'for ' + globalState.tenants.find(t => t.id === selectedTenant)?.name} saved successfully!`)
+                  }}
+                  style={{
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '14px 28px',
+                    fontWeight: '600',
+                    fontSize: '15px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
+                >
+                  Save Settings
+                </button>
               </div>
             </div>
           )}
@@ -2150,20 +2473,7 @@ export default function AdminPage() {
           )}
 
           {/* White Label */}
-          {activeSection === 'whiteLabel' && selectedTenant !== 'all' && (() => {
-            // Load existing white label settings
-            const existingSettings = globalState.getWhiteLabel(selectedTenant);
-            if (existingSettings && !whiteLabelForm.companyName) {
-              setWhiteLabelForm({
-                companyName: existingSettings.companyName,
-                logoData: existingSettings.logoData || '',
-                primaryColor: existingSettings.primaryColor,
-                secondaryColor: existingSettings.secondaryColor,
-                accentColor: existingSettings.accentColor
-              });
-            }
-            
-            return (
+          {activeSection === 'whiteLabel' && selectedTenant !== 'all' && (
             <div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 {/* Branding Section */}
@@ -2196,6 +2506,20 @@ export default function AdminPage() {
                         textAlign: 'center',
                         backgroundColor: 'rgba(51, 78, 104, 0.1)'
                       }}>
+                        {whiteLabelForm.logoData && (
+                          <div style={{ marginBottom: '16px' }}>
+                            <img 
+                              src={whiteLabelForm.logoData} 
+                              alt="Company Logo Preview" 
+                              style={{ 
+                                maxWidth: '200px', 
+                                maxHeight: '200px', 
+                                borderRadius: '8px',
+                                border: '2px solid rgba(215, 187, 145, 0.3)'
+                              }} 
+                            />
+                          </div>
+                        )}
                         <input 
                           type="file" 
                           accept="image/*" 
@@ -2204,12 +2528,32 @@ export default function AdminPage() {
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
+                              // Check file size (2MB max)
+                              if (file.size > 2 * 1024 * 1024) {
+                                alert('File size must be less than 2MB');
+                                return;
+                              }
+                              
+                              // Create image to check dimensions
+                              const img = new Image();
                               const reader = new FileReader();
+                              
                               reader.onload = (ev) => {
-                                const base64 = ev.target?.result as string;
-                                setWhiteLabelForm({ ...whiteLabelForm, logoData: base64 });
-                                alert('Logo uploaded successfully!');
+                                img.onload = () => {
+                                  // Check image dimensions (512x512 max)
+                                  if (img.width > 512 || img.height > 512) {
+                                    alert('Image dimensions must be 512x512 pixels or smaller');
+                                    return;
+                                  }
+                                  
+                                  // If all validations pass, save the image
+                                  const base64 = ev.target?.result as string;
+                                  setWhiteLabelForm({ ...whiteLabelForm, logoData: base64 });
+                                  alert('Logo uploaded successfully!');
+                                };
+                                img.src = ev.target?.result as string;
                               };
+                              
                               reader.readAsDataURL(file);
                             }
                           }}
@@ -2223,8 +2567,8 @@ export default function AdminPage() {
                           cursor: 'pointer',
                           fontSize: '14px',
                           display: 'inline-block'
-                        }}>Upload Logo</label>
-                        <p style={{ color: '#d7bb91', opacity: 0.7, margin: '8px 0 0 0', fontSize: '12px' }}>PNG, JPG, SVG (max 2MB)</p>
+                        }}>{whiteLabelForm.logoData ? 'Change Logo' : 'Upload Logo'}</label>
+                        <p style={{ color: '#d7bb91', opacity: 0.7, margin: '8px 0 0 0', fontSize: '12px' }}>PNG, JPG, SVG (max 512x512px, 2MB)</p>
                       </div>
                     </div>
                   </div>
@@ -2362,8 +2706,7 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
-            );
-          })()}
+          )}
 
           {/* Ticket Management */}
           {activeSection === 'ticketManagement' && (
@@ -2636,12 +2979,20 @@ export default function AdminPage() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '20px',
-                          flexShrink: 0
+                          fontSize: '24px',
+                          flexShrink: 0,
+                          boxShadow: 
+                            notification.type === 'Critical' ? '0 0 20px rgba(239, 68, 68, 0.5)' :
+                            notification.type === 'Warning' ? '0 0 20px rgba(245, 158, 11, 0.5)' :
+                            notification.type === 'Success' ? '0 0 20px rgba(16, 185, 129, 0.5)' : '0 0 20px rgba(59, 130, 246, 0.5)',
+                          color: 
+                            notification.type === 'Critical' ? '#EF4444' :
+                            notification.type === 'Warning' ? '#F59E0B' :
+                            notification.type === 'Success' ? '#10B981' : '#3B82F6'
                         }}>
-                          {notification.type === 'Critical' ? '🚨' : 
-                           notification.type === 'Warning' ? '⚠️' : 
-                           notification.type === 'Success' ? '✅' : 'ℹ️'}
+                          {notification.type === 'Critical' ? <ErrorCircleRegular /> : 
+                           notification.type === 'Warning' ? <WarningRegular /> : 
+                           notification.type === 'Success' ? <CheckmarkCircleRegular /> : <InfoRegular />}
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
@@ -2945,6 +3296,196 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Parking Management */}
+          {activeSection === 'parkingManagement' && selectedTenant !== 'all' && (
+            <div>
+              {/* Stats Overview */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Spaces</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F1F5F9' }}>{globalState.parkingSpaces.filter(p => p.tenantId === selectedTenant).length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Available</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>{globalState.parkingSpaces.filter(p => p.tenantId === selectedTenant && p.status === 'available').length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Occupied</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{globalState.parkingSpaces.filter(p => p.tenantId === selectedTenant && p.status === 'occupied').length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Reserved</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{globalState.parkingSpaces.filter(p => p.tenantId === selectedTenant && p.status === 'reserved').length}</div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ marginBottom: '24px', display: 'flex', gap: '12px' }}>
+                <button onClick={() => {
+                  setEditingParkingSpace({
+                    spaceNumber: '',
+                    name: '',
+                    building: '',
+                    location: '',
+                    level: '',
+                    floor: '',
+                    isElectric: false,
+                    isDisabled: false,
+                    isSpecialNeed: false,
+                    isVIP: false,
+                    isReservedForVisitor: false,
+                    notes: ''
+                  });
+                  setShowParkingModal(true);
+                }} style={{
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>+ Add Parking Space</button>
+              </div>
+
+              {/* Parking Spaces Table */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Parking Spaces for {globalState.tenants.find(t => t.id === selectedTenant)?.name}</h3>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#0F1629' }}>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Space Number</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Building/Location</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Features</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Status</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Assigned To</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {globalState.parkingSpaces.filter(p => p.tenantId === selectedTenant).map((space) => (
+                        <tr key={space.id} style={{ borderBottom: '1px solid #1E293B' }}>
+                          <td style={{ padding: '16px 24px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>
+                            {space.spaceNumber}
+                            {space.name && <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>{space.name}</div>}
+                          </td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>
+                            {space.building}
+                            <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>{space.location}</div>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                              {space.isElectric && <span style={{ fontSize: '10px', padding: '2px 6px', backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981', borderRadius: '4px' }}>⚡ EV</span>}
+                              {space.isDisabled && <span style={{ fontSize: '10px', padding: '2px 6px', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', borderRadius: '4px' }}>♿ Disabled</span>}
+                              {space.isVIP && <span style={{ fontSize: '10px', padding: '2px 6px', backgroundColor: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B', borderRadius: '4px' }}>⭐ VIP</span>}
+                              {space.isSpecialNeed && <span style={{ fontSize: '10px', padding: '2px 6px', backgroundColor: 'rgba(139, 92, 246, 0.1)', color: '#8B5CF6', borderRadius: '4px' }}>Special</span>}
+                              {space.isReservedForVisitor && <span style={{ fontSize: '10px', padding: '2px 6px', backgroundColor: 'rgba(236, 72, 153, 0.1)', color: '#EC4899', borderRadius: '4px' }}>Visitor</span>}
+                            </div>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: 
+                                space.status === 'available' ? 'rgba(16, 185, 129, 0.1)' :
+                                space.status === 'occupied' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                              color: 
+                                space.status === 'available' ? '#10B981' :
+                                space.status === 'occupied' ? '#EF4444' : '#F59E0B'
+                            }}>
+                              {space.status.charAt(0).toUpperCase() + space.status.slice(1)}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>
+                            {space.assignedToName || '-'}
+                          </td>
+                          <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                            <button onClick={() => {
+                              setEditingParkingSpace({
+                                id: space.id,
+                                spaceNumber: space.spaceNumber,
+                                name: space.name || '',
+                                building: space.building,
+                                location: space.location,
+                                level: space.level || '',
+                                floor: space.floor || '',
+                                isElectric: space.isElectric || false,
+                                isDisabled: space.isDisabled || false,
+                                isSpecialNeed: space.isSpecialNeed || false,
+                                isVIP: space.isVIP || false,
+                                isReservedForVisitor: space.isReservedForVisitor || false,
+                                notes: space.notes || ''
+                              });
+                              setShowParkingModal(true);
+                            }} style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #475569',
+                              borderRadius: '6px',
+                              color: '#3B82F6',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer',
+                              marginRight: '8px'
+                            }}>Edit</button>
+                            {space.status === 'occupied' && (
+                              <button onClick={() => {
+                                if (confirm(`Release parking space ${space.spaceNumber}?`)) {
+                                  globalState.updateParkingSpace(space.id, {
+                                    status: 'available',
+                                    assignedTo: undefined,
+                                    assignedToName: undefined,
+                                    vehiclePlate: undefined,
+                                    assignedDate: undefined
+                                  })
+                                  alert('Parking space released!')
+                                }
+                              }} style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #475569',
+                                borderRadius: '6px',
+                                color: '#F59E0B',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                marginRight: '8px'
+                              }}>Release</button>
+                            )}
+                            <button onClick={() => {
+                              if (confirm(`Delete parking space ${space.spaceNumber}? This action cannot be undone.`)) {
+                                globalState.updateParkingSpace(space.id, { status: 'available', tenantId: undefined });
+                                alert('Parking space deleted!');
+                              }
+                            }} style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #475569',
+                              borderRadius: '6px',
+                              color: '#EF4444',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer'
+                            }}>Delete</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -4010,6 +4551,336 @@ export default function AdminPage() {
                   boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
                 }}>{editingProfile.id ? 'Update Profile' : 'Create Profile'}</button>
                 <button type="button" onClick={() => { setShowProfileModal(false); setEditingProfile(null); }} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Parking Space Modal */}
+      {showParkingModal && editingParkingSpace && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => { setShowParkingModal(false); setEditingParkingSpace(null); }}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '800px',
+            width: '90%',
+            border: '1px solid #1E293B',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '8px' }}>
+              {editingParkingSpace.id ? 'Edit' : 'Create'} Parking Space
+            </h2>
+            <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Configure parking space details and features</p>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              
+              const parkingData = {
+                spaceNumber: formData.get('spaceNumber') as string,
+                name: formData.get('name') as string,
+                building: formData.get('building') as string,
+                location: formData.get('location') as string,
+                level: formData.get('level') as string,
+                floor: formData.get('floor') as string,
+                isElectric: formData.get('isElectric') === 'on',
+                isDisabled: formData.get('isDisabled') === 'on',
+                isSpecialNeed: formData.get('isSpecialNeed') === 'on',
+                isVIP: formData.get('isVIP') === 'on',
+                isReservedForVisitor: formData.get('isReservedForVisitor') === 'on',
+                notes: formData.get('notes') as string,
+                tenantId: selectedTenant,
+                status: 'available' as const
+              };
+              
+              if (editingParkingSpace.id) {
+                // Update existing parking space
+                globalState.updateParkingSpace(editingParkingSpace.id, parkingData);
+                alert('Parking space updated successfully');
+              } else {
+                // Create new parking space
+                globalState.addParkingSpace(parkingData);
+                alert('Parking space created successfully');
+              }
+              
+              setShowParkingModal(false);
+              setEditingParkingSpace(null);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Space Number *</label>
+                  <input 
+                    type="text" 
+                    name="spaceNumber"
+                    defaultValue={editingParkingSpace.spaceNumber}
+                    required 
+                    placeholder="e.g., A-101, B2-045"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Friendly Name</label>
+                  <input 
+                    type="text" 
+                    name="name"
+                    defaultValue={editingParkingSpace.name}
+                    placeholder="e.g., Executive Parking, Visitor Spot 1"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Building *</label>
+                  <input 
+                    type="text" 
+                    name="building"
+                    defaultValue={editingParkingSpace.building}
+                    required 
+                    placeholder="e.g., Building A, Main Tower"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Location *</label>
+                  <input 
+                    type="text" 
+                    name="location"
+                    defaultValue={editingParkingSpace.location}
+                    required 
+                    placeholder="e.g., North Wing, Underground Garage"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Level</label>
+                  <input 
+                    type="text" 
+                    name="level"
+                    defaultValue={editingParkingSpace.level}
+                    placeholder="e.g., Level 1, Ground, Basement"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Floor</label>
+                  <input 
+                    type="text" 
+                    name="floor"
+                    defaultValue={editingParkingSpace.floor}
+                    placeholder="e.g., 1st Floor, -2"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '12px', display: 'block' }}>Space Features</label>
+                <div style={{ 
+                  padding: '16px', 
+                  backgroundColor: '#1E293B', 
+                  borderRadius: '8px', 
+                  border: '1px solid #475569'
+                }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      color: '#F1F5F9'
+                    }}>
+                      <input 
+                        type="checkbox" 
+                        name="isElectric"
+                        defaultChecked={editingParkingSpace.isElectric}
+                        style={{ accentColor: '#10B981', cursor: 'pointer', width: '18px', height: '18px' }} 
+                      />
+                      <span style={{ fontSize: '14px' }}>⚡ Electric Vehicle Charging</span>
+                    </label>
+                    
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      color: '#F1F5F9'
+                    }}>
+                      <input 
+                        type="checkbox" 
+                        name="isDisabled"
+                        defaultChecked={editingParkingSpace.isDisabled}
+                        style={{ accentColor: '#3B82F6', cursor: 'pointer', width: '18px', height: '18px' }} 
+                      />
+                      <span style={{ fontSize: '14px' }}>♿ Disabled Access</span>
+                    </label>
+                    
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      color: '#F1F5F9'
+                    }}>
+                      <input 
+                        type="checkbox" 
+                        name="isSpecialNeed"
+                        defaultChecked={editingParkingSpace.isSpecialNeed}
+                        style={{ accentColor: '#8B5CF6', cursor: 'pointer', width: '18px', height: '18px' }} 
+                      />
+                      <span style={{ fontSize: '14px' }}>Special Needs</span>
+                    </label>
+                    
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      color: '#F1F5F9'
+                    }}>
+                      <input 
+                        type="checkbox" 
+                        name="isVIP"
+                        defaultChecked={editingParkingSpace.isVIP}
+                        style={{ accentColor: '#F59E0B', cursor: 'pointer', width: '18px', height: '18px' }} 
+                      />
+                      <span style={{ fontSize: '14px' }}>⭐ VIP / Executive</span>
+                    </label>
+                    
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      color: '#F1F5F9'
+                    }}>
+                      <input 
+                        type="checkbox" 
+                        name="isReservedForVisitor"
+                        defaultChecked={editingParkingSpace.isReservedForVisitor}
+                        style={{ accentColor: '#EC4899', cursor: 'pointer', width: '18px', height: '18px' }} 
+                      />
+                      <span style={{ fontSize: '14px' }}>Reserved for Visitors</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Additional Notes</label>
+                <textarea 
+                  name="notes"
+                  defaultValue={editingParkingSpace.notes}
+                  placeholder="Any additional information about this parking space..."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    resize: 'vertical'
+                  }} 
+                />
+              </div>
+              
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>{editingParkingSpace.id ? 'Update Parking Space' : 'Create Parking Space'}</button>
+                <button type="button" onClick={() => { setShowParkingModal(false); setEditingParkingSpace(null); }} style={{
                   flex: 1,
                   backgroundColor: 'transparent',
                   color: '#F1F5F9',
