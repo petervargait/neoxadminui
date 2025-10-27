@@ -222,7 +222,23 @@ const getInitialState = (): GlobalState => {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored) {
       try {
-        return JSON.parse(stored)
+        const parsedState = JSON.parse(stored) as Partial<GlobalState>
+        // Merge with defaults to ensure new fields exist
+        return {
+          ...parsedState,
+          systemSettings: parsedState.systemSettings || {
+            'global': {
+              tenantId: 'global',
+              emailNotifications: true,
+              autoApproveInvitations: true,
+              maintenanceMode: false,
+              sessionTimeout: 30,
+              require2FA: true,
+              workflowManagementEnabled: false,
+              updatedAt: new Date().toISOString()
+            }
+          }
+        } as GlobalState
       } catch (e) {
         console.error('Failed to parse stored state:', e)
       }
