@@ -62,6 +62,49 @@ export default function AdminPage() {
     notes: string
   } | null>(null)
   
+  // Locker state
+  const [showLockerModal, setShowLockerModal] = useState(false)
+  const [editingLocker, setEditingLocker] = useState<{
+    id?: string
+    lockerNumber: string
+    name: string
+    building: string
+    floor: string
+    zone: string
+    type: 'permanent' | 'gym' | 'bike' | 'temporary' | 'storage'
+    notes: string
+  } | null>(null)
+  
+  // Space state
+  const [showSpaceModal, setShowSpaceModal] = useState(false)
+  const [editingSpace, setEditingSpace] = useState<{
+    id?: string
+    spaceNumber: string
+    name: string
+    building: string
+    floor: string
+    location: string
+    zone: string
+    type: 'desk' | 'office' | 'meeting-room' | 'conference-room' | 'social-hub'
+    capacity: number
+    notes: string
+  } | null>(null)
+  
+  // Building state
+  const [showBuildingModal, setShowBuildingModal] = useState(false)
+  const [editingBuilding, setEditingBuilding] = useState<{
+    id?: string
+    name: string
+    basementLevels: number
+    topFloor: number
+  } | null>(null)
+  const [selectedFloorForZones, setSelectedFloorForZones] = useState<number | null>(null)
+  
+  // Building selection state for modals
+  const [selectedParkingBuilding, setSelectedParkingBuilding] = useState<string>('')
+  const [selectedLockerBuilding, setSelectedLockerBuilding] = useState<string>('')
+  const [selectedSpaceBuilding, setSelectedSpaceBuilding] = useState<string>('')
+  
   // White label state
   const [whiteLabelForm, setWhiteLabelForm] = useState({
     companyName: '',
@@ -401,6 +444,9 @@ export default function AdminPage() {
             { icon: '◆', label: 'White Label', action: () => setActiveSection('whiteLabel'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), enabled: true, isFluentIcon: false, iconType: null },
             { icon: '◧', label: 'Parking Management', action: () => setActiveSection('parkingManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '◎', label: 'Locker Management', action: () => setActiveSection('lockerManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '◩', label: 'Space Management', action: () => setActiveSection('spaceManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '◫', label: 'Building Management', action: () => setActiveSection('buildingManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: 'ticket', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: true, iconType: 'ticket' },
             { icon: 'alert', label: 'Notifications', action: () => setActiveSection('notifications'), enabled: true, isFluentIcon: true, iconType: 'alert' },
             { icon: 'status', label: 'System Status', action: () => setActiveSection('systemStatus'), enabled: true, isFluentIcon: true, iconType: 'status' },
@@ -544,6 +590,9 @@ export default function AdminPage() {
               {activeSection === 'whiteLabel' && 'White Label Settings'}
               {activeSection === 'policies' && 'Policy Management'}
               {activeSection === 'parkingManagement' && 'Parking Management'}
+              {activeSection === 'lockerManagement' && 'Locker Management'}
+              {activeSection === 'spaceManagement' && 'Space Management'}
+              {activeSection === 'buildingManagement' && 'Building Management'}
               {activeSection === 'ticketManagement' && 'Ticket Management'}
               {activeSection === 'notifications' && 'Notifications'}
               {activeSection === 'systemStatus' && 'System Status'}
@@ -2148,6 +2197,11 @@ export default function AdminPage() {
                   <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>{globalState.parkingSpaces.length}</div>
                   <div style={{ fontSize: '12px', color: '#64748B' }}>{globalState.parkingSpaces.filter(p => p.status === 'available').length} available</div>
                 </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Lockers</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#8B5CF6', marginBottom: '8px' }}>{globalState.lockers.length}</div>
+                  <div style={{ fontSize: '12px', color: '#64748B' }}>{globalState.lockers.filter(l => l.status === 'available').length} available</div>
+                </div>
               </div>
               <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
                 <h4 style={{ color: '#F1F5F9', fontSize: '16px', margin: '0 0 16px 0' }}>Top Tenants by User Count</h4>
@@ -3298,6 +3352,580 @@ export default function AdminPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Parking Management */}
+          {/* Locker Management */}
+          {activeSection === 'lockerManagement' && selectedTenant !== 'all' && (
+            <div>
+              {/* Stats Overview */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Lockers</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F1F5F9' }}>{globalState.lockers.filter(l => l.tenantId === selectedTenant).length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Available</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>{globalState.lockers.filter(l => l.tenantId === selectedTenant && l.status === 'available').length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Occupied</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{globalState.lockers.filter(l => l.tenantId === selectedTenant && l.status === 'occupied').length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Maintenance</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{globalState.lockers.filter(l => l.tenantId === selectedTenant && l.status === 'maintenance').length}</div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ marginBottom: '24px', display: 'flex', gap: '12px' }}>
+                <button onClick={() => {
+                  setEditingLocker({
+                    lockerNumber: '',
+                    name: '',
+                    building: '',
+                    floor: '',
+                    zone: '',
+                    type: 'permanent',
+                    notes: ''
+                  });
+                  setShowLockerModal(true);
+                }} style={{
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>+ Add Locker</button>
+              </div>
+
+              {/* Lockers Table */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Lockers for {globalState.tenants.find(t => t.id === selectedTenant)?.name}</h3>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#0F1629' }}>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Locker Number</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Building/Floor</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Type</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Status</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Assigned To</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {globalState.lockers.filter(l => l.tenantId === selectedTenant).map((locker) => (
+                        <tr key={locker.id} style={{ borderBottom: '1px solid #1E293B' }}>
+                          <td style={{ padding: '16px 24px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>
+                            {locker.lockerNumber}
+                            {locker.name && <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>{locker.name}</div>}
+                          </td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>
+                            {locker.building}
+                            <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>Floor {locker.floor}{locker.zone && ` - ${locker.zone}`}</div>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: 
+                                locker.type === 'permanent' ? 'rgba(139, 92, 246, 0.1)' :
+                                locker.type === 'gym' ? 'rgba(16, 185, 129, 0.1)' :
+                                locker.type === 'bike' ? 'rgba(59, 130, 246, 0.1)' :
+                                locker.type === 'temporary' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                              color: 
+                                locker.type === 'permanent' ? '#8B5CF6' :
+                                locker.type === 'gym' ? '#10B981' :
+                                locker.type === 'bike' ? '#3B82F6' :
+                                locker.type === 'temporary' ? '#F59E0B' : '#64748B'
+                            }}>
+                              {locker.type.charAt(0).toUpperCase() + locker.type.slice(1)}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: 
+                                locker.status === 'available' ? 'rgba(16, 185, 129, 0.1)' :
+                                locker.status === 'occupied' ? 'rgba(239, 68, 68, 0.1)' :
+                                locker.status === 'reserved' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                              color: 
+                                locker.status === 'available' ? '#10B981' :
+                                locker.status === 'occupied' ? '#EF4444' :
+                                locker.status === 'reserved' ? '#F59E0B' : '#64748B'
+                            }}>
+                              {locker.status.charAt(0).toUpperCase() + locker.status.slice(1)}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>
+                            {locker.assignedToName || '-'}
+                            {locker.assignedDate && <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>Since {new Date(locker.assignedDate).toLocaleDateString()}</div>}
+                          </td>
+                          <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                            <button onClick={() => {
+                              setEditingLocker({
+                                id: locker.id,
+                                lockerNumber: locker.lockerNumber,
+                                name: locker.name || '',
+                                building: locker.building,
+                                floor: locker.floor,
+                                zone: locker.zone || '',
+                                type: locker.type,
+                                notes: locker.notes || ''
+                              });
+                              setShowLockerModal(true);
+                            }} style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #475569',
+                              borderRadius: '6px',
+                              color: '#3B82F6',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer',
+                              marginRight: '8px'
+                            }}>Edit</button>
+                            {locker.status === 'occupied' && (
+                              <button onClick={() => {
+                                if (confirm(`Release locker ${locker.lockerNumber}?`)) {
+                                  globalState.updateLocker(locker.id, {
+                                    status: 'available',
+                                    assignedTo: undefined,
+                                    assignedToName: undefined,
+                                    assignedDate: undefined
+                                  })
+                                  alert('Locker released!')
+                                }
+                              }} style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #475569',
+                                borderRadius: '6px',
+                                color: '#F59E0B',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                marginRight: '8px'
+                              }}>Release</button>
+                            )}
+                            <button onClick={() => {
+                              if (confirm(`Delete locker ${locker.lockerNumber}? This action cannot be undone.`)) {
+                                globalState.updateLocker(locker.id, { status: 'available', tenantId: undefined });
+                                alert('Locker deleted!');
+                              }
+                            }} style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #475569',
+                              borderRadius: '6px',
+                              color: '#EF4444',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer'
+                            }}>Delete</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Space Management */}
+          {activeSection === 'spaceManagement' && selectedTenant !== 'all' && (
+            <div>
+              {/* Stats Overview */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Spaces</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F1F5F9' }}>{globalState.spaces.filter(s => s.tenantId === selectedTenant).length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Available</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>{globalState.spaces.filter(s => s.tenantId === selectedTenant && s.status === 'available').length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Assigned</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{globalState.spaces.filter(s => s.tenantId === selectedTenant && s.status === 'occupied').length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Maintenance</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{globalState.spaces.filter(s => s.tenantId === selectedTenant && s.status === 'maintenance').length}</div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ marginBottom: '24px', display: 'flex', gap: '12px' }}>
+                <button onClick={() => {
+                  setEditingSpace({
+                    spaceNumber: '',
+                    name: '',
+                    building: '',
+                    floor: '',
+                    location: '',
+                    zone: '',
+                    type: 'desk',
+                    capacity: 1,
+                    notes: ''
+                  });
+                  setShowSpaceModal(true);
+                }} style={{
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>+ Add Space</button>
+              </div>
+
+              {/* Spaces Table */}
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Spaces for {globalState.tenants.find(t => t.id === selectedTenant)?.name}</h3>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#0F1629' }}>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Space Number</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Building/Floor</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Type</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Capacity</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Status</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'left', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Assigned To</th>
+                        <th style={{ padding: '12px 24px', textAlign: 'right', color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {globalState.spaces.filter(s => s.tenantId === selectedTenant).map((space) => (
+                        <tr key={space.id} style={{ borderBottom: '1px solid #1E293B' }}>
+                          <td style={{ padding: '16px 24px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>
+                            {space.spaceNumber}
+                            {space.name && <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>{space.name}</div>}
+                          </td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>
+                            {space.building}
+                            <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>Floor {space.floor}{space.zone && ` - ${space.zone}`}</div>
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: 
+                                space.type === 'desk' ? 'rgba(59, 130, 246, 0.1)' :
+                                space.type === 'office' ? 'rgba(139, 92, 246, 0.1)' :
+                                space.type === 'meeting-room' ? 'rgba(16, 185, 129, 0.1)' :
+                                space.type === 'conference-room' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(236, 72, 153, 0.1)',
+                              color: 
+                                space.type === 'desk' ? '#3B82F6' :
+                                space.type === 'office' ? '#8B5CF6' :
+                                space.type === 'meeting-room' ? '#10B981' :
+                                space.type === 'conference-room' ? '#F59E0B' : '#EC4899'
+                            }}>
+                              {space.type === 'meeting-room' ? 'Meeting Room' : space.type === 'conference-room' ? 'Conference Room' : space.type === 'social-hub' ? 'Social Hub' : space.type.charAt(0).toUpperCase() + space.type.slice(1)}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>
+                            {space.capacity} {space.capacity === 1 ? 'person' : 'people'}
+                          </td>
+                          <td style={{ padding: '16px 24px' }}>
+                            <span style={{
+                              padding: '4px 12px',
+                              borderRadius: '20px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: 
+                                space.status === 'available' ? 'rgba(16, 185, 129, 0.1)' :
+                                space.status === 'occupied' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                              color: 
+                                space.status === 'available' ? '#10B981' :
+                                space.status === 'occupied' ? '#EF4444' : '#64748B'
+                            }}>
+                              {space.status.charAt(0).toUpperCase() + space.status.slice(1)}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 24px', color: '#94A3B8', fontSize: '14px' }}>
+                            {space.assignedToName || '-'}
+                            {space.assignedDate && <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>Since {new Date(space.assignedDate).toLocaleDateString()}</div>}
+                          </td>
+                          <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                            <button onClick={() => {
+                              setEditingSpace({
+                                id: space.id,
+                                spaceNumber: space.spaceNumber,
+                                name: space.name || '',
+                                building: space.building,
+                                floor: space.floor,
+                                location: space.location || '',
+                                zone: space.zone || '',
+                                type: space.type,
+                                capacity: space.capacity || 1,
+                                notes: space.notes || ''
+                              });
+                              setShowSpaceModal(true);
+                            }} style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #475569',
+                              borderRadius: '6px',
+                              color: '#3B82F6',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer',
+                              marginRight: '8px'
+                            }}>Edit</button>
+                            {space.status === 'occupied' && (
+                              <button onClick={() => {
+                                if (confirm(`Release space ${space.spaceNumber}?`)) {
+                                  globalState.updateSpace(space.id, {
+                                    status: 'available',
+                                    assignedTo: undefined,
+                                    assignedToName: undefined,
+                                    assignedDate: undefined
+                                  })
+                                  alert('Space released!')
+                                }
+                              }} style={{
+                                backgroundColor: 'transparent',
+                                border: '1px solid #475569',
+                                borderRadius: '6px',
+                                color: '#F59E0B',
+                                fontSize: '12px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                marginRight: '8px'
+                              }}>Release</button>
+                            )}
+                            <button onClick={() => {
+                              if (confirm(`Delete space ${space.spaceNumber}? This action cannot be undone.`)) {
+                                globalState.updateSpace(space.id, { status: 'available', tenantId: undefined });
+                                alert('Space deleted!');
+                              }
+                            }} style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid #475569',
+                              borderRadius: '6px',
+                              color: '#EF4444',
+                              fontSize: '12px',
+                              padding: '6px 12px',
+                              cursor: 'pointer'
+                            }}>Delete</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Building Management */}
+          {activeSection === 'buildingManagement' && selectedTenant !== 'all' && (
+            <div>
+              {/* Stats Overview */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Buildings</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F1F5F9' }}>{globalState.buildings.filter(b => b.tenantId === selectedTenant).length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Floors</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>
+                    {globalState.buildings.filter(b => b.tenantId === selectedTenant).reduce((sum, b) => sum + b.floors.length, 0)}
+                  </div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Zones</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#3B82F6' }}>
+                    {globalState.buildings.filter(b => b.tenantId === selectedTenant).reduce((sum, b) => sum + b.floors.reduce((zoneSum, f) => zoneSum + f.zones.length, 0), 0)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ marginBottom: '24px', display: 'flex', gap: '12px' }}>
+                <button onClick={() => {
+                  setEditingBuilding({
+                    name: '',
+                    basementLevels: 0,
+                    topFloor: 10
+                  });
+                  setShowBuildingModal(true);
+                }} style={{
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>+ Add Building</button>
+              </div>
+
+              {/* Buildings List */}
+              {globalState.buildings.filter(b => b.tenantId === selectedTenant).map((building) => (
+                <div key={building.id} style={{
+                  backgroundColor: '#162032',
+                  borderRadius: '12px',
+                  border: '1px solid #1E293B',
+                  overflow: 'hidden',
+                  marginBottom: '24px'
+                }}>
+                  <div style={{ padding: '24px', borderBottom: '1px solid #1E293B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: '0 0 8px 0' }}>{building.name}</h3>
+                      <p style={{ color: '#64748B', fontSize: '14px', margin: 0 }}>
+                        {building.floors.length} floors • {building.basementLevels} basement{building.basementLevels !== 1 ? 's' : ''} • Top floor: {building.topFloor}
+                      </p>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button onClick={() => {
+                        setEditingBuilding({
+                          id: building.id,
+                          name: building.name,
+                          basementLevels: building.basementLevels,
+                          topFloor: building.topFloor
+                        });
+                        setShowBuildingModal(true);
+                      }} style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid #475569',
+                        borderRadius: '6px',
+                        color: '#3B82F6',
+                        fontSize: '12px',
+                        padding: '8px 16px',
+                        cursor: 'pointer'
+                      }}>Edit</button>
+                      <button onClick={() => {
+                        if (confirm(`Delete ${building.name}? This action cannot be undone.`)) {
+                          globalState.deleteBuilding(building.id);
+                          alert('Building deleted!');
+                        }
+                      }} style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid #475569',
+                        borderRadius: '6px',
+                        color: '#EF4444',
+                        fontSize: '12px',
+                        padding: '8px 16px',
+                        cursor: 'pointer'
+                      }}>Delete</button>
+                    </div>
+                  </div>
+
+                  {/* Floor Visualization */}
+                  <div style={{ padding: '24px' }}>
+                    <h4 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Floor Configuration</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px' }}>
+                      {building.floors.map((floor) => (
+                        <div key={floor.floorNumber} style={{
+                          backgroundColor: '#0F1629',
+                          borderRadius: '8px',
+                          padding: '16px',
+                          border: '1px solid #1E293B'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                            <div>
+                              <div style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600' }}>
+                                {floor.floorLabel === 'Ground' ? 'Ground Floor' : `Floor ${floor.floorLabel}`}
+                              </div>
+                              <div style={{ color: '#64748B', fontSize: '12px', marginTop: '4px' }}>
+                                {floor.zones.length} zone{floor.zones.length !== 1 ? 's' : ''}
+                              </div>
+                            </div>
+                            <span style={{
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              backgroundColor: floor.floorNumber < 0 ? 'rgba(139, 92, 246, 0.1)' : floor.floorNumber === 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                              color: floor.floorNumber < 0 ? '#8B5CF6' : floor.floorNumber === 0 ? '#10B981' : '#3B82F6'
+                            }}>
+                              {floor.floorNumber < 0 ? 'Basement' : floor.floorNumber === 0 ? 'Ground' : 'Above'}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                            {floor.zones.map((zone, zoneIdx) => (
+                              <span key={zoneIdx} style={{
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                                color: '#94A3B8',
+                                border: '1px solid #334155'
+                              }}>
+                                {zone}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {globalState.buildings.filter(b => b.tenantId === selectedTenant).length === 0 && (
+                <div style={{
+                  backgroundColor: '#162032',
+                  borderRadius: '12px',
+                  border: '1px solid #1E293B',
+                  padding: '48px 24px',
+                  textAlign: 'center'
+                }}>
+                  <BuildingRegular style={{ fontSize: '48px', color: '#475569', marginBottom: '16px' }} />
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>No Buildings Configured</h3>
+                  <p style={{ color: '#64748B', fontSize: '14px', marginBottom: '24px' }}>Add your first building to get started with building management.</p>
+                  <button onClick={() => {
+                    setEditingBuilding({
+                      name: '',
+                      basementLevels: 0,
+                      topFloor: 10
+                    });
+                    setShowBuildingModal(true);
+                  }} style={{
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '12px 24px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>+ Add Building</button>
+                </div>
+              )}
             </div>
           )}
 
@@ -4676,12 +5304,11 @@ export default function AdminPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Building *</label>
-                  <input 
-                    type="text" 
+                  <select
                     name="building"
                     defaultValue={editingParkingSpace.building}
-                    required 
-                    placeholder="e.g., Building A, Main Tower"
+                    required
+                    onChange={(e) => setSelectedParkingBuilding(e.target.value)}
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -4689,11 +5316,50 @@ export default function AdminPage() {
                       border: '1px solid #475569',
                       borderRadius: '8px',
                       color: '#F1F5F9',
-                      fontSize: '14px'
-                    }} 
-                  />
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="">Select a building</option>
+                    {globalState.buildings.filter(b => b.tenantId === selectedTenant).map(building => (
+                      <option key={building.id} value={building.name}>{building.name}</option>
+                    ))}
+                  </select>
                 </div>
                 
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Floor *</label>
+                  <select
+                    name="floor"
+                    defaultValue={editingParkingSpace.floor}
+                    required
+                    disabled={!selectedParkingBuilding && !editingParkingSpace.building}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      opacity: (!selectedParkingBuilding && !editingParkingSpace.building) ? 0.5 : 1
+                    }}
+                  >
+                    <option value="">Select a floor</option>
+                    {(() => {
+                      const buildingName = selectedParkingBuilding || editingParkingSpace.building;
+                      const building = globalState.buildings.find(b => b.name === buildingName && b.tenantId === selectedTenant);
+                      if (!building) return null;
+                      return building.floors.map(floor => (
+                        <option key={floor.floorNumber} value={floor.floorLabel}>{floor.floorLabel === 'Ground' ? 'Ground Floor' : `Floor ${floor.floorLabel}`}</option>
+                      ));
+                    })()}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Location *</label>
                   <input 
@@ -4713,9 +5379,7 @@ export default function AdminPage() {
                     }} 
                   />
                 </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                
                 <div>
                   <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Level</label>
                   <input 
@@ -4723,25 +5387,6 @@ export default function AdminPage() {
                     name="level"
                     defaultValue={editingParkingSpace.level}
                     placeholder="e.g., Level 1, Ground, Basement"
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: '#1E293B',
-                      border: '1px solid #475569',
-                      borderRadius: '8px',
-                      color: '#F1F5F9',
-                      fontSize: '14px'
-                    }} 
-                  />
-                </div>
-                
-                <div>
-                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Floor</label>
-                  <input 
-                    type="text" 
-                    name="floor"
-                    defaultValue={editingParkingSpace.floor}
-                    placeholder="e.g., 1st Floor, -2"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -4882,6 +5527,871 @@ export default function AdminPage() {
                   boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
                 }}>{editingParkingSpace.id ? 'Update Parking Space' : 'Create Parking Space'}</button>
                 <button type="button" onClick={() => { setShowParkingModal(false); setEditingParkingSpace(null); }} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Locker Modal */}
+      {showLockerModal && editingLocker && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => { setShowLockerModal(false); setEditingLocker(null); }}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '700px',
+            width: '90%',
+            border: '1px solid #1E293B',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '8px' }}>
+              {editingLocker.id ? 'Edit' : 'Create'} Locker
+            </h2>
+            <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Configure locker details and assignment</p>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              
+              const lockerData = {
+                lockerNumber: formData.get('lockerNumber') as string,
+                name: formData.get('name') as string,
+                building: formData.get('building') as string,
+                floor: formData.get('floor') as string,
+                zone: formData.get('zone') as string,
+                type: formData.get('type') as 'permanent' | 'gym' | 'bike' | 'temporary' | 'storage',
+                notes: formData.get('notes') as string,
+                tenantId: selectedTenant,
+                status: 'available' as const
+              };
+              
+              if (editingLocker.id) {
+                // Update existing locker
+                globalState.updateLocker(editingLocker.id, lockerData);
+                alert('Locker updated successfully');
+              } else {
+                // Create new locker
+                globalState.addLocker(lockerData);
+                alert('Locker created successfully');
+              }
+              
+              setShowLockerModal(false);
+              setEditingLocker(null);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Locker Number *</label>
+                  <input 
+                    type="text" 
+                    name="lockerNumber"
+                    defaultValue={editingLocker.lockerNumber}
+                    required 
+                    placeholder="e.g., L-101, GYM-045"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Friendly Name</label>
+                  <input 
+                    type="text" 
+                    name="name"
+                    defaultValue={editingLocker.name}
+                    placeholder="e.g., Executive Locker, Bike Storage 1"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Building *</label>
+                  <select
+                    name="building"
+                    defaultValue={editingLocker.building}
+                    required
+                    onChange={(e) => setSelectedLockerBuilding(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="">Select a building</option>
+                    {globalState.buildings.filter(b => b.tenantId === selectedTenant).map(building => (
+                      <option key={building.id} value={building.name}>{building.name}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Floor *</label>
+                  <select
+                    name="floor"
+                    defaultValue={editingLocker.floor}
+                    required
+                    disabled={!selectedLockerBuilding && !editingLocker.building}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      opacity: (!selectedLockerBuilding && !editingLocker.building) ? 0.5 : 1
+                    }}
+                  >
+                    <option value="">Select a floor</option>
+                    {(() => {
+                      const buildingName = selectedLockerBuilding || editingLocker.building;
+                      const building = globalState.buildings.find(b => b.name === buildingName && b.tenantId === selectedTenant);
+                      if (!building) return null;
+                      return building.floors.map(floor => (
+                        <option key={floor.floorNumber} value={floor.floorLabel}>{floor.floorLabel === 'Ground' ? 'Ground Floor' : `Floor ${floor.floorLabel}`}</option>
+                      ));
+                    })()}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Zone</label>
+                  <select
+                    name="zone"
+                    defaultValue={editingLocker.zone}
+                    disabled={!selectedLockerBuilding && !editingLocker.building}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      opacity: (!selectedLockerBuilding && !editingLocker.building) ? 0.5 : 1
+                    }}
+                  >
+                    <option value="">Select a zone (optional)</option>
+                    {(() => {
+                      const buildingName = selectedLockerBuilding || editingLocker.building;
+                      const building = globalState.buildings.find(b => b.name === buildingName && b.tenantId === selectedTenant);
+                      if (!building) return null;
+                      const allZones = building.floors.flatMap(f => f.zones);
+                      const uniqueZones = Array.from(new Set(allZones));
+                      return uniqueZones.map(zone => (
+                        <option key={zone} value={zone}>{zone}</option>
+                      ));
+                    })()}
+                  </select>
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Locker Type *</label>
+                  <select 
+                    name="type"
+                    defaultValue={editingLocker.type}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }} 
+                  >
+                    <option value="permanent">Permanent</option>
+                    <option value="gym">Gym</option>
+                    <option value="bike">Bike</option>
+                    <option value="temporary">Temporary</option>
+                    <option value="storage">Storage</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Additional Notes</label>
+                <textarea 
+                  name="notes"
+                  defaultValue={editingLocker.notes}
+                  placeholder="Any additional information about this locker..."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    resize: 'vertical'
+                  }} 
+                />
+              </div>
+              
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>{editingLocker.id ? 'Update Locker' : 'Create Locker'}</button>
+                <button type="button" onClick={() => { setShowLockerModal(false); setEditingLocker(null); }} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Space Modal */}
+      {showSpaceModal && editingSpace && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => { setShowSpaceModal(false); setEditingSpace(null); }}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '700px',
+            width: '90%',
+            border: '1px solid #1E293B',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '8px' }}>
+              {editingSpace.id ? 'Edit' : 'Create'} Space
+            </h2>
+            <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Configure space details and assignment</p>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              
+              const spaceData = {
+                spaceNumber: formData.get('spaceNumber') as string,
+                name: formData.get('name') as string,
+                building: formData.get('building') as string,
+                floor: formData.get('floor') as string,
+                location: formData.get('location') as string,
+                zone: formData.get('zone') as string,
+                type: formData.get('type') as 'desk' | 'office' | 'meeting-room' | 'conference-room' | 'social-hub',
+                capacity: parseInt(formData.get('capacity') as string) || 1,
+                notes: formData.get('notes') as string,
+                tenantId: selectedTenant,
+                status: 'available' as const
+              };
+              
+              if (editingSpace.id) {
+                // Update existing space
+                globalState.updateSpace(editingSpace.id, spaceData);
+                alert('Space updated successfully');
+              } else {
+                // Create new space
+                globalState.addSpace(spaceData);
+                alert('Space created successfully');
+              }
+              
+              setShowSpaceModal(false);
+              setEditingSpace(null);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Space Number *</label>
+                  <input 
+                    type="text" 
+                    name="spaceNumber"
+                    defaultValue={editingSpace.spaceNumber}
+                    required 
+                    placeholder="e.g., DSK-101, OFF-205"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Friendly Name</label>
+                  <input 
+                    type="text" 
+                    name="name"
+                    defaultValue={editingSpace.name}
+                    placeholder="e.g., Corner Office, Blue Desk"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Building *</label>
+                  <select
+                    name="building"
+                    defaultValue={editingSpace.building}
+                    required
+                    onChange={(e) => setSelectedSpaceBuilding(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="">Select a building</option>
+                    {globalState.buildings.filter(b => b.tenantId === selectedTenant).map(building => (
+                      <option key={building.id} value={building.name}>{building.name}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Floor *</label>
+                  <select
+                    name="floor"
+                    defaultValue={editingSpace.floor}
+                    required
+                    disabled={!selectedSpaceBuilding && !editingSpace.building}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      opacity: (!selectedSpaceBuilding && !editingSpace.building) ? 0.5 : 1
+                    }}
+                  >
+                    <option value="">Select a floor</option>
+                    {(() => {
+                      const buildingName = selectedSpaceBuilding || editingSpace.building;
+                      const building = globalState.buildings.find(b => b.name === buildingName && b.tenantId === selectedTenant);
+                      if (!building) return null;
+                      return building.floors.map(floor => (
+                        <option key={floor.floorNumber} value={floor.floorLabel}>{floor.floorLabel === 'Ground' ? 'Ground Floor' : `Floor ${floor.floorLabel}`}</option>
+                      ));
+                    })()}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Location</label>
+                  <input 
+                    type="text" 
+                    name="location"
+                    defaultValue={editingSpace.location}
+                    placeholder="e.g., East Wing, Near Reception"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Zone</label>
+                  <select
+                    name="zone"
+                    defaultValue={editingSpace.zone}
+                    disabled={!selectedSpaceBuilding && !editingSpace.building}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      opacity: (!selectedSpaceBuilding && !editingSpace.building) ? 0.5 : 1
+                    }}
+                  >
+                    <option value="">Select a zone (optional)</option>
+                    {(() => {
+                      const buildingName = selectedSpaceBuilding || editingSpace.building;
+                      const building = globalState.buildings.find(b => b.name === buildingName && b.tenantId === selectedTenant);
+                      if (!building) return null;
+                      const allZones = building.floors.flatMap(f => f.zones);
+                      const uniqueZones = Array.from(new Set(allZones));
+                      return uniqueZones.map(zone => (
+                        <option key={zone} value={zone}>{zone}</option>
+                      ));
+                    })()}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Space Type *</label>
+                  <select 
+                    name="type"
+                    defaultValue={editingSpace.type}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }} 
+                  >
+                    <option value="desk">Desk</option>
+                    <option value="office">Office</option>
+                    <option value="meeting-room">Meeting Room</option>
+                    <option value="conference-room">Conference Room</option>
+                    <option value="social-hub">Social Hub</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Capacity *</label>
+                  <input 
+                    type="number" 
+                    name="capacity"
+                    defaultValue={editingSpace.capacity}
+                    required 
+                    min="1"
+                    placeholder="Number of people"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Additional Notes</label>
+                <textarea 
+                  name="notes"
+                  defaultValue={editingSpace.notes}
+                  placeholder="Any additional information about this space..."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    resize: 'vertical'
+                  }} 
+                />
+              </div>
+              
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>{editingSpace.id ? 'Update Space' : 'Create Space'}</button>
+                <button type="button" onClick={() => { setShowSpaceModal(false); setEditingSpace(null); }} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Building Modal */}
+      {showBuildingModal && editingBuilding && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => { setShowBuildingModal(false); setEditingBuilding(null); setSelectedFloorForZones(null); }}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '900px',
+            width: '90%',
+            border: '1px solid #1E293B',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '8px' }}>
+              {editingBuilding.id ? 'Edit' : 'Create'} Building
+            </h2>
+            <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Configure building structure with floors and zones</p>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              
+              const name = formData.get('name') as string;
+              const basementLevels = parseInt(formData.get('basementLevels') as string) || 0;
+              const topFloor = parseInt(formData.get('topFloor') as string) || 1;
+              
+              // Generate floors array
+              const floors = [];
+              
+              // Add basement floors
+              for (let i = -basementLevels; i < 0; i++) {
+                const floorLabel = `B${Math.abs(i)}`;
+                const zonesInput = formData.get(`zones_${i}`) as string;
+                const zones = zonesInput ? zonesInput.split(',').map(z => z.trim()).filter(z => z) : ['Zone A'];
+                floors.push({
+                  floorNumber: i,
+                  floorLabel,
+                  zones
+                });
+              }
+              
+              // Add ground floor
+              const groundZonesInput = formData.get('zones_0') as string;
+              const groundZones = groundZonesInput ? groundZonesInput.split(',').map(z => z.trim()).filter(z => z) : ['Lobby'];
+              floors.push({
+                floorNumber: 0,
+                floorLabel: 'Ground',
+                zones: groundZones
+              });
+              
+              // Add upper floors
+              for (let i = 1; i <= topFloor; i++) {
+                const floorLabel = `${i}`;
+                const zonesInput = formData.get(`zones_${i}`) as string;
+                const zones = zonesInput ? zonesInput.split(',').map(z => z.trim()).filter(z => z) : ['Zone A'];
+                floors.push({
+                  floorNumber: i,
+                  floorLabel,
+                  zones
+                });
+              }
+              
+              const buildingData = {
+                name,
+                tenantId: selectedTenant,
+                basementLevels,
+                topFloor,
+                floors
+              };
+              
+              if (editingBuilding.id) {
+                // Update existing building
+                globalState.updateBuilding(editingBuilding.id, buildingData);
+                alert('Building updated successfully');
+              } else {
+                // Create new building
+                globalState.addBuilding(buildingData);
+                alert('Building created successfully');
+              }
+              
+              setShowBuildingModal(false);
+              setEditingBuilding(null);
+              setSelectedFloorForZones(null);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Building Name *</label>
+                <input 
+                  type="text" 
+                  name="name"
+                  defaultValue={editingBuilding.name}
+                  required 
+                  placeholder="e.g., Building A, Main Tower"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    backgroundColor: '#1E293B',
+                    border: '1px solid #475569',
+                    borderRadius: '8px',
+                    color: '#F1F5F9',
+                    fontSize: '14px'
+                  }} 
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Basement Levels</label>
+                  <input 
+                    type="number" 
+                    name="basementLevels"
+                    defaultValue={editingBuilding.basementLevels}
+                    min="0"
+                    max="10"
+                    placeholder="0"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value) || 0;
+                      setEditingBuilding(prev => prev ? {...prev, basementLevels: val} : null);
+                    }}
+                  />
+                  <p style={{ color: '#64748B', fontSize: '12px', marginTop: '4px' }}>Number of basement floors (e.g., 2 = B2, B1)</p>
+                </div>
+                
+                <div>
+                  <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Top Floor *</label>
+                  <input 
+                    type="number" 
+                    name="topFloor"
+                    defaultValue={editingBuilding.topFloor}
+                    required 
+                    min="1"
+                    max="100"
+                    placeholder="10"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      backgroundColor: '#1E293B',
+                      border: '1px solid #475569',
+                      borderRadius: '8px',
+                      color: '#F1F5F9',
+                      fontSize: '14px'
+                    }} 
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value) || 1;
+                      setEditingBuilding(prev => prev ? {...prev, topFloor: val} : null);
+                    }}
+                  />
+                  <p style={{ color: '#64748B', fontSize: '12px', marginTop: '4px' }}>Highest floor number</p>
+                </div>
+              </div>
+
+              {/* Floor Zone Configuration */}
+              <div style={{
+                backgroundColor: '#0F1629',
+                borderRadius: '8px',
+                padding: '16px',
+                border: '1px solid #1E293B'
+              }}>
+                <h4 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>Zone Configuration</h4>
+                <p style={{ color: '#64748B', fontSize: '13px', marginBottom: '16px' }}>Define zones for each floor (comma-separated, e.g., &quot;Zone A, Zone B, Zone C&quot;)</p>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '300px', overflow: 'auto', padding: '4px' }}>
+                  {/* Basement floors */}
+                  {Array.from({ length: editingBuilding.basementLevels }, (_, i) => {
+                    const floorNum = -(editingBuilding.basementLevels - i);
+                    const floorLabel = `B${Math.abs(floorNum)}`;
+                    return (
+                      <div key={floorNum} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <span style={{ color: '#8B5CF6', fontSize: '14px', fontWeight: '600', minWidth: '80px' }}>{floorLabel}</span>
+                        <input 
+                          type="text" 
+                          name={`zones_${floorNum}`}
+                          defaultValue="Parking, Storage"
+                          placeholder="Parking, Storage"
+                          style={{
+                            flex: 1,
+                            padding: '10px',
+                            backgroundColor: '#1E293B',
+                            border: '1px solid #475569',
+                            borderRadius: '6px',
+                            color: '#F1F5F9',
+                            fontSize: '13px'
+                          }} 
+                        />
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Ground floor */}
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <span style={{ color: '#10B981', fontSize: '14px', fontWeight: '600', minWidth: '80px' }}>Ground</span>
+                    <input 
+                      type="text" 
+                      name="zones_0"
+                      defaultValue="Lobby, Reception, Security"
+                      placeholder="Lobby, Reception"
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        backgroundColor: '#1E293B',
+                        border: '1px solid #475569',
+                        borderRadius: '6px',
+                        color: '#F1F5F9',
+                        fontSize: '13px'
+                      }} 
+                    />
+                  </div>
+                  
+                  {/* Upper floors */}
+                  {Array.from({ length: editingBuilding.topFloor }, (_, i) => {
+                    const floorNum = i + 1;
+                    return (
+                      <div key={floorNum} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <span style={{ color: '#3B82F6', fontSize: '14px', fontWeight: '600', minWidth: '80px' }}>Floor {floorNum}</span>
+                        <input 
+                          type="text" 
+                          name={`zones_${floorNum}`}
+                          defaultValue="Zone A, Zone B"
+                          placeholder="Zone A, Zone B"
+                          style={{
+                            flex: 1,
+                            padding: '10px',
+                            backgroundColor: '#1E293B',
+                            border: '1px solid #475569',
+                            borderRadius: '6px',
+                            color: '#F1F5F9',
+                            fontSize: '13px'
+                          }} 
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)'
+                }}>{editingBuilding.id ? 'Update Building' : 'Create Building'}</button>
+                <button type="button" onClick={() => { setShowBuildingModal(false); setEditingBuilding(null); setSelectedFloorForZones(null); }} style={{
                   flex: 1,
                   backgroundColor: 'transparent',
                   color: '#F1F5F9',

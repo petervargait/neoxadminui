@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular } from '@fluentui/react-icons'
+import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular, BuildingRegular } from '@fluentui/react-icons'
 import { useGlobalState } from '../../context/GlobalStateContext'
 
 export default function TenantPage() {
@@ -59,6 +59,10 @@ export default function TenantPage() {
   const [editingTemplate, setEditingTemplate] = useState<{name: string; subject?: string; status?: string} | null>(null)
   const [showParkingModal, setShowParkingModal] = useState(false)
   const [selectedParkingSpace, setSelectedParkingSpace] = useState<string | null>(null)
+  const [showLockerModal, setShowLockerModal] = useState(false)
+  const [selectedLocker, setSelectedLocker] = useState<string | null>(null)
+  const [showSpaceModal, setShowSpaceModal] = useState(false)
+  const [selectedSpace, setSelectedSpace] = useState<string | null>(null)
   const [showTicketModal, setShowTicketModal] = useState(false)
   const [systemOnline, setSystemOnline] = useState(true)
   const [notificationCount, setNotificationCount] = useState(3)
@@ -253,6 +257,9 @@ export default function TenantPage() {
             { icon: 'people', label: 'Users', action: () => setActiveSection('users'), isFluentIcon: true, iconType: 'people' },
             { icon: 'person', label: 'Invitations', action: () => setActiveSection('invitations'), isFluentIcon: true, iconType: 'person' },
             { icon: 'vehicle', label: 'Parking', action: () => setActiveSection('parking'), isFluentIcon: true, iconType: 'vehicle' },
+            { icon: '◎', label: 'Lockers', action: () => setActiveSection('lockers'), isFluentIcon: false, iconType: null },
+            { icon: '◩', label: 'Spaces', action: () => setActiveSection('spaces'), isFluentIcon: false, iconType: null },
+            { icon: 'building', label: 'Building Config', action: () => setActiveSection('buildings'), isFluentIcon: true, iconType: 'building' },
             { icon: 'document', label: 'Digital Badges', action: () => setActiveSection('digitalBadges'), isFluentIcon: true, iconType: 'document' },
             { icon: '◨', label: 'Templates', action: () => setActiveSection('templates'), isFluentIcon: false, iconType: null },
             { icon: '◪', label: 'Policies', action: () => setActiveSection('policies'), isFluentIcon: false, iconType: null },
@@ -296,6 +303,8 @@ export default function TenantPage() {
                   <DocumentRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : item.iconType === 'settings' ? (
                   <SettingsRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'building' ? (
+                  <BuildingRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : (
                   <span style={{ fontSize: '18px' }}>{item.icon}</span>
                 )
@@ -398,6 +407,8 @@ export default function TenantPage() {
               {activeSection === 'users' && 'User Management'}
               {activeSection === 'invitations' && 'Invitation Management'}
               {activeSection === 'parking' && 'Parking Management'}
+              {activeSection === 'lockers' && 'Locker Management'}
+              {activeSection === 'spaces' && 'Space Management'}
               {activeSection === 'digitalBadges' && 'Digital Badges Management'}
               {activeSection === 'templates' && 'Template Management'}
               {activeSection === 'policies' && 'Company Policies'}
@@ -564,10 +575,10 @@ export default function TenantPage() {
                       color: '#D7BB91',
                       boxShadow: '0 0 15px rgba(215, 187, 145, 0.4), 0 0 30px rgba(215, 187, 145, 0.2)'
                     }}>◎</div>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>147</div>
+                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>{globalState.users.filter(u => u.tenantId === selectedTenantId).length}</div>
                   </div>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Total Users</h3>
-                  <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>Active in your organization</p>
+                  <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>{globalState.users.filter(u => u.tenantId === selectedTenantId && u.status === 'active').length} active</p>
                 </div>
 
                 <div style={{
@@ -590,10 +601,10 @@ export default function TenantPage() {
                       color: '#CBD5E1',
                       boxShadow: '0 0 15px rgba(203, 213, 225, 0.4), 0 0 30px rgba(203, 213, 225, 0.2)'
                     }}>◫</div>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>23</div>
+                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>{globalState.invitations.length}</div>
                   </div>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Active Invitations</h3>
-                  <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>Pending responses</p>
+                  <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>{globalState.invitations.filter(i => i.status === 'pending').length} pending</p>
                 </div>
 
                 <div style={{
@@ -616,10 +627,46 @@ export default function TenantPage() {
                       color: '#60A5FA',
                       boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 30px rgba(96, 165, 250, 0.2)'
                     }}>◧</div>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>12/50</div>
+                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>
+                      {globalState.parkingSpaces.filter(p => (!p.tenantId || p.tenantId === selectedTenantId) && p.status === 'occupied').length}/
+                      {globalState.parkingSpaces.filter(p => !p.tenantId || p.tenantId === selectedTenantId).length}
+                    </div>
                   </div>
                   <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Parking Spaces</h3>
-                  <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>38 available</p>
+                  <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>
+                    {globalState.parkingSpaces.filter(p => (!p.tenantId || p.tenantId === selectedTenantId) && p.status === 'available').length} available
+                  </p>
+                </div>
+
+                <div style={{
+                  padding: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: '#162032',
+                  border: '1px solid #1E293B',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '24px',
+                      color: '#8B5CF6',
+                      boxShadow: '0 0 15px rgba(139, 92, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.2)'
+                    }}>◎</div>
+                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>
+                      {globalState.lockers.filter(l => l.type === 'permanent' && (!l.tenantId || l.tenantId === selectedTenantId) && l.status === 'occupied').length}/
+                      {globalState.lockers.filter(l => l.type === 'permanent' && (!l.tenantId || l.tenantId === selectedTenantId)).length}
+                    </div>
+                  </div>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Permanent Lockers</h3>
+                  <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>
+                    {globalState.lockers.filter(l => l.type === 'permanent' && (!l.tenantId || l.tenantId === selectedTenantId) && l.status === 'available').length} available
+                  </p>
                 </div>
               </div>
 
@@ -913,13 +960,16 @@ export default function TenantPage() {
             const tenantInvitations = globalState.invitations;
             const tenantTickets = globalState.tickets.filter(t => t.tenantId === selectedTenantId);
             const tenantBadges = globalState.badges;
+            const tenantLockers = globalState.lockers.filter(l => l.type === 'permanent' && (!l.tenantId || l.tenantId === selectedTenantId));
             
             const activeUsers = tenantUsers.filter(u => u.status === 'active').length;
             const pendingInvitations = tenantInvitations.filter(i => i.status === 'pending').length;
-            const totalParkingSpaces = globalState.parkingSpaces.length;
-            const occupiedSpaces = globalState.parkingSpaces.filter(p => p.status === 'occupied' || p.status === 'reserved').length;
+            const totalParkingSpaces = globalState.parkingSpaces.filter(p => !p.tenantId || p.tenantId === selectedTenantId).length;
+            const occupiedSpaces = globalState.parkingSpaces.filter(p => (!p.tenantId || p.tenantId === selectedTenantId) && (p.status === 'occupied' || p.status === 'reserved')).length;
             const parkingUsagePercent = totalParkingSpaces > 0 ? Math.round((occupiedSpaces / totalParkingSpaces) * 100) : 0;
             const openTickets = tenantTickets.filter(t => t.status === 'open' || t.status === 'in-progress').length;
+            const occupiedLockers = tenantLockers.filter(l => l.status === 'occupied').length;
+            const lockerUsagePercent = tenantLockers.length > 0 ? Math.round((occupiedLockers / tenantLockers.length) * 100) : 0;
             
             // Get recent audit logs for this tenant
             const recentLogs = globalState.auditLogs.slice(0, 5);
@@ -956,6 +1006,11 @@ export default function TenantPage() {
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>User Status</h4>
                   <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#10B981', marginBottom: '8px' }}>{activeUsers}</div>
                   <div style={{ fontSize: '14px', color: '#64748B' }}>{tenantUsers.filter(u => u.status === 'pending').length} pending</div>
+                </div>
+                <div style={{ padding: '24px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Locker Usage</h4>
+                  <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#8B5CF6', marginBottom: '8px' }}>{lockerUsagePercent}%</div>
+                  <div style={{ fontSize: '14px', color: '#64748B' }}>{occupiedLockers} of {tenantLockers.length} lockers</div>
                 </div>
               </div>
               <div style={{ padding: '24px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
@@ -1653,6 +1708,461 @@ export default function TenantPage() {
                   )}
                 </div>
               </div>
+            </div>
+          );})()}
+
+          {/* Locker Management Section */}
+          {activeSection === 'lockers' && (() => {
+            // Filter permanent lockers for this tenant (either assigned to this tenant or global lockers without tenantId)
+            const tenantLockers = globalState.lockers.filter(l => l.type === 'permanent' && (!l.tenantId || l.tenantId === selectedTenantId));
+            const occupiedLockers = tenantLockers.filter(l => l.status === 'occupied');
+            const availableLockers = tenantLockers.filter(l => l.status === 'available');
+
+            return (
+            <div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '24px' }}>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Lockers</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F1F5F9' }}>{tenantLockers.length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Occupied</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{occupiedLockers.length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Available</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>{availableLockers.length}</div>
+                </div>
+              </div>
+
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Permanent Lockers</h3>
+                  <button onClick={() => setShowLockerModal(true)} style={{
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>Assign Locker</button>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
+                    {tenantLockers.map((locker) => {
+                      const isOccupied = locker.status === 'occupied';
+                      return (
+                        <div key={locker.id} 
+                          onClick={() => {
+                            if (!isOccupied) {
+                              setSelectedLocker(locker.lockerNumber);
+                              setShowLockerModal(true);
+                            }
+                          }}
+                          style={{
+                          padding: '20px',
+                          backgroundColor: isOccupied ? '#1E293B' : '#0F1629',
+                          border: `2px solid ${isOccupied ? '#EF4444' : '#10B981'}`,
+                          borderRadius: '8px',
+                          textAlign: 'center',
+                          cursor: isOccupied ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s',
+                          opacity: isOccupied ? 0.6 : 1
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1.05)';
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1)';
+                        }}>
+                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: isOccupied ? '#EF4444' : '#10B981', marginBottom: '4px' }}>{locker.lockerNumber}</div>
+                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{isOccupied ? 'Occupied' : 'Available'}</div>
+                          {isOccupied && locker.assignedToName && (
+                            <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '4px' }}>{locker.assignedToName}</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden',
+                marginTop: '24px'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Current Locker Assignments</h3>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  {occupiedLockers.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '48px 24px', color: '#64748B' }}>
+                      <div style={{ fontSize: '16px', fontWeight: '500' }}>No locker assignments yet</div>
+                      <div style={{ fontSize: '14px', marginTop: '8px' }}>Assign lockers to users from the available lockers above</div>
+                    </div>
+                  ) : (
+                    occupiedLockers.map((assignment) => (
+                    <div key={assignment.id} style={{
+                      padding: '16px',
+                      backgroundColor: '#1E293B',
+                      borderRadius: '8px',
+                      marginBottom: '12px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          backgroundColor: '#0F1629',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          color: '#8B5CF6'
+                        }}>{assignment.lockerNumber}</div>
+                        <div>
+                          <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600' }}>{assignment.assignedToName || 'Unknown User'}</h4>
+                          <p style={{ color: '#94A3B8', margin: '0 0 2px 0', fontSize: '13px' }}>{assignment.building} - Floor {assignment.floor}</p>
+                          {assignment.zone && (
+                            <p style={{ color: '#64748B', margin: 0, fontSize: '12px' }}>{assignment.zone}</p>
+                          )}
+                          {assignment.assignedDate && (
+                            <p style={{ color: '#64748B', margin: 0, fontSize: '11px', marginTop: '2px' }}>Assigned: {new Date(assignment.assignedDate).toLocaleDateString()}</p>
+                          )}
+                        </div>
+                      </div>
+                      <button onClick={() => { 
+                        if (confirm(`Release locker ${assignment.lockerNumber}?`)) { 
+                          globalState.updateLocker(assignment.id, { status: 'available', assignedTo: undefined, assignedToName: undefined, assignedDate: undefined });
+                          alert(`Locker ${assignment.lockerNumber} released successfully`); 
+                        } 
+                      }} style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid #475569',
+                        borderRadius: '6px',
+                        color: '#EF4444',
+                        fontSize: '12px',
+                        padding: '6px 12px',
+                        cursor: 'pointer'
+                      }}>Release</button>
+                    </div>
+                  ))
+                  )}
+                </div>
+              </div>
+            </div>
+          );})()}
+
+          {/* Space Management Section */}
+          {activeSection === 'spaces' && (() => {
+            // Filter spaces for this tenant
+            const tenantSpaces = globalState.spaces.filter(s => !s.tenantId || s.tenantId === selectedTenantId);
+            const occupiedSpaces = tenantSpaces.filter(s => s.status === 'occupied');
+            const availableSpaces = tenantSpaces.filter(s => s.status === 'available');
+
+            return (
+            <div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '24px' }}>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Spaces</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F1F5F9' }}>{tenantSpaces.length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Assigned</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{occupiedSpaces.length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Available</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>{availableSpaces.length}</div>
+                </div>
+              </div>
+
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Bookable Spaces</h3>
+                  <button onClick={() => setShowSpaceModal(true)} style={{
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>Assign Space</button>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
+                    {tenantSpaces.map((space) => {
+                      const isOccupied = space.status === 'occupied';
+                      const typeColors: Record<string, string> = {
+                        'desk': '#3B82F6',
+                        'office': '#8B5CF6',
+                        'meeting-room': '#10B981',
+                        'conference-room': '#F59E0B',
+                        'social-hub': '#EC4899'
+                      };
+                      const typeColor = typeColors[space.type] || '#64748B';
+                      return (
+                        <div key={space.id} 
+                          onClick={() => {
+                            if (!isOccupied) {
+                              setSelectedSpace(space.spaceNumber);
+                              setShowSpaceModal(true);
+                            }
+                          }}
+                          style={{
+                          padding: '20px',
+                          backgroundColor: isOccupied ? '#1E293B' : '#0F1629',
+                          border: `2px solid ${isOccupied ? '#EF4444' : typeColor}`,
+                          borderRadius: '8px',
+                          textAlign: 'center',
+                          cursor: isOccupied ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s',
+                          opacity: isOccupied ? 0.6 : 1
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1.05)';
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1)';
+                        }}>
+                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: isOccupied ? '#EF4444' : typeColor, marginBottom: '4px' }}>{space.spaceNumber}</div>
+                          <div style={{ fontSize: '10px', color: '#64748B', textTransform: 'uppercase', marginBottom: '4px' }}>
+                            {space.type === 'meeting-room' ? 'Meeting' : space.type === 'conference-room' ? 'Conference' : space.type === 'social-hub' ? 'Social' : space.type}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{isOccupied ? 'Occupied' : 'Available'}</div>
+                          {isOccupied && space.assignedToName && (
+                            <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '4px' }}>{space.assignedToName}</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{
+                backgroundColor: '#162032',
+                borderRadius: '12px',
+                border: '1px solid #1E293B',
+                overflow: 'hidden',
+                marginTop: '24px'
+              }}>
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B' }}>
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Current Space Assignments</h3>
+                </div>
+                <div style={{ padding: '24px' }}>
+                  {occupiedSpaces.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '48px 24px', color: '#64748B' }}>
+                      <div style={{ fontSize: '16px', fontWeight: '500' }}>No space assignments yet</div>
+                      <div style={{ fontSize: '14px', marginTop: '8px' }}>Assign spaces to users from the available spaces above</div>
+                    </div>
+                  ) : (
+                    occupiedSpaces.map((assignment) => {
+                      const typeColors: Record<string, string> = {
+                        'desk': '#3B82F6',
+                        'office': '#8B5CF6',
+                        'meeting-room': '#10B981',
+                        'conference-room': '#F59E0B',
+                        'social-hub': '#EC4899'
+                      };
+                      const typeColor = typeColors[assignment.type] || '#64748B';
+                      return (
+                    <div key={assignment.id} style={{
+                      padding: '16px',
+                      backgroundColor: '#1E293B',
+                      borderRadius: '8px',
+                      marginBottom: '12px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                        <div style={{
+                          width: '48px',
+                          height: '48px',
+                          backgroundColor: '#0F1629',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '14px',
+                          fontWeight: 'bold',
+                          color: typeColor
+                        }}>{assignment.spaceNumber}</div>
+                        <div>
+                          <h4 style={{ color: '#F1F5F9', margin: '0 0 4px 0', fontSize: '15px', fontWeight: '600' }}>{assignment.assignedToName || 'Unknown User'}</h4>
+                          <p style={{ color: '#94A3B8', margin: '0 0 2px 0', fontSize: '13px' }}>
+                            {assignment.type === 'meeting-room' ? 'Meeting Room' : assignment.type === 'conference-room' ? 'Conference Room' : assignment.type === 'social-hub' ? 'Social Hub' : assignment.type.charAt(0).toUpperCase() + assignment.type.slice(1)} • {assignment.building} - Floor {assignment.floor}
+                          </p>
+                          {assignment.zone && (
+                            <p style={{ color: '#64748B', margin: 0, fontSize: '12px' }}>{assignment.zone}</p>
+                          )}
+                          {assignment.assignedDate && (
+                            <p style={{ color: '#64748B', margin: 0, fontSize: '11px', marginTop: '2px' }}>Assigned: {new Date(assignment.assignedDate).toLocaleDateString()}</p>
+                          )}
+                        </div>
+                      </div>
+                      <button onClick={() => { 
+                        if (confirm(`Release space ${assignment.spaceNumber}?`)) { 
+                          globalState.updateSpace(assignment.id, { status: 'available', assignedTo: undefined, assignedToName: undefined, assignedDate: undefined });
+                          alert(`Space ${assignment.spaceNumber} released successfully`); 
+                        } 
+                      }} style={{
+                        backgroundColor: 'transparent',
+                        border: '1px solid #475569',
+                        borderRadius: '6px',
+                        color: '#EF4444',
+                        fontSize: '12px',
+                        padding: '6px 12px',
+                        cursor: 'pointer'
+                      }}>Release</button>
+                    </div>
+                    );
+                  })
+                  )}
+                </div>
+              </div>
+            </div>
+          );})()}
+
+          {/* Building Configuration Section (Read-only) */}
+          {activeSection === 'buildings' && (() => {
+            // Filter buildings for this tenant
+            const tenantBuildings = globalState.buildings.filter(b => b.tenantId === selectedTenantId);
+
+            return (
+            <div>
+              <div style={{ marginBottom: '24px', padding: '16px 20px', backgroundColor: '#162032', borderRadius: '8px', border: '1px solid #1E293B' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <InfoRegular style={{ fontSize: '20px', color: '#3B82F6' }} />
+                  <p style={{ color: '#94A3B8', fontSize: '14px', margin: 0 }}>Building configuration is managed by your administrator. This is a read-only view.</p>
+                </div>
+              </div>
+
+              {/* Stats Overview */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Buildings</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F1F5F9' }}>{tenantBuildings.length}</div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Floors</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>
+                    {tenantBuildings.reduce((sum, b) => sum + b.floors.length, 0)}
+                  </div>
+                </div>
+                <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                  <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Total Zones</h4>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#3B82F6' }}>
+                    {tenantBuildings.reduce((sum, b) => sum + b.floors.reduce((zoneSum, f) => zoneSum + f.zones.length, 0), 0)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Buildings List */}
+              {tenantBuildings.map((building) => (
+                <div key={building.id} style={{
+                  backgroundColor: '#162032',
+                  borderRadius: '12px',
+                  border: '1px solid #1E293B',
+                  overflow: 'hidden',
+                  marginBottom: '24px'
+                }}>
+                  <div style={{ padding: '24px', borderBottom: '1px solid #1E293B' }}>
+                    <div>
+                      <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: '0 0 8px 0' }}>{building.name}</h3>
+                      <p style={{ color: '#64748B', fontSize: '14px', margin: 0 }}>
+                        {building.floors.length} floors • {building.basementLevels} basement{building.basementLevels !== 1 ? 's' : ''} • Top floor: {building.topFloor}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Floor Visualization */}
+                  <div style={{ padding: '24px' }}>
+                    <h4 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>Floor Configuration</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px' }}>
+                      {building.floors.map((floor) => (
+                        <div key={floor.floorNumber} style={{
+                          backgroundColor: '#0F1629',
+                          borderRadius: '8px',
+                          padding: '16px',
+                          border: '1px solid #1E293B'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                            <div>
+                              <div style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600' }}>
+                                {floor.floorLabel === 'Ground' ? 'Ground Floor' : `Floor ${floor.floorLabel}`}
+                              </div>
+                              <div style={{ color: '#64748B', fontSize: '12px', marginTop: '4px' }}>
+                                {floor.zones.length} zone{floor.zones.length !== 1 ? 's' : ''}
+                              </div>
+                            </div>
+                            <span style={{
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              backgroundColor: floor.floorNumber < 0 ? 'rgba(139, 92, 246, 0.1)' : floor.floorNumber === 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                              color: floor.floorNumber < 0 ? '#8B5CF6' : floor.floorNumber === 0 ? '#10B981' : '#3B82F6'
+                            }}>
+                              {floor.floorNumber < 0 ? 'Basement' : floor.floorNumber === 0 ? 'Ground' : 'Above'}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                            {floor.zones.map((zone, zoneIdx) => (
+                              <span key={zoneIdx} style={{
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                                color: '#94A3B8',
+                                border: '1px solid #334155'
+                              }}>
+                                {zone}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {tenantBuildings.length === 0 && (
+                <div style={{
+                  backgroundColor: '#162032',
+                  borderRadius: '12px',
+                  border: '1px solid #1E293B',
+                  padding: '48px 24px',
+                  textAlign: 'center'
+                }}>
+                  <BuildingRegular style={{ fontSize: '48px', color: '#475569', marginBottom: '16px' }} />
+                  <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>No Buildings Configured</h3>
+                  <p style={{ color: '#64748B', fontSize: '14px', marginBottom: '24px' }}>Your administrator has not configured any buildings yet. Contact your administrator for more information.</p>
+                </div>
+              )}
             </div>
           );})()}
 
@@ -3209,6 +3719,188 @@ export default function TenantPage() {
                   fontSize: '14px'
                 }}>Assign Space</button>
                 <button type="button" onClick={() => { setShowParkingModal(false); setSelectedParkingSpace(null); }} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Locker Assignment Modal */}
+      {showLockerModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => { setShowLockerModal(false); setSelectedLocker(null); }}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            border: '1px solid #1E293B'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
+              Assign Locker {selectedLocker ? `#${selectedLocker}` : ''}
+            </h2>
+            <form onSubmit={(e) => { 
+              e.preventDefault(); 
+              const formData = new FormData(e.currentTarget);
+              const userId = formData.get('user') as string;
+              const userName = (e.currentTarget.elements.namedItem('user') as HTMLSelectElement).selectedOptions[0].text;
+              
+              const locker = globalState.lockers.find(l => l.lockerNumber === selectedLocker);
+              if (locker) {
+                globalState.updateLocker(locker.id, {
+                  status: 'occupied',
+                  assignedTo: userId,
+                  assignedToName: userName,
+                  assignedDate: new Date().toISOString()
+                });
+                alert(`Locker ${selectedLocker} (${locker.building} - Floor ${locker.floor}) assigned successfully to ${userName}!`);
+              }
+              setShowLockerModal(false);
+              setSelectedLocker(null);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Select User *</label>
+                <select name="user" required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}>
+                  <option value="">Choose a user...</option>
+                  {globalState.users.filter(u => u.tenantId === selectedTenantId).map(user => (
+                    <option key={user.id} value={user.id}>{user.name} ({user.email})</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Assign Locker</button>
+                <button type="button" onClick={() => { setShowLockerModal(false); setSelectedLocker(null); }} style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: '#F1F5F9',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Space Assignment Modal */}
+      {showSpaceModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }} onClick={() => { setShowSpaceModal(false); setSelectedSpace(null); }}>
+          <div style={{
+            backgroundColor: '#162032',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            border: '1px solid #1E293B'
+          }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
+              Assign Space {selectedSpace ? `#${selectedSpace}` : ''}
+            </h2>
+            <form onSubmit={(e) => { 
+              e.preventDefault(); 
+              const formData = new FormData(e.currentTarget);
+              const userId = formData.get('user') as string;
+              const userName = (e.currentTarget.elements.namedItem('user') as HTMLSelectElement).selectedOptions[0].text;
+              
+              const space = globalState.spaces.find(s => s.spaceNumber === selectedSpace);
+              if (space) {
+                globalState.updateSpace(space.id, {
+                  status: 'occupied',
+                  assignedTo: userId,
+                  assignedToName: userName,
+                  assignedDate: new Date().toISOString()
+                });
+                alert(`Space ${selectedSpace} (${space.building} - Floor ${space.floor}) assigned successfully to ${userName}!`);
+              }
+              setShowSpaceModal(false);
+              setSelectedSpace(null);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Select User *</label>
+                <select name="user" required style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#1E293B',
+                  border: '1px solid #475569',
+                  borderRadius: '8px',
+                  color: '#F1F5F9',
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}>
+                  <option value="">Choose a user...</option>
+                  {globalState.users.filter(u => u.tenantId === selectedTenantId).map(user => (
+                    <option key={user.id} value={user.id}>{user.name} ({user.email})</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                <button type="submit" style={{
+                  flex: 1,
+                  backgroundColor: '#3B82F6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 24px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}>Assign Space</button>
+                <button type="button" onClick={() => { setShowSpaceModal(false); setSelectedSpace(null); }} style={{
                   flex: 1,
                   backgroundColor: 'transparent',
                   color: '#F1F5F9',

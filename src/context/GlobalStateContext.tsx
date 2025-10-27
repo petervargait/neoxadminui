@@ -109,6 +109,26 @@ export interface Locker {
   updatedAt?: string
 }
 
+export interface Space {
+  id: string
+  spaceNumber: string
+  name?: string
+  building: string
+  floor: string
+  location?: string
+  zone?: string
+  type: 'desk' | 'office' | 'meeting-room' | 'conference-room' | 'social-hub'
+  capacity?: number
+  status: 'available' | 'occupied' | 'reserved' | 'maintenance'
+  tenantId?: string
+  assignedTo?: string
+  assignedToName?: string
+  assignedDate?: string
+  notes?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
 export interface Ticket {
   id: string
   ticketNumber: string
@@ -181,6 +201,23 @@ export interface SystemSettings {
   updatedAt: string
 }
 
+export interface BuildingFloor {
+  floorNumber: number // Negative for basements, positive for floors above ground
+  floorLabel: string // e.g., "B4", "Ground", "1", "21"
+  zones: string[] // e.g., ["East Wing", "West Wing", "Social Area"]
+}
+
+export interface Building {
+  id: string
+  name: string
+  tenantId: string
+  basementLevels: number // Number of basement levels (e.g., 4 means -4 to -1)
+  topFloor: number // Highest floor number (e.g., 21)
+  floors: BuildingFloor[] // Array of all floors with their zones
+  createdAt: string
+  updatedAt: string
+}
+
 interface GlobalState {
   users: User[]
   tenants: Tenant[]
@@ -189,6 +226,8 @@ interface GlobalState {
   invitations: Invitation[]
   parkingSpaces: ParkingSpace[]
   lockers: Locker[]
+  spaces: Space[]
+  buildings: Building[]
   tickets: Ticket[]
   policyFiles: Record<string, PolicyFile | null>
   auditLogs: AuditLog[]
@@ -218,6 +257,11 @@ interface GlobalStateContextType extends GlobalState {
   updateParkingSpace: (id: string, updates: Partial<ParkingSpace>) => void
   addLocker: (locker: Omit<Locker, 'id'>) => Locker
   updateLocker: (id: string, updates: Partial<Locker>) => void
+  addSpace: (space: Omit<Space, 'id'>) => Space
+  updateSpace: (id: string, updates: Partial<Space>) => void
+  addBuilding: (building: Omit<Building, 'id' | 'createdAt' | 'updatedAt'>) => Building
+  updateBuilding: (id: string, updates: Partial<Building>) => void
+  deleteBuilding: (id: string) => void
   addTicket: (ticket: Omit<Ticket, 'id' | 'ticketNumber' | 'createdAt' | 'updatedAt'>) => Ticket
   updateTicket: (id: string, updates: Partial<Ticket>) => void
   uploadPolicy: (policyName: string, file: PolicyFile) => void
@@ -248,6 +292,8 @@ const getInitialState = (): GlobalState => {
         return {
           ...parsedState,
           lockers: parsedState.lockers || [],
+          spaces: parsedState.spaces || [],
+          buildings: parsedState.buildings || [],
           systemSettings: parsedState.systemSettings || {
             'global': {
               tenantId: 'global',
@@ -408,7 +454,223 @@ const getInitialState = (): GlobalState => {
       { id: 'p109', spaceNumber: 'C-U29', building: 'Building C', location: 'Building C - Underground', status: 'available' },
       { id: 'p110', spaceNumber: 'C-U30', building: 'Building C', location: 'Building C - Underground', status: 'available' },
     ],
-    lockers: [],
+    lockers: [
+      // Building A - Floor 1 - Permanent Lockers (20 lockers)
+      { id: 'l1', lockerNumber: 'A1-001', building: 'Building A', floor: '1', zone: 'Zone A', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l2', lockerNumber: 'A1-002', building: 'Building A', floor: '1', zone: 'Zone A', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l3', lockerNumber: 'A1-003', building: 'Building A', floor: '1', zone: 'Zone A', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l4', lockerNumber: 'A1-004', building: 'Building A', floor: '1', zone: 'Zone A', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l5', lockerNumber: 'A1-005', building: 'Building A', floor: '1', zone: 'Zone A', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l6', lockerNumber: 'A1-006', building: 'Building A', floor: '1', zone: 'Zone B', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l7', lockerNumber: 'A1-007', building: 'Building A', floor: '1', zone: 'Zone B', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l8', lockerNumber: 'A1-008', building: 'Building A', floor: '1', zone: 'Zone B', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l9', lockerNumber: 'A1-009', building: 'Building A', floor: '1', zone: 'Zone B', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l10', lockerNumber: 'A1-010', building: 'Building A', floor: '1', zone: 'Zone B', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l11', lockerNumber: 'A1-011', building: 'Building A', floor: '1', zone: 'Zone C', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l12', lockerNumber: 'A1-012', building: 'Building A', floor: '1', zone: 'Zone C', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l13', lockerNumber: 'A1-013', building: 'Building A', floor: '1', zone: 'Zone C', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l14', lockerNumber: 'A1-014', building: 'Building A', floor: '1', zone: 'Zone C', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l15', lockerNumber: 'A1-015', building: 'Building A', floor: '1', zone: 'Zone C', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l16', lockerNumber: 'A1-016', building: 'Building A', floor: '1', zone: 'Zone D', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l17', lockerNumber: 'A1-017', building: 'Building A', floor: '1', zone: 'Zone D', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l18', lockerNumber: 'A1-018', building: 'Building A', floor: '1', zone: 'Zone D', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l19', lockerNumber: 'A1-019', building: 'Building A', floor: '1', zone: 'Zone D', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l20', lockerNumber: 'A1-020', building: 'Building A', floor: '1', zone: 'Zone D', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      // Building A - Floor 2 - Permanent Lockers (20 lockers)
+      { id: 'l21', lockerNumber: 'A2-001', building: 'Building A', floor: '2', zone: 'Zone A', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l22', lockerNumber: 'A2-002', building: 'Building A', floor: '2', zone: 'Zone A', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l23', lockerNumber: 'A2-003', building: 'Building A', floor: '2', zone: 'Zone A', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l24', lockerNumber: 'A2-004', building: 'Building A', floor: '2', zone: 'Zone A', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l25', lockerNumber: 'A2-005', building: 'Building A', floor: '2', zone: 'Zone A', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l26', lockerNumber: 'A2-006', building: 'Building A', floor: '2', zone: 'Zone B', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l27', lockerNumber: 'A2-007', building: 'Building A', floor: '2', zone: 'Zone B', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l28', lockerNumber: 'A2-008', building: 'Building A', floor: '2', zone: 'Zone B', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l29', lockerNumber: 'A2-009', building: 'Building A', floor: '2', zone: 'Zone B', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l30', lockerNumber: 'A2-010', building: 'Building A', floor: '2', zone: 'Zone B', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l31', lockerNumber: 'A2-011', building: 'Building A', floor: '2', zone: 'Zone C', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l32', lockerNumber: 'A2-012', building: 'Building A', floor: '2', zone: 'Zone C', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l33', lockerNumber: 'A2-013', building: 'Building A', floor: '2', zone: 'Zone C', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l34', lockerNumber: 'A2-014', building: 'Building A', floor: '2', zone: 'Zone C', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l35', lockerNumber: 'A2-015', building: 'Building A', floor: '2', zone: 'Zone C', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l36', lockerNumber: 'A2-016', building: 'Building A', floor: '2', zone: 'Zone D', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l37', lockerNumber: 'A2-017', building: 'Building A', floor: '2', zone: 'Zone D', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l38', lockerNumber: 'A2-018', building: 'Building A', floor: '2', zone: 'Zone D', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l39', lockerNumber: 'A2-019', building: 'Building A', floor: '2', zone: 'Zone D', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l40', lockerNumber: 'A2-020', building: 'Building A', floor: '2', zone: 'Zone D', type: 'permanent', status: 'available', createdAt: new Date().toISOString() },
+      // Building B - Gym Lockers (15 lockers)
+      { id: 'l41', lockerNumber: 'B-GYM-001', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l42', lockerNumber: 'B-GYM-002', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l43', lockerNumber: 'B-GYM-003', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l44', lockerNumber: 'B-GYM-004', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l45', lockerNumber: 'B-GYM-005', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l46', lockerNumber: 'B-GYM-006', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l47', lockerNumber: 'B-GYM-007', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l48', lockerNumber: 'B-GYM-008', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l49', lockerNumber: 'B-GYM-009', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l50', lockerNumber: 'B-GYM-010', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l51', lockerNumber: 'B-GYM-011', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l52', lockerNumber: 'B-GYM-012', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l53', lockerNumber: 'B-GYM-013', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l54', lockerNumber: 'B-GYM-014', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l55', lockerNumber: 'B-GYM-015', building: 'Building B', floor: 'Ground', zone: 'Gym Area', type: 'gym', status: 'available', createdAt: new Date().toISOString() },
+      // Building C - Bike Storage (10 lockers)
+      { id: 'l56', lockerNumber: 'C-BIKE-001', building: 'Building C', floor: 'Basement', zone: 'Bike Storage', type: 'bike', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l57', lockerNumber: 'C-BIKE-002', building: 'Building C', floor: 'Basement', zone: 'Bike Storage', type: 'bike', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l58', lockerNumber: 'C-BIKE-003', building: 'Building C', floor: 'Basement', zone: 'Bike Storage', type: 'bike', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l59', lockerNumber: 'C-BIKE-004', building: 'Building C', floor: 'Basement', zone: 'Bike Storage', type: 'bike', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l60', lockerNumber: 'C-BIKE-005', building: 'Building C', floor: 'Basement', zone: 'Bike Storage', type: 'bike', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l61', lockerNumber: 'C-BIKE-006', building: 'Building C', floor: 'Basement', zone: 'Bike Storage', type: 'bike', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l62', lockerNumber: 'C-BIKE-007', building: 'Building C', floor: 'Basement', zone: 'Bike Storage', type: 'bike', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l63', lockerNumber: 'C-BIKE-008', building: 'Building C', floor: 'Basement', zone: 'Bike Storage', type: 'bike', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l64', lockerNumber: 'C-BIKE-009', building: 'Building C', floor: 'Basement', zone: 'Bike Storage', type: 'bike', status: 'available', createdAt: new Date().toISOString() },
+      { id: 'l65', lockerNumber: 'C-BIKE-010', building: 'Building C', floor: 'Basement', zone: 'Bike Storage', type: 'bike', status: 'available', createdAt: new Date().toISOString() },
+    ],
+    spaces: [
+      // Building A - Floor 1 - Desks (30 desks)
+      { id: 's1', spaceNumber: 'A1-D001', name: 'Desk 1', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone A', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's2', spaceNumber: 'A1-D002', name: 'Desk 2', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone A', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's3', spaceNumber: 'A1-D003', name: 'Desk 3', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone A', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's4', spaceNumber: 'A1-D004', name: 'Desk 4', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone A', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's5', spaceNumber: 'A1-D005', name: 'Desk 5', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone A', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's6', spaceNumber: 'A1-D006', name: 'Desk 6', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone B', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's7', spaceNumber: 'A1-D007', name: 'Desk 7', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone B', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's8', spaceNumber: 'A1-D008', name: 'Desk 8', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone B', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's9', spaceNumber: 'A1-D009', name: 'Desk 9', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone B', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's10', spaceNumber: 'A1-D010', name: 'Desk 10', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone B', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's11', spaceNumber: 'A1-D011', name: 'Desk 11', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone C', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's12', spaceNumber: 'A1-D012', name: 'Desk 12', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone C', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's13', spaceNumber: 'A1-D013', name: 'Desk 13', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone C', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's14', spaceNumber: 'A1-D014', name: 'Desk 14', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone C', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's15', spaceNumber: 'A1-D015', name: 'Desk 15', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone C', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's16', spaceNumber: 'A1-D016', name: 'Desk 16', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone D', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's17', spaceNumber: 'A1-D017', name: 'Desk 17', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone D', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's18', spaceNumber: 'A1-D018', name: 'Desk 18', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone D', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's19', spaceNumber: 'A1-D019', name: 'Desk 19', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone D', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's20', spaceNumber: 'A1-D020', name: 'Desk 20', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone D', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's21', spaceNumber: 'A1-D021', name: 'Desk 21', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone E', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's22', spaceNumber: 'A1-D022', name: 'Desk 22', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone E', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's23', spaceNumber: 'A1-D023', name: 'Desk 23', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone E', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's24', spaceNumber: 'A1-D024', name: 'Desk 24', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone E', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's25', spaceNumber: 'A1-D025', name: 'Desk 25', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone E', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's26', spaceNumber: 'A1-D026', name: 'Desk 26', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone F', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's27', spaceNumber: 'A1-D027', name: 'Desk 27', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone F', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's28', spaceNumber: 'A1-D028', name: 'Desk 28', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone F', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's29', spaceNumber: 'A1-D029', name: 'Desk 29', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone F', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's30', spaceNumber: 'A1-D030', name: 'Desk 30', building: 'Building A', floor: '1', location: 'Open Plan', zone: 'Zone F', type: 'desk', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      // Building A - Floor 2 - Offices (10 offices)
+      { id: 's31', spaceNumber: 'A2-O001', name: 'Office 1', building: 'Building A', floor: '2', location: 'Private Offices', zone: 'Zone A', type: 'office', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's32', spaceNumber: 'A2-O002', name: 'Office 2', building: 'Building A', floor: '2', location: 'Private Offices', zone: 'Zone A', type: 'office', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's33', spaceNumber: 'A2-O003', name: 'Office 3', building: 'Building A', floor: '2', location: 'Private Offices', zone: 'Zone A', type: 'office', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's34', spaceNumber: 'A2-O004', name: 'Office 4', building: 'Building A', floor: '2', location: 'Private Offices', zone: 'Zone B', type: 'office', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's35', spaceNumber: 'A2-O005', name: 'Office 5', building: 'Building A', floor: '2', location: 'Private Offices', zone: 'Zone B', type: 'office', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's36', spaceNumber: 'A2-O006', name: 'Office 6', building: 'Building A', floor: '2', location: 'Private Offices', zone: 'Zone B', type: 'office', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's37', spaceNumber: 'A2-O007', name: 'Office 7', building: 'Building A', floor: '2', location: 'Private Offices', zone: 'Zone C', type: 'office', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's38', spaceNumber: 'A2-O008', name: 'Office 8', building: 'Building A', floor: '2', location: 'Private Offices', zone: 'Zone C', type: 'office', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's39', spaceNumber: 'A2-O009', name: 'Office 9', building: 'Building A', floor: '2', location: 'Private Offices', zone: 'Zone C', type: 'office', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's40', spaceNumber: 'A2-O010', name: 'Office 10', building: 'Building A', floor: '2', location: 'Private Offices', zone: 'Zone D', type: 'office', capacity: 1, status: 'available', createdAt: new Date().toISOString() },
+      // Building B - Meeting Rooms (8 meeting rooms)
+      { id: 's41', spaceNumber: 'B1-MR01', name: 'Meeting Room 1', building: 'Building B', floor: '1', location: 'Meeting Rooms', zone: 'North Wing', type: 'meeting-room', capacity: 6, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's42', spaceNumber: 'B1-MR02', name: 'Meeting Room 2', building: 'Building B', floor: '1', location: 'Meeting Rooms', zone: 'North Wing', type: 'meeting-room', capacity: 6, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's43', spaceNumber: 'B1-MR03', name: 'Meeting Room 3', building: 'Building B', floor: '1', location: 'Meeting Rooms', zone: 'North Wing', type: 'meeting-room', capacity: 8, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's44', spaceNumber: 'B1-MR04', name: 'Meeting Room 4', building: 'Building B', floor: '1', location: 'Meeting Rooms', zone: 'South Wing', type: 'meeting-room', capacity: 8, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's45', spaceNumber: 'B2-MR05', name: 'Meeting Room 5', building: 'Building B', floor: '2', location: 'Meeting Rooms', zone: 'North Wing', type: 'meeting-room', capacity: 10, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's46', spaceNumber: 'B2-MR06', name: 'Meeting Room 6', building: 'Building B', floor: '2', location: 'Meeting Rooms', zone: 'North Wing', type: 'meeting-room', capacity: 10, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's47', spaceNumber: 'B2-MR07', name: 'Meeting Room 7', building: 'Building B', floor: '2', location: 'Meeting Rooms', zone: 'South Wing', type: 'meeting-room', capacity: 4, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's48', spaceNumber: 'B2-MR08', name: 'Meeting Room 8', building: 'Building B', floor: '2', location: 'Meeting Rooms', zone: 'South Wing', type: 'meeting-room', capacity: 4, status: 'available', createdAt: new Date().toISOString() },
+      // Building C - Conference Rooms (4 conference rooms)
+      { id: 's49', spaceNumber: 'C1-CR01', name: 'Conference Room A', building: 'Building C', floor: '1', location: 'Conference Center', zone: 'East Wing', type: 'conference-room', capacity: 20, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's50', spaceNumber: 'C1-CR02', name: 'Conference Room B', building: 'Building C', floor: '1', location: 'Conference Center', zone: 'East Wing', type: 'conference-room', capacity: 20, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's51', spaceNumber: 'C2-CR03', name: 'Conference Room C', building: 'Building C', floor: '2', location: 'Conference Center', zone: 'West Wing', type: 'conference-room', capacity: 30, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's52', spaceNumber: 'C2-CR04', name: 'Boardroom', building: 'Building C', floor: '2', location: 'Conference Center', zone: 'West Wing', type: 'conference-room', capacity: 16, status: 'available', createdAt: new Date().toISOString() },
+      // Social Hubs (3 hubs)
+      { id: 's53', spaceNumber: 'A1-SH01', name: 'The Lounge', building: 'Building A', floor: '1', location: 'Central', zone: 'Common Area', type: 'social-hub', capacity: 15, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's54', spaceNumber: 'B1-SH02', name: 'Collaboration Hub', building: 'Building B', floor: '1', location: 'Central', zone: 'Common Area', type: 'social-hub', capacity: 20, status: 'available', createdAt: new Date().toISOString() },
+      { id: 's55', spaceNumber: 'C1-SH03', name: 'Breakout Space', building: 'Building C', floor: '1', location: 'Central', zone: 'Common Area', type: 'social-hub', capacity: 25, status: 'available', createdAt: new Date().toISOString() },
+    ],
+    buildings: [
+      // Building A - Tower with 21 floors
+      {
+        id: 'bldg_a',
+        name: 'Building A',
+        tenantId: 'acme',
+        basementLevels: 2,
+        topFloor: 21,
+        floors: [
+          { floorNumber: -2, floorLabel: 'B2', zones: ['Parking', 'Storage'] },
+          { floorNumber: -1, floorLabel: 'B1', zones: ['Parking', 'Bike Storage'] },
+          { floorNumber: 0, floorLabel: 'Ground', zones: ['Lobby', 'Reception', 'Security'] },
+          { floorNumber: 1, floorLabel: '1', zones: ['Zone A', 'Zone B', 'Zone C', 'Zone D', 'Zone E', 'Zone F'] },
+          { floorNumber: 2, floorLabel: '2', zones: ['Zone A', 'Zone B', 'Zone C', 'Zone D'] },
+          { floorNumber: 3, floorLabel: '3', zones: ['Zone A', 'Zone B', 'Zone C', 'Zone D'] },
+          { floorNumber: 4, floorLabel: '4', zones: ['East Wing', 'West Wing'] },
+          { floorNumber: 5, floorLabel: '5', zones: ['East Wing', 'West Wing'] },
+          { floorNumber: 6, floorLabel: '6', zones: ['East Wing', 'West Wing'] },
+          { floorNumber: 7, floorLabel: '7', zones: ['East Wing', 'West Wing'] },
+          { floorNumber: 8, floorLabel: '8', zones: ['East Wing', 'West Wing'] },
+          { floorNumber: 9, floorLabel: '9', zones: ['East Wing', 'West Wing'] },
+          { floorNumber: 10, floorLabel: '10', zones: ['Open Plan', 'Meeting Rooms'] },
+          { floorNumber: 11, floorLabel: '11', zones: ['Open Plan', 'Meeting Rooms'] },
+          { floorNumber: 12, floorLabel: '12', zones: ['Open Plan', 'Meeting Rooms'] },
+          { floorNumber: 13, floorLabel: '13', zones: ['Open Plan', 'Meeting Rooms'] },
+          { floorNumber: 14, floorLabel: '14', zones: ['Open Plan', 'Meeting Rooms'] },
+          { floorNumber: 15, floorLabel: '15', zones: ['Open Plan', 'Meeting Rooms'] },
+          { floorNumber: 16, floorLabel: '16', zones: ['Executive Offices', 'Boardrooms'] },
+          { floorNumber: 17, floorLabel: '17', zones: ['Executive Offices', 'Boardrooms'] },
+          { floorNumber: 18, floorLabel: '18', zones: ['Conference Center', 'Training Rooms'] },
+          { floorNumber: 19, floorLabel: '19', zones: ['IT Infrastructure', 'Server Room'] },
+          { floorNumber: 20, floorLabel: '20', zones: ['Executive Suite', 'VIP Lounge'] },
+          { floorNumber: 21, floorLabel: '21', zones: ['Penthouse', 'Sky Lounge'] }
+        ],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      // Building B - Mid-rise with 10 floors
+      {
+        id: 'bldg_b',
+        name: 'Building B',
+        tenantId: 'mbank',
+        basementLevels: 1,
+        topFloor: 10,
+        floors: [
+          { floorNumber: -1, floorLabel: 'B1', zones: ['Parking', 'Storage', 'Bike Storage'] },
+          { floorNumber: 0, floorLabel: 'Ground', zones: ['Lobby', 'Cafe', 'Security'] },
+          { floorNumber: 1, floorLabel: '1', zones: ['North Wing', 'South Wing', 'Common Area'] },
+          { floorNumber: 2, floorLabel: '2', zones: ['North Wing', 'South Wing', 'Common Area'] },
+          { floorNumber: 3, floorLabel: '3', zones: ['East Section', 'West Section'] },
+          { floorNumber: 4, floorLabel: '4', zones: ['East Section', 'West Section'] },
+          { floorNumber: 5, floorLabel: '5', zones: ['Open Office', 'Collaboration Zone'] },
+          { floorNumber: 6, floorLabel: '6', zones: ['Open Office', 'Collaboration Zone'] },
+          { floorNumber: 7, floorLabel: '7', zones: ['Team Spaces', 'Meeting Rooms'] },
+          { floorNumber: 8, floorLabel: '8', zones: ['Management Offices', 'Executive Lounge'] },
+          { floorNumber: 9, floorLabel: '9', zones: ['Conference Rooms', 'Event Space'] },
+          { floorNumber: 10, floorLabel: '10', zones: ['Rooftop', 'Terrace', 'Recreation'] }
+        ],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      // Building C - Low-rise with 5 floors and garage basement
+      {
+        id: 'bldg_c',
+        name: 'Building C',
+        tenantId: 'eassetmanager',
+        basementLevels: 4,
+        topFloor: 5,
+        floors: [
+          { floorNumber: -4, floorLabel: 'B4', zones: ['Parking Level 4'] },
+          { floorNumber: -3, floorLabel: 'B3', zones: ['Parking Level 3'] },
+          { floorNumber: -2, floorLabel: 'B2', zones: ['Parking Level 2'] },
+          { floorNumber: -1, floorLabel: 'B1', zones: ['Parking Level 1', 'Bike Storage', 'Facilities'] },
+          { floorNumber: 0, floorLabel: 'Ground', zones: ['Main Entrance', 'Reception', 'Lobby', 'Retail'] },
+          { floorNumber: 1, floorLabel: '1', zones: ['East Wing', 'West Wing', 'Conference Center'] },
+          { floorNumber: 2, floorLabel: '2', zones: ['East Wing', 'West Wing', 'Conference Center'] },
+          { floorNumber: 3, floorLabel: '3', zones: ['Training Rooms', 'Workshops'] },
+          { floorNumber: 4, floorLabel: '4', zones: ['Administrative', 'HR Department'] },
+          { floorNumber: 5, floorLabel: '5', zones: ['Executive Floor', 'Boardroom', 'Sky Lounge'] }
+        ],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ],
     tickets: [],
     policyFiles: {
       'GDPR': null,
@@ -645,6 +907,60 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const addSpace = (space: Omit<Space, 'id'>) => {
+    const newSpace: Space = {
+      ...space,
+      id: `space_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString()
+    }
+    setState(prev => ({ ...prev, spaces: [...prev.spaces, newSpace] }))
+    addAuditLog({ user: 'system', action: `Created space ${newSpace.spaceNumber} (${newSpace.type})`, status: 'Success' })
+    return newSpace
+  }
+
+  const updateSpace = (id: string, updates: Partial<Space>) => {
+    setState(prev => ({
+      ...prev,
+      spaces: prev.spaces.map(s => s.id === id ? { ...s, ...updates, updatedAt: new Date().toISOString() } : s)
+    }))
+    const space = state.spaces.find(s => s.id === id)
+    if (updates.assignedTo) {
+      addAuditLog({ user: 'system', action: `Assigned space ${space?.spaceNumber} to ${updates.assignedToName}`, status: 'Success' })
+    } else {
+      addAuditLog({ user: 'system', action: `Updated space ${space?.spaceNumber}`, status: 'Success' })
+    }
+  }
+
+  const addBuilding = (building: Omit<Building, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newBuilding: Building = {
+      ...building,
+      id: `building_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+    setState(prev => ({ ...prev, buildings: [...prev.buildings, newBuilding] }))
+    addAuditLog({ user: 'system', action: `Created building "${newBuilding.name}" with ${newBuilding.floors.length} floors`, status: 'Success' })
+    return newBuilding
+  }
+
+  const updateBuilding = (id: string, updates: Partial<Building>) => {
+    setState(prev => ({
+      ...prev,
+      buildings: prev.buildings.map(b => b.id === id ? { ...b, ...updates, updatedAt: new Date().toISOString() } : b)
+    }))
+    const building = state.buildings.find(b => b.id === id)
+    addAuditLog({ user: 'system', action: `Updated building "${building?.name}"`, status: 'Success' })
+  }
+
+  const deleteBuilding = (id: string) => {
+    const building = state.buildings.find(b => b.id === id)
+    setState(prev => ({
+      ...prev,
+      buildings: prev.buildings.filter(b => b.id !== id)
+    }))
+    addAuditLog({ user: 'system', action: `Deleted building "${building?.name}"`, status: 'Success' })
+  }
+
   const addTicket = (ticket: Omit<Ticket, 'id' | 'ticketNumber' | 'createdAt' | 'updatedAt'>) => {
     const ticketNumber = `TKT-${(state.tickets.length + 1).toString().padStart(5, '0')}`
     const newTicket: Ticket = {
@@ -810,6 +1126,11 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     updateParkingSpace,
     addLocker,
     updateLocker,
+    addSpace,
+    updateSpace,
+    addBuilding,
+    updateBuilding,
+    deleteBuilding,
     addTicket,
     updateTicket,
     uploadPolicy,
