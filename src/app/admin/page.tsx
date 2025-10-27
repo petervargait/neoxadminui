@@ -2432,23 +2432,19 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        { id: 'TKT-1024', tenant: 'Acme Corporation', subject: 'Unable to access parking module', priority: 'High', status: 'Open', created: '2025-10-22 14:30', assignedTo: 'Support Team' },
-                        { id: 'TKT-1023', tenant: 'TechFlow Industries', subject: 'White label configuration help', priority: 'Medium', status: 'In Progress', created: '2025-10-22 10:15', assignedTo: 'John Smith' },
-                        { id: 'TKT-1022', tenant: 'Innovation Labs', subject: 'Bulk user upload failing', priority: 'Critical', status: 'Open', created: '2025-10-22 09:45', assignedTo: 'Support Team' },
-                        { id: 'TKT-1021', tenant: 'Global Solutions', subject: 'Need additional module activation', priority: 'Low', status: 'Resolved', created: '2025-10-21 16:20', assignedTo: 'Sarah Johnson' },
-                        { id: 'TKT-1020', tenant: 'Digital Dynamics', subject: 'User permissions issue', priority: 'High', status: 'In Progress', created: '2025-10-21 13:10', assignedTo: 'Mike Davis' },
-                      ].map((ticket, index) => (
-                        <tr key={index} style={{ borderBottom: '1px solid #1E293B' }}>
+                      {globalState.tickets.map((ticket, index) => {
+                        const ticketTenant = globalState.tenants.find(t => t.id === ticket.tenantId);
+                        return (
+                        <tr key={ticket.id} style={{ borderBottom: '1px solid #1E293B' }}>
                           <td style={{ padding: '16px 24px' }}>
-                            <div style={{ color: '#3B82F6', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace' }}>{ticket.id}</div>
+                            <div style={{ color: '#3B82F6', fontSize: '14px', fontWeight: '600', fontFamily: 'monospace' }}>{ticket.ticketNumber}</div>
                           </td>
                           <td style={{ padding: '16px 24px' }}>
-                            <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{ticket.tenant}</div>
+                            <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{ticketTenant?.name || 'N/A'}</div>
                           </td>
                           <td style={{ padding: '16px 24px' }}>
-                            <div style={{ color: '#F1F5F9', fontSize: '14px', maxWidth: '300px' }}>{ticket.subject}</div>
-                            <div style={{ color: '#64748B', fontSize: '12px', marginTop: '4px' }}>Assigned to: {ticket.assignedTo}</div>
+                            <div style={{ color: '#F1F5F9', fontSize: '14px', maxWidth: '300px' }}>{ticket.title}</div>
+                            <div style={{ color: '#64748B', fontSize: '12px', marginTop: '4px' }}>Assigned to: {ticket.assignedToName || 'Unassigned'}</div>
                           </td>
                           <td style={{ padding: '16px 24px' }}>
                             <span style={{
@@ -2457,15 +2453,15 @@ export default function AdminPage() {
                               fontSize: '12px',
                               fontWeight: '500',
                               backgroundColor: 
-                                ticket.priority === 'Critical' ? 'rgba(239, 68, 68, 0.2)' :
-                                ticket.priority === 'High' ? 'rgba(245, 158, 11, 0.2)' :
-                                ticket.priority === 'Medium' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(100, 116, 139, 0.2)',
+                                ticket.priority === 'critical' ? 'rgba(239, 68, 68, 0.2)' :
+                                ticket.priority === 'high' ? 'rgba(245, 158, 11, 0.2)' :
+                                ticket.priority === 'medium' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(100, 116, 139, 0.2)',
                               color: 
-                                ticket.priority === 'Critical' ? '#EF4444' :
-                                ticket.priority === 'High' ? '#F59E0B' :
-                                ticket.priority === 'Medium' ? '#3B82F6' : '#64748B'
+                                ticket.priority === 'critical' ? '#EF4444' :
+                                ticket.priority === 'high' ? '#F59E0B' :
+                                ticket.priority === 'medium' ? '#3B82F6' : '#64748B'
                             }}>
-                              {ticket.priority}
+                              {ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}
                             </span>
                           </td>
                           <td style={{ padding: '16px 24px' }}>
@@ -2475,20 +2471,22 @@ export default function AdminPage() {
                               fontSize: '12px',
                               fontWeight: '500',
                               backgroundColor: 
-                                ticket.status === 'Open' ? 'rgba(239, 68, 68, 0.1)' :
-                                ticket.status === 'In Progress' ? 'rgba(59, 130, 246, 0.1)' :
-                                ticket.status === 'Resolved' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                                ticket.status === 'open' ? 'rgba(239, 68, 68, 0.1)' :
+                                ticket.status === 'in-progress' ? 'rgba(59, 130, 246, 0.1)' :
+                                ticket.status === 'resolved' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
                               color: 
-                                ticket.status === 'Open' ? '#EF4444' :
-                                ticket.status === 'In Progress' ? '#3B82F6' :
-                                ticket.status === 'Resolved' ? '#10B981' : '#64748B'
+                                ticket.status === 'open' ? '#EF4444' :
+                                ticket.status === 'in-progress' ? '#3B82F6' :
+                                ticket.status === 'resolved' ? '#10B981' : '#64748B'
                             }}>
-                              {ticket.status}
+                              {ticket.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                             </span>
                           </td>
-                          <td style={{ padding: '16px 24px', color: '#64748B', fontSize: '13px' }}>{ticket.created}</td>
+                          <td style={{ padding: '16px 24px', color: '#64748B', fontSize: '13px' }}>{new Date(ticket.createdAt).toLocaleString()}</td>
                           <td style={{ padding: '16px 24px', textAlign: 'right' }}>
-                            <button style={{
+                            <button 
+                              onClick={() => alert(`Ticket: ${ticket.ticketNumber}\n\nTitle: ${ticket.title}\n\nDescription: ${ticket.description}\n\nStatus: ${ticket.status}\n\nPriority: ${ticket.priority}\n\nCategory: ${ticket.category}\n\nCreated by: ${ticket.createdByName}`)}
+                              style={{
                               backgroundColor: '#3B82F6',
                               border: 'none',
                               borderRadius: '6px',
@@ -2498,7 +2496,20 @@ export default function AdminPage() {
                               cursor: 'pointer',
                               marginRight: '8px'
                             }}>View</button>
-                            <button style={{
+                            <button 
+                              onClick={() => {
+                                const assignToUser = prompt('Enter user email to assign ticket to:');
+                                if (assignToUser) {
+                                  const user = globalState.users.find(u => u.email.toLowerCase() === assignToUser.toLowerCase());
+                                  if (user) {
+                                    globalState.updateTicket(ticket.id, { assignedTo: user.id, assignedToName: user.name, status: 'in-progress' });
+                                    alert(`Ticket ${ticket.ticketNumber} assigned to ${user.name}`);
+                                  } else {
+                                    alert('User not found');
+                                  }
+                                }
+                              }}
+                              style={{
                               backgroundColor: 'transparent',
                               border: '1px solid #1E293B',
                               borderRadius: '6px',
@@ -2509,7 +2520,8 @@ export default function AdminPage() {
                             }}>Assign</button>
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
