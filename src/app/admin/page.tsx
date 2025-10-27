@@ -931,23 +931,22 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {[
-                        { name: 'John Smith', email: 'john.smith@company.com', role: 'Admin', department: 'IT', status: 'Active', modules: { 'User Management': true, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': true, 'Ticketing': true, 'Service Hub': true, 'Lockers': true, 'News': true, 'AI Assistant': true, 'Space Management': true, 'Private Delivery': true, 'Authentication': true, 'Reporting': true } },
-                        { name: 'Sarah Johnson', email: 'sarah.j@company.com', role: 'Manager', department: 'HR', status: 'Active', modules: { 'User Management': true, 'Visitor Management': true, 'Parking': false, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': false, 'Lockers': false, 'News': true, 'AI Assistant': false, 'Space Management': true, 'Private Delivery': false, 'Authentication': false, 'Reporting': true } },
-                        { name: 'Mike Davis', email: 'mike.davis@company.com', role: 'User', department: 'Sales', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': false, 'Emergency': true, 'Map': true, 'Restaurant': true, 'Ticketing': false, 'Service Hub': false, 'Lockers': false, 'News': true, 'AI Assistant': false, 'Space Management': false, 'Private Delivery': false, 'Authentication': false, 'Reporting': false } },
-                        { name: 'Lisa Wilson', email: 'lisa.w@company.com', role: 'Receptionist', department: 'Reception', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': false, 'Lockers': true, 'News': true, 'AI Assistant': false, 'Space Management': false, 'Private Delivery': false, 'Authentication': false, 'Reporting': false } },
-                        { name: 'Tom Brown', email: 'tom.brown@company.com', role: 'Manager', department: 'Operations', status: 'Active', modules: { 'User Management': false, 'Visitor Management': true, 'Parking': true, 'Emergency': true, 'Map': true, 'Restaurant': false, 'Ticketing': true, 'Service Hub': true, 'Lockers': true, 'News': true, 'AI Assistant': false, 'Space Management': true, 'Private Delivery': true, 'Authentication': false, 'Reporting': true } },
-                      ].sort((a, b) => {
-                        const aVal = a[userSortField].toLowerCase();
-                        const bVal = b[userSortField].toLowerCase();
+                      {globalState.users
+                        .filter(u => u.tenantId === selectedTenant)
+                        .sort((a, b) => {
+                        const aVal = (a[userSortField] || '').toString().toLowerCase();
+                        const bVal = (b[userSortField] || '').toString().toLowerCase();
                         if (userSortDirection === 'asc') {
                           return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
                         } else {
                           return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
                         }
-                      }).map((user, idx) => (
+                      }).map((user, idx) => {
+                        const userProfile = globalState.profiles.find(p => p.id === user.profileId);
+                        const userModules = userProfile?.modules || [];
+                        return (
                         <>
-                          <tr key={idx} style={{ borderBottom: expandedUserRow === idx ? 'none' : '1px solid #1E293B' }}>
+                          <tr key={user.id} style={{ borderBottom: expandedUserRow === idx ? 'none' : '1px solid #1E293B' }}>
                             <td style={{ padding: '16px', color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{user.name}</td>
                             <td style={{ padding: '16px', color: '#94A3B8', fontSize: '14px' }}>{user.email}</td>
                             <td style={{ padding: '16px' }}>
@@ -997,11 +996,11 @@ export default function AdminPage() {
                                   e.currentTarget.style.boxShadow = '0 0 10px rgba(59, 130, 246, 0.3)';
                                   e.currentTarget.style.transform = 'translateY(0)';
                                 }}>
-                                {expandedUserRow === idx ? 'Hide' : 'View'} ({Object.values(user.modules || {}).filter(Boolean).length}/{Object.keys(user.modules || {}).length})
+                                {expandedUserRow === idx ? 'Hide' : 'View'} Profile: {userProfile?.name || 'None'}
                               </button>
                             </td>
                             <td style={{ padding: '16px', textAlign: 'right' }}>
-                              <button onClick={() => { setEditingUser(user); setShowUserModal(true); }} style={{
+                              <button onClick={() => { setEditingUser({ name: user.name, email: user.email, role: user.role, department: user.department, status: user.status, profileId: user.profileId }); setShowUserModal(true); }} style={{
                                 backgroundColor: '#60A5FA',
                                 border: 'none',
                                 borderRadius: '6px',
@@ -1021,8 +1020,13 @@ export default function AdminPage() {
                                 e.currentTarget.style.boxShadow = '0 0 10px rgba(96, 165, 250, 0.3)';
                                 e.currentTarget.style.transform = 'translateY(0)';
                               }}>Edit</button>
-                              <button onClick={() => { if (confirm(`${user.status === 'Active' ? 'Deactivate' : 'Reactivate'} ${user.name}?`)) { alert(`User ${user.status === 'Active' ? 'deactivated' : 'reactivated'} successfully`); } }} style={{
-                                backgroundColor: user.status === 'Active' ? '#F59E0B' : '#10B981',
+                              <button onClick={() => { 
+                                if (confirm(`${user.status === 'active' ? 'Deactivate' : 'Reactivate'} ${user.name}?`)) { 
+                                  globalState.updateUser(user.id, { status: user.status === 'active' ? 'inactive' : 'active' });
+                                  alert(`User ${user.status === 'active' ? 'deactivated' : 'reactivated'} successfully`); 
+                                } 
+                              }} style={{
+                                backgroundColor: user.status === 'active' ? '#F59E0B' : '#10B981',
                                 border: 'none',
                                 borderRadius: '6px',
                                 color: 'white',
@@ -1030,18 +1034,23 @@ export default function AdminPage() {
                                 padding: '6px 12px',
                                 cursor: 'pointer',
                                 marginRight: '8px',
-                                boxShadow: user.status === 'Active' ? '0 0 10px rgba(245, 158, 11, 0.3)' : '0 0 10px rgba(16, 185, 129, 0.3)',
+                                boxShadow: user.status === 'active' ? '0 0 10px rgba(245, 158, 11, 0.3)' : '0 0 10px rgba(16, 185, 129, 0.3)',
                                 transition: 'all 0.2s ease'
                               }}
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.boxShadow = user.status === 'Active' ? '0 0 15px rgba(245, 158, 11, 0.5)' : '0 0 15px rgba(16, 185, 129, 0.5)';
+                                e.currentTarget.style.boxShadow = user.status === 'active' ? '0 0 15px rgba(245, 158, 11, 0.5)' : '0 0 15px rgba(16, 185, 129, 0.5)';
                                 e.currentTarget.style.transform = 'translateY(-1px)';
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.boxShadow = user.status === 'Active' ? '0 0 10px rgba(245, 158, 11, 0.3)' : '0 0 10px rgba(16, 185, 129, 0.3)';
+                                e.currentTarget.style.boxShadow = user.status === 'active' ? '0 0 10px rgba(245, 158, 11, 0.3)' : '0 0 10px rgba(16, 185, 129, 0.3)';
                                 e.currentTarget.style.transform = 'translateY(0)';
-                              }}>{user.status === 'Active' ? 'Deactivate' : 'Reactivate'}</button>
-                              <button onClick={() => { if (confirm(`Delete ${user.name}? This action cannot be undone.`)) { alert('User deleted successfully'); } }} style={{
+                              }}>{user.status === 'active' ? 'Deactivate' : 'Reactivate'}</button>
+                              <button onClick={() => { 
+                                if (confirm(`Delete ${user.name}? This action cannot be undone.`)) { 
+                                  globalState.deleteUser(user.id);
+                                  alert('User deleted successfully'); 
+                                } 
+                              }} style={{
                                 backgroundColor: '#EF4444',
                                 border: 'none',
                                 borderRadius: '6px',
@@ -1062,11 +1071,15 @@ export default function AdminPage() {
                               }}>Delete</button>
                             </td>
                           </tr>
-                          {expandedUserRow === idx && (
-                            <tr key={`${idx}-modules`} style={{ borderBottom: '1px solid #1E293B' }}>
+                          {expandedUserRow === idx && userProfile && (
+                            <tr key={`${user.id}-profile`} style={{ borderBottom: '1px solid #1E293B' }}>
                               <td colSpan={7} style={{ padding: '16px', backgroundColor: '#0F1629' }}>
+                                <div style={{ marginBottom: '12px' }}>
+                                  <h4 style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>Profile: {userProfile.name}</h4>
+                                  <p style={{ color: '#94A3B8', fontSize: '13px', margin: 0 }}>{userProfile.description}</p>
+                                </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '8px' }}>
-                                  {Object.entries(user.modules || {}).map(([module, enabled]) => (
+                                  {userModules.map((module) => (
                                     <div key={module} style={{
                                       padding: '8px 12px',
                                       backgroundColor: '#1E293B',
@@ -1074,7 +1087,7 @@ export default function AdminPage() {
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'space-between',
-                                      border: `1px solid ${enabled ? '#10B981' : '#475569'}`
+                                      border: '1px solid #10B981'
                                     }}>
                                       <span style={{ color: '#F1F5F9', fontSize: '13px' }}>{module}</span>
                                       <span style={{
@@ -1082,10 +1095,10 @@ export default function AdminPage() {
                                         borderRadius: '12px',
                                         fontSize: '11px',
                                         fontWeight: '500',
-                                        backgroundColor: enabled ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
-                                        color: enabled ? '#10B981' : '#64748B'
+                                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                        color: '#10B981'
                                       }}>
-                                        {enabled ? 'Enabled' : 'Disabled'}
+                                        Enabled
                                       </span>
                                     </div>
                                   ))}
@@ -1094,7 +1107,8 @@ export default function AdminPage() {
                             </tr>
                           )}
                         </>
-                      ))}
+                      );
+                    })}
                     </tbody>
                   </table>
                 </div>
@@ -3031,10 +3045,46 @@ export default function AdminPage() {
             <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
               {editingUser ? 'Edit User' : 'Add New User'}
             </h2>
-            <form onSubmit={(e) => { e.preventDefault(); alert(`User ${editingUser ? 'updated' : 'added'} successfully!`); setShowUserModal(false); }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={(e) => { 
+              e.preventDefault(); 
+              const formData = new FormData(e.currentTarget);
+              const name = formData.get('name') as string;
+              const email = formData.get('email') as string;
+              const role = formData.get('role') as string;
+              const department = formData.get('department') as string;
+              const profileId = editingUser?.profileId;
+              
+              if (!profileId) {
+                alert('Please select an access profile');
+                return;
+              }
+              
+              if (editingUser && 'id' in editingUser) {
+                // Update existing user - find by email match
+                const existingUser = globalState.users.find(u => u.email === editingUser.email);
+                if (existingUser) {
+                  globalState.updateUser(existingUser.id, { name, email, role, department, profileId });
+                  alert('User updated successfully!');
+                }
+              } else {
+                // Create new user
+                globalState.addUser({
+                  name,
+                  email,
+                  role,
+                  department,
+                  status: 'active',
+                  profileId,
+                  tenantId: selectedTenant
+                });
+                alert('User added successfully!');
+              }
+              setShowUserModal(false);
+              setEditingUser(null);
+            }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Full Name *</label>
-                <input type="text" defaultValue={editingUser?.name} required style={{
+                <input type="text" name="name" defaultValue={editingUser?.name} required style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -3046,7 +3096,7 @@ export default function AdminPage() {
               </div>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email *</label>
-                <input type="email" defaultValue={editingUser?.email} required style={{
+                <input type="email" name="email" defaultValue={editingUser?.email} required style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -3058,7 +3108,7 @@ export default function AdminPage() {
               </div>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Role *</label>
-                <select defaultValue={editingUser?.role || 'User'} required style={{
+                <select name="role" defaultValue={editingUser?.role || 'User'} required style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -3076,7 +3126,7 @@ export default function AdminPage() {
               </div>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Department</label>
-                <input type="text" defaultValue={editingUser?.department} style={{
+                <input type="text" name="department" defaultValue={editingUser?.department} style={{
                   width: '100%',
                   padding: '12px',
                   backgroundColor: '#1E293B',
@@ -3110,13 +3160,14 @@ export default function AdminPage() {
                     cursor: 'pointer'
                   }}>
                   <option value="" disabled>Select an access profile</option>
-                  {[...globalProfiles, ...(selectedTenant !== 'all' ? (tenantProfiles[selectedTenant] || []) : [])].map((profile) => (
-                    <option key={profile.id} value={profile.id}>{profile.name} ({profile.modules.length} modules) - {profile.isGlobal ? 'Global' : 'Tenant'}</option>
-                  ))}
+                  {globalState.profiles
+                    .filter(p => p.isGlobal || p.tenantId === selectedTenant)
+                    .map((profile) => (
+                      <option key={profile.id} value={profile.id}>{profile.name} ({profile.modules.length} modules) - {profile.isGlobal ? 'Global' : 'Tenant'}</option>
+                    ))}
                 </select>
                 {editingUser?.profileId && (() => {
-                  const allProfiles = [...globalProfiles, ...(selectedTenant !== 'all' ? (tenantProfiles[selectedTenant] || []) : [])];
-                  const selectedProfile = allProfiles.find(p => p.id === editingUser.profileId);
+                  const selectedProfile = globalState.profiles.find(p => p.id === editingUser.profileId);
                   return selectedProfile ? (
                     <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #475569' }}>
                       <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Modules from {selectedProfile.name}:</div>
