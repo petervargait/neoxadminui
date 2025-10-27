@@ -84,7 +84,7 @@ export default function AdminPage() {
 
   // Load white label settings when tenant changes
   useEffect(() => {
-    if (selectedTenant !== 'all') {
+    if (selectedTenant !== 'all' && globalState?.getWhiteLabel) {
       const existingSettings = globalState.getWhiteLabel(selectedTenant)
       if (existingSettings) {
         setWhiteLabelForm({
@@ -110,6 +110,7 @@ export default function AdminPage() {
 
   // Load system settings when tenant changes
   useEffect(() => {
+    if (!globalState?.getSystemSettings) return
     const tenantId = selectedTenant === 'all' ? 'global' : selectedTenant
     const existingSettings = globalState.getSystemSettings(tenantId)
     if (existingSettings) {
