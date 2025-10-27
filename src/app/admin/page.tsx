@@ -35,14 +35,7 @@ export default function AdminPage() {
 
   // Note: Policy files are now managed via global state (globalState.policyFiles)
 
-  // Digital Badges state
-  const [badgeUsers, setBadgeUsers] = useState([
-    { id: 1, name: 'John Smith', email: 'john.smith@acme.com', company: 'Acme Corp', cardType: 'Mifare EV3', status: 'Downloaded', imei: '123456789012345' },
-    { id: 2, name: 'Sarah Johnson', email: 'sarah.j@techflow.com', company: 'TechFlow Industries', cardType: 'HID', status: 'Sent', imei: '234567890123456' },
-    { id: 3, name: 'Mike Davis', email: 'mike.d@global.com', company: 'Global Solutions', cardType: 'NFC', status: 'New', imei: '345678901234567' },
-    { id: 4, name: 'Lisa Wilson', email: 'lisa.w@innovation.com', company: 'Innovation Labs', cardType: 'LEGIC', status: 'Downloaded', imei: '456789012345678' },
-    { id: 5, name: 'Tom Brown', email: 'tom.b@digital.com', company: 'Digital Dynamics', cardType: 'Mifare EV3', status: 'Suspended', imei: '567890123456789' },
-  ])
+  // Note: Digital badges are now managed via global state (globalState.badges)
   const [showBadgeModal, setShowBadgeModal] = useState(false)
   const [editingBadge, setEditingBadge] = useState<{id?: number; name: string; email: string; company: string; cardType: string; imei: string} | null>(null)
   const [badgeSearchTerm, setBadgeSearchTerm] = useState('')
@@ -95,7 +88,7 @@ export default function AdminPage() {
     setShowBadgeModal(true)
   }
 
-  const handleEditBadgeUser = (user: typeof badgeUsers[0]) => {
+  const handleEditBadgeUser = (user: typeof globalState.badges[0]) => {
     setEditingBadge(user)
     setShowBadgeModal(true)
   }
@@ -110,12 +103,25 @@ export default function AdminPage() {
 
     if (editingBadge.id) {
       // Update existing
-      setBadgeUsers(prev => prev.map(u => u.id === editingBadge.id ? { ...editingBadge, id: editingBadge.id, status: u.status } as typeof u : u))
+      const existingBadge = globalState.badges.find(b => b.id === editingBadge.id)
+      globalState.updateBadge(editingBadge.id, { 
+        name: editingBadge.name, 
+        email: editingBadge.email, 
+        company: editingBadge.company, 
+        cardType: editingBadge.cardType, 
+        imei: editingBadge.imei 
+      })
       alert('Badge user updated successfully')
     } else {
       // Add new
-      const newUser = { ...editingBadge, id: Math.max(...badgeUsers.map(u => u.id)) + 1, status: 'New' as const }
-      setBadgeUsers(prev => [...prev, newUser])
+      globalState.addBadge({ 
+        name: editingBadge.name, 
+        email: editingBadge.email, 
+        company: editingBadge.company, 
+        cardType: editingBadge.cardType, 
+        imei: editingBadge.imei,
+        status: 'New'
+      })
       alert('Badge user added successfully')
     }
     
@@ -124,41 +130,41 @@ export default function AdminPage() {
   }
 
   const handleDeleteBadgeUser = (userId: number) => {
-    const user = badgeUsers.find(u => u.id === userId)
+    const user = globalState.badges.find(u => u.id === userId)
     if (user && confirm(`Delete badge for ${user.name}? This action cannot be undone.`)) {
-      setBadgeUsers(prev => prev.filter(u => u.id !== userId))
+      globalState.deleteBadge(userId)
       alert('Badge user deleted successfully')
     }
   }
 
   const handleSendBadgeEmail = (userId: number) => {
-    const user = badgeUsers.find(u => u.id === userId)
+    const user = globalState.badges.find(u => u.id === userId)
     if (user) {
-      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Sent' as const } : u))
+      globalState.updateBadge(userId, { status: 'Sent' })
       alert(`Badge email sent to ${user.email}`)
     }
   }
 
   const handleSendBadgePush = (userId: number) => {
-    const user = badgeUsers.find(u => u.id === userId)
+    const user = globalState.badges.find(u => u.id === userId)
     if (user) {
-      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Sent' as const } : u))
+      globalState.updateBadge(userId, { status: 'Sent' })
       alert(`Push notification sent to ${user.name}`)
     }
   }
 
   const handleSuspendBadge = (userId: number) => {
-    const user = badgeUsers.find(u => u.id === userId)
+    const user = globalState.badges.find(u => u.id === userId)
     if (user && confirm(`Suspend badge for ${user.name}?`)) {
-      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Suspended' as const } : u))
+      globalState.updateBadge(userId, { status: 'Suspended' })
       alert('Badge suspended successfully')
     }
   }
 
   const handleRecoverBadge = (userId: number) => {
-    const user = badgeUsers.find(u => u.id === userId)
+    const user = globalState.badges.find(u => u.id === userId)
     if (user && confirm(`Recover badge for ${user.name}?`)) {
-      setBadgeUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'Downloaded' as const } : u))
+      globalState.updateBadge(userId, { status: 'Downloaded' })
       alert('Badge recovered successfully')
     }
   }
@@ -172,21 +178,19 @@ export default function AdminPage() {
         const lines = csv.split('\n').filter(line => line.trim())
         const headers = lines[0].split(',')
         
-        const newUsers = lines.slice(1).map((line, index) => {
+        lines.slice(1).forEach((line) => {
           const values = line.split(',')
-          return {
-            id: Math.max(...badgeUsers.map(u => u.id)) + index + 1,
+          globalState.addBadge({
             name: values[0]?.trim() || '',
             email: values[1]?.trim() || '',
             company: values[2]?.trim() || '',
             cardType: values[3]?.trim() || 'NFC',
             imei: values[4]?.trim() || '',
-            status: 'New' as const
-          }
+            status: 'New'
+          })
         })
         
-        setBadgeUsers(prev => [...prev, ...newUsers])
-        alert(`Successfully imported ${newUsers.length} badge users`)
+        alert(`Successfully imported ${lines.length - 1} badge users`)
         setShowBadgeImportModal(false)
       }
       reader.readAsText(file)
@@ -195,7 +199,7 @@ export default function AdminPage() {
     }
   }
 
-  const filteredBadgeUsers = badgeUsers.filter(user => {
+  const filteredBadgeUsers = globalState.badges.filter(user => {
     const matchesSearch = badgeSearchTerm === '' || 
       user.name.toLowerCase().includes(badgeSearchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(badgeSearchTerm.toLowerCase())
@@ -1359,7 +1363,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>{badgeUsers.length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9', marginBottom: '8px' }}>{globalState.badges.length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Total Badges Issued</div>
                 </div>
                 <div style={{
@@ -1368,7 +1372,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>{badgeUsers.filter(u => u.status === 'Sent').length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#3B82F6', marginBottom: '8px' }}>{globalState.badges.filter(u => u.status === 'Sent').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Sent</div>
                 </div>
                 <div style={{
@@ -1377,7 +1381,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>{badgeUsers.filter(u => u.status === 'Downloaded').length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#10B981', marginBottom: '8px' }}>{globalState.badges.filter(u => u.status === 'Downloaded').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Activated</div>
                 </div>
                 <div style={{
