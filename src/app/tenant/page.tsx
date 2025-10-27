@@ -4,17 +4,21 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
 import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular } from '@fluentui/react-icons'
+import { useGlobalState } from '../../context/GlobalStateContext'
 
 export default function TenantPage() {
   const router = useRouter()
+  const globalState = useGlobalState()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [username, setUsername] = useState('')
   const [tenantName, setTenantName] = useState('Organization')
+  const [selectedTenantId, setSelectedTenantId] = useState('')
 
   useEffect(() => {
     const authStatus = sessionStorage.getItem('isAuthenticated')
     const storedUsername = sessionStorage.getItem('username') || ''
     const storedTenantName = sessionStorage.getItem('selectedTenantName') || 'Organization'
+    const storedTenantId = sessionStorage.getItem('selectedTenant') || ''
     
     if (authStatus !== 'true') {
       router.push('/login')
@@ -22,6 +26,7 @@ export default function TenantPage() {
       setIsAuthenticated(true)
       setUsername(storedUsername)
       setTenantName(storedTenantName)
+      setSelectedTenantId(storedTenantId)
     }
   }, [router])
 
@@ -1885,14 +1890,18 @@ export default function TenantPage() {
                 </p>
               </div>
 
+              {Object.entries(globalState.policyFiles).filter(([_, file]) => file !== null).length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '64px 24px', color: '#64748B' }}>
+                  <div style={{ fontSize: '64px', marginBottom: '16px' }}>📄</div>
+                  <div style={{ fontSize: '18px', fontWeight: '500', marginBottom: '8px' }}>No Policies Available</div>
+                  <div style={{ fontSize: '14px' }}>Policy documents will appear here once uploaded by your administrator</div>
+                </div>
+              ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
-                {[
-                  { name: 'GDPR', description: 'General Data Protection Regulation compliance policy', lastUpdated: '2025-10-15', size: '2.4 MB' },
-                  { name: 'Terms & Conditions', description: 'Platform terms and conditions of use', lastUpdated: '2025-10-12', size: '1.8 MB' },
-                  { name: 'Passwords', description: 'Password requirements and security guidelines', lastUpdated: '2025-10-10', size: '856 KB' },
-                  { name: 'Installation and Onboarding Guide', description: 'Complete setup and onboarding instructions', lastUpdated: '2025-10-08', size: '5.2 MB' },
-                ].map((policy) => (
-                  <div key={policy.name} style={{
+                {Object.entries(globalState.policyFiles).filter(([_, file]) => file !== null).map(([policyName, policyFile]) => {
+                  if (!policyFile) return null;
+                  return (
+                  <div key={policyName} style={{
                     padding: '24px',
                     backgroundColor: '#162032',
                     borderRadius: '12px',
@@ -1914,24 +1923,37 @@ export default function TenantPage() {
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0' }}>
-                          {policy.name}
+                          {policyName}
                         </h3>
                         <p style={{ color: '#94A3B8', fontSize: '14px', margin: '0 0 12px 0', lineHeight: '1.5' }}>
-                          {policy.description}
+                          {policyFile.name || 'Policy document'}
                         </p>
                         <div style={{ display: 'flex', gap: '16px', fontSize: '13px' }}>
                           <span style={{ color: '#64748B' }}>
-                            <span style={{ color: '#94A3B8', fontWeight: '500' }}>Updated:</span> {policy.lastUpdated}
+                            <span style={{ color: '#94A3B8', fontWeight: '500' }}>Uploaded:</span> {policyFile.uploadDate}
                           </span>
                           <span style={{ color: '#64748B' }}>
-                            <span style={{ color: '#94A3B8', fontWeight: '500' }}>Size:</span> {policy.size}
+                            <span style={{ color: '#94A3B8', fontWeight: '500' }}>Type:</span> {policyFile.fileType || 'PDF'}
                           </span>
                         </div>
                       </div>
                     </div>
 
                     <button
-                      onClick={() => alert(`Downloading ${policy.name} policy...`)}
+                      onClick={() => {
+                        if (policyFile.fileData) {
+                          // Create download link from base64 data
+                          const link = document.createElement('a');
+                          link.href = policyFile.fileData;
+                          link.download = `${policyName.replace(/\s+/g, '_')}.pdf`;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          alert(`Downloading ${policyName} policy...`);
+                        } else {
+                          alert('Policy file data not available');
+                        }
+                      }}
                       style={{
                         width: '100%',
                         padding: '12px 20px',
@@ -1955,8 +1977,10 @@ export default function TenantPage() {
                       <span>Download PDF</span>
                     </button>
                   </div>
-                ))}
+                  );
+                })}
               </div>
+              )}
             </div>
           )}
 
