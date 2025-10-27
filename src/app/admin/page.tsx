@@ -33,12 +33,7 @@ export default function AdminPage() {
   const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc')
   const [expandedUserRow, setExpandedUserRow] = useState<number | null>(null)
 
-  const [policyFiles, setPolicyFiles] = useState<Record<string, {name: string; uploadDate: string} | null>>({
-    'GDPR': null,
-    'Terms & Conditions': null,
-    'Passwords': null,
-    'Installation and Onboarding Guide': null
-  })
+  // Note: Policy files are now managed via global state (globalState.policyFiles)
 
   // Digital Badges state
   const [badgeUsers, setBadgeUsers] = useState([
@@ -77,14 +72,18 @@ export default function AdminPage() {
   const handlePolicyUpload = (policyName: string, event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file && file.type === 'application/pdf') {
-      setPolicyFiles(prev => ({
-        ...prev,
-        [policyName]: {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const base64Data = e.target?.result as string
+        globalState.uploadPolicy(policyName, {
           name: file.name,
-          uploadDate: new Date().toLocaleDateString()
-        }
-      }))
-      alert(`${policyName} policy "${file.name}" uploaded successfully!`)
+          uploadDate: new Date().toLocaleDateString(),
+          fileData: base64Data,
+          fileType: file.type
+        })
+        alert(`${policyName} policy "${file.name}" uploaded successfully!`)
+      }
+      reader.readAsDataURL(file)
     } else {
       alert('Please select a valid PDF file')
     }
@@ -2513,7 +2512,7 @@ export default function AdminPage() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
-                {Object.keys(policyFiles).map((policyName) => (
+                {Object.keys(globalState.policyFiles).map((policyName) => (
                   <div key={policyName} style={{
                     padding: '24px',
                     backgroundColor: 'rgba(51, 78, 104, 0.3)',
@@ -2537,9 +2536,9 @@ export default function AdminPage() {
                         <h3 style={{ color: '#d7bb91', fontSize: '18px', fontWeight: '600', margin: '0 0 4px 0' }}>
                           {policyName}
                         </h3>
-                        {policyFiles[policyName] ? (
+                        {globalState.policyFiles[policyName] ? (
                           <p style={{ color: '#64748B', fontSize: '13px', margin: 0 }}>
-                            Uploaded: {policyFiles[policyName]?.uploadDate}
+                            Uploaded: {globalState.policyFiles[policyName]?.uploadDate}
                           </p>
                         ) : (
                           <p style={{ color: '#64748B', fontSize: '13px', margin: 0 }}>
@@ -2549,7 +2548,7 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {policyFiles[policyName] && (
+                    {globalState.policyFiles[policyName] && (
                       <div style={{
                         padding: '12px',
                         backgroundColor: 'rgba(51, 78, 104, 0.5)',
@@ -2560,7 +2559,7 @@ export default function AdminPage() {
                           Current File:
                         </p>
                         <p style={{ color: '#d7bb91', fontSize: '13px', margin: 0, opacity: 0.8 }}>
-                          {policyFiles[policyName]?.name}
+                          {globalState.policyFiles[policyName]?.name}
                         </p>
                       </div>
                     )}
@@ -2596,7 +2595,7 @@ export default function AdminPage() {
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(75, 101, 129, 1)'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(75, 101, 129, 0.8)'}
                       >
-                        {policyFiles[policyName] ? 'Replace File' : 'Upload PDF'}
+                        {globalState.policyFiles[policyName] ? 'Replace File' : 'Upload PDF'}
                       </label>
                       <p style={{ color: '#d7bb91', opacity: 0.7, margin: '8px 0 0 0', fontSize: '12px' }}>
                         PDF files only (max 10MB)
