@@ -55,20 +55,7 @@ export default function AdminPage() {
   const [badgeCardTypeFilter, setBadgeCardTypeFilter] = useState('All Card Types')
   const [showBadgeImportModal, setShowBadgeImportModal] = useState(false)
 
-  // Global Profiles state - profiles can have multiple modules assigned
-  const [globalProfiles, setGlobalProfiles] = useState<Array<{id: string; name: string; description: string; modules: string[]; isGlobal: boolean}>>([
-    { id: 'prof1', name: 'Full Access', description: 'Complete access to all system modules', modules: ['User Management', 'Visitor Management', 'Parking', 'Emergency', 'Map', 'Restaurant', 'Ticketing', 'Service Hub', 'Lockers', 'News', 'AI Assistant', 'Space Management', 'Private Delivery', 'Authentication', 'Reporting'], isGlobal: true },
-    { id: 'prof2', name: 'Limited Access', description: 'Access to core operational modules', modules: ['User Management', 'Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Space Management', 'Reporting'], isGlobal: true },
-    { id: 'prof3', name: 'Visitor Management Only', description: 'Limited to front desk and visitor operations', modules: ['Visitor Management', 'Emergency', 'Map', 'Ticketing', 'Lockers', 'News'], isGlobal: true },
-  ])
-  // Tenant-specific profiles (in real app, would be per-tenant)
-  const [tenantProfiles, setTenantProfiles] = useState<Record<string, Array<{id: string; name: string; description: string; modules: string[]; isGlobal: boolean}>>>({
-    'acme': [],
-    'techflow': [],
-    'global': [],
-    'innovation': [],
-    'digital': []
-  })
+  // Note: Profiles are now managed via global state (globalState.profiles)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [editingProfile, setEditingProfile] = useState<{id?: string; name: string; description: string; modules: string[]} | null>(null)
 
@@ -1198,7 +1185,9 @@ export default function AdminPage() {
           {/* Module Management Section - Context-aware: Global profiles or Tenant-specific profiles */}
           {activeSection === 'modules' && (() => {
             const isGlobalView = selectedTenant === 'all';
-            const currentProfiles = isGlobalView ? globalProfiles : [...globalProfiles, ...(tenantProfiles[selectedTenant] || [])];
+            const currentProfiles = isGlobalView 
+              ? globalState.profiles.filter(p => p.isGlobal)
+              : globalState.profiles.filter(p => p.isGlobal || p.tenantId === selectedTenant);
             
             return (
               <div>
@@ -1310,10 +1299,7 @@ export default function AdminPage() {
                                   <button 
                                     onClick={() => {
                                       if (confirm(`Delete profile "${profile.name}"? This action cannot be undone.`)) {
-                                        setTenantProfiles(prev => ({
-                                          ...prev,
-                                          [selectedTenant]: prev[selectedTenant].filter(p => p.id !== profile.id)
-                                        }));
+                                        globalState.deleteProfile(profile.id);
                                         alert('Profile deleted successfully');
                                       }
                                     }}
@@ -3430,35 +3416,24 @@ export default function AdminPage() {
               const description = formData.get('description') as string;
               
               const isGlobalView = selectedTenant === 'all';
-              const newProfile = {
-                id: editingProfile.id || `${isGlobalView ? 'global' : selectedTenant}_prof_${Date.now()}`,
-                name: profileName,
-                description: description,
-                modules: editingProfile.modules,
-                isGlobal: isGlobalView
-              };
               
               if (editingProfile.id) {
-                // Update existing
-                if (isGlobalView) {
-                  setGlobalProfiles(prev => prev.map(p => p.id === editingProfile.id ? newProfile : p));
-                } else {
-                  setTenantProfiles(prev => ({
-                    ...prev,
-                    [selectedTenant]: prev[selectedTenant].map(p => p.id === editingProfile.id ? newProfile : p)
-                  }));
-                }
+                // Update existing profile
+                globalState.updateProfile(editingProfile.id, {
+                  name: profileName,
+                  description: description,
+                  modules: editingProfile.modules
+                });
                 alert('Profile updated successfully');
               } else {
-                // Create new
-                if (isGlobalView) {
-                  setGlobalProfiles(prev => [...prev, newProfile]);
-                } else {
-                  setTenantProfiles(prev => ({
-                    ...prev,
-                    [selectedTenant]: [...prev[selectedTenant], newProfile]
-                  }));
-                }
+                // Create new profile
+                globalState.addProfile({
+                  name: profileName,
+                  description: description,
+                  modules: editingProfile.modules,
+                  isGlobal: isGlobalView,
+                  tenantId: isGlobalView ? undefined : selectedTenant
+                });
                 alert('Profile created successfully');
               }
               
