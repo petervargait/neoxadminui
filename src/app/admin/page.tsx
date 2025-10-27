@@ -977,8 +977,8 @@ export default function AdminPage() {
                                 borderRadius: '20px',
                                 fontSize: '12px',
                                 fontWeight: '500',
-                                backgroundColor: user.status === 'Active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
-                                color: user.status === 'Active' ? '#10B981' : '#64748B'
+                                backgroundColor: user.status === 'active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(100, 116, 139, 0.1)',
+                                color: user.status === 'active' ? '#10B981' : '#64748B'
                               }}>
                                 {user.status}
                               </span>
@@ -1413,7 +1413,7 @@ export default function AdminPage() {
                   backgroundColor: '#162032',
                   border: '1px solid #1E293B'
                 }}>
-                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>{badgeUsers.filter(u => u.status === 'Suspended').length}</div>
+                  <div style={{ fontSize: '32px', fontWeight: '700', color: '#EF4444', marginBottom: '8px' }}>{globalState.badges.filter(u => u.status === 'Suspended').length}</div>
                   <div style={{ color: '#64748B', fontSize: '14px' }}>Badges Suspended</div>
                 </div>
               </div>
@@ -1928,10 +1928,10 @@ export default function AdminPage() {
                 }} />
               </div>
               <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '16px' }}>
-                {globalState.state.auditLogs.length === 0 ? (
+                {globalState.auditLogs.length === 0 ? (
                   <div style={{ color: '#d7bb91', opacity: 0.7, textAlign: 'center', padding: '24px' }}>No audit logs available</div>
                 ) : (
-                  globalState.state.auditLogs.map((log) => (
+                  globalState.auditLogs.map((log) => (
                     <div key={log.id} style={{
                       padding: '12px',
                       backgroundColor: 'rgba(51, 78, 104, 0.3)',
@@ -2788,7 +2788,7 @@ export default function AdminPage() {
                 {globalState.tenants.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '40px', color: '#64748B' }}>
                     <p style={{ fontSize: '16px', marginBottom: '8px' }}>No tenants created yet</p>
-                    <p style={{ fontSize: '14px' }}>Click "Create Tenant" to add your first tenant</p>
+                    <p style={{ fontSize: '14px' }}>Click &quot;Create Tenant&quot; to add your first tenant</p>
                   </div>
                 ) : (
                   globalState.tenants.sort((a, b) => a.name.localeCompare(b.name)).map((tenant) => {

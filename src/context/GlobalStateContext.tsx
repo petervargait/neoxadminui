@@ -120,7 +120,7 @@ export interface Task {
   requestedBy: string
   requestedByName: string
   status: 'pending' | 'approved' | 'rejected'
-  data: any
+  data: Record<string, unknown>
   createdAt: string
   reviewedAt?: string
   reviewedBy?: string
