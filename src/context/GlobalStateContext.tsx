@@ -91,6 +91,24 @@ export interface ParkingSpace {
   updatedAt?: string
 }
 
+export interface Locker {
+  id: string
+  lockerNumber: string
+  name?: string
+  building: string
+  floor: string
+  zone?: string
+  type: 'permanent' | 'gym' | 'bike' | 'temporary' | 'storage'
+  status: 'available' | 'occupied' | 'reserved' | 'maintenance'
+  tenantId?: string
+  assignedTo?: string
+  assignedToName?: string
+  assignedDate?: string
+  notes?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
 export interface Ticket {
   id: string
   ticketNumber: string
@@ -170,6 +188,7 @@ interface GlobalState {
   badges: Badge[]
   invitations: Invitation[]
   parkingSpaces: ParkingSpace[]
+  lockers: Locker[]
   tickets: Ticket[]
   policyFiles: Record<string, PolicyFile | null>
   auditLogs: AuditLog[]
@@ -197,6 +216,8 @@ interface GlobalStateContextType extends GlobalState {
   deleteInvitation: (id: string) => void
   addParkingSpace: (space: Omit<ParkingSpace, 'id'>) => ParkingSpace
   updateParkingSpace: (id: string, updates: Partial<ParkingSpace>) => void
+  addLocker: (locker: Omit<Locker, 'id'>) => Locker
+  updateLocker: (id: string, updates: Partial<Locker>) => void
   addTicket: (ticket: Omit<Ticket, 'id' | 'ticketNumber' | 'createdAt' | 'updatedAt'>) => Ticket
   updateTicket: (id: string, updates: Partial<Ticket>) => void
   uploadPolicy: (policyName: string, file: PolicyFile) => void
@@ -226,6 +247,7 @@ const getInitialState = (): GlobalState => {
         // Merge with defaults to ensure new fields exist
         return {
           ...parsedState,
+          lockers: parsedState.lockers || [],
           systemSettings: parsedState.systemSettings || {
             'global': {
               tenantId: 'global',
@@ -386,6 +408,7 @@ const getInitialState = (): GlobalState => {
       { id: 'p109', spaceNumber: 'C-U29', building: 'Building C', location: 'Building C - Underground', status: 'available' },
       { id: 'p110', spaceNumber: 'C-U30', building: 'Building C', location: 'Building C - Underground', status: 'available' },
     ],
+    lockers: [],
     tickets: [],
     policyFiles: {
       'GDPR': null,
@@ -598,6 +621,30 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const addLocker = (locker: Omit<Locker, 'id'>) => {
+    const newLocker: Locker = {
+      ...locker,
+      id: `locker_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString()
+    }
+    setState(prev => ({ ...prev, lockers: [...prev.lockers, newLocker] }))
+    addAuditLog({ user: 'system', action: `Created locker ${newLocker.lockerNumber} (${newLocker.type})`, status: 'Success' })
+    return newLocker
+  }
+
+  const updateLocker = (id: string, updates: Partial<Locker>) => {
+    setState(prev => ({
+      ...prev,
+      lockers: prev.lockers.map(l => l.id === id ? { ...l, ...updates, updatedAt: new Date().toISOString() } : l)
+    }))
+    const locker = state.lockers.find(l => l.id === id)
+    if (updates.assignedTo) {
+      addAuditLog({ user: 'system', action: `Assigned locker ${locker?.lockerNumber} to ${updates.assignedToName}`, status: 'Success' })
+    } else {
+      addAuditLog({ user: 'system', action: `Updated locker ${locker?.lockerNumber}`, status: 'Success' })
+    }
+  }
+
   const addTicket = (ticket: Omit<Ticket, 'id' | 'ticketNumber' | 'createdAt' | 'updatedAt'>) => {
     const ticketNumber = `TKT-${(state.tickets.length + 1).toString().padStart(5, '0')}`
     const newTicket: Ticket = {
@@ -761,6 +808,8 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     deleteInvitation,
     addParkingSpace,
     updateParkingSpace,
+    addLocker,
+    updateLocker,
     addTicket,
     updateTicket,
     uploadPolicy,
