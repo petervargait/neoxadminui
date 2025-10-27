@@ -518,17 +518,20 @@ export default function AdminPage() {
                 justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                position: 'relative'
+                position: 'relative',
+                boxShadow: '0 0 15px rgba(239, 68, 68, 0.5), 0 0 25px rgba(239, 68, 68, 0.3)'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = '#334155'
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.6), 0 0 35px rgba(239, 68, 68, 0.4)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = '#1E293B'
+                e.currentTarget.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.5), 0 0 25px rgba(239, 68, 68, 0.3)'
               }}
               title="Notifications"
             >
-              <AlertRegular style={{ fontSize: '20px', width: '20px', height: '20px', color: '#F1F5F9' }} />
+              <AlertOnRegular style={{ fontSize: '20px', width: '20px', height: '20px', color: '#F1F5F9' }} />
               <span style={{
                 position: 'absolute',
                 top: '6px',
@@ -537,7 +540,8 @@ export default function AdminPage() {
                 height: '8px',
                 backgroundColor: '#EF4444',
                 borderRadius: '50%',
-                border: '2px solid #1E293B'
+                border: '2px solid #1E293B',
+                boxShadow: '0 0 8px rgba(239, 68, 68, 0.8)'
               }}></span>
             </button>
 
@@ -1914,7 +1918,7 @@ export default function AdminPage() {
 
           {/* Audit Logs */}
           {activeSection === 'auditLogs' && (
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 170px)' }}>
               <div style={{ marginBottom: '16px' }}>
                 <input type="search" placeholder="Search logs..." style={{
                   width: '100%',
@@ -1926,13 +1930,28 @@ export default function AdminPage() {
                   fontSize: '14px'
                 }} />
               </div>
-              <div style={{ maxHeight: '300px', overflow: 'auto' }}>
+              <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '16px' }}>
                 {[
                   { time: '2025-10-21 13:05:23', user: 'admin@system', action: 'Created tenant "Acme Corp"', status: 'Success' },
                   { time: '2025-10-21 12:58:15', user: 'admin@system', action: 'Updated system configuration', status: 'Success' },
                   { time: '2025-10-21 12:45:02', user: 'john@tenant1', action: 'Failed login attempt', status: 'Failed' },
                   { time: '2025-10-21 12:30:18', user: 'admin@system', action: 'Enabled parking module', status: 'Success' },
-                  { time: '2025-10-21 12:15:44', user: 'jane@tenant2', action: 'Sent invitation to visitor', status: 'Success' }
+                  { time: '2025-10-21 12:15:44', user: 'jane@tenant2', action: 'Sent invitation to visitor', status: 'Success' },
+                  { time: '2025-10-21 12:00:33', user: 'admin@system', action: 'Disabled Restaurant module', status: 'Success' },
+                  { time: '2025-10-21 11:45:12', user: 'sarah@tenant3', action: 'Updated user profile', status: 'Success' },
+                  { time: '2025-10-21 11:30:56', user: 'admin@system', action: 'Created new user account', status: 'Success' },
+                  { time: '2025-10-21 11:15:22', user: 'mike@tenant1', action: 'Failed password reset', status: 'Failed' },
+                  { time: '2025-10-21 11:00:44', user: 'admin@system', action: 'Exported audit logs', status: 'Success' },
+                  { time: '2025-10-21 10:45:09', user: 'lisa@tenant2', action: 'Modified white label settings', status: 'Success' },
+                  { time: '2025-10-21 10:30:28', user: 'admin@system', action: 'System backup completed', status: 'Success' },
+                  { time: '2025-10-21 10:15:51', user: 'tom@tenant4', action: 'Uploaded policy document', status: 'Success' },
+                  { time: '2025-10-21 10:00:17', user: 'admin@system', action: 'Updated system settings', status: 'Success' },
+                  { time: '2025-10-21 09:45:33', user: 'emma@tenant1', action: 'Sent bulk invitations', status: 'Success' },
+                  { time: '2025-10-21 09:30:59', user: 'admin@system', action: 'Enabled AI Assistant module', status: 'Success' },
+                  { time: '2025-10-21 09:15:14', user: 'david@tenant3', action: 'Failed API authentication', status: 'Failed' },
+                  { time: '2025-10-21 09:00:48', user: 'admin@system', action: 'Created new tenant', status: 'Success' },
+                  { time: '2025-10-21 08:45:26', user: 'olivia@tenant2', action: 'Downloaded digital badge', status: 'Success' },
+                  { time: '2025-10-21 08:30:03', user: 'admin@system', action: 'Modified module permissions', status: 'Success' }
                 ].map((log, index) => (
                   <div key={index} style={{
                     padding: '12px',

@@ -35,10 +35,21 @@ export default function APIDocsPage() {
 
   const apiCategories = [
     { id: 'overview', name: 'Overview', icon: 'book', isFluentIcon: true },
+    { id: 'authentication', name: 'Authentication', icon: '🔐', isFluentIcon: false },
     { id: 'user-management', name: 'User Management', icon: 'people', isFluentIcon: true },
+    { id: 'tenant-management', name: 'Tenant Management', icon: '🏢', isFluentIcon: false },
     { id: 'visitor-management', name: 'Visitor Management', icon: 'person', isFluentIcon: true },
     { id: 'parking', name: 'Parking Management', icon: 'vehicle', isFluentIcon: true },
     { id: 'digital-badge', name: 'Digital Badge Management', icon: 'document', isFluentIcon: true },
+    { id: 'modules-profiles', name: 'Modules & Profiles', icon: '⚙️', isFluentIcon: false },
+    { id: 'tickets', name: 'Ticketing System', icon: '🎫', isFluentIcon: false },
+    { id: 'notifications', name: 'Notifications', icon: '🔔', isFluentIcon: false },
+    { id: 'emergency', name: 'Emergency Management', icon: '🚨', isFluentIcon: false },
+    { id: 'restaurant', name: 'Restaurant & Catering', icon: '🍽️', isFluentIcon: false },
+    { id: 'space-management', name: 'Space Management', icon: '📍', isFluentIcon: false },
+    { id: 'lockers', name: 'Locker Management', icon: '🔒', isFluentIcon: false },
+    { id: 'analytics', name: 'Analytics & Reporting', icon: '📊', isFluentIcon: false },
+    { id: 'ai-assistant', name: 'AI Assistant', icon: '🤖', isFluentIcon: false },
   ]
 
   return (
@@ -307,6 +318,83 @@ export default function APIDocsPage() {
             </div>
           )}
 
+          {/* Authentication API */}
+          {activeAPI === 'authentication' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>
+                Authentication API
+              </h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>
+                OAuth 2.0 authentication endpoints for secure access
+              </p>
+
+              {/* POST /auth/login */}
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/auth/login</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '16px' }}>Authenticate user and receive JWT access token</p>
+                
+                <h4 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginTop: '20px', marginBottom: '12px' }}>Request Body</h4>
+                <div style={{ backgroundColor: '#0F1629', padding: '16px', borderRadius: '8px' }}>
+                  <pre style={{ color: '#94A3B8', fontSize: '13px', margin: 0, fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+{`{
+  "email": "user@company.com",
+  "password": "SecurePassword123!",
+  "remember_me": true
+}`}
+                  </pre>
+                </div>
+
+                <h4 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginTop: '20px', marginBottom: '12px' }}>Response 200</h4>
+                <div style={{ backgroundColor: '#0F1629', padding: '16px', borderRadius: '8px' }}>
+                  <pre style={{ color: '#94A3B8', fontSize: '13px', margin: 0, fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+{`{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "user": {
+    "id": "usr_123456",
+    "email": "user@company.com",
+    "name": "John Smith",
+    "role": "admin"
+  }
+}`}
+                  </pre>
+                </div>
+              </div>
+
+              {/* POST /auth/refresh */}
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/auth/refresh</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Refresh expired access token using refresh token</p>
+              </div>
+
+              {/* POST /auth/logout */}
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/auth/logout</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Invalidate current session and access token</p>
+              </div>
+
+              {/* POST /auth/forgot-password */}
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/auth/forgot-password</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Request password reset email</p>
+              </div>
+            </div>
+          )}
+
           {/* User Management API */}
           {activeAPI === 'user-management' && (
             <div>
@@ -555,6 +643,68 @@ export default function APIDocsPage() {
             </div>
           )}
 
+          {/* Tenant Management API */}
+          {activeAPI === 'tenant-management' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>
+                Tenant Management API
+              </h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>
+                Multi-tenant organization management
+              </p>
+              
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/tenants</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>List all tenants with pagination</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/tenants</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '16px' }}>Create new tenant organization</p>
+                
+                <h4 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginTop: '20px', marginBottom: '12px' }}>Request Body</h4>
+                <div style={{ backgroundColor: '#0F1629', padding: '16px', borderRadius: '8px' }}>
+                  <pre style={{ color: '#94A3B8', fontSize: '13px', margin: 0, fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+{`{
+  "name": "Acme Corporation",
+  "domain": "acme.com",
+  "contact_email": "admin@acme.com",
+  "contact_phone": "+1-555-0123",
+  "address": "123 Business St, City, ST 12345",
+  "modules": ["user_management", "visitor_management", "parking"],
+  "settings": {
+    "max_users": 500,
+    "enable_sso": true
+  }
+}`}
+                  </pre>
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#F59E0B', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>PATCH</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/tenants/:id</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Update tenant configuration</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#EF4444', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>DELETE</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/tenants/:id</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Deactivate or delete tenant</p>
+              </div>
+            </div>
+          )}
+
           {/* Digital Badge Management API */}
           {activeAPI === 'digital-badge' && (
             <div>
@@ -608,6 +758,318 @@ export default function APIDocsPage() {
                   <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/badges/:id/verify</code>
                 </div>
                 <p style={{ color: '#94A3B8', fontSize: '14px' }}>Verify badge and check access rights</p>
+              </div>
+            </div>
+          )}
+
+          {/* Modules & Profiles API */}
+          {activeAPI === 'modules-profiles' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>Modules & Profiles API</h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Manage system modules and user permission profiles</p>
+              
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/modules</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>List all available modules</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#F59E0B', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>PATCH</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/modules/:id/toggle</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Enable or disable a module</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/profiles</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Get all user profiles with module permissions</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/profiles</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Create new user profile with module permissions</p>
+              </div>
+            </div>
+          )}
+
+          {/* Ticketing System API */}
+          {activeAPI === 'tickets' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>Ticketing System API</h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Support ticket management and tracking</p>
+              
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/tickets</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Create new support ticket</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/tickets</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>List all tickets with filtering options</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#F59E0B', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>PATCH</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/tickets/:id</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Update ticket status or assign to agent</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/tickets/:id/comments</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Add comment to ticket</p>
+              </div>
+            </div>
+          )}
+
+          {/* Notifications API */}
+          {activeAPI === 'notifications' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>Notifications API</h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Push notifications, emails, and in-app alerts</p>
+              
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/notifications/send</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Send notification to user or group</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/notifications</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Get notifications for current user</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#F59E0B', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>PATCH</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/notifications/:id/read</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Mark notification as read</p>
+              </div>
+            </div>
+          )}
+
+          {/* Emergency Management API */}
+          {activeAPI === 'emergency' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>Emergency Management API</h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Emergency alerts, evacuation management, and crisis response</p>
+              
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#EF4444', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/emergency/alert</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Trigger emergency alert</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/emergency/status</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Get current emergency status</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#F59E0B', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>PATCH</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/emergency/resolve</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Resolve emergency and clear alerts</p>
+              </div>
+            </div>
+          )}
+
+          {/* Restaurant & Catering API */}
+          {activeAPI === 'restaurant' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>Restaurant & Catering API</h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Food ordering, catering requests, and menu management</p>
+              
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/restaurant/menu</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Get current menu</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/restaurant/orders</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Place food order</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/catering/request</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Request catering for event</p>
+              </div>
+            </div>
+          )}
+
+          {/* Space Management API */}
+          {activeAPI === 'space-management' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>Space Management API</h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Meeting rooms, desks, and workspace reservations</p>
+              
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/spaces</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>List available spaces</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/spaces/reserve</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Reserve a space or room</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/spaces/availability</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Check space availability for date range</p>
+              </div>
+            </div>
+          )}
+
+          {/* Locker Management API */}
+          {activeAPI === 'lockers' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>Locker Management API</h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Locker assignment, access control, and management</p>
+              
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/lockers</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>List all lockers with status</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/lockers/assign</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Assign locker to user</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#F59E0B', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>PATCH</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/lockers/:id/access</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Grant or revoke locker access</p>
+              </div>
+            </div>
+          )}
+
+          {/* Analytics & Reporting API */}
+          {activeAPI === 'analytics' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>Analytics & Reporting API</h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>System analytics, usage reports, and data insights</p>
+              
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/analytics/dashboard</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Get overview dashboard metrics</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/analytics/users</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Get user activity and engagement analytics</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#10B981', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>GET</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/reports/audit-logs</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Export audit logs with filters</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/reports/generate</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Generate custom report with specified parameters</p>
+              </div>
+            </div>
+          )}
+
+          {/* AI Assistant API */}
+          {activeAPI === 'ai-assistant' && (
+            <div>
+              <h2 style={{ color: '#F1F5F9', fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>AI Assistant API</h2>
+              <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>Natural language processing, chatbot, and AI-powered features</p>
+              
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/ai/chat</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Send message to AI assistant and get response</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/ai/recommendations</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Get personalized recommendations based on user context</p>
+              </div>
+
+              <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                  <span style={{ padding: '4px 12px', backgroundColor: '#3B82F6', color: 'white', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>POST</span>
+                  <code style={{ color: '#60A5FA', fontSize: '16px', fontFamily: 'monospace' }}>/ai/analyze</code>
+                </div>
+                <p style={{ color: '#94A3B8', fontSize: '14px' }}>Analyze text, images, or data with AI</p>
               </div>
             </div>
           )}
