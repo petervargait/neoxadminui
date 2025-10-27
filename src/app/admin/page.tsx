@@ -29,6 +29,7 @@ export default function AdminPage() {
   const [selectedTenant, setSelectedTenant] = useState<string>('all')
   const [showUserModal, setShowUserModal] = useState(false)
   const [editingUser, setEditingUser] = useState<{name: string; email: string; role: string; department: string; status: string; profileId?: string} | null>(null)
+  const [createBadgeForUser, setCreateBadgeForUser] = useState(false)
   const [userSortField, setUserSortField] = useState<'name' | 'email' | 'role' | 'department' | 'status'>('name')
   const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc')
   const [expandedUserRow, setExpandedUserRow] = useState<number | null>(null)
@@ -3342,12 +3343,7 @@ export default function AdminPage() {
       </div>
 
       {/* User Add/Edit Modal */}
-      {showUserModal && (() => {
-        // Initialize editingUser with empty values if creating new user
-        if (!editingUser) {
-          setEditingUser({ name: '', email: '', role: 'User', department: '', status: 'active', profileId: '' });
-        }
-        return (
+      {showUserModal && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -3380,7 +3376,7 @@ export default function AdminPage() {
               const email = formData.get('email') as string;
               const role = formData.get('role') as string;
               const department = formData.get('department') as string;
-              const profileId = editingUser?.profileId;
+              const profileId = formData.get('profileId') as string;
               
               if (!profileId) {
                 alert('Please select an access profile');
@@ -3396,7 +3392,7 @@ export default function AdminPage() {
                 }
               } else {
                 // Create new user
-                globalState.addUser({
+                const newUser = globalState.addUser({
                   name,
                   email,
                   role,
@@ -3405,10 +3401,25 @@ export default function AdminPage() {
                   profileId,
                   tenantId: selectedTenant
                 });
-                alert('User added successfully!');
+                
+                // Create badge if checkbox is checked
+                if (createBadgeForUser) {
+                  globalState.addBadge({
+                    userId: newUser.id,
+                    name,
+                    email,
+                    company: department || 'N/A',
+                    cardType: 'NFC',
+                    imei: `IMEI${Date.now()}`,
+                    status: 'New'
+                  });
+                }
+                
+                alert('User added successfully!' + (createBadgeForUser ? ' Digital badge created.' : ''));
               }
               setShowUserModal(false);
               setEditingUser(null);
+              setCreateBadgeForUser(false);
             }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Full Name *</label>
@@ -3467,15 +3478,8 @@ export default function AdminPage() {
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Access Profile *</label>
                 <select 
-                  value={editingUser?.profileId || ''}
-                  onChange={(e) => {
-                    if (editingUser) {
-                      setEditingUser({
-                        ...editingUser,
-                        profileId: e.target.value
-                      });
-                    }
-                  }}
+                  name="profileId"
+                  defaultValue={editingUser?.profileId || ''}
                   required 
                   style={{
                     width: '100%',
@@ -3494,29 +3498,21 @@ export default function AdminPage() {
                       <option key={profile.id} value={profile.id}>{profile.name} ({profile.modules.length} modules) - {profile.isGlobal ? 'Global' : 'Tenant'}</option>
                     ))}
                 </select>
-                {editingUser?.profileId && (() => {
-                  const selectedProfile = globalState.profiles.find(p => p.id === editingUser.profileId);
-                  return selectedProfile ? (
-                    <div style={{ marginTop: '12px', padding: '12px', backgroundColor: '#1E293B', borderRadius: '8px', border: '1px solid #475569' }}>
-                      <div style={{ color: '#64748B', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', marginBottom: '8px' }}>Modules from {selectedProfile.name}:</div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                        {selectedProfile.modules.map((module) => (
-                        <span key={module} style={{
-                          padding: '4px 10px',
-                          backgroundColor: '#0F1629',
-                          borderRadius: '12px',
-                          fontSize: '11px',
-                          color: '#10B981',
-                          border: '1px solid rgba(16, 185, 129, 0.3)'
-                        }}>
-                          {module}
-                        </span>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null;
-                })()}
               </div>
+              {!(editingUser && 'id' in editingUser) && (
+                <div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#F1F5F9', cursor: 'pointer' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={createBadgeForUser}
+                      onChange={(e) => setCreateBadgeForUser(e.target.checked)}
+                      style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                    />
+                    <span style={{ fontSize: '14px', fontWeight: '500' }}>Create Digital Badge for this user</span>
+                  </label>
+                  <p style={{ color: '#64748B', fontSize: '12px', marginTop: '4px', marginLeft: '24px' }}>A digital badge will be automatically created with NFC card type</p>
+                </div>
+              )}
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
                   flex: 1,
@@ -3544,8 +3540,7 @@ export default function AdminPage() {
             </form>
           </div>
         </div>
-        );
-      })()}
+      )}
 
       {/* Badge Add/Edit Modal */}
       {showBadgeModal && editingBadge && (
