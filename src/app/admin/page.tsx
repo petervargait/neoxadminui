@@ -3330,7 +3330,12 @@ export default function AdminPage() {
       </div>
 
       {/* User Add/Edit Modal */}
-      {showUserModal && (
+      {showUserModal && (() => {
+        // Initialize editingUser with empty values if creating new user
+        if (!editingUser) {
+          setEditingUser({ name: '', email: '', role: 'User', department: '', status: 'active', profileId: '' });
+        }
+        return (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -3342,7 +3347,7 @@ export default function AdminPage() {
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1000
-        }} onClick={() => setShowUserModal(false)}>
+        }} onClick={() => { setShowUserModal(false); setEditingUser(null); }}>
           <div style={{
             backgroundColor: '#162032',
             borderRadius: '12px',
@@ -3354,7 +3359,7 @@ export default function AdminPage() {
             overflow: 'auto'
           }} onClick={(e) => e.stopPropagation()}>
             <h2 style={{ color: '#F1F5F9', fontSize: '24px', fontWeight: '600', marginBottom: '24px' }}>
-              {editingUser ? 'Edit User' : 'Add New User'}
+              {editingUser && 'id' in editingUser ? 'Edit User' : 'Add New User'}
             </h2>
             <form onSubmit={(e) => { 
               e.preventDefault(); 
@@ -3511,8 +3516,8 @@ export default function AdminPage() {
                   fontWeight: '500',
                   cursor: 'pointer',
                   fontSize: '14px'
-                }}>{editingUser ? 'Update User' : 'Add User'}</button>
-                <button type="button" onClick={() => setShowUserModal(false)} style={{
+                }}>{editingUser && 'id' in editingUser ? 'Update User' : 'Add User'}</button>
+                <button type="button" onClick={() => { setShowUserModal(false); setEditingUser(null); }} style={{
                   flex: 1,
                   backgroundColor: 'transparent',
                   color: '#F1F5F9',
@@ -3527,7 +3532,8 @@ export default function AdminPage() {
             </form>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* Badge Add/Edit Modal */}
       {showBadgeModal && editingBadge && (
