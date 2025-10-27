@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { GlobalStateProvider } from '../context/GlobalStateContext';
 
 export const metadata: Metadata = {
   title: "NEOX Infinity - Multi-Tenant Admin Platform",
@@ -62,7 +63,9 @@ export default function RootLayout({
         <link rel="icon" href="/neoxfavicon.png" type="image/png" />
       </head>
       <body className="h-full antialiased">
-        {children}
+        <GlobalStateProvider>
+          {children}
+        </GlobalStateProvider>
       </body>
     </html>
   );
