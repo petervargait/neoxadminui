@@ -1104,86 +1104,75 @@ export default function AdminPage() {
                   </div>
 
                   {/* Visitor Management Dashboard */}
-                  {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Visitor Management') && (
-                    <div style={{
-                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
-                      borderRadius: '16px',
-                      border: '1px solid rgba(139, 92, 246, 0.3)',
-                      padding: '24px',
-                      marginBottom: '24px',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
-                    }}>
-                      <VisitorDashboard
-                        invitations={globalState.invitations.filter(inv => {
-                          const host = globalState.users.find(u => u.id === inv.hostId)
-                          return host?.tenantId === selectedTenant
-                        })}
-                        startDate={appliedStartDate}
-                        endDate={appliedEndDate}
-                        searchTerm=""
-                      />
-                    </div>
-                  )}
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                    padding: '24px',
+                    marginBottom: '24px',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                  }}>
+                    <VisitorDashboard
+                      invitations={globalState.invitations.filter(inv => {
+                        const host = globalState.users.find(u => u.id === inv.hostId)
+                        return host?.tenantId === selectedTenant
+                      })}
+                      startDate={appliedStartDate}
+                      endDate={appliedEndDate}
+                      searchTerm=""
+                    />
+                  </div>
 
                   {/* Parking Dashboard */}
-                  {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Parking') && (
-                    <div style={{
-                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
-                      borderRadius: '16px',
-                      border: '1px solid rgba(139, 92, 246, 0.3)',
-                      padding: '24px',
-                      marginBottom: '24px',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
-                    }}>
-                      <ParkingDashboard
-                        parkingSpaces={globalState.parkingSpaces.filter(space => space.tenantId === selectedTenant)}
-                        parkingBookings={globalState.parkingBookings?.filter(b => b.tenantId === selectedTenant)}
-                        searchTerm=""
-                      />
-                    </div>
-                  )}
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                    padding: '24px',
+                    marginBottom: '24px',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                  }}>
+                    <ParkingDashboard
+                      parkingSpaces={globalState.parkingSpaces.filter(space => space.tenantId === selectedTenant)}
+                      parkingBookings={globalState.parkingBookings?.filter(b => b.tenantId === selectedTenant)}
+                      searchTerm=""
+                    />
+                  </div>
 
                   {/* Locker Dashboard */}
-                  {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Lockers') && (
-                    <div style={{
-                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
-                      borderRadius: '16px',
-                      border: '1px solid rgba(139, 92, 246, 0.3)',
-                      padding: '24px',
-                      marginBottom: '24px',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
-                    }}>
-                      <LockerDashboard
-                        lockers={globalState.lockers.filter(locker => locker.tenantId === selectedTenant)}
-                        lockerUsages={globalState.lockerUsages?.filter(u => u.tenantId === selectedTenant)}
-                        searchTerm=""
-                      />
-                    </div>
-                  )}
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                    padding: '24px',
+                    marginBottom: '24px',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                  }}>
+                    <LockerDashboard
+                      lockers={globalState.lockers.filter(locker => locker.tenantId === selectedTenant)}
+                      lockerUsages={globalState.lockerUsages?.filter(u => u.tenantId === selectedTenant)}
+                      searchTerm=""
+                    />
+                  </div>
 
                   {/* Digital Badges Dashboard */}
-                  {globalState.badges.some(badge => {
-                    const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
-                    return user?.tenantId === selectedTenant
-                  }) && (
-                    <div style={{
-                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
-                      borderRadius: '16px',
-                      border: '1px solid rgba(139, 92, 246, 0.3)',
-                      padding: '24px',
-                      marginBottom: '24px',
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
-                    }}>
-                      <BadgesDashboard
-                        badges={globalState.badges.filter(badge => {
-                          const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
-                          return user?.tenantId === selectedTenant
-                        })}
-                        badgeSwipes={globalState.badgeSwipes?.filter(s => s.tenantId === selectedTenant)}
-                        searchTerm=""
-                      />
-                    </div>
-                  )}
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                    padding: '24px',
+                    marginBottom: '24px',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                  }}>
+                    <BadgesDashboard
+                      badges={globalState.badges.filter(badge => {
+                        const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
+                        return user?.tenantId === selectedTenant
+                      })}
+                      badgeSwipes={globalState.badgeSwipes?.filter(s => s.tenantId === selectedTenant)}
+                      searchTerm=""
+                    />
+                  </div>
                 </div>
               )}
 
