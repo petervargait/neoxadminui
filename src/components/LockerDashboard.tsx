@@ -15,7 +15,6 @@ export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDa
   const maintenance = lockers.filter(l => l.status === 'maintenance').length
   const utilization = lockers.length > 0 ? ((occupied / lockers.length) * 100).toFixed(1) : '0'
   
-  // Usage statistics
   const totalUsages = lockerUsages.length
   const opened = lockerUsages.filter(u => u.opened).length
   const notOpened = lockerUsages.filter(u => !u.opened).length
@@ -23,7 +22,6 @@ export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDa
   
   const total = lockers.length || 1
   
-  // Usage by locker (top 5)
   const usageByLocker = lockers.slice(0, 5).map(locker => {
     const uses = lockerUsages.filter(u => u.lockerId === locker.id).length
     return { number: locker.lockerNumber, uses }
@@ -31,135 +29,138 @@ export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDa
   const maxUses = Math.max(...usageByLocker.map(l => l.uses), 1)
 
   return (
-    <div style={{ marginBottom: '32px' }}>
-      <div style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))', borderRadius: '20px', border: '1px solid rgba(139, 92, 246, 0.2)', padding: '32px', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px rgba(139, 92, 246, 0.3)' }}>
-            <svg style={{ width: '32px', height: '32px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div>
+      <div style={{ 
+        background: 'radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%)',
+        borderRadius: '24px',
+        padding: '32px',
+        marginBottom: '32px',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))', backdropFilter: 'blur(10px)' }} />
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 20px 40px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.3)' }}>
+            <svg style={{ width: '36px', height: '36px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
           <div>
-            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#F1F5F9', margin: 0 }}>Locker Management</h2>
-            <p style={{ fontSize: '14px', color: '#94A3B8', margin: '4px 0 0 0' }}>Locker utilization and usage analytics</p>
+            <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#F1F5F9', margin: 0, letterSpacing: '-0.02em' }}>Locker Management</h2>
+            <p style={{ fontSize: '15px', color: '#A0AEC0', margin: '4px 0 0 0', fontWeight: '500' }}>Utilization metrics & usage analytics</p>
           </div>
         </div>
       </div>
       
-      {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '24px' }}>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15))', border: '1px solid rgba(99, 102, 241, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{lockers.length}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOTAL LOCKERS</div>
-        </div>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15))', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{available}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AVAILABLE</div>
-        </div>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(109, 40, 217, 0.15), rgba(91, 33, 182, 0.15))', border: '1px solid rgba(109, 40, 217, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{occupied}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#C4B5FD', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OCCUPIED</div>
-        </div>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(109, 40, 217, 0.15))', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{opened}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OPENED (30D)</div>
-        </div>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(67, 56, 202, 0.15))', border: '1px solid rgba(79, 70, 229, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{notOpened}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>NOT OPENED</div>
-        </div>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(67, 56, 202, 0.15), rgba(55, 48, 163, 0.15))', border: '1px solid rgba(67, 56, 202, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{avgDuration}m</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#A5B4FC', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AVG DURATION</div>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+        {[
+          { value: lockers.length, label: 'Total Lockers', gradient: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' },
+          { value: available, label: 'Available', gradient: 'linear-gradient(135deg, #0EA5E9 0%, #06B6D4 100%)' },
+          { value: occupied, label: 'Occupied', gradient: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%)' },
+          { value: opened, label: 'Opened', gradient: 'linear-gradient(135deg, #EC4899 0%, #F97316 100%)' },
+          { value: `${avgDuration}m`, label: 'Avg Duration', gradient: 'linear-gradient(135deg, #10B981 0%, #06B6D4 100%)' }
+        ].map((stat, idx) => (
+          <div key={idx} style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '28px 24px', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: stat.gradient, opacity: 0.1, borderRadius: '50%', filter: 'blur(40px)' }} />
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ fontSize: '40px', fontWeight: '900', background: stat.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '8px', lineHeight: 1 }}>{stat.value}</div>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#A0AEC0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</div>
+            </div>
+          </div>
+        ))}
       </div>
       
-      {/* Charts Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
-        {/* Pie Chart - Locker Status */}
-        <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.6))', borderRadius: '16px', border: '1px solid rgba(139, 92, 246, 0.2)', padding: '24px' }}>
-          <h3 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '20px', margin: '0 0 20px 0' }}>Locker Status Distribution</h3>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ position: 'relative', width: '160px', height: '160px' }}>
-              <svg width="160" height="160" viewBox="0 0 160 160" style={{ filter: 'drop-shadow(0 4px 12px rgba(139, 92, 246, 0.2))' }}>
-                <circle cx="80" cy="80" r="60" fill="rgba(15, 23, 42, 0.4)" />
-                <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(139, 92, 246, 0.8)" strokeWidth="20" strokeDasharray={`${(available/total) * 439.6} 439.6`} strokeDashoffset="0" transform="rotate(-90 80 80)" strokeLinecap="round" />
-                <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(109, 40, 217, 0.8)" strokeWidth="20" strokeDasharray={`${(occupied/total) * 439.6} 439.6`} strokeDashoffset={`-${(available/total) * 439.6}`} transform="rotate(-90 80 80)" strokeLinecap="round" />
-                <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(99, 102, 241, 0.5)" strokeWidth="20" strokeDasharray={`${(maintenance/total) * 439.6} 439.6`} strokeDashoffset={`-${((available + occupied)/total) * 439.6}`} transform="rotate(-90 80 80)" strokeLinecap="round" />
-                <text x="80" y="75" textAnchor="middle" fill="#F1F5F9" fontSize="28" fontWeight="900">{utilization}%</text>
-                <text x="80" y="95" textAnchor="middle" fill="#94A3B8" fontSize="12">Used</text>
-              </svg>
-            </div>
-            <div style={{ flex: 1, paddingLeft: '20px' }}>
-              <div style={{ marginBottom: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'rgba(139, 92, 246, 0.8)', boxShadow: '0 0 8px rgba(139, 92, 246, 0.4)' }}></div>
-                  <span style={{ color: '#94A3B8', fontSize: '13px' }}>Available</span>
-                </div>
-                <div style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700' }}>{available}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', gap: '24px', marginBottom: '32px' }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(30, 41, 59, 0.4))', backdropFilter: 'blur(20px)', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '32px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: '-50%', right: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)' }} />
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700', marginBottom: '32px', margin: '0 0 32px 0' }}>Status Distribution</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+              <div style={{ position: 'relative', width: '220px', height: '220px' }}>
+                <svg width="220" height="220" viewBox="0 0 220 220" style={{ filter: 'drop-shadow(0 8px 24px rgba(139, 92, 246, 0.4))' }}>
+                  <defs>
+                    <linearGradient id="lockerGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#0EA5E9', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#06B6D4', stopOpacity: 1 }} />
+                    </linearGradient>
+                    <linearGradient id="lockerGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#8B5CF6', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#A855F7', stopOpacity: 1 }} />
+                    </linearGradient>
+                    <linearGradient id="lockerGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#64748B', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#475569', stopOpacity: 1 }} />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="110" cy="110" r="80" fill="rgba(15, 23, 42, 0.6)" />
+                  <circle cx="110" cy="110" r="95" fill="none" stroke="url(#lockerGrad1)" strokeWidth="28" strokeDasharray={`${(available/total) * 596.9} 596.9`} strokeDashoffset="0" transform="rotate(-90 110 110)" strokeLinecap="round" />
+                  <circle cx="110" cy="110" r="95" fill="none" stroke="url(#lockerGrad2)" strokeWidth="28" strokeDasharray={`${(occupied/total) * 596.9} 596.9`} strokeDashoffset={`-${(available/total) * 596.9}`} transform="rotate(-90 110 110)" strokeLinecap="round" />
+                  <circle cx="110" cy="110" r="95" fill="none" stroke="url(#lockerGrad3)" strokeWidth="28" strokeDasharray={`${(maintenance/total) * 596.9} 596.9`} strokeDashoffset={`-${((available + occupied)/total) * 596.9}`} transform="rotate(-90 110 110)" strokeLinecap="round" />
+                  <text x="110" y="105" textAnchor="middle" fill="#F1F5F9" fontSize="38" fontWeight="900">{utilization}%</text>
+                  <text x="110" y="130" textAnchor="middle" fill="#94A3B8" fontSize="14" fontWeight="600">USED</text>
+                </svg>
               </div>
-              <div style={{ marginBottom: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'rgba(109, 40, 217, 0.8)', boxShadow: '0 0 8px rgba(109, 40, 217, 0.4)' }}></div>
-                  <span style={{ color: '#94A3B8', fontSize: '13px' }}>Occupied</span>
-                </div>
-                <div style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700' }}>{occupied}</div>
-              </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'rgba(99, 102, 241, 0.5)', boxShadow: '0 0 8px rgba(99, 102, 241, 0.3)' }}></div>
-                  <span style={{ color: '#94A3B8', fontSize: '13px' }}>Maintenance</span>
-                </div>
-                <div style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700' }}>{maintenance}</div>
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {[
+                  { label: 'Available', value: available, color: 'linear-gradient(135deg, #0EA5E9, #06B6D4)' },
+                  { label: 'Occupied', value: occupied, color: 'linear-gradient(135deg, #8B5CF6, #A855F7)' },
+                  { label: 'Maintenance', value: maintenance, color: 'linear-gradient(135deg, #64748B, #475569)' }
+                ].map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: item.color, boxShadow: '0 0 12px rgba(139, 92, 246, 0.5)' }} />
+                      <span style={{ color: '#94A3B8', fontSize: '15px', fontWeight: '600' }}>{item.label}</span>
+                    </div>
+                    <div style={{ color: '#F1F5F9', fontSize: '22px', fontWeight: '800' }}>{item.value}</div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
         
-        {/* Bar Chart - Top Used Lockers */}
-        <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.6))', borderRadius: '16px', border: '1px solid rgba(139, 92, 246, 0.2)', padding: '24px' }}>
-          <h3 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '20px', margin: '0 0 20px 0' }}>Most Used Lockers (30D)</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {usageByLocker.map((locker, index) => {
-              const percentage = (locker.uses / maxUses) * 100
-              return (
-                <div key={index}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                    <span style={{ color: '#94A3B8', fontSize: '13px' }}>{locker.number}</span>
-                    <span style={{ color: '#F1F5F9', fontSize: '13px', fontWeight: '600' }}>{locker.uses} uses</span>
+        <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(30, 41, 59, 0.4))', backdropFilter: 'blur(20px)', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '32px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', bottom: '-50%', left: '-20%', width: '140%', height: '140%', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%)' }} />
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700', marginBottom: '32px', margin: '0 0 32px 0' }}>Top 5 Most Used Lockers</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '300px', justifyContent: 'center' }}>
+              {usageByLocker.map((locker, index) => {
+                const percentage = (locker.uses / maxUses) * 100
+                const colors = ['#6366F1', '#8B5CF6', '#A855F7', '#EC4899', '#F97316']
+                return (
+                  <div key={index}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'baseline' }}>
+                      <span style={{ color: '#94A3B8', fontSize: '15px', fontWeight: '600' }}>{locker.number}</span>
+                      <span style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '800' }}>{locker.uses}<span style={{ fontSize: '14px', color: '#64748B', fontWeight: '600' }}> uses</span></span>
+                    </div>
+                    <div style={{ width: '100%', height: '12px', background: 'rgba(100, 116, 139, 0.2)', borderRadius: '100px', overflow: 'hidden' }}>
+                      <div style={{ width: `${percentage}%`, height: '100%', background: `linear-gradient(90deg, ${colors[index]}, ${colors[(index + 1) % colors.length]})`, borderRadius: '100px', transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: `0 0 20px ${colors[index]}40` }} />
+                    </div>
                   </div>
-                  <div style={{ width: '100%', height: '8px', background: 'rgba(100, 116, 139, 0.2)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: `${percentage}%`, height: '100%', background: 'linear-gradient(90deg, #8B5CF6, #6366F1)', borderRadius: '4px', transition: 'width 0.5s ease' }}></div>
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
       
-      {/* Usage Success Rate */}
-      <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.6))', borderRadius: '16px', border: '1px solid rgba(139, 92, 246, 0.2)', padding: '24px' }}>
-        <h3 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '20px', margin: '0 0 20px 0' }}>Usage Success Rate</h3>
-        <div style={{ display: 'flex', gap: '20px' }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ color: '#94A3B8', fontSize: '13px' }}>Successfully Opened</span>
-              <span style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '600' }}>{opened} / {totalUsages}</span>
+      <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(30, 41, 59, 0.4))', backdropFilter: 'blur(20px)', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '32px' }}>
+        <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700', marginBottom: '28px', margin: '0 0 28px 0' }}>Usage Success Rate</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '32px' }}>
+          {[
+            { label: 'Successfully Opened', value: opened, total: totalUsages, gradient: 'linear-gradient(90deg, #10B981, #06B6D4)' },
+            { label: 'Failed to Open', value: notOpened, total: totalUsages, gradient: 'linear-gradient(90deg, #EC4899, #F97316)' }
+          ].map((item, idx) => (
+            <div key={idx}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', alignItems: 'baseline' }}>
+                <span style={{ color: '#94A3B8', fontSize: '15px', fontWeight: '600' }}>{item.label}</span>
+                <span style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '800' }}>{item.value}<span style={{ fontSize: '14px', color: '#64748B', fontWeight: '600' }}> / {item.total}</span></span>
+              </div>
+              <div style={{ width: '100%', height: '12px', background: 'rgba(100, 116, 139, 0.2)', borderRadius: '100px', overflow: 'hidden' }}>
+                <div style={{ width: `${(item.value / (item.total || 1)) * 100}%`, height: '100%', background: item.gradient, borderRadius: '100px', transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: `0 0 20px ${item.gradient}40` }} />
+              </div>
             </div>
-            <div style={{ width: '100%', height: '12px', background: 'rgba(100, 116, 139, 0.2)', borderRadius: '6px', overflow: 'hidden' }}>
-              <div style={{ width: `${(opened / (totalUsages || 1)) * 100}%`, height: '100%', background: 'linear-gradient(90deg, #8B5CF6, #7C3AED)', borderRadius: '6px', transition: 'width 0.5s ease' }}></div>
-            </div>
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ color: '#94A3B8', fontSize: '13px' }}>Failed to Open</span>
-              <span style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '600' }}>{notOpened} / {totalUsages}</span>
-            </div>
-            <div style={{ width: '100%', height: '12px', background: 'rgba(100, 116, 139, 0.2)', borderRadius: '6px', overflow: 'hidden' }}>
-              <div style={{ width: `${(notOpened / (totalUsages || 1)) * 100}%`, height: '100%', background: 'linear-gradient(90deg, #6366F1, #4F46E5)', borderRadius: '6px', transition: 'width 0.5s ease' }}></div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

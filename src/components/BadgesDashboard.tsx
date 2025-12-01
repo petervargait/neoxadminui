@@ -20,7 +20,6 @@ export default function BadgesDashboard({ badges, badgeSwipes = [] }: BadgesDash
   
   const total = badges.length || 1
   
-  // Swipes by location (top 5)
   const locationCounts: Record<string, number> = {}
   badgeSwipes.forEach(swipe => {
     locationCounts[swipe.location] = (locationCounts[swipe.location] || 0) + 1
@@ -29,106 +28,117 @@ export default function BadgesDashboard({ badges, badgeSwipes = [] }: BadgesDash
   const maxSwipes = Math.max(...topLocations.map(l => l[1]), 1)
 
   return (
-    <div style={{ marginBottom: '32px' }}>
-      <div style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))', borderRadius: '20px', border: '1px solid rgba(139, 92, 246, 0.2)', padding: '32px', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px rgba(139, 92, 246, 0.3)' }}>
-            <svg style={{ width: '32px', height: '32px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div>
+      <div style={{ background: 'radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%)', borderRadius: '24px', padding: '32px', marginBottom: '32px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))', backdropFilter: 'blur(10px)' }} />
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 20px 40px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.3)' }}>
+            <svg style={{ width: '36px', height: '36px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
             </svg>
           </div>
           <div>
-            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#F1F5F9', margin: 0 }}>Badge Management</h2>
-            <p style={{ fontSize: '14px', color: '#94A3B8', margin: '4px 0 0 0' }}>Badge distribution and access analytics</p>
+            <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#F1F5F9', margin: 0, letterSpacing: '-0.02em' }}>Badge Management</h2>
+            <p style={{ fontSize: '15px', color: '#A0AEC0', margin: '4px 0 0 0', fontWeight: '500' }}>Badge distribution & access analytics</p>
           </div>
         </div>
       </div>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '24px' }}>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15))', border: '1px solid rgba(99, 102, 241, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{badges.length}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOTAL BADGES</div>
-        </div>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15))', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{downloaded}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>DOWNLOADED</div>
-        </div>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(109, 40, 217, 0.15), rgba(91, 33, 182, 0.15))', border: '1px solid rgba(109, 40, 217, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{sent}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#C4B5FD', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SENT</div>
-        </div>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(109, 40, 217, 0.15))', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{suspended}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SUSPENDED</div>
-        </div>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(67, 56, 202, 0.15))', border: '1px solid rgba(79, 70, 229, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{totalSwipes}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOTAL SWIPES</div>
-        </div>
-        <div style={{ borderRadius: '12px', background: 'linear-gradient(135deg, rgba(67, 56, 202, 0.15), rgba(55, 48, 163, 0.15))', border: '1px solid rgba(67, 56, 202, 0.3)', padding: '16px' }}>
-          <div style={{ fontSize: '32px', fontWeight: '900', color: '#F1F5F9', marginBottom: '8px' }}>{todaySwipes}</div>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: '#A5B4FC', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TODAY</div>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+        {[
+          { value: badges.length, label: 'Total Badges', gradient: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' },
+          { value: downloaded, label: 'Downloaded', gradient: 'linear-gradient(135deg, #10B981 0%, #06B6D4 100%)' },
+          { value: sent, label: 'Sent', gradient: 'linear-gradient(135deg, #0EA5E9 0%, #06B6D4 100%)' },
+          { value: suspended, label: 'Suspended', gradient: 'linear-gradient(135deg, #EC4899 0%, #F97316 100%)' },
+          { value: totalSwipes, label: 'Total Swipes', gradient: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%)' }
+        ].map((stat, idx) => (
+          <div key={idx} style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '28px 24px', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: stat.gradient, opacity: 0.1, borderRadius: '50%', filter: 'blur(40px)' }} />
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ fontSize: '40px', fontWeight: '900', background: stat.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '8px', lineHeight: 1 }}>{stat.value}</div>
+              <div style={{ fontSize: '13px', fontWeight: '700', color: '#A0AEC0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</div>
+            </div>
+          </div>
+        ))}
       </div>
       
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
-        <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.6))', borderRadius: '16px', border: '1px solid rgba(139, 92, 246, 0.2)', padding: '24px' }}>
-          <h3 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '20px', margin: '0 0 20px 0' }}>Badge Status Distribution</h3>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ position: 'relative', width: '160px', height: '160px' }}>
-              <svg width="160" height="160" viewBox="0 0 160 160" style={{ filter: 'drop-shadow(0 4px 12px rgba(139, 92, 246, 0.2))' }}>
-                <circle cx="80" cy="80" r="60" fill="rgba(15, 23, 42, 0.4)" />
-                <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(139, 92, 246, 0.8)" strokeWidth="20" strokeDasharray={`${(downloaded/total) * 439.6} 439.6`} strokeDashoffset="0" transform="rotate(-90 80 80)" strokeLinecap="round" />
-                <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(109, 40, 217, 0.8)" strokeWidth="20" strokeDasharray={`${(sent/total) * 439.6} 439.6`} strokeDashoffset={`-${(downloaded/total) * 439.6}`} transform="rotate(-90 80 80)" strokeLinecap="round" />
-                <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(99, 102, 241, 0.7)" strokeWidth="20" strokeDasharray={`${(newBadges/total) * 439.6} 439.6`} strokeDashoffset={`-${((downloaded + sent)/total) * 439.6}`} transform="rotate(-90 80 80)" strokeLinecap="round" />
-                <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(124, 58, 237, 0.5)" strokeWidth="20" strokeDasharray={`${(suspended/total) * 439.6} 439.6`} strokeDashoffset={`-${((downloaded + sent + newBadges)/total) * 439.6}`} transform="rotate(-90 80 80)" strokeLinecap="round" />
-                <text x="80" y="75" textAnchor="middle" fill="#F1F5F9" fontSize="28" fontWeight="900">{badges.length}</text>
-                <text x="80" y="95" textAnchor="middle" fill="#94A3B8" fontSize="12">Total</text>
-              </svg>
-            </div>
-            <div style={{ flex: 1, paddingLeft: '20px' }}>
-              <div style={{ marginBottom: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'rgba(139, 92, 246, 0.8)', boxShadow: '0 0 8px rgba(139, 92, 246, 0.4)' }}></div>
-                  <span style={{ color: '#94A3B8', fontSize: '12px' }}>Downloaded</span>
-                </div>
-                <div style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '700' }}>{downloaded}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', gap: '24px', marginBottom: '32px' }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(30, 41, 59, 0.4))', backdropFilter: 'blur(20px)', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '32px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: '-50%', right: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)' }} />
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700', marginBottom: '32px', margin: '0 0 32px 0' }}>Badge Status</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
+              <div style={{ position: 'relative', width: '220px', height: '220px' }}>
+                <svg width="220" height="220" viewBox="0 0 220 220" style={{ filter: 'drop-shadow(0 8px 24px rgba(139, 92, 246, 0.4))' }}>
+                  <defs>
+                    <linearGradient id="badgeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#10B981', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#06B6D4', stopOpacity: 1 }} />
+                    </linearGradient>
+                    <linearGradient id="badgeGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#0EA5E9', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#06B6D4', stopOpacity: 1 }} />
+                    </linearGradient>
+                    <linearGradient id="badgeGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#6366F1', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#8B5CF6', stopOpacity: 1 }} />
+                    </linearGradient>
+                    <linearGradient id="badgeGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#EC4899', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#F97316', stopOpacity: 1 }} />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="110" cy="110" r="80" fill="rgba(15, 23, 42, 0.6)" />
+                  <circle cx="110" cy="110" r="95" fill="none" stroke="url(#badgeGrad1)" strokeWidth="28" strokeDasharray={`${(downloaded/total) * 596.9} 596.9`} strokeDashoffset="0" transform="rotate(-90 110 110)" strokeLinecap="round" />
+                  <circle cx="110" cy="110" r="95" fill="none" stroke="url(#badgeGrad2)" strokeWidth="28" strokeDasharray={`${(sent/total) * 596.9} 596.9`} strokeDashoffset={`-${(downloaded/total) * 596.9}`} transform="rotate(-90 110 110)" strokeLinecap="round" />
+                  <circle cx="110" cy="110" r="95" fill="none" stroke="url(#badgeGrad3)" strokeWidth="28" strokeDasharray={`${(newBadges/total) * 596.9} 596.9`} strokeDashoffset={`-${((downloaded + sent)/total) * 596.9}`} transform="rotate(-90 110 110)" strokeLinecap="round" />
+                  <circle cx="110" cy="110" r="95" fill="none" stroke="url(#badgeGrad4)" strokeWidth="28" strokeDasharray={`${(suspended/total) * 596.9} 596.9`} strokeDashoffset={`-${((downloaded + sent + newBadges)/total) * 596.9}`} transform="rotate(-90 110 110)" strokeLinecap="round" />
+                  <text x="110" y="105" textAnchor="middle" fill="#F1F5F9" fontSize="38" fontWeight="900">{badges.length}</text>
+                  <text x="110" y="130" textAnchor="middle" fill="#94A3B8" fontSize="14" fontWeight="600">TOTAL</text>
+                </svg>
               </div>
-              <div style={{ marginBottom: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'rgba(109, 40, 217, 0.8)', boxShadow: '0 0 8px rgba(109, 40, 217, 0.4)' }}></div>
-                  <span style={{ color: '#94A3B8', fontSize: '12px' }}>Sent</span>
-                </div>
-                <div style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '700' }}>{sent}</div>
-              </div>
-              <div style={{ marginBottom: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'rgba(99, 102, 241, 0.7)', boxShadow: '0 0 8px rgba(99, 102, 241, 0.4)' }}></div>
-                  <span style={{ color: '#94A3B8', fontSize: '12px' }}>New</span>
-                </div>
-                <div style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '700' }}>{newBadges}</div>
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {[
+                  { label: 'Downloaded', value: downloaded, color: 'linear-gradient(135deg, #10B981, #06B6D4)' },
+                  { label: 'Sent', value: sent, color: 'linear-gradient(135deg, #0EA5E9, #06B6D4)' },
+                  { label: 'New', value: newBadges, color: 'linear-gradient(135deg, #6366F1, #8B5CF6)' },
+                  { label: 'Suspended', value: suspended, color: 'linear-gradient(135deg, #EC4899, #F97316)' }
+                ].map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: item.color, boxShadow: '0 0 12px rgba(139, 92, 246, 0.5)' }} />
+                      <span style={{ color: '#94A3B8', fontSize: '15px', fontWeight: '600' }}>{item.label}</span>
+                    </div>
+                    <div style={{ color: '#F1F5F9', fontSize: '22px', fontWeight: '800' }}>{item.value}</div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
         
-        <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.6))', borderRadius: '16px', border: '1px solid rgba(139, 92, 246, 0.2)', padding: '24px' }}>
-          <h3 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '20px', margin: '0 0 20px 0' }}>Top Access Locations</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {topLocations.map(([location, count], index) => {
-              const percentage = (count / maxSwipes) * 100
-              return (
-                <div key={index}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                    <span style={{ color: '#94A3B8', fontSize: '12px' }}>{location.split(' - ')[1] || location}</span>
-                    <span style={{ color: '#F1F5F9', fontSize: '13px', fontWeight: '600' }}>{count}</span>
+        <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(30, 41, 59, 0.4))', backdropFilter: 'blur(20px)', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '32px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', bottom: '-50%', left: '-20%', width: '140%', height: '140%', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%)' }} />
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700', marginBottom: '32px', margin: '0 0 32px 0' }}>Top Access Locations</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '300px', justifyContent: 'center' }}>
+              {topLocations.map(([location, count], index) => {
+                const percentage = (count / maxSwipes) * 100
+                const colors = ['#6366F1', '#8B5CF6', '#A855F7', '#EC4899', '#F97316']
+                const locationName = location.split(' - ')[1] || location
+                return (
+                  <div key={index}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'baseline' }}>
+                      <span style={{ color: '#94A3B8', fontSize: '15px', fontWeight: '600' }}>{locationName}</span>
+                      <span style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '800' }}>{count}<span style={{ fontSize: '14px', color: '#64748B', fontWeight: '600' }}> swipes</span></span>
+                    </div>
+                    <div style={{ width: '100%', height: '12px', background: 'rgba(100, 116, 139, 0.2)', borderRadius: '100px', overflow: 'hidden' }}>
+                      <div style={{ width: `${percentage}%`, height: '100%', background: `linear-gradient(90deg, ${colors[index]}, ${colors[(index + 1) % colors.length]})`, borderRadius: '100px', transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: `0 0 20px ${colors[index]}40` }} />
+                    </div>
                   </div>
-                  <div style={{ width: '100%', height: '8px', background: 'rgba(100, 116, 139, 0.2)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: `${percentage}%`, height: '100%', background: 'linear-gradient(90deg, #8B5CF6, #6366F1)', borderRadius: '4px', transition: 'width 0.5s ease' }}></div>
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
