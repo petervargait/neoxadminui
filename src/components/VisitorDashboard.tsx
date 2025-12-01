@@ -72,24 +72,24 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
     <div style={{ marginBottom: '32px' }}>
       {/* Header */}
       <div style={{ 
-        background: 'radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%)',
+        background: 'radial-gradient(ellipse at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%)',
         borderRadius: '24px',
         padding: '32px',
         marginBottom: '32px',
         position: 'relative',
         overflow: 'hidden'
       }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))', backdropFilter: 'blur(10px)' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(96, 165, 250, 0.05))', backdropFilter: 'blur(10px)' }} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div style={{
             width: '72px',
             height: '72px',
             borderRadius: '20px',
-            background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+            background: 'linear-gradient(135deg, #3B82F6, #60A5FA)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 20px 40px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.3)',
+            boxShadow: '0 20px 40px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.3)',
             fontSize: '36px',
             color: 'white',
             fontWeight: '400'
@@ -103,68 +103,68 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
         </div>
       </div>
 
-      {/* KPI Grid - All Purple/Blue Theme */}
+      {/* KPI Grid - Blue Theme */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15))', border: '1px solid rgba(99, 102, 241, 0.3)', padding: '24px' }}>
-          <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: '50%', filter: 'blur(40px)' }}></div>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.15))', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '24px' }}>
+          <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '50%', filter: 'blur(40px)' }}></div>
           <div style={{ position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(99, 102, 241, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg style={{ width: '24px', height: '24px', color: '#818CF8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg style={{ width: '24px', height: '24px', color: '#60A5FA' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
               <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9' }}>{kpis.totalVisits}</div>
             </div>
-            <div style={{ fontSize: '12px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOTAL VISITS</div>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: '#BFDBFE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOTAL VISITS</div>
             <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>In selected period</div>
           </div>
         </div>
 
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15))', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '24px' }}>
-          <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: 'rgba(139, 92, 246, 0.1)', borderRadius: '50%', filter: 'blur(40px)' }}></div>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(96, 165, 250, 0.15), rgba(59, 130, 246, 0.15))', border: '1px solid rgba(96, 165, 250, 0.3)', padding: '24px' }}>
+          <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: 'rgba(96, 165, 250, 0.1)', borderRadius: '50%', filter: 'blur(40px)' }}></div>
           <div style={{ position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(139, 92, 246, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg style={{ width: '24px', height: '24px', color: '#A78BFA' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(96, 165, 250, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg style={{ width: '24px', height: '24px', color: '#60A5FA' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9' }}>{kpis.avgLeadTime}</div>
             </div>
-            <div style={{ fontSize: '12px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AVG LEAD TIME</div>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: '#BFDBFE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AVG LEAD TIME</div>
             <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>Time in building</div>
           </div>
         </div>
 
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(109, 40, 217, 0.15))', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '24px' }}>
-          <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: 'rgba(124, 58, 237, 0.1)', borderRadius: '50%', filter: 'blur(40px)' }}></div>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.15))', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '24px' }}>
+          <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '50%', filter: 'blur(40px)' }}></div>
           <div style={{ position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(124, 58, 237, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg style={{ width: '24px', height: '24px', color: '#A78BFA' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg style={{ width: '24px', height: '24px', color: '#F87171' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
               <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9' }}>{kpis.noShowRate}%</div>
             </div>
-            <div style={{ fontSize: '12px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>NO-SHOW RATE</div>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: '#FECACA', textTransform: 'uppercase', letterSpacing: '0.05em' }}>NO-SHOW RATE</div>
             <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>Did not appear</div>
           </div>
         </div>
 
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(67, 56, 202, 0.15))', border: '1px solid rgba(79, 70, 229, 0.3)', padding: '24px' }}>
-          <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: 'rgba(79, 70, 229, 0.1)', borderRadius: '50%', filter: 'blur(40px)' }}></div>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(29, 78, 216, 0.15))', border: '1px solid rgba(37, 99, 235, 0.3)', padding: '24px' }}>
+          <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: 'rgba(37, 99, 235, 0.1)', borderRadius: '50%', filter: 'blur(40px)' }}></div>
           <div style={{ position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(79, 70, 229, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg style={{ width: '24px', height: '24px', color: '#818CF8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(37, 99, 235, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg style={{ width: '24px', height: '24px', color: '#60A5FA' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
               <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9' }}>{kpis.sites.length}</div>
             </div>
-            <div style={{ fontSize: '12px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ACTIVE SITES</div>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: '#BFDBFE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ACTIVE SITES</div>
             <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>With visits</div>
           </div>
         </div>
@@ -172,9 +172,9 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
 
       {/* Charts */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
-        <div style={{ borderRadius: '20px', background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))', border: '1px solid rgba(139, 92, 246, 0.2)', padding: '28px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)' }}>
+        <div style={{ borderRadius: '20px', background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))', border: '1px solid rgba(59, 130, 246, 0.2)', padding: '28px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)' }}>
           <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#F1F5F9', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #3B82F6, #60A5FA)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}>
               <svg style={{ width: '20px', height: '20px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
@@ -197,9 +197,9 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
                       left: 0, 
                       bottom: 0, 
                       width: `${percentage}%`, 
-                      background: 'linear-gradient(90deg, #6366F1, #8B5CF6)',
+                      background: 'linear-gradient(90deg, #3B82F6, #60A5FA)',
                       borderRadius: '10px',
-                      boxShadow: '0 0 16px rgba(139, 92, 246, 0.6)',
+                      boxShadow: '0 0 16px rgba(59, 130, 246, 0.6)',
                       transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}></div>
                   </div>
@@ -210,9 +210,9 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
           </div>
         </div>
 
-        <div style={{ borderRadius: '20px', background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))', border: '1px solid rgba(139, 92, 246, 0.2)', padding: '28px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)' }}>
+        <div style={{ borderRadius: '20px', background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))', border: '1px solid rgba(59, 130, 246, 0.2)', padding: '28px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)' }}>
           <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#F1F5F9', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #3B82F6, #60A5FA)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}>
               <svg style={{ width: '20px', height: '20px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
@@ -225,7 +225,7 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
               const percentage = maxCount > 0 ? (data.count / maxCount) * 100 : 0
               const circumference = 2 * Math.PI * 60
               const strokeDashoffset = circumference - (percentage / 100) * circumference
-              const colors = ['#6366F1', '#8B5CF6', '#7C3AED']
+              const colors = ['#3B82F6', '#60A5FA', '#2563EB']
               const color = colors[index % colors.length]
               
               return (
