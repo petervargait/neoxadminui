@@ -853,6 +853,22 @@ const getInitialState = (): GlobalState => {
       { id: 'bs13', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-30T08:25:00.000Z', tenantId: 'acme' },
       { id: 'bs14', badgeId: 4, userId: 'usr_acme_4', userName: 'Robert Wilson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-30T09:00:00.000Z', tenantId: 'acme' },
       { id: 'bs15', badgeId: 6, userName: 'James Thompson', location: 'Building A - Cafeteria', accessPoint: 'Cafe1', timestamp: '2024-11-30T12:00:00.000Z', tenantId: 'acme' },
+      // Additional swipes for better data visualization
+      { id: 'bs16', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-29T08:15:00.000Z', tenantId: 'acme' },
+      { id: 'bs17', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-29T08:35:00.000Z', tenantId: 'acme' },
+      { id: 'bs18', badgeId: 4, userId: 'usr_acme_4', userName: 'Robert Wilson', location: 'Building A - Server Room', accessPoint: 'SR1', timestamp: '2024-11-29T10:20:00.000Z', tenantId: 'acme' },
+      { id: 'bs19', badgeId: 6, userName: 'James Thompson', location: 'Building A - Gym', accessPoint: 'Gym1', timestamp: '2024-11-29T07:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs20', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Meeting Room 3', accessPoint: 'MR3', timestamp: '2024-11-28T10:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs21', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-28T08:30:00.000Z', tenantId: 'acme' },
+      { id: 'bs22', badgeId: 4, userId: 'usr_acme_4', userName: 'Robert Wilson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-28T09:10:00.000Z', tenantId: 'acme' },
+      { id: 'bs23', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-27T08:20:00.000Z', tenantId: 'acme' },
+      { id: 'bs24', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Parking', accessPoint: 'Garage A', timestamp: '2024-11-27T17:50:00.000Z', tenantId: 'acme' },
+      { id: 'bs25', badgeId: 6, userName: 'James Thompson', location: 'Building A - Cafeteria', accessPoint: 'Cafe1', timestamp: '2024-11-27T12:30:00.000Z', tenantId: 'acme' },
+      { id: 'bs26', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-26T08:15:00.000Z', tenantId: 'acme' },
+      { id: 'bs27', badgeId: 4, userId: 'usr_acme_4', userName: 'Robert Wilson', location: 'Building A - Server Room', accessPoint: 'SR1', timestamp: '2024-11-26T14:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs28', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-26T08:25:00.000Z', tenantId: 'acme' },
+      { id: 'bs29', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building B - Entrance', accessPoint: 'Door B1', timestamp: '2024-11-25T14:30:00.000Z', tenantId: 'acme' },
+      { id: 'bs30', badgeId: 6, userName: 'James Thompson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-25T08:40:00.000Z', tenantId: 'acme' },
     ],
     parkingBookings: [
       // ACME tenant parking bookings - Recent and upcoming
@@ -871,6 +887,17 @@ const getInitialState = (): GlobalState => {
       { id: 'pb13', spaceId: 'p8', spaceNumber: 'A-108', userId: 'usr_acme_3', userName: 'Emily Chen', vehiclePlate: 'DEF456', bookingDate: '2024-11-25', startTime: '09:00', endTime: '17:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-24T12:00:00.000Z' },
       { id: 'pb14', spaceId: 'p5', spaceNumber: 'A-105', userId: 'usr_acme_4', userName: 'Robert Wilson', vehiclePlate: 'GHI789', bookingDate: '2024-11-24', startTime: '08:00', endTime: '18:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-23T10:00:00.000Z' },
       { id: 'pb15', spaceId: 'p13', spaceNumber: 'A-113', userId: 'usr_acme_5', userName: 'Lisa Anderson', vehiclePlate: 'JKL012', bookingDate: '2024-11-23', startTime: '08:00', endTime: '18:00', status: 'no-show', tenantId: 'acme', createdAt: '2024-11-22T09:00:00.000Z' },
+      // Additional bookings for 7-day trend
+      { id: 'pb16', spaceId: 'p14', spaceNumber: 'A-114', userId: 'usr_acme_1', userName: 'Sarah Johnson', vehiclePlate: 'ABC123', bookingDate: '2024-11-28', startTime: '08:00', endTime: '18:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-27T09:00:00.000Z' },
+      { id: 'pb17', spaceId: 'p16', spaceNumber: 'A-116', userId: 'usr_acme_2', userName: 'David Martinez', vehiclePlate: 'XYZ789', bookingDate: '2024-11-28', startTime: '08:00', endTime: '18:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-27T09:30:00.000Z' },
+      { id: 'pb18', spaceId: 'p17', spaceNumber: 'A-117', userId: 'usr_acme_3', userName: 'Emily Chen', vehiclePlate: 'DEF456', bookingDate: '2024-11-28', startTime: '08:00', endTime: '18:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-27T10:00:00.000Z' },
+      { id: 'pb19', spaceId: 'p18', spaceNumber: 'A-118', userId: 'usr_acme_4', userName: 'Robert Wilson', vehiclePlate: 'GHI789', bookingDate: '2024-11-27', startTime: '08:00', endTime: '18:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-26T09:00:00.000Z' },
+      { id: 'pb20', spaceId: 'p19', spaceNumber: 'A-119', userId: 'usr_acme_5', userName: 'Lisa Anderson', vehiclePlate: 'JKL012', bookingDate: '2024-11-27', startTime: '08:00', endTime: '18:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-26T09:30:00.000Z' },
+      { id: 'pb21', spaceId: 'p14', spaceNumber: 'A-114', userId: 'usr_acme_1', userName: 'Sarah Johnson', vehiclePlate: 'ABC123', bookingDate: '2024-11-26', startTime: '08:00', endTime: '18:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-25T09:00:00.000Z' },
+      { id: 'pb22', spaceId: 'p16', spaceNumber: 'A-116', userId: 'usr_acme_2', userName: 'David Martinez', vehiclePlate: 'XYZ789', bookingDate: '2024-11-26', startTime: '08:00', endTime: '18:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-25T09:30:00.000Z' },
+      { id: 'pb23', spaceId: 'p14', spaceNumber: 'A-114', userId: 'usr_acme_3', userName: 'Emily Chen', vehiclePlate: 'DEF456', bookingDate: '2024-11-25', startTime: '09:00', endTime: '17:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-24T10:00:00.000Z' },
+      { id: 'pb24', spaceId: 'p17', spaceNumber: 'A-117', userId: 'usr_acme_4', userName: 'Robert Wilson', vehiclePlate: 'GHI789', bookingDate: '2024-11-25', startTime: '08:00', endTime: '18:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-24T10:30:00.000Z' },
+      { id: 'pb25', spaceId: 'p18', spaceNumber: 'A-118', userId: 'usr_acme_5', userName: 'Lisa Anderson', vehiclePlate: 'JKL012', bookingDate: '2024-11-25', startTime: '08:00', endTime: '18:00', status: 'completed', tenantId: 'acme', createdAt: '2024-11-24T11:00:00.000Z' },
     ],
     lockerUsages: [
       // ACME tenant locker usage - Last 30 days
@@ -889,6 +916,17 @@ const getInitialState = (): GlobalState => {
       { id: 'lu13', lockerId: 'l2', lockerNumber: 'A1-002', userId: 'usr_acme_2', userName: 'David Martinez', usageDate: '2024-11-28', opened: false, duration: 0, tenantId: 'acme', timestamp: '2024-11-28T08:35:00.000Z' },
       { id: 'lu14', lockerId: 'l4', lockerNumber: 'A1-004', userId: 'usr_acme_3', userName: 'Emily Chen', usageDate: '2024-11-27', opened: true, duration: 40, tenantId: 'acme', timestamp: '2024-11-27T09:10:00.000Z' },
       { id: 'lu15', lockerId: 'l1', lockerNumber: 'A1-001', userId: 'usr_acme_1', userName: 'Sarah Johnson', usageDate: '2024-11-26', opened: true, duration: 35, tenantId: 'acme', timestamp: '2024-11-26T08:15:00.000Z' },
+      // Additional locker usage data
+      { id: 'lu16', lockerId: 'l2', lockerNumber: 'A1-002', userId: 'usr_acme_2', userName: 'David Martinez', usageDate: '2024-11-26', opened: true, duration: 28, tenantId: 'acme', timestamp: '2024-11-26T08:30:00.000Z' },
+      { id: 'lu17', lockerId: 'l4', lockerNumber: 'A1-004', userId: 'usr_acme_3', userName: 'Emily Chen', usageDate: '2024-11-26', opened: true, duration: 42, tenantId: 'acme', timestamp: '2024-11-26T09:00:00.000Z' },
+      { id: 'lu18', lockerId: 'l1', lockerNumber: 'A1-001', userId: 'usr_acme_1', userName: 'Sarah Johnson', usageDate: '2024-11-25', opened: true, duration: 38, tenantId: 'acme', timestamp: '2024-11-25T08:15:00.000Z' },
+      { id: 'lu19', lockerId: 'l2', lockerNumber: 'A1-002', userId: 'usr_acme_2', userName: 'David Martinez', usageDate: '2024-11-25', opened: true, duration: 32, tenantId: 'acme', timestamp: '2024-11-25T08:30:00.000Z' },
+      { id: 'lu20', lockerId: 'l4', lockerNumber: 'A1-004', userId: 'usr_acme_3', userName: 'Emily Chen', usageDate: '2024-11-25', opened: false, duration: 0, tenantId: 'acme', timestamp: '2024-11-25T09:00:00.000Z' },
+      { id: 'lu21', lockerId: 'l1', lockerNumber: 'A1-001', userId: 'usr_acme_1', userName: 'Sarah Johnson', usageDate: '2024-11-24', opened: true, duration: 44, tenantId: 'acme', timestamp: '2024-11-24T08:20:00.000Z' },
+      { id: 'lu22', lockerId: 'l2', lockerNumber: 'A1-002', userId: 'usr_acme_2', userName: 'David Martinez', usageDate: '2024-11-24', opened: true, duration: 30, tenantId: 'acme', timestamp: '2024-11-24T08:35:00.000Z' },
+      { id: 'lu23', lockerId: 'l4', lockerNumber: 'A1-004', userId: 'usr_acme_3', userName: 'Emily Chen', usageDate: '2024-11-24', opened: true, duration: 52, tenantId: 'acme', timestamp: '2024-11-24T09:10:00.000Z' },
+      { id: 'lu24', lockerId: 'l1', lockerNumber: 'A1-001', userId: 'usr_acme_1', userName: 'Sarah Johnson', usageDate: '2024-11-23', opened: true, duration: 40, tenantId: 'acme', timestamp: '2024-11-23T08:15:00.000Z' },
+      { id: 'lu25', lockerId: 'l2', lockerNumber: 'A1-002', userId: 'usr_acme_2', userName: 'David Martinez', usageDate: '2024-11-23', opened: true, duration: 33, tenantId: 'acme', timestamp: '2024-11-23T08:30:00.000Z' },
     ],
     moduleStates: {
       'User Management': true,
