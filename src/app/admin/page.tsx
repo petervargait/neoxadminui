@@ -634,7 +634,10 @@ export default function AdminPage() {
               fontWeight: '600', 
               margin: 0 
             }}>
-              {activeSection === 'dashboard' && 'Global Admin Dashboard'}
+              {activeSection === 'dashboard' && selectedTenant !== 'all' && (
+                `${globalState.tenants.find(t => t.id === selectedTenant)?.name || selectedTenant} Dashboard`
+              )}
+              {activeSection === 'dashboard' && selectedTenant === 'all' && 'Global Admin Dashboard'}
               {activeSection === 'tasks' && 'Approval Tasks'}
               {activeSection === 'tenantsList' && 'Tenants Management'}
               {activeSection === 'tenantEdit' && 'Edit Tenant'}
@@ -661,7 +664,8 @@ export default function AdminPage() {
               fontSize: '14px', 
               margin: '4px 0 0 0' 
             }}>
-              {activeSection === 'dashboard' && 'Manage tenants, users, and system operations'}
+              {activeSection === 'dashboard' && selectedTenant !== 'all' && 'Real-time analytics and insights'}
+              {activeSection === 'dashboard' && selectedTenant === 'all' && 'Manage tenants, users, and system operations'}
               {activeSection === 'users' && selectedTenant !== 'all' && `Managing users for ${selectedTenant}`}
             </p>
           </div>
@@ -910,7 +914,14 @@ export default function AdminPage() {
 
                   {/* Visitor Management Dashboard */}
                   {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Visitor Management') && (
-                    <div style={{ marginBottom: '24px' }}>
+                    <div style={{
+                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(139, 92, 246, 0.3)',
+                      padding: '24px',
+                      marginBottom: '24px',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                    }}>
                       <VisitorDashboard
                         invitations={globalState.invitations.filter(inv => {
                           const host = globalState.users.find(u => u.id === inv.hostId)
@@ -925,7 +936,14 @@ export default function AdminPage() {
 
                   {/* Parking Dashboard */}
                   {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Parking') && (
-                    <div style={{ marginBottom: '24px' }}>
+                    <div style={{
+                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(139, 92, 246, 0.3)',
+                      padding: '24px',
+                      marginBottom: '24px',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                    }}>
                       <ParkingDashboard
                         parkingSpaces={globalState.parkingSpaces.filter(space => space.tenantId === selectedTenant)}
                         parkingBookings={globalState.parkingBookings?.filter(b => b.tenantId === selectedTenant)}
@@ -936,7 +954,14 @@ export default function AdminPage() {
 
                   {/* Locker Dashboard */}
                   {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Lockers') && (
-                    <div style={{ marginBottom: '24px' }}>
+                    <div style={{
+                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(139, 92, 246, 0.3)',
+                      padding: '24px',
+                      marginBottom: '24px',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                    }}>
                       <LockerDashboard
                         lockers={globalState.lockers.filter(locker => locker.tenantId === selectedTenant)}
                         lockerUsages={globalState.lockerUsages?.filter(u => u.tenantId === selectedTenant)}
@@ -950,7 +975,14 @@ export default function AdminPage() {
                     const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
                     return user?.tenantId === selectedTenant
                   }) && (
-                    <div style={{ marginBottom: '24px' }}>
+                    <div style={{
+                      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(139, 92, 246, 0.3)',
+                      padding: '24px',
+                      marginBottom: '24px',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                    }}>
                       <BadgesDashboard
                         badges={globalState.badges.filter(badge => {
                           const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
