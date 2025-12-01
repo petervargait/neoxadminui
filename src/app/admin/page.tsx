@@ -161,7 +161,128 @@ export default function AdminPage() {
   // Dashboard filter state
   const [dashboardStartDate, setDashboardStartDate] = useState('')
   const [dashboardEndDate, setDashboardEndDate] = useState('')
-  const [dashboardSearchTerm, setDashboardSearchTerm] = useState('')
+
+  // Export dashboard data to CSV
+  const exportToCSV = () => {
+    if (selectedTenant === 'all') return
+    
+    const tenant = globalState.tenants.find(t => t.id === selectedTenant)
+    if (!tenant) return
+
+    let csvContent = ''
+    
+    // Export Visitor Management data
+    if (tenant.modules.includes('Visitor Management')) {
+      const invitations = globalState.invitations.filter(inv => {
+        const host = globalState.users.find(u => u.id === inv.hostId)
+        return host?.tenantId === selectedTenant
+      })
+      csvContent += 'Visitor Management\n'
+      csvContent += 'Name,Email,Host,Date,Time,Purpose,Status\n'
+      invitations.forEach(inv => {
+        const host = globalState.users.find(u => u.id === inv.hostId)
+        csvContent += `"${inv.visitorName}","${inv.visitorEmail}","${host?.name || ''}","${inv.visitDate}","${inv.visitTime}","${inv.purpose}","${inv.status}"\n`
+      })
+      csvContent += '\n'
+    }
+
+    // Export Parking data
+    if (tenant.modules.includes('Parking')) {
+      const parkingSpaces = globalState.parkingSpaces.filter(s => s.tenantId === selectedTenant)
+      const bookings = globalState.parkingBookings?.filter(b => b.tenantId === selectedTenant) || []
+      csvContent += 'Parking Spaces\n'
+      csvContent += 'Space Number,Name,Building,Status\n'
+      parkingSpaces.forEach(space => {
+        csvContent += `"${space.spaceNumber}","${space.name}","${space.building}","${space.status}"\n`
+      })
+      csvContent += '\nParking Bookings\n'
+      csvContent += 'Space,User,Date,Status\n'
+      bookings.forEach(b => {
+        csvContent += `"${b.spaceNumber}","${b.userName}","${b.bookingDate}","${b.status}"\n`
+      })
+      csvContent += '\n'
+    }
+
+    // Export Locker data
+    if (tenant.modules.includes('Lockers')) {
+      const lockers = globalState.lockers.filter(l => l.tenantId === selectedTenant)
+      csvContent += 'Lockers\n'
+      csvContent += 'Locker Number,Name,Building,Floor,Status\n'
+      lockers.forEach(locker => {
+        csvContent += `"${locker.lockerNumber}","${locker.name}","${locker.building}","${locker.floor}","${locker.status}"\n`
+      })
+      csvContent += '\n'
+    }
+
+    // Export Badge data
+    const badges = globalState.badges.filter(badge => {
+      const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
+      return user?.tenantId === selectedTenant
+    })
+    if (badges.length > 0) {
+      csvContent += 'Digital Badges\n'
+      csvContent += 'Name,Email,Company,Status\n'
+      badges.forEach(badge => {
+        csvContent += `"${badge.name}","${badge.email}","${badge.company}","${badge.status}"\n`
+      })
+    }
+
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `${tenant.name}_dashboard_${new Date().toISOString().split('T')[0]}.csv`
+    link.click()
+  }
+
+  // Export dashboard data to XLS (HTML table format)
+  const exportToXLS = () => {
+    if (selectedTenant === 'all') return
+    
+    const tenant = globalState.tenants.find(t => t.id === selectedTenant)
+    if (!tenant) return
+
+    let xlsContent = '<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"><xml><x:ExcelWorkbook><x:ExcelWorksheets>'
+    
+    // Export Visitor Management data
+    if (tenant.modules.includes('Visitor Management')) {
+      xlsContent += `<x:ExcelWorksheet><x:Name>Visitors</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>`
+    }
+
+    xlsContent += '</x:ExcelWorksheets></x:ExcelWorkbook></xml></head><body>'
+    
+    // Add tables
+    if (tenant.modules.includes('Visitor Management')) {
+      const invitations = globalState.invitations.filter(inv => {
+        const host = globalState.users.find(u => u.id === inv.hostId)
+        return host?.tenantId === selectedTenant
+      })
+      xlsContent += '<table border="1"><caption>Visitor Management</caption><tr><th>Name</th><th>Email</th><th>Host</th><th>Date</th><th>Time</th><th>Purpose</th><th>Status</th></tr>'
+      invitations.forEach(inv => {
+        const host = globalState.users.find(u => u.id === inv.hostId)
+        xlsContent += `<tr><td>${inv.visitorName}</td><td>${inv.visitorEmail}</td><td>${host?.name || ''}</td><td>${inv.visitDate}</td><td>${inv.visitTime}</td><td>${inv.purpose}</td><td>${inv.status}</td></tr>`
+      })
+      xlsContent += '</table><br/>'
+    }
+
+    if (tenant.modules.includes('Parking')) {
+      const parkingSpaces = globalState.parkingSpaces.filter(s => s.tenantId === selectedTenant)
+      xlsContent += '<table border="1"><caption>Parking Spaces</caption><tr><th>Space Number</th><th>Name</th><th>Building</th><th>Status</th></tr>'
+      parkingSpaces.forEach(space => {
+        xlsContent += `<tr><td>${space.spaceNumber}</td><td>${space.name}</td><td>${space.building}</td><td>${space.status}</td></tr>`
+      })
+      xlsContent += '</table><br/>'
+    }
+
+    xlsContent += '</body></html>'
+
+    // Download XLS
+    const blob = new Blob([xlsContent], { type: 'application/vnd.ms-excel' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `${tenant.name}_dashboard_${new Date().toISOString().split('T')[0]}.xls`
+    link.click()
+  }
 
   // Load white label settings when tenant changes
   useEffect(() => {
@@ -898,18 +1019,10 @@ export default function AdminPage() {
                   <DashboardFilters
                     startDate={dashboardStartDate}
                     endDate={dashboardEndDate}
-                    searchTerm={dashboardSearchTerm}
                     onStartDateChange={setDashboardStartDate}
                     onEndDateChange={setDashboardEndDate}
-                    onSearchChange={setDashboardSearchTerm}
-                    onExportCSV={() => {
-                      // Export all filtered data to CSV
-                      alert('Exporting all dashboard data to CSV')
-                    }}
-                    onExportXLS={() => {
-                      // Export all filtered data to XLS
-                      alert('Exporting all dashboard data to XLS')
-                    }}
+                    onExportCSV={exportToCSV}
+                    onExportXLS={exportToXLS}
                   />
 
                   {/* Visitor Management Dashboard */}
@@ -929,7 +1042,7 @@ export default function AdminPage() {
                         })}
                         startDate={dashboardStartDate}
                         endDate={dashboardEndDate}
-                        searchTerm={dashboardSearchTerm}
+                        searchTerm=""
                       />
                     </div>
                   )}
@@ -947,7 +1060,7 @@ export default function AdminPage() {
                       <ParkingDashboard
                         parkingSpaces={globalState.parkingSpaces.filter(space => space.tenantId === selectedTenant)}
                         parkingBookings={globalState.parkingBookings?.filter(b => b.tenantId === selectedTenant)}
-                        searchTerm={dashboardSearchTerm}
+                        searchTerm=""
                       />
                     </div>
                   )}
@@ -965,7 +1078,7 @@ export default function AdminPage() {
                       <LockerDashboard
                         lockers={globalState.lockers.filter(locker => locker.tenantId === selectedTenant)}
                         lockerUsages={globalState.lockerUsages?.filter(u => u.tenantId === selectedTenant)}
-                        searchTerm={dashboardSearchTerm}
+                        searchTerm=""
                       />
                     </div>
                   )}
@@ -989,7 +1102,7 @@ export default function AdminPage() {
                           return user?.tenantId === selectedTenant
                         })}
                         badgeSwipes={globalState.badgeSwipes?.filter(s => s.tenantId === selectedTenant)}
-                        searchTerm={dashboardSearchTerm}
+                        searchTerm=""
                       />
                     </div>
                   )}

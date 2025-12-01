@@ -5,10 +5,8 @@ import React from 'react'
 interface DashboardFiltersProps {
   startDate: string
   endDate: string
-  searchTerm: string
   onStartDateChange: (date: string) => void
   onEndDateChange: (date: string) => void
-  onSearchChange: (term: string) => void
   onExportCSV: () => void
   onExportXLS: () => void
 }
@@ -16,10 +14,8 @@ interface DashboardFiltersProps {
 export default function DashboardFilters({
   startDate,
   endDate,
-  searchTerm,
   onStartDateChange,
   onEndDateChange,
-  onSearchChange,
   onExportCSV,
   onExportXLS
 }: DashboardFiltersProps) {
@@ -33,26 +29,12 @@ export default function DashboardFilters({
       display: 'flex',
       flexWrap: 'wrap',
       gap: '16px',
-      alignItems: 'center'
+      alignItems: 'center',
+      justifyContent: 'space-between'
     }}>
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
-        style={{
-          flex: '1',
-          minWidth: '200px',
-          padding: '12px 16px',
-          borderRadius: '12px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          background: 'rgba(15, 23, 42, 0.5)',
-          color: '#F1F5F9',
-          fontSize: '14px',
-          outline: 'none'
-        }}
-      />
-      <input
+      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+        <span style={{ color: '#94A3B8', fontSize: '14px', fontWeight: '500' }}>Date Range:</span>
+        <input
         type="date"
         value={startDate}
         onChange={(e) => onStartDateChange(e.target.value)}
@@ -80,36 +62,45 @@ export default function DashboardFilters({
           outline: 'none'
         }}
       />
-      <button
-        onClick={onExportCSV}
-        style={{
-          padding: '12px 24px',
-          borderRadius: '12px',
-          border: 'none',
-          background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
-          color: 'white',
-          fontSize: '14px',
-          fontWeight: '600',
-          cursor: 'pointer'
-        }}
-      >
-        CSV
-      </button>
-      <button
-        onClick={onExportXLS}
-        style={{
-          padding: '12px 24px',
-          borderRadius: '12px',
-          border: 'none',
-          background: 'linear-gradient(135deg, #10B981, #059669)',
-          color: 'white',
-          fontSize: '14px',
-          fontWeight: '600',
-          cursor: 'pointer'
-        }}
-      >
-        XLS
-      </button>
+      </div>
+      <div style={{ display: 'flex', gap: '12px' }}>
+        <button
+          onClick={onExportCSV}
+          style={{
+            padding: '12px 24px',
+            borderRadius: '12px',
+            border: 'none',
+            background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'transform 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          📊 Export CSV
+        </button>
+        <button
+          onClick={onExportXLS}
+          style={{
+            padding: '12px 24px',
+            borderRadius: '12px',
+            border: 'none',
+            background: 'linear-gradient(135deg, #6366F1, #4F46E5)',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'transform 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          📈 Export XLS
+        </button>
+      </div>
     </div>
   )
 }
