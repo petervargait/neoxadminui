@@ -1,0 +1,31 @@
+ID,Type,Title,Description,ParentID,Implementation Area,Story Points,Priority,Status
+001,Service,NEOX Infinity App,"Multi-tenant administrative platform for building management, visitor control, parking, space management, and facility operations",,"Global Admin, Tenant Admin, API",,Critical,Active
+001-001,Epic,Visitor Management,"Complete visitor lifecycle management including pre-registration, check-in/out, badge printing, and notifications",001,"Global Admin, Tenant Admin, API",175,High,Planned
+001-001-UC01,Feature/Use Case,Visitor Pre-Registration,Allow hosts to pre-register visitors before their arrival,001-001,"Tenant Admin, API",27,High,Planned
+001-001-UC01-WI01,User Story,Create visitor registration form,"Design and implement form with visitor details (name, email, phone, company, visit date/time)",001-001-UC01,Tenant Admin,5,High,Not Started
+001-001-UC01-WI02,User Story,Add host selection functionality,Enable host to select themselves or another employee as the visitor's host,001-001-UC01,Tenant Admin,3,High,Not Started
+001-001-UC01-WI03,Task,Implement visitor data validation,"Validate email format, phone numbers, required fields",001-001-UC01,API,3,High,Not Started
+001-001-UC01-WI04,Task,Create visitor API endpoints,"POST /api/visitors, GET /api/visitors/{id}",001-001-UC01,API,5,High,Not Started
+001-001-UC01-WI05,User Story,Send confirmation email to visitor,"Automated email with QR code, visit details, and directions",001-001-UC01,API,5,High,Not Started
+001-001-UC01-WI06,Task,Store visitor data in database,Create visitors table with proper indexes and relationships,001-001-UC01,API,3,High,Not Started
+001-001-UC01-WI07,Task,Handle duplicate visitor detection,Check for existing visitors by email/phone,001-001-UC01,API,3,Medium,Not Started
+001-001-UC02,Feature/Use Case,Visitor Check-In/Check-Out,Enable reception to check visitors in and out of the building,001-001,"Tenant Admin, API",35,Critical,Planned
+001-001-UC02-WI01,User Story,Build check-in interface,Create UI for scanning QR codes or searching visitors,001-001-UC02,Tenant Admin,8,High,Not Started
+001-001-UC02-WI02,Task,Implement QR code scanner,Integrate QR code scanning functionality,001-001-UC02,Tenant Admin,5,High,Not Started
+001-001-UC02-WI03,Task,Create check-in API endpoint,PUT /api/visitors/{id}/checkin,001-001-UC02,API,3,High,Not Started
+001-001-UC02-WI04,Task,Create check-out API endpoint,PUT /api/visitors/{id}/checkout,001-001-UC02,API,3,High,Not Started
+001-001-UC02-WI05,User Story,Display visitor photo on check-in,Show visitor photo for identity verification,001-001-UC02,Tenant Admin,3,High,Not Started
+001-001-UC02-WI06,Task,Notify host on visitor arrival,Send notification to host when visitor checks in,001-001-UC02,API,5,High,Not Started
+001-001-UC02-WI07,User Story,Record check-in/out timestamps,Store accurate timestamps with timezone support,001-001-UC02,API,3,High,Not Started
+001-001-UC02-WI08,Task,Handle walk-in visitors,Support check-in for visitors without pre-registration,001-001-UC02,"Tenant Admin, API",5,High,Not Started
+001-002,Epic,Parking Management,"Vehicle and parking space management including reservations, access control, and occupancy tracking",001,"Global Admin, Tenant Admin, API",183,High,Planned
+001-003,Epic,Digital Badges,Digital credential management for building access and identification,001,"Global Admin, Tenant Admin, API",155,Medium-High,Planned
+001-004,Epic,Lockers,"Locker assignment, reservation, and management system",001,"Global Admin, Tenant Admin, API",149,Medium,Planned
+001-005,Epic,Space Management,"Meeting rooms, desks, and workspace booking and management",001,"Global Admin, Tenant Admin, API",215,High,Planned
+001-006,Epic,User Management,"User roles, permissions, authentication, and profile management",001,"Global Admin, Tenant Admin, API",194,Critical,Planned
+001-007,Epic,Tenant Management,"Multi-tenant configuration, onboarding, and administration",001,"Global Admin, API",168,Critical,Planned
+001-008,Epic,Building Management,"Building configuration, floors, zones, and facility settings",001,"Global Admin, Tenant Admin, API",130,High,Planned
+001-009,Epic,Reporting & Analytics,"Dashboards, reports, and data analytics across all modules",001,"Global Admin, Tenant Admin, API",180,High,Planned
+001-010,Epic,Notifications,"Multi-channel notification system (Email, SMS, Push)",001,"Global Admin, Tenant Admin, API",164,High,Planned
+001-011,Epic,Integration Hub,Third-party integrations and API management,001,"Global Admin, API Documentation",196,High,Planned
+001-012,Epic,Security & Compliance,"Audit logs, compliance reporting, and security controls",001,"Global Admin, API",196,Critical,Planned

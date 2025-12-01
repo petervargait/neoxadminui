@@ -5,6 +5,12 @@ import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
 import { PersonRegular, AlertRegular, StatusRegular, DocumentBulletListRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, BuildingRegular, SettingsRegular, ErrorCircleRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular } from '@fluentui/react-icons'
 import { useGlobalState } from '../../context/GlobalStateContext'
+import ColorPicker, { ColorConfig } from '../../components/ColorPicker'
+import FontFamilySelector, { FontFamily } from '../../components/FontFamilySelector'
+import VisitorDashboard from '../../components/VisitorDashboard'
+import ParkingDashboard from '../../components/ParkingDashboard'
+import LockerDashboard from '../../components/LockerDashboard'
+import BadgesDashboard from '../../components/BadgesDashboard'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -106,12 +112,25 @@ export default function AdminPage() {
   const [selectedSpaceBuilding, setSelectedSpaceBuilding] = useState<string>('')
   
   // White label state
-  const [whiteLabelForm, setWhiteLabelForm] = useState({
+  const [whiteLabelForm, setWhiteLabelForm] = useState<{
+    companyName: string;
+    logoData: string;
+    primaryColor: ColorConfig;
+    secondaryColor: ColorConfig;
+    fontFamily: FontFamily;
+  }>({
     companyName: '',
     logoData: '',
-    primaryColor: '#d7bb91',
-    secondaryColor: '#08122e',
-    accentColor: '#3b82f6'
+    primaryColor: { type: 'solid', solid: { color: '#d7bb91', alpha: 100 } },
+    secondaryColor: { type: 'solid', solid: { color: '#3b82f6', alpha: 100 } },
+    fontFamily: {
+      id: 'roboto',
+      name: 'Roboto',
+      category: 'google',
+      fallback: 'Roboto, sans-serif',
+      weights: [100, 300, 400, 500, 700, 900],
+      googleFontUrl: 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
+    }
   })
   
   // System Settings state
@@ -143,21 +162,40 @@ export default function AdminPage() {
     if (selectedTenant !== 'all' && globalState?.getWhiteLabel) {
       const existingSettings = globalState.getWhiteLabel(selectedTenant)
       if (existingSettings) {
+        // Support both old format (string colors) and new format (ColorConfig)
         setWhiteLabelForm({
           companyName: existingSettings.companyName,
           logoData: existingSettings.logoData || '',
-          primaryColor: existingSettings.primaryColor,
-          secondaryColor: existingSettings.secondaryColor,
-          accentColor: existingSettings.accentColor
+          primaryColor: typeof existingSettings.primaryColor === 'string' 
+            ? { type: 'solid', solid: { color: existingSettings.primaryColor, alpha: 100 } }
+            : existingSettings.primaryColor || { type: 'solid', solid: { color: '#d7bb91', alpha: 100 } },
+          secondaryColor: typeof existingSettings.secondaryColor === 'string'
+            ? { type: 'solid', solid: { color: existingSettings.secondaryColor, alpha: 100 } }
+            : existingSettings.secondaryColor || { type: 'solid', solid: { color: '#3b82f6', alpha: 100 } },
+          fontFamily: existingSettings.fontFamily || {
+            id: 'roboto',
+            name: 'Roboto',
+            category: 'google',
+            fallback: 'Roboto, sans-serif',
+            weights: [100, 300, 400, 500, 700, 900],
+            googleFontUrl: 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
+          }
         })
       } else {
         // Reset to defaults for tenants without settings
         setWhiteLabelForm({
           companyName: '',
           logoData: '',
-          primaryColor: '#d7bb91',
-          secondaryColor: '#08122e',
-          accentColor: '#3b82f6'
+          primaryColor: { type: 'solid', solid: { color: '#d7bb91', alpha: 100 } },
+          secondaryColor: { type: 'solid', solid: { color: '#3b82f6', alpha: 100 } },
+          fontFamily: {
+            id: 'roboto',
+            name: 'Roboto',
+            category: 'google',
+            fallback: 'Roboto, sans-serif',
+            weights: [100, 300, 400, 500, 700, 900],
+            googleFontUrl: 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
+          }
         })
       }
     }
@@ -463,8 +501,7 @@ export default function AdminPage() {
             { icon: 'ticket', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: true, iconType: 'ticket' },
             { icon: 'alert', label: 'Notifications', action: () => setActiveSection('notifications'), enabled: true, isFluentIcon: true, iconType: 'alert' },
             { icon: 'status', label: 'System Status', action: () => setActiveSection('systemStatus'), enabled: true, isFluentIcon: true, iconType: 'status' },
-            { icon: '◫', label: 'Audit Logs', action: () => setActiveSection('auditLogs'), enabled: true, isFluentIcon: false, iconType: null },
-            { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), enabled: true, isFluentIcon: false, iconType: null },
+            { icon: '▫', label: 'Audit Logs', action: () => setActiveSection('auditLogs'), enabled: true, isFluentIcon: false, iconType: null },
             { icon: '◦', label: 'System Settings', action: () => setActiveSection('systemSettings'), enabled: true, isFluentIcon: false, iconType: null },
           ].map((item, index) => (
             <div key={index} 
@@ -840,6 +877,76 @@ export default function AdminPage() {
                   <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>All services operational</p>
                 </div>
               </div>
+
+              {/* Tenant-Specific Dashboards */}
+              {selectedTenant !== 'all' && (
+                <div style={{ marginBottom: '32px' }}>
+                  <div style={{
+                    marginBottom: '24px',
+                    padding: '20px',
+                    backgroundColor: '#162032',
+                    borderRadius: '12px',
+                    border: '1px solid #1E293B'
+                  }}>
+                    <h2 style={{ color: '#F1F5F9', fontSize: '22px', fontWeight: '600', margin: 0, marginBottom: '8px' }}>
+                      {globalState.tenants.find(t => t.id === selectedTenant)?.name} - Analytics Dashboard
+                    </h2>
+                    <p style={{ color: '#64748B', fontSize: '14px', margin: 0 }}>
+                      Comprehensive analytics and KPIs for the selected tenant
+                    </p>
+                  </div>
+
+                  {/* Visitor Management Dashboard */}
+                  {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Visitor Management') && (
+                    <div style={{ marginBottom: '24px' }}>
+                      <VisitorDashboard
+                        invitations={globalState.invitations.filter(inv => {
+                          // Filter by tenant - match by location or host
+                          const host = globalState.users.find(u => u.id === inv.hostId)
+                          return host?.tenantId === selectedTenant
+                        })}
+                        tenantId={selectedTenant}
+                      />
+                    </div>
+                  )}
+
+                  {/* Parking Dashboard */}
+                  {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Parking') && (
+                    <div style={{ marginBottom: '24px' }}>
+                      <ParkingDashboard
+                        parkingSpaces={globalState.parkingSpaces.filter(space => space.tenantId === selectedTenant)}
+                        tenantId={selectedTenant}
+                      />
+                    </div>
+                  )}
+
+                  {/* Locker Dashboard */}
+                  {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Lockers') && (
+                    <div style={{ marginBottom: '24px' }}>
+                      <LockerDashboard
+                        lockers={globalState.lockers.filter(locker => locker.tenantId === selectedTenant)}
+                        tenantId={selectedTenant}
+                      />
+                    </div>
+                  )}
+
+                  {/* Digital Badges Dashboard */}
+                  {globalState.badges.some(badge => {
+                    const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
+                    return user?.tenantId === selectedTenant
+                  }) && (
+                    <div style={{ marginBottom: '24px' }}>
+                      <BadgesDashboard
+                        badges={globalState.badges.filter(badge => {
+                          const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
+                          return user?.tenantId === selectedTenant
+                        })}
+                        tenantId={selectedTenant}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div style={{
                 backgroundColor: '#162032',
@@ -2478,32 +2585,110 @@ export default function AdminPage() {
                         if (!tenant) return null;
                         
                         const integrationOptions: Record<string, string[]> = {
-                          'User Management': ['NEOX', 'Entra', 'Okta', 'JumpCloud', 'Ping Identity', 'CyberArk', 'OneLogin', 'Clerk'],
-                          'Visitor Management': ['NEOX', 'TDS', 'Tablog', 'Sine', 'Envoy', 'Eptura', 'VisitUs'],
-                          'Parking': ['NEOX', 'Parkl', 'SkiData'],
-                          'Emergency': ['NEOX', 'IBM Tririga'],
-                          'Map': ['NEOX', 'Mapbox', 'Google Maps', 'Azure Maps'],
-                          'Restaurant': ['Delirest', 'Gundel'],
-                          'Ticketing': ['NEOX', 'IBM Tririga', 'IBM Maximo', 'ServiceNow', 'Jira'],
-                          'Service Hub': ['Life1', 'Luxuria', 'AYCM', 'EXOS'],
-                          'Lockers': ['Vecos', 'Digilock', 'Fleclock'],
-                          'News': ['NEOX', 'SharePoint', 'Workplace', 'Simpplr'],
-                          'AI Assistant': ['NEOX', 'OpenAI', 'Azure OpenAI', 'Google AI'],
-                          'Space Management': ['NEOX', 'IBM Tririga', 'Tablog'],
-                          'Private Delivery': ['NEOX', 'Parcel Pending', 'Package Concierge', 'Luxer One'],
-                          'Building Automation': ['NEOX', 'Siemens', 'Schneider Electric', 'Nective'],
-                          'Smart Sensors': ['NEOX', 'bGrid', 'Haltian', 'Motorola'],
-                          'Access Management': ['NEOX', 'HID', 'ThirdMillennium', 'Avigilon', 'Seawing', 'Kantech']
+                          'User Management': ['NONE', 'NEOX', 'Entra', 'Okta', 'JumpCloud', 'Ping Identity', 'CyberArk', 'OneLogin', 'Clerk'],
+                          'Visitor Management': ['NONE', 'NEOX', 'TDS', 'Tablog', 'Sine', 'Envoy', 'Eptura', 'VisitUs'],
+                          'Parking': ['NONE', 'NEOX', 'Parkl', 'SkiData'],
+                          'Emergency': ['NONE', 'NEOX', 'IBM Tririga'],
+                          'Map': ['NONE', 'NEOX', 'Mapbox', 'Google Maps', 'Azure Maps'],
+                          'Restaurant': ['NONE', 'Delirest', 'Gundel'],
+                          'Ticketing': ['NONE', 'NEOX', 'IBM Tririga', 'IBM Maximo', 'ServiceNow', 'Jira'],
+                          'Service Hub': ['NONE', 'Life1', 'Luxuria', 'AYCM', 'EXOS'],
+                          'Lockers': ['NONE', 'Vecos', 'Digilock', 'Fleclock'],
+                          'News': ['NONE', 'NEOX', 'SharePoint', 'Workplace', 'Simpplr'],
+                          'AI Assistant': ['NONE', 'NEOX', 'OpenAI', 'Azure OpenAI', 'Google AI'],
+                          'Space Management': ['NONE', 'NEOX', 'IBM Tririga', 'Tablog'],
+                          'Private Delivery': ['NONE', 'NEOX', 'Parcel Pending', 'Package Concierge', 'Luxer One'],
+                          'Building Automation': ['NONE', 'Siemens', 'Schneider Electric', 'Nective'],
+                          'Smart Sensors': ['NONE', 'bGrid', 'Haltian', 'Motorola'],
+                          'Access Management': ['NONE', 'NEOX', 'HID', 'ThirdMillennium', 'Avigilon', 'Seawing', 'Kantech']
                         };
                         
-                        // Logo colors/emojis for visual identification
+                        // Company logos for visual identification (based on brand colors)
                         const providerLogos: Record<string, string> = {
+                          // Default
+                          'NONE': '⚪',
+                          
+                          // NEOX Platform
                           'NEOX': '🔷',
-                          'Entra': '🔵', 'Okta': '🔵', 'JumpCloud': '🟢',
-                          'Siemens': '🟢', 'Schneider Electric': '🟢', 'Nective': '🔵',
-                          'HID': '🔴', 'Avigilon': '🔴',
-                          'IBM Tririga': '🔵', 'IBM Maximo': '🔵', 'ServiceNow': '🟢', 'Jira': '🔵',
-                          'bGrid': '🟣', 'Haltian': '🔵', 'Motorola': '🔵'
+                          
+                          // Identity & Access Management
+                          'Entra': '🟦',        // Microsoft blue
+                          'Okta': '🔵',         // Okta blue
+                          'JumpCloud': '🟢',    // JumpCloud green
+                          'Ping Identity': '🟡', // Ping yellow
+                          'CyberArk': '🔴',     // CyberArk red
+                          'OneLogin': '🟠',     // OneLogin orange
+                          'Clerk': '🟣',        // Clerk purple
+                          
+                          // Visitor Management
+                          'TDS': '🔵',
+                          'Tablog': '🟢',
+                          'Sine': '🟠',
+                          'Envoy': '🔴',
+                          'Eptura': '🔵',
+                          'VisitUs': '🟣',
+                          
+                          // Parking
+                          'Parkl': '🟢',
+                          'SkiData': '🔴',
+                          
+                          // Building Management & IWMS
+                          'IBM Tririga': '🔵',
+                          'IBM Maximo': '⚙️',
+                          
+                          // Ticketing & Service Management
+                          'ServiceNow': '🟢',
+                          'Jira': '🔵',
+                          
+                          // Restaurant & Services
+                          'Delirest': '🍽️',
+                          'Gundel': '🍷',
+                          'Life1': '🟣',
+                          'Luxuria': '🟡',
+                          'AYCM': '🔵',
+                          'EXOS': '🟠',
+                          
+                          // Lockers
+                          'Vecos': '🔵',
+                          'Digilock': '🟢',
+                          'Fleclock': '🟠',
+                          
+                          // Maps
+                          'Mapbox': '🗺️',
+                          'Google Maps': '🔴',
+                          'Azure Maps': '🔵',
+                          
+                          // News & Communication
+                          'SharePoint': '🟦',
+                          'Workplace': '🔵',
+                          'Simpplr': '🟣',
+                          
+                          // AI Assistants
+                          'OpenAI': '🤖',
+                          'Azure OpenAI': '🔵',
+                          'Google AI': '🔴',
+                          
+                          // Package & Delivery
+                          'Parcel Pending': '📦',
+                          'Package Concierge': '🟠',
+                          'Luxer One': '🔵',
+                          
+                          // Building Automation
+                          'Siemens': '🟢',
+                          'Schneider Electric': '🟢',
+                          'Nective': '🔵',
+                          
+                          // Smart Sensors
+                          'bGrid': '🟣',
+                          'Haltian': '🔵',
+                          'Motorola': '🔵',
+                          
+                          // Access Control
+                          'HID': '🔴',
+                          'ThirdMillennium': '🟡',
+                          'Avigilon': '🔴',
+                          'Seawing': '🔵',
+                          'Kantech': '🟢'
                         };
                         
                         return tenant.modules
@@ -2728,99 +2913,29 @@ export default function AdminPage() {
 
                 {/* Color Scheme Section */}
                 <div>
-                  <h3 style={{ color: '#d7bb91', fontSize: '20px', marginBottom: '20px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Color Scheme</h3>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                    <div>
-                      <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Primary Color</label>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <input 
-                          type="color" 
-                          value={whiteLabelForm.primaryColor}
-                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, primaryColor: e.target.value })}
-                          style={{
-                          width: '40px',
-                          height: '40px',
-                          border: 'none',
-                          borderRadius: '8px',
-                          cursor: 'pointer'
-                        }} />
-                        <input 
-                          type="text" 
-                          value={whiteLabelForm.primaryColor}
-                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, primaryColor: e.target.value })}
-                          style={{
-                          flex: 1,
-                          padding: '8px 12px',
-                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                          border: '1px solid rgba(75, 101, 129, 0.3)',
-                          borderRadius: '8px',
-                          color: '#d7bb91',
-                          fontSize: '14px',
-                          fontFamily: 'monospace'
-                        }} />
-                      </div>
-                    </div>
-                    <div>
-                      <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Secondary Color</label>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <input 
-                          type="color" 
-                          value={whiteLabelForm.secondaryColor}
-                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, secondaryColor: e.target.value })}
-                          style={{
-                          width: '40px',
-                          height: '40px',
-                          border: 'none',
-                          borderRadius: '8px',
-                          cursor: 'pointer'
-                        }} />
-                        <input 
-                          type="text" 
-                          value={whiteLabelForm.secondaryColor}
-                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, secondaryColor: e.target.value })}
-                          style={{
-                          flex: 1,
-                          padding: '8px 12px',
-                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                          border: '1px solid rgba(75, 101, 129, 0.3)',
-                          borderRadius: '8px',
-                          color: '#d7bb91',
-                          fontSize: '14px',
-                          fontFamily: 'monospace'
-                        }} />
-                      </div>
-                    </div>
-                    <div>
-                      <label style={{ color: '#d7bb91', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Accent Color</label>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <input 
-                          type="color" 
-                          value={whiteLabelForm.accentColor}
-                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, accentColor: e.target.value })}
-                          style={{
-                          width: '40px',
-                          height: '40px',
-                          border: 'none',
-                          borderRadius: '8px',
-                          cursor: 'pointer'
-                        }} />
-                        <input 
-                          type="text" 
-                          value={whiteLabelForm.accentColor}
-                          onChange={(e) => setWhiteLabelForm({ ...whiteLabelForm, accentColor: e.target.value })}
-                          style={{
-                          flex: 1,
-                          padding: '8px 12px',
-                          backgroundColor: 'rgba(51, 78, 104, 0.5)',
-                          border: '1px solid rgba(75, 101, 129, 0.3)',
-                          borderRadius: '8px',
-                          color: '#d7bb91',
-                          fontSize: '14px',
-                          fontFamily: 'monospace'
-                        }} />
-                      </div>
-                    </div>
+                  <h3 style={{ color: '#d7bb91', fontSize: '20px', marginBottom: '20px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Colors & Typography</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+                    <ColorPicker
+                      label="Primary Brand Color"
+                      value={whiteLabelForm.primaryColor}
+                      onChange={(value) => setWhiteLabelForm({ ...whiteLabelForm, primaryColor: value })}
+                    />
+                    
+                    <ColorPicker
+                      label="Secondary Brand Color"
+                      value={whiteLabelForm.secondaryColor}
+                      onChange={(value) => setWhiteLabelForm({ ...whiteLabelForm, secondaryColor: value })}
+                    />
                   </div>
+                </div>
+
+                {/* Font Family Section */}
+                <div>
+                  <h3 style={{ color: '#d7bb91', fontSize: '20px', marginBottom: '20px', borderBottom: '1px solid rgba(75, 101, 129, 0.3)', paddingBottom: '8px' }}>Font Family</h3>
+                  <FontFamilySelector
+                    value={whiteLabelForm.fontFamily}
+                    onChange={(value) => setWhiteLabelForm({ ...whiteLabelForm, fontFamily: value })}
+                  />
                 </div>
 
                 {/* Save Button */}
@@ -2836,7 +2951,7 @@ export default function AdminPage() {
                         logoData: whiteLabelForm.logoData,
                         primaryColor: whiteLabelForm.primaryColor,
                         secondaryColor: whiteLabelForm.secondaryColor,
-                        accentColor: whiteLabelForm.accentColor
+                        fontFamily: whiteLabelForm.fontFamily
                       });
                       alert('White label settings saved successfully!');
                     }}

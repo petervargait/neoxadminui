@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../components/NeoxLogo'
 import { useGlobalState } from '../context/GlobalStateContext'
+import { DataBarVerticalRegular, WeatherMoonRegular } from '@fluentui/react-icons'
 
 export default function Home() {
   const router = useRouter()
@@ -170,9 +171,9 @@ export default function Home() {
           {/* Main Admin Panels */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '24px',
-            maxWidth: '1200px',
+            maxWidth: '1400px',
             margin: '0 auto'
           }}>
             <Link
@@ -255,6 +256,87 @@ export default function Home() {
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Tenant Admin</h2>
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage your organization&apos;s users and settings</p>
             </div>
+
+            <div
+              onClick={() => alert('Dashboard & Analytics\n\nAdvanced analytics and reporting features are coming soon. Stay tuned for comprehensive insights into your building operations!')}
+              style={{
+                display: 'block',
+                padding: '40px 32px',
+                backgroundColor: '#162032',
+                border: '1px solid #1E293B',
+                borderRadius: '12px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E293B'
+                e.currentTarget.style.transform = 'translateY(-4px)'
+                e.currentTarget.style.boxShadow = '0 8px 25px -3px rgba(0, 0, 0, 0.2)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#162032'
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px auto',
+                boxShadow: '0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.3)'
+              }}>
+                <DataBarVerticalRegular style={{ fontSize: '32px', width: '32px', height: '32px', color: '#3B82F6' }} />
+              </div>
+              <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Dashboard & Analytics</h2>
+              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Advanced reporting and data visualization</p>
+            </div>
+
+            <Link
+              href="/energy"
+              style={{
+                display: 'block',
+                padding: '40px 32px',
+                backgroundColor: '#162032',
+                border: '1px solid #1E293B',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E293B'
+                e.currentTarget.style.transform = 'translateY(-4px)'
+                e.currentTarget.style.boxShadow = '0 8px 25px -3px rgba(0, 0, 0, 0.2)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#162032'
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px auto',
+                boxShadow: '0 0 20px rgba(34, 197, 94, 0.5), 0 0 40px rgba(34, 197, 94, 0.3)'
+              }}>
+                <WeatherMoonRegular style={{ fontSize: '32px', width: '32px', height: '32px', color: '#22C55E' }} />
+              </div>
+              <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>AI Energy Management</h2>
+              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>AI-powered building energy control and optimization</p>
+            </Link>
 
             <Link
               href="/api-docs"

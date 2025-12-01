@@ -179,13 +179,44 @@ export interface Task {
   comments?: string
 }
 
+export interface GradientStop {
+  id: string
+  color: string
+  alpha: number
+  position: number
+}
+
+export interface ColorConfig {
+  type: 'solid' | 'gradient'
+  solid?: {
+    color: string
+    alpha: number
+  }
+  gradient?: {
+    type: 'linear' | 'radial' | 'conic'
+    angle?: number
+    stops: GradientStop[]
+  }
+}
+
+export interface FontFamily {
+  id: string
+  name: string
+  category: 'system' | 'google'
+  fallback: string
+  weights: number[]
+  googleFontUrl?: string
+}
+
 export interface WhiteLabelSettings {
   tenantId: string
   companyName: string
   logoData?: string
-  primaryColor: string
-  secondaryColor: string
-  accentColor: string
+  // Support both old (string) and new (ColorConfig) formats for backward compatibility
+  primaryColor: string | ColorConfig
+  secondaryColor: string | ColorConfig
+  accentColor?: string // Keep for old data
+  fontFamily?: FontFamily
   updatedAt: string
 }
 
