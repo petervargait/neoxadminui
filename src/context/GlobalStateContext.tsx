@@ -1342,18 +1342,72 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const resetDashboardData = () => {
-    // Get fresh initial state for dashboard data only
-    const initialState = getInitialState()
+    // Hardcoded default data - bypassing localStorage
+    const defaultBadges: Badge[] = [
+      { id: 1, userId: 'usr_acme_1', name: 'Sarah Johnson', email: 'sarah@acme.com', company: 'ACME', department: 'HR', cardType: 'Employee', status: 'Downloaded' as const, imei: 'IMEI001', createdAt: '2024-11-15T08:00:00.000Z' },
+      { id: 2, userId: 'usr_acme_2', name: 'David Martinez', email: 'david@acme.com', company: 'ACME', department: 'Sales', cardType: 'Employee', status: 'Downloaded' as const, imei: 'IMEI002', createdAt: '2024-11-16T09:00:00.000Z' },
+      { id: 3, userId: 'usr_acme_3', name: 'Emily Chen', email: 'emily@acme.com', company: 'ACME', department: 'Marketing', cardType: 'Employee', status: 'New' as const, imei: 'IMEI003', createdAt: '2024-11-28T10:00:00.000Z' },
+      { id: 4, userId: 'usr_acme_4', name: 'Robert Wilson', email: 'robert@acme.com', company: 'ACME', department: 'IT', cardType: 'Manager', status: 'Sent' as const, imei: 'IMEI004', createdAt: '2024-11-20T11:00:00.000Z' },
+      { id: 5, userId: 'usr_acme_5', name: 'Lisa Anderson', email: 'lisa@acme.com', company: 'ACME', department: 'Operations', cardType: 'Employee', status: 'Suspended' as const, imei: 'IMEI005', createdAt: '2024-10-01T08:30:00.000Z' },
+      { id: 6, name: 'James Thompson', email: 'james@acme.com', company: 'ACME', department: 'Finance', cardType: 'Employee', status: 'Downloaded' as const, imei: 'IMEI006', createdAt: '2024-11-10T09:00:00.000Z' },
+      { id: 7, name: 'Maria Garcia', email: 'maria@acme.com', company: 'ACME', department: 'HR', cardType: 'Visitor', status: 'Sent' as const, imei: 'IMEI007', createdAt: '2024-11-25T14:00:00.000Z' },
+      { id: 8, name: 'Chris Lee', email: 'chris@acme.com', company: 'ACME', department: 'Sales', cardType: 'Contractor', status: 'New' as const, imei: 'IMEI008', createdAt: '2024-11-29T15:00:00.000Z' },
+    ]
     
-    // Reset only dashboard-related data, keep tenants and users
-    setState(prev => ({
-      ...prev,
-      badges: initialState.badges,
-      badgeSwipes: initialState.badgeSwipes,
-      invitations: initialState.invitations,
-      parkingBookings: initialState.parkingBookings,
-      lockerUsages: initialState.lockerUsages
-    }))
+    const defaultBadgeSwipes: BadgeSwipe[] = [
+      { id: 'bs1', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-12-01T08:15:00.000Z', tenantId: 'acme' },
+      { id: 'bs2', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-12-01T08:30:00.000Z', tenantId: 'acme' },
+      { id: 'bs3', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Floor 5', accessPoint: 'Elevator A5', timestamp: '2024-12-01T09:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs4', badgeId: 4, userId: 'usr_acme_4', userName: 'Robert Wilson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-12-01T09:15:00.000Z', tenantId: 'acme' },
+      { id: 'bs5', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Meeting Room 3', accessPoint: 'MR3', timestamp: '2024-12-01T10:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs6', badgeId: 6, userName: 'James Thompson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-12-01T08:45:00.000Z', tenantId: 'acme' },
+      { id: 'bs7', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building B - Entrance', accessPoint: 'Door B1', timestamp: '2024-12-01T14:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs8', badgeId: 4, userId: 'usr_acme_4', userName: 'Robert Wilson', location: 'Building A - Server Room', accessPoint: 'SR1', timestamp: '2024-12-01T15:30:00.000Z', tenantId: 'acme' },
+      { id: 'bs9', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Parking', accessPoint: 'Garage A', timestamp: '2024-12-01T17:45:00.000Z', tenantId: 'acme' },
+      { id: 'bs10', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Main Exit', accessPoint: 'Door A1', timestamp: '2024-12-01T18:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs11', badgeId: 6, userName: 'James Thompson', location: 'Building A - Gym', accessPoint: 'Gym1', timestamp: '2024-11-30T07:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs12', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-30T08:10:00.000Z', tenantId: 'acme' },
+      { id: 'bs13', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-30T08:25:00.000Z', tenantId: 'acme' },
+      { id: 'bs14', badgeId: 4, userId: 'usr_acme_4', userName: 'Robert Wilson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-30T09:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs15', badgeId: 6, userName: 'James Thompson', location: 'Building A - Cafeteria', accessPoint: 'Cafe1', timestamp: '2024-11-30T12:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs16', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-29T08:15:00.000Z', tenantId: 'acme' },
+      { id: 'bs17', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-29T08:35:00.000Z', tenantId: 'acme' },
+      { id: 'bs18', badgeId: 4, userId: 'usr_acme_4', userName: 'Robert Wilson', location: 'Building A - Server Room', accessPoint: 'SR1', timestamp: '2024-11-29T10:20:00.000Z', tenantId: 'acme' },
+      { id: 'bs19', badgeId: 6, userName: 'James Thompson', location: 'Building A - Gym', accessPoint: 'Gym1', timestamp: '2024-11-29T07:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs20', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Meeting Room 3', accessPoint: 'MR3', timestamp: '2024-11-28T10:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs21', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-28T08:30:00.000Z', tenantId: 'acme' },
+      { id: 'bs22', badgeId: 4, userId: 'usr_acme_4', userName: 'Robert Wilson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-28T09:10:00.000Z', tenantId: 'acme' },
+      { id: 'bs23', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-27T08:20:00.000Z', tenantId: 'acme' },
+      { id: 'bs24', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Parking', accessPoint: 'Garage A', timestamp: '2024-11-27T17:50:00.000Z', tenantId: 'acme' },
+      { id: 'bs25', badgeId: 6, userName: 'James Thompson', location: 'Building A - Cafeteria', accessPoint: 'Cafe1', timestamp: '2024-11-27T12:30:00.000Z', tenantId: 'acme' },
+      { id: 'bs26', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-26T08:15:00.000Z', tenantId: 'acme' },
+      { id: 'bs27', badgeId: 4, userId: 'usr_acme_4', userName: 'Robert Wilson', location: 'Building A - Server Room', accessPoint: 'SR1', timestamp: '2024-11-26T14:00:00.000Z', tenantId: 'acme' },
+      { id: 'bs28', badgeId: 2, userId: 'usr_acme_2', userName: 'David Martinez', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-26T08:25:00.000Z', tenantId: 'acme' },
+      { id: 'bs29', badgeId: 1, userId: 'usr_acme_1', userName: 'Sarah Johnson', location: 'Building B - Entrance', accessPoint: 'Door B1', timestamp: '2024-11-25T14:30:00.000Z', tenantId: 'acme' },
+      { id: 'bs30', badgeId: 6, userName: 'James Thompson', location: 'Building A - Main Entrance', accessPoint: 'Door A1', timestamp: '2024-11-25T08:40:00.000Z', tenantId: 'acme' },
+    ]
+    
+    // Get fresh initial state to extract invitations, parkingBookings, lockerUsages
+    // We need to temporarily remove localStorage to get defaults
+    if (typeof window !== 'undefined') {
+      const currentData = localStorage.getItem(STORAGE_KEY)
+      localStorage.removeItem(STORAGE_KEY)
+      const freshDefaults = getInitialState()
+      // Restore localStorage
+      if (currentData) {
+        localStorage.setItem(STORAGE_KEY, currentData)
+      }
+      
+      // Reset only dashboard-related data, keep tenants and users
+      setState(prev => ({
+        ...prev,
+        badges: defaultBadges,
+        badgeSwipes: defaultBadgeSwipes,
+        invitations: freshDefaults.invitations,
+        parkingBookings: freshDefaults.parkingBookings,
+        lockerUsages: freshDefaults.lockerUsages
+      }))
+    }
     
     addAuditLog({ user: 'system', action: 'Reset dashboard data to sample data', status: 'Success' })
   }
