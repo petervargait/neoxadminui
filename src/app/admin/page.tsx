@@ -169,6 +169,16 @@ export default function AdminPage() {
     const tenant = globalState.tenants.find(t => t.id === selectedTenant)
     if (!tenant) return
 
+    // Prompt user for filename
+    const defaultFilename = `${tenant.name}_dashboard_${new Date().toISOString().split('T')[0]}`
+    const filename = window.prompt('Enter filename for CSV export:', defaultFilename)
+    
+    // User cancelled the prompt
+    if (filename === null) return
+    
+    // Use provided filename or default if empty
+    const finalFilename = filename.trim() || defaultFilename
+
     let csvContent = ''
     
     // Export Visitor Management data
@@ -231,7 +241,7 @@ export default function AdminPage() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
-    link.download = `${tenant.name}_dashboard_${new Date().toISOString().split('T')[0]}.csv`
+    link.download = `${finalFilename}.csv`
     link.click()
   }
 
@@ -241,6 +251,16 @@ export default function AdminPage() {
     
     const tenant = globalState.tenants.find(t => t.id === selectedTenant)
     if (!tenant) return
+
+    // Prompt user for filename
+    const defaultFilename = `${tenant.name}_dashboard_${new Date().toISOString().split('T')[0]}`
+    const filename = window.prompt('Enter filename for Excel export:', defaultFilename)
+    
+    // User cancelled the prompt
+    if (filename === null) return
+    
+    // Use provided filename or default if empty
+    const finalFilename = filename.trim() || defaultFilename
 
     let xlsContent = '<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"><xml><x:ExcelWorkbook><x:ExcelWorksheets>'
     
@@ -280,7 +300,7 @@ export default function AdminPage() {
     const blob = new Blob([xlsContent], { type: 'application/vnd.ms-excel' })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
-    link.download = `${tenant.name}_dashboard_${new Date().toISOString().split('T')[0]}.xls`
+    link.download = `${finalFilename}.xls`
     link.click()
   }
 
