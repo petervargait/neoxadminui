@@ -31,16 +31,16 @@ export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDa
   return (
     <div>
       <div style={{ 
-        background: 'radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%)',
+        background: 'radial-gradient(ellipse at center, rgba(100, 116, 139, 0.15) 0%, transparent 70%)',
         borderRadius: '24px',
         padding: '32px',
         marginBottom: '32px',
         position: 'relative',
         overflow: 'hidden'
       }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))', backdropFilter: 'blur(10px)' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(100, 116, 139, 0.05), rgba(71, 85, 105, 0.05))', backdropFilter: 'blur(10px)' }} />
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 20px 40px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.3)', fontSize: '36px', color: 'white', fontWeight: '400' }}>
+          <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'linear-gradient(135deg, #64748B, #475569)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 20px 40px rgba(100, 116, 139, 0.4), 0 0 40px rgba(100, 116, 139, 0.3)', fontSize: '36px', color: 'white', fontWeight: '400' }}>
             ◎
           </div>
           <div>
@@ -52,11 +52,11 @@ export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDa
       
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '32px' }}>
         {[
-          { value: lockers.length, label: 'Total Lockers', gradient: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' },
-          { value: available, label: 'Available', gradient: 'linear-gradient(135deg, #0EA5E9 0%, #06B6D4 100%)' },
-          { value: occupied, label: 'Occupied', gradient: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%)' },
-          { value: opened, label: 'Opened', gradient: 'linear-gradient(135deg, #EC4899 0%, #F97316 100%)' },
-          { value: `${avgDuration}m`, label: 'Avg Duration', gradient: 'linear-gradient(135deg, #10B981 0%, #06B6D4 100%)' }
+          { value: lockers.length, label: 'Total Lockers', gradient: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)' },
+          { value: available, label: 'Available', gradient: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)' },
+          { value: occupied, label: 'Occupied', gradient: 'linear-gradient(135deg, #64748B 0%, #475569 100%)' },
+          { value: opened, label: 'Opened', gradient: 'linear-gradient(135deg, #0EA5E9 0%, #06B6D4 100%)' },
+          { value: `${avgDuration}m`, label: 'Avg Duration', gradient: 'linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%)' }
         ].map((stat, idx) => (
           <div key={idx} style={{ background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05))', backdropFilter: 'blur(20px)', borderRadius: '20px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '28px 24px', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: 0, right: 0, width: '120px', height: '120px', background: stat.gradient, opacity: 0.1, borderRadius: '50%', filter: 'blur(40px)' }} />
@@ -70,24 +70,24 @@ export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDa
       
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', gap: '24px', marginBottom: '32px' }}>
         <div style={{ background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(30, 41, 59, 0.4))', backdropFilter: 'blur(20px)', borderRadius: '24px', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '32px', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: '-50%', right: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)' }} />
+          <div style={{ position: 'absolute', top: '-50%', right: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle, rgba(100, 116, 139, 0.15) 0%, transparent 70%)' }} />
           <div style={{ position: 'relative', zIndex: 1 }}>
             <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700', marginBottom: '32px', margin: '0 0 32px 0' }}>Status Distribution</h3>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px' }}>
               <div style={{ position: 'relative', width: '220px', height: '220px' }}>
-                <svg width="220" height="220" viewBox="0 0 220 220" style={{ filter: 'drop-shadow(0 8px 24px rgba(139, 92, 246, 0.4))' }}>
+                <svg width="220" height="220" viewBox="0 0 220 220" style={{ filter: 'drop-shadow(0 8px 24px rgba(100, 116, 139, 0.4))' }}>
                   <defs>
                     <linearGradient id="lockerGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style={{ stopColor: '#0EA5E9', stopOpacity: 1 }} />
-                      <stop offset="100%" style={{ stopColor: '#06B6D4', stopOpacity: 1 }} />
+                      <stop offset="0%" style={{ stopColor: '#6366F1', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#4F46E5', stopOpacity: 1 }} />
                     </linearGradient>
                     <linearGradient id="lockerGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style={{ stopColor: '#8B5CF6', stopOpacity: 1 }} />
-                      <stop offset="100%" style={{ stopColor: '#A855F7', stopOpacity: 1 }} />
-                    </linearGradient>
-                    <linearGradient id="lockerGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" style={{ stopColor: '#64748B', stopOpacity: 1 }} />
                       <stop offset="100%" style={{ stopColor: '#475569', stopOpacity: 1 }} />
+                    </linearGradient>
+                    <linearGradient id="lockerGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#0EA5E9', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#06B6D4', stopOpacity: 1 }} />
                     </linearGradient>
                   </defs>
                   <circle cx="110" cy="110" r="80" fill="rgba(15, 23, 42, 0.6)" />
@@ -100,9 +100,9 @@ export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDa
               </div>
               <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {[
-                  { label: 'Available', value: available, color: 'linear-gradient(135deg, #0EA5E9, #06B6D4)' },
-                  { label: 'Occupied', value: occupied, color: 'linear-gradient(135deg, #8B5CF6, #A855F7)' },
-                  { label: 'Maintenance', value: maintenance, color: 'linear-gradient(135deg, #64748B, #475569)' }
+                  { label: 'Available', value: available, color: 'linear-gradient(135deg, #6366F1, #4F46E5)' },
+                  { label: 'Occupied', value: occupied, color: 'linear-gradient(135deg, #64748B, #475569)' },
+                  { label: 'Maintenance', value: maintenance, color: 'linear-gradient(135deg, #0EA5E9, #06B6D4)' }
                 ].map((item, idx) => (
                   <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
