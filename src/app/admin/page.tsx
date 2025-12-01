@@ -161,6 +161,20 @@ export default function AdminPage() {
   // Dashboard filter state
   const [dashboardStartDate, setDashboardStartDate] = useState('')
   const [dashboardEndDate, setDashboardEndDate] = useState('')
+  const [appliedStartDate, setAppliedStartDate] = useState('')
+  const [appliedEndDate, setAppliedEndDate] = useState('')
+
+  const applyDateFilters = () => {
+    setAppliedStartDate(dashboardStartDate)
+    setAppliedEndDate(dashboardEndDate)
+  }
+
+  const clearDateFilters = () => {
+    setDashboardStartDate('')
+    setDashboardEndDate('')
+    setAppliedStartDate('')
+    setAppliedEndDate('')
+  }
 
   // Export dashboard data to CSV
   const exportToCSV = () => {
@@ -1041,6 +1055,8 @@ export default function AdminPage() {
                     endDate={dashboardEndDate}
                     onStartDateChange={setDashboardStartDate}
                     onEndDateChange={setDashboardEndDate}
+                    onApplyFilters={applyDateFilters}
+                    onClearFilters={clearDateFilters}
                     onExportCSV={exportToCSV}
                     onExportXLS={exportToXLS}
                   />
@@ -1064,8 +1080,7 @@ export default function AdminPage() {
                       onClick={() => {
                         if (confirm('Reset dashboard data? This will reload sample data for badges, invitations, parking bookings, and locker usages. Your tenants and users will not be affected.')) {
                           globalState.resetDashboardData()
-                          setDashboardStartDate('')
-                          setDashboardEndDate('')
+                          clearDateFilters()
                           alert('Dashboard data has been reset with sample data! Date filters cleared.')
                         }
                       }}
@@ -1103,8 +1118,8 @@ export default function AdminPage() {
                           const host = globalState.users.find(u => u.id === inv.hostId)
                           return host?.tenantId === selectedTenant
                         })}
-                        startDate={dashboardStartDate}
-                        endDate={dashboardEndDate}
+                        startDate={appliedStartDate}
+                        endDate={appliedEndDate}
                         searchTerm=""
                       />
                     </div>
