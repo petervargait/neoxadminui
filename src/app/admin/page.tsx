@@ -799,90 +799,93 @@ export default function AdminPage() {
           {/* Dashboard View */}
           {activeSection === 'dashboard' && (
             <>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                gap: '24px',
-                marginBottom: '32px'
-              }}>
+              {/* Global Stats - Only show when no specific tenant is selected */}
+              {selectedTenant === 'all' && (
                 <div style={{
-                  padding: '24px',
-                  borderRadius: '12px',
-                  backgroundColor: '#162032',
-                  border: '1px solid #1E293B',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: '24px',
+                  marginBottom: '32px'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(215, 187, 145, 0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 0 15px rgba(215, 187, 145, 0.4), 0 0 30px rgba(215, 187, 145, 0.2)'
-                    }}>
-                      <span style={{ fontSize: '24px', color: '#D7BB91' }}>◎</span>
+                  <div style={{
+                    padding: '24px',
+                    borderRadius: '12px',
+                    backgroundColor: '#162032',
+                    border: '1px solid #1E293B',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                      <div style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '8px',
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 0 15px rgba(139, 92, 246, 0.4)'
+                      }}>
+                        <span style={{ fontSize: '24px', color: '#A78BFA' }}>◎</span>
+                      </div>
+                      <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>{globalState.tenants.filter(t => t.status === 'active').length}</div>
                     </div>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>{globalState.tenants.filter(t => t.status === 'active').length}</div>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Active Tenants</h3>
+                    <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>Organizations using the platform</p>
                   </div>
-                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Active Tenants</h3>
-                  <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>Organizations using the platform</p>
-                </div>
 
-                <div style={{
-                  padding: '24px',
-                  borderRadius: '12px',
-                  backgroundColor: '#162032',
-                  border: '1px solid #1E293B',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(96, 165, 250, 0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 0 15px rgba(96, 165, 250, 0.4), 0 0 30px rgba(96, 165, 250, 0.2)'
-                    }}>
-                      <span style={{ fontSize: '24px', color: '#60A5FA' }}>◧</span>
+                  <div style={{
+                    padding: '24px',
+                    borderRadius: '12px',
+                    backgroundColor: '#162032',
+                    border: '1px solid #1E293B',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                      <div style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '8px',
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 0 15px rgba(139, 92, 246, 0.4)'
+                      }}>
+                        <span style={{ fontSize: '24px', color: '#A78BFA' }}>◧</span>
+                      </div>
+                      <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>{globalState.users.length}</div>
                     </div>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#F1F5F9' }}>{globalState.users.length}</div>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Total Users</h3>
+                    <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>Across all tenants</p>
                   </div>
-                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>Total Users</h3>
-                  <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>Across all tenants</p>
-                </div>
 
-                <div style={{
-                  padding: '24px',
-                  borderRadius: '12px',
-                  backgroundColor: '#162032',
-                  border: '1px solid #1E293B',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(34, 197, 94, 0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 0 15px rgba(34, 197, 94, 0.4), 0 0 30px rgba(34, 197, 94, 0.2)'
-                    }}>
-                      <span style={{ fontSize: '24px', color: '#22C55E' }}>◈</span>
+                  <div style={{
+                    padding: '24px',
+                    borderRadius: '12px',
+                    backgroundColor: '#162032',
+                    border: '1px solid #1E293B',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                      <div style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '8px',
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 0 15px rgba(139, 92, 246, 0.4)'
+                      }}>
+                        <span style={{ fontSize: '24px', color: '#A78BFA' }}>◈</span>
+                      </div>
+                      <div style={{ fontSize: '32px', fontWeight: '700', color: '#A78BFA' }}>Online</div>
                     </div>
-                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#22C55E' }}>Online</div>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>System Status</h3>
+                    <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>All services operational</p>
                   </div>
-                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#F1F5F9', marginBottom: '4px' }}>System Status</h3>
-                  <p style={{ fontSize: '14px', color: '#64748B', margin: 0 }}>All services operational</p>
                 </div>
-              </div>
+              )}
 
               {/* Tenant-Specific Dashboards */}
               {selectedTenant !== 'all' && (
@@ -958,24 +961,26 @@ export default function AdminPage() {
                 </div>
               )}
 
-              <div style={{
-                backgroundColor: '#162032',
-                borderRadius: '12px',
-                border: '1px solid #1E293B',
-                overflow: 'hidden',
-                marginBottom: '32px'
-              }}>
+              {/* Recent Tenants - Only show when no specific tenant is selected */}
+              {selectedTenant === 'all' && (
                 <div style={{
-                  padding: '24px',
-                  borderBottom: '1px solid #1E293B',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
+                  backgroundColor: '#162032',
+                  borderRadius: '12px',
+                  border: '1px solid #1E293B',
+                  overflow: 'hidden',
+                  marginBottom: '32px'
                 }}>
-                  <div>
-                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Recent Tenants</h2>
-                    <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Latest organization registrations</p>
-                  </div>
+                  <div style={{
+                    padding: '24px',
+                    borderBottom: '1px solid #1E293B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    <div>
+                      <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>Recent Tenants</h2>
+                      <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Latest organization registrations</p>
+                    </div>
                   <button 
                     onClick={() => { setSelectedTenant('all'); setActiveSection('tenantCreate'); }}
                     style={{
@@ -1075,6 +1080,7 @@ export default function AdminPage() {
                   </table>
                 </div>
               </div>
+              )}
             </>
           )}
 
