@@ -1045,6 +1045,47 @@ export default function AdminPage() {
                     onExportXLS={exportToXLS}
                   />
 
+                  {/* Reset Dashboard Data Button */}
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9))',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    padding: '16px 20px',
+                    marginBottom: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    <div>
+                      <h4 style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '600', margin: '0 0 4px 0' }}>No Dashboard Data?</h4>
+                      <p style={{ color: '#94A3B8', fontSize: '13px', margin: 0 }}>Reset to load sample data for badges, invitations, parking, and lockers</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (confirm('Reset dashboard data? This will reload sample data for badges, invitations, parking bookings, and locker usages. Your tenants and users will not be affected.')) {
+                          globalState.resetDashboardData()
+                          alert('Dashboard data has been reset with sample data!')
+                        }
+                      }}
+                      style={{
+                        padding: '10px 20px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
+                        color: 'white',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s',
+                        whiteSpace: 'nowrap'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                      Reset Dashboard Data
+                    </button>
+                  </div>
+
                   {/* Visitor Management Dashboard */}
                   {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Visitor Management') && (
                     <div style={{

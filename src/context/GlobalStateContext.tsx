@@ -349,6 +349,7 @@ interface GlobalStateContextType extends GlobalState {
   getSystemSettings: (tenantId: string) => SystemSettings | undefined
   toggleModule: (moduleName: string) => void
   clearAllData: () => void
+  resetDashboardData: () => void
 }
 
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(undefined)
@@ -1340,6 +1341,23 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     window.location.reload()
   }
 
+  const resetDashboardData = () => {
+    // Get fresh initial state for dashboard data only
+    const initialState = getInitialState()
+    
+    // Reset only dashboard-related data, keep tenants and users
+    setState(prev => ({
+      ...prev,
+      badges: initialState.badges,
+      badgeSwipes: initialState.badgeSwipes,
+      invitations: initialState.invitations,
+      parkingBookings: initialState.parkingBookings,
+      lockerUsages: initialState.lockerUsages
+    }))
+    
+    addAuditLog({ user: 'system', action: 'Reset dashboard data to sample data', status: 'Success' })
+  }
+
   const value: GlobalStateContextType = {
     ...state,
     addUser,
@@ -1379,7 +1397,8 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     updateSystemSettings,
     getSystemSettings,
     toggleModule,
-    clearAllData
+    clearAllData,
+    resetDashboardData
   }
 
   return (
