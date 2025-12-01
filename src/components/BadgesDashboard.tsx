@@ -9,7 +9,7 @@ interface BadgesDashboardProps {
   tenantId: string
 }
 
-export default function BadgesDashboard({ badges, tenantId }: BadgesDashboardProps) {
+export default function BadgesDashboard({ badges }: BadgesDashboardProps) {
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [cardTypeFilter, setCardTypeFilter] = useState<string>('all')

@@ -2,14 +2,14 @@
 
 import React, { useState, useMemo } from 'react'
 import { Invitation } from '../context/GlobalStateContext'
-import { CalendarRegular, FilterRegular, ArrowDownloadRegular, SearchRegular } from '@fluentui/react-icons'
+import { CalendarRegular, ArrowDownloadRegular, SearchRegular } from '@fluentui/react-icons'
 
 interface VisitorDashboardProps {
   invitations: Invitation[]
   tenantId: string
 }
 
-export default function VisitorDashboard({ invitations, tenantId }: VisitorDashboardProps) {
+export default function VisitorDashboard({ invitations }: VisitorDashboardProps) {
   const [startDate, setStartDate] = useState<string>('')
   const [endDate, setEndDate] = useState<string>('')
   const [searchTerm, setSearchTerm] = useState<string>('')
@@ -254,7 +254,7 @@ export default function VisitorDashboard({ invitations, tenantId }: VisitorDashb
             </div>
           </div>
           <div className="text-4xl font-bold text-white mb-1">{kpis.noShowRate}%</div>
-          <p className="text-sm text-gray-400">Didn't appear</p>
+          <p className="text-sm text-gray-400">Did not appear</p>
         </div>
 
         {/* Unique Sites */}

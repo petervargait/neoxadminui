@@ -9,9 +9,7 @@ interface ParkingDashboardProps {
   tenantId: string
 }
 
-export default function ParkingDashboard({ parkingSpaces, tenantId }: ParkingDashboardProps) {
-  const [startDate, setStartDate] = useState<string>('')
-  const [endDate, setEndDate] = useState<string>('')
+export default function ParkingDashboard({ parkingSpaces }: ParkingDashboardProps) {
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [buildingFilter, setBuildingFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -42,7 +40,7 @@ export default function ParkingDashboard({ parkingSpaces, tenantId }: ParkingDas
   // Calculate KPIs
   const kpis = useMemo(() => {
     const totalSpaces = filteredSpaces.length
-    const activeSpaces = filteredSpaces.filter(s => s.status !== 'maintenance').length
+    const activeSpaces = filteredSpaces.length // All spaces are active (no maintenance status for parking)
     const occupiedSpaces = filteredSpaces.filter(s => s.status === 'occupied').length
     const availableSpaces = filteredSpaces.filter(s => s.status === 'available').length
     const guestSpaces = filteredSpaces.filter(s => s.isReservedForVisitor).length

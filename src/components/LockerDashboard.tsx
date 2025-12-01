@@ -9,7 +9,7 @@ interface LockerDashboardProps {
   tenantId: string
 }
 
-export default function LockerDashboard({ lockers, tenantId }: LockerDashboardProps) {
+export default function LockerDashboard({ lockers }: LockerDashboardProps) {
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [buildingFilter, setBuildingFilter] = useState<string>('all')
   const [typeFilter, setTypeFilter] = useState<string>('all')
