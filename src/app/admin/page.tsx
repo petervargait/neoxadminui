@@ -1058,13 +1058,15 @@ export default function AdminPage() {
                   }}>
                     <div>
                       <h4 style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '600', margin: '0 0 4px 0' }}>No Dashboard Data?</h4>
-                      <p style={{ color: '#94A3B8', fontSize: '13px', margin: 0 }}>Reset to load sample data for badges, invitations, parking, and lockers</p>
+                      <p style={{ color: '#94A3B8', fontSize: '13px', margin: 0 }}>Reset to load sample data (Nov-Dec 2024). Clear date filters above to see all data.</p>
                     </div>
                     <button
                       onClick={() => {
                         if (confirm('Reset dashboard data? This will reload sample data for badges, invitations, parking bookings, and locker usages. Your tenants and users will not be affected.')) {
                           globalState.resetDashboardData()
-                          alert('Dashboard data has been reset with sample data!')
+                          setDashboardStartDate('')
+                          setDashboardEndDate('')
+                          alert('Dashboard data has been reset with sample data! Date filters cleared.')
                         }
                       }}
                       style={{
