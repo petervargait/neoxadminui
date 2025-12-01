@@ -71,31 +71,34 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
   return (
     <div style={{ marginBottom: '32px' }}>
       {/* Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))',
-        borderRadius: '20px',
-        border: '1px solid rgba(139, 92, 246, 0.2)',
+      <div style={{ 
+        background: 'radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%)',
+        borderRadius: '24px',
         padding: '32px',
-        marginBottom: '24px'
+        marginBottom: '32px',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))', backdropFilter: 'blur(10px)' }} />
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div style={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '16px',
+            width: '72px',
+            height: '72px',
+            borderRadius: '20px',
             background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 8px 16px rgba(139, 92, 246, 0.3)'
+            boxShadow: '0 20px 40px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.3)',
+            fontSize: '36px',
+            color: 'white',
+            fontWeight: '400'
           }}>
-            <svg style={{ width: '32px', height: '32px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
+            👥
           </div>
           <div>
-            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#F1F5F9', margin: 0 }}>Visitor Management</h2>
-            <p style={{ fontSize: '14px', color: '#94A3B8', margin: '4px 0 0 0' }}>Real-time visitor analytics and insights</p>
+            <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#F1F5F9', margin: 0, letterSpacing: '-0.02em' }}>Visitor Management</h2>
+            <p style={{ fontSize: '15px', color: '#A0AEC0', margin: '4px 0 0 0', fontWeight: '500' }}>Real-time visitor analytics and insights</p>
           </div>
         </div>
       </div>

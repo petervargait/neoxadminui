@@ -80,7 +80,7 @@ export default function DashboardFilters({
           onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
-          📊 Export CSV
+          Export CSV
         </button>
         <button
           onClick={onExportXLS}
@@ -98,7 +98,7 @@ export default function DashboardFilters({
           onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
-          📈 Export XLS
+          Export XLS
         </button>
       </div>
     </div>

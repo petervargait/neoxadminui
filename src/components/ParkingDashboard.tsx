@@ -56,11 +56,12 @@ export default function ParkingDashboard({ parkingSpaces, parkingBookings = [] }
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
-            boxShadow: '0 20px 40px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.3)'
+            boxShadow: '0 20px 40px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.3)',
+            fontSize: '36px',
+            color: 'white',
+            fontWeight: '400'
           }}>
-            <svg style={{ width: '36px', height: '36px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-            </svg>
+            ◧
           </div>
           <div>
             <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#F1F5F9', margin: 0, letterSpacing: '-0.02em' }}>Parking Management</h2>
