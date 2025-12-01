@@ -5,6 +5,11 @@ import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
 import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular, BuildingRegular } from '@fluentui/react-icons'
 import { useGlobalState } from '../../context/GlobalStateContext'
+import VisitorDashboard from '../../components/VisitorDashboard'
+import ParkingDashboard from '../../components/ParkingDashboard'
+import LockerDashboard from '../../components/LockerDashboard'
+import BadgesDashboard from '../../components/BadgesDashboard'
+import DashboardFilters from '../../components/DashboardFilters'
 
 export default function TenantPage() {
   const router = useRouter()
@@ -131,6 +136,190 @@ export default function TenantPage() {
     location: 'Main Office'
   })
   const [editingInvitation, setEditingInvitation] = useState<string | null>(null)
+
+  // Dashboard filter state
+  const [dashboardStartDate, setDashboardStartDate] = useState('')
+  const [dashboardEndDate, setDashboardEndDate] = useState('')
+  const [appliedStartDate, setAppliedStartDate] = useState('')
+  const [appliedEndDate, setAppliedEndDate] = useState('')
+
+  const applyDateFilters = () => {
+    setAppliedStartDate(dashboardStartDate)
+    setAppliedEndDate(dashboardEndDate)
+  }
+
+  const clearDateFilters = () => {
+    setDashboardStartDate('')
+    setDashboardEndDate('')
+    setAppliedStartDate('')
+    setAppliedEndDate('')
+  }
+
+  // Export dashboard data to CSV
+  const exportToCSV = () => {
+    const tenant = globalState.tenants.find(t => t.id === selectedTenantId)
+    if (!tenant) return
+    
+    // Prompt user for filename
+    const defaultFilename = `${tenant.name}_dashboard_${new Date().toISOString().split('T')[0]}`
+    const filename = window.prompt('Enter filename for CSV export:', defaultFilename)
+    
+    // User cancelled the prompt
+    if (filename === null) return
+    
+    // Use provided filename or default if empty
+    const finalFilename = filename.trim() || defaultFilename
+
+    let csvContent = ''
+    
+    // Export Visitor Management data
+    const invitations = globalState.invitations.filter(inv => {
+      const host = globalState.users.find(u => u.id === inv.hostId)
+      return host?.tenantId === selectedTenantId
+    })
+    if (invitations.length > 0) {
+      csvContent += 'Visitor Management\n'
+      csvContent += 'Name,Email,Host,Date,Time,Purpose,Status\n'
+      invitations.forEach(inv => {
+        const host = globalState.users.find(u => u.id === inv.hostId)
+        csvContent += `"${inv.visitorName}","${inv.visitorEmail}","${host?.name || ''}","${inv.visitDate}","${inv.visitTime}","${inv.purpose}","${inv.status}"\n`
+      })
+      csvContent += '\n'
+    }
+
+    // Export Parking data
+    const parkingSpaces = globalState.parkingSpaces.filter(s => s.tenantId === selectedTenantId)
+    const bookings = globalState.parkingBookings?.filter(b => b.tenantId === selectedTenantId) || []
+    if (parkingSpaces.length > 0) {
+      csvContent += 'Parking Spaces\n'
+      csvContent += 'Space Number,Name,Building,Status\n'
+      parkingSpaces.forEach(space => {
+        csvContent += `"${space.spaceNumber}","${space.name}","${space.building}","${space.status}"\n`
+      })
+      csvContent += '\nParking Bookings\n'
+      csvContent += 'Space,User,Date,Status\n'
+      bookings.forEach(b => {
+        csvContent += `"${b.spaceNumber}","${b.userName}","${b.bookingDate}","${b.status}"\n`
+      })
+      csvContent += '\n'
+    }
+
+    // Export Locker data
+    const lockers = globalState.lockers.filter(l => l.tenantId === selectedTenantId)
+    if (lockers.length > 0) {
+      csvContent += 'Lockers\n'
+      csvContent += 'Locker Number,Name,Building,Floor,Status\n'
+      lockers.forEach(locker => {
+        csvContent += `"${locker.lockerNumber}","${locker.name}","${locker.building}","${locker.floor}","${locker.status}"\n`
+      })
+      csvContent += '\n'
+    }
+
+    // Export Badge data
+    const badges = globalState.badges.filter(badge => {
+      const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
+      return user?.tenantId === selectedTenantId
+    })
+    if (badges.length > 0) {
+      csvContent += 'Digital Badges\n'
+      csvContent += 'Name,Email,Company,Status\n'
+      badges.forEach(badge => {
+        csvContent += `"${badge.name}","${badge.email}","${badge.company}","${badge.status}"\n`
+      })
+    }
+
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `${finalFilename}.csv`
+    link.click()
+  }
+
+  // Export dashboard data to XLS (HTML table format)
+  const exportToXLS = () => {
+    const tenant = globalState.tenants.find(t => t.id === selectedTenantId)
+    if (!tenant) return
+    
+    // Prompt user for filename
+    const defaultFilename = `${tenant.name}_dashboard_${new Date().toISOString().split('T')[0]}`
+    const filename = window.prompt('Enter filename for Excel export:', defaultFilename)
+    
+    // User cancelled the prompt
+    if (filename === null) return
+    
+    // Use provided filename or default if empty
+    const finalFilename = filename.trim() || defaultFilename
+
+    let xlsContent = '<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body>'
+    
+    // Export Visitor Management data
+    const invitations = globalState.invitations.filter(inv => {
+      const host = globalState.users.find(u => u.id === inv.hostId)
+      return host?.tenantId === selectedTenantId
+    })
+    if (invitations.length > 0) {
+      xlsContent += '<h2>Visitor Management</h2>'
+      xlsContent += '<table border="1"><tr><th>Name</th><th>Email</th><th>Host</th><th>Date</th><th>Time</th><th>Purpose</th><th>Status</th></tr>'
+      invitations.forEach(inv => {
+        const host = globalState.users.find(u => u.id === inv.hostId)
+        xlsContent += `<tr><td>${inv.visitorName}</td><td>${inv.visitorEmail}</td><td>${host?.name || ''}</td><td>${inv.visitDate}</td><td>${inv.visitTime}</td><td>${inv.purpose}</td><td>${inv.status}</td></tr>`
+      })
+      xlsContent += '</table><br/>'
+    }
+
+    // Export Parking data
+    const parkingSpaces = globalState.parkingSpaces.filter(s => s.tenantId === selectedTenantId)
+    const bookings = globalState.parkingBookings?.filter(b => b.tenantId === selectedTenantId) || []
+    if (parkingSpaces.length > 0) {
+      xlsContent += '<h2>Parking Spaces</h2>'
+      xlsContent += '<table border="1"><tr><th>Space Number</th><th>Name</th><th>Building</th><th>Status</th></tr>'
+      parkingSpaces.forEach(space => {
+        xlsContent += `<tr><td>${space.spaceNumber}</td><td>${space.name}</td><td>${space.building}</td><td>${space.status}</td></tr>`
+      })
+      xlsContent += '</table><br/>'
+      xlsContent += '<h2>Parking Bookings</h2>'
+      xlsContent += '<table border="1"><tr><th>Space</th><th>User</th><th>Date</th><th>Status</th></tr>'
+      bookings.forEach(b => {
+        xlsContent += `<tr><td>${b.spaceNumber}</td><td>${b.userName}</td><td>${b.bookingDate}</td><td>${b.status}</td></tr>`
+      })
+      xlsContent += '</table><br/>'
+    }
+
+    // Export Locker data
+    const lockers = globalState.lockers.filter(l => l.tenantId === selectedTenantId)
+    if (lockers.length > 0) {
+      xlsContent += '<h2>Lockers</h2>'
+      xlsContent += '<table border="1"><tr><th>Locker Number</th><th>Name</th><th>Building</th><th>Floor</th><th>Status</th></tr>'
+      lockers.forEach(locker => {
+        xlsContent += `<tr><td>${locker.lockerNumber}</td><td>${locker.name}</td><td>${locker.building}</td><td>${locker.floor}</td><td>${locker.status}</td></tr>`
+      })
+      xlsContent += '</table><br/>'
+    }
+
+    // Export Badge data
+    const badges = globalState.badges.filter(badge => {
+      const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
+      return user?.tenantId === selectedTenantId
+    })
+    if (badges.length > 0) {
+      xlsContent += '<h2>Digital Badges</h2>'
+      xlsContent += '<table border="1"><tr><th>Name</th><th>Email</th><th>Company</th><th>Status</th></tr>'
+      badges.forEach(badge => {
+        xlsContent += `<tr><td>${badge.name}</td><td>${badge.email}</td><td>${badge.company}</td><td>${badge.status}</td></tr>`
+      })
+      xlsContent += '</table>'
+    }
+
+    xlsContent += '</body></html>'
+
+    // Download XLS
+    const blob = new Blob([xlsContent], { type: 'application/vnd.ms-excel' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `${finalFilename}.xls`
+    link.click()
+  }
 
   // Digital Badges state
   const [showBadgeModal, setShowBadgeModal] = useState(false)
@@ -851,6 +1040,139 @@ export default function TenantPage() {
                     View Analytics
                   </button>
                 </div>
+              </div>
+
+              {/* Tenant Dashboard Section */}
+              <div style={{ marginTop: '32px' }}>
+                {/* Dashboard Filters */}
+                <DashboardFilters
+                  startDate={dashboardStartDate}
+                  endDate={dashboardEndDate}
+                  onStartDateChange={setDashboardStartDate}
+                  onEndDateChange={setDashboardEndDate}
+                  onApplyFilters={applyDateFilters}
+                  onClearFilters={clearDateFilters}
+                  onExportCSV={exportToCSV}
+                  onExportXLS={exportToXLS}
+                />
+
+                {/* Reset Dashboard Data Button */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9))',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(139, 92, 246, 0.2)',
+                  padding: '16px 20px',
+                  marginBottom: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <h4 style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '600', margin: '0 0 4px 0' }}>No Dashboard Data?</h4>
+                    <p style={{ color: '#94A3B8', fontSize: '13px', margin: 0 }}>Reset to load sample data (Nov-Dec 2024). Clear date filters above to see all data.</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (confirm('Reset dashboard data? This will reload sample data for badges, invitations, parking bookings, and locker usages. Your tenants and users will not be affected.')) {
+                        globalState.resetDashboardData()
+                        clearDateFilters()
+                        alert('Dashboard data has been reset with sample data! Date filters cleared.')
+                      }
+                    }}
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
+                      color: 'white',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'transform 0.2s',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    Reset Dashboard Data
+                  </button>
+                </div>
+
+                {/* Visitor Management Dashboard */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
+                  padding: '24px',
+                  marginBottom: '24px',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                }}>
+                  <VisitorDashboard
+                    invitations={globalState.invitations.filter(inv => {
+                      const host = globalState.users.find(u => u.id === inv.hostId)
+                      return host?.tenantId === selectedTenantId
+                    })}
+                    startDate={appliedStartDate}
+                    endDate={appliedEndDate}
+                    searchTerm=""
+                  />
+                </div>
+
+                {/* Parking Dashboard */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
+                  padding: '24px',
+                  marginBottom: '24px',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                }}>
+                  <ParkingDashboard
+                    parkingSpaces={globalState.parkingSpaces.filter(space => space.tenantId === selectedTenantId)}
+                    parkingBookings={globalState.parkingBookings?.filter(b => b.tenantId === selectedTenantId)}
+                    searchTerm=""
+                  />
+                </div>
+
+                {/* Locker Dashboard */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
+                  padding: '24px',
+                  marginBottom: '24px',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                }}>
+                  <LockerDashboard
+                    lockers={globalState.lockers.filter(locker => locker.tenantId === selectedTenantId)}
+                    lockerUsages={globalState.lockerUsages?.filter(u => u.tenantId === selectedTenantId)}
+                    searchTerm=""
+                  />
+                </div>
+
+                {/* Digital Badges Dashboard */}
+                {globalState.badges.some(badge => {
+                  const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
+                  return user?.tenantId === selectedTenantId
+                }) && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                    padding: '24px',
+                    marginBottom: '24px',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                  }}>
+                    <BadgesDashboard
+                      badges={globalState.badges.filter(badge => {
+                        const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
+                        return user?.tenantId === selectedTenantId
+                      })}
+                      badgeSwipes={globalState.badgeSwipes?.filter(s => s.tenantId === selectedTenantId)}
+                      searchTerm=""
+                    />
+                  </div>
+                )}
               </div>
             </>
           )}
