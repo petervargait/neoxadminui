@@ -1,18 +1,23 @@
 'use client'
 
 import React from 'react'
-import { Badge } from '../context/GlobalStateContext'
+import { Badge, BadgeSwipe } from '../context/GlobalStateContext'
 
 interface BadgesDashboardProps {
   badges: Badge[]
+  badgeSwipes?: BadgeSwipe[]
   searchTerm: string
 }
 
-export default function BadgesDashboard({ badges }: BadgesDashboardProps) {
+export default function BadgesDashboard({ badges, badgeSwipes = [] }: BadgesDashboardProps) {
   const downloaded = badges.filter(b => b.status === 'Downloaded').length
   const sent = badges.filter(b => b.status === 'Sent').length
   const newBadges = badges.filter(b => b.status === 'New').length
   const suspended = badges.filter(b => b.status === 'Suspended').length
+  
+  // Swipe statistics
+  const totalSwipes = badgeSwipes.length
+  const todaySwipes = badgeSwipes.filter(s => s.timestamp.startsWith(new Date().toISOString().split('T')[0])).length
 
   return (
     <div style={{ marginBottom: '32px' }}>
@@ -30,25 +35,35 @@ export default function BadgesDashboard({ badges }: BadgesDashboardProps) {
         </div>
       </div>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15))', border: '1px solid rgba(99, 102, 241, 0.3)', padding: '24px' }}>
-          <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9', marginBottom: '16px' }}>{badges.length}</div>
-          <div style={{ fontSize: '12px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOTAL BADGES</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15))', border: '1px solid rgba(99, 102, 241, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{badges.length}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOTAL BADGES</div>
         </div>
         
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15))', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '24px' }}>
-          <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9', marginBottom: '16px' }}>{downloaded}</div>
-          <div style={{ fontSize: '12px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>DOWNLOADED</div>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15))', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{downloaded}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>DOWNLOADED</div>
         </div>
         
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(109, 40, 217, 0.15))', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '24px' }}>
-          <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9', marginBottom: '16px' }}>{sent}</div>
-          <div style={{ fontSize: '12px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SENT</div>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(109, 40, 217, 0.15))', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{sent}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SENT</div>
         </div>
         
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(67, 56, 202, 0.15))', border: '1px solid rgba(79, 70, 229, 0.3)', padding: '24px' }}>
-          <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9', marginBottom: '16px' }}>{suspended}</div>
-          <div style={{ fontSize: '12px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SUSPENDED</div>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(67, 56, 202, 0.15))', border: '1px solid rgba(79, 70, 229, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{suspended}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SUSPENDED</div>
+        </div>
+        
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15))', border: '1px solid rgba(99, 102, 241, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{totalSwipes}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOTAL SWIPES (30D)</div>
+        </div>
+        
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15))', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{todaySwipes}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TODAY SWIPES</div>
         </div>
       </div>
     </div>

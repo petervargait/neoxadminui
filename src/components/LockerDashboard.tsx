@@ -1,17 +1,24 @@
 'use client'
 
 import React from 'react'
-import { Locker } from '../context/GlobalStateContext'
+import { Locker, LockerUsage } from '../context/GlobalStateContext'
 
 interface LockerDashboardProps {
   lockers: Locker[]
+  lockerUsages?: LockerUsage[]
   searchTerm: string
 }
 
-export default function LockerDashboard({ lockers }: LockerDashboardProps) {
+export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDashboardProps) {
   const occupied = lockers.filter(l => l.status === 'occupied').length
   const available = lockers.filter(l => l.status === 'available').length
   const utilization = lockers.length > 0 ? ((occupied / lockers.length) * 100).toFixed(1) : '0'
+  
+  // Usage statistics
+  const totalUsages = lockerUsages.length
+  const opened = lockerUsages.filter(u => u.opened).length
+  const notOpened = lockerUsages.filter(u => !u.opened).length
+  const avgDuration = lockerUsages.length > 0 ? Math.round(lockerUsages.reduce((sum, u) => sum + u.duration, 0) / lockerUsages.length) : 0
 
   return (
     <div style={{ marginBottom: '32px' }}>
@@ -29,25 +36,40 @@ export default function LockerDashboard({ lockers }: LockerDashboardProps) {
         </div>
       </div>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15))', border: '1px solid rgba(99, 102, 241, 0.3)', padding: '24px' }}>
-          <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9', marginBottom: '16px' }}>{lockers.length}</div>
-          <div style={{ fontSize: '12px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOTAL LOCKERS</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15))', border: '1px solid rgba(99, 102, 241, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{lockers.length}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>TOTAL LOCKERS</div>
         </div>
         
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15))', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '24px' }}>
-          <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9', marginBottom: '16px' }}>{occupied}</div>
-          <div style={{ fontSize: '12px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OCCUPIED</div>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15))', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{occupied}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OCCUPIED</div>
         </div>
         
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(109, 40, 217, 0.15))', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '24px' }}>
-          <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9', marginBottom: '16px' }}>{available}</div>
-          <div style={{ fontSize: '12px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AVAILABLE</div>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(109, 40, 217, 0.15))', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{available}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AVAILABLE</div>
         </div>
         
-        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '20px', background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(67, 56, 202, 0.15))', border: '1px solid rgba(79, 70, 229, 0.3)', padding: '24px' }}>
-          <div style={{ fontSize: '48px', fontWeight: '900', color: '#F1F5F9', marginBottom: '16px' }}>{utilization}%</div>
-          <div style={{ fontSize: '12px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>UTILIZATION</div>
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(67, 56, 202, 0.15))', border: '1px solid rgba(79, 70, 229, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{utilization}%</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>UTILIZATION</div>
+        </div>
+        
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15))', border: '1px solid rgba(99, 102, 241, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{opened}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#C7D2FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OPENED (30D)</div>
+        </div>
+        
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15))', border: '1px solid rgba(139, 92, 246, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{notOpened}</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>NOT OPENED (30D)</div>
+        </div>
+        
+        <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(109, 40, 217, 0.15))', border: '1px solid rgba(124, 58, 237, 0.3)', padding: '20px' }}>
+          <div style={{ fontSize: '40px', fontWeight: '900', color: '#F1F5F9', marginBottom: '12px' }}>{avgDuration}m</div>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: '#DDD6FE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>AVG DURATION</div>
         </div>
       </div>
     </div>

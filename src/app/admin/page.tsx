@@ -464,7 +464,7 @@ export default function AdminPage() {
               onChange={(e) => {
                 setSelectedTenant(e.target.value);
                 if (e.target.value !== 'all') {
-                  setActiveSection('tenantEdit');
+                  setActiveSection('dashboard');
                 } else {
                   setActiveSection('dashboard');
                 }
@@ -928,6 +928,7 @@ export default function AdminPage() {
                     <div style={{ marginBottom: '24px' }}>
                       <ParkingDashboard
                         parkingSpaces={globalState.parkingSpaces.filter(space => space.tenantId === selectedTenant)}
+                        parkingBookings={globalState.parkingBookings?.filter(b => b.tenantId === selectedTenant)}
                         searchTerm={dashboardSearchTerm}
                       />
                     </div>
@@ -938,6 +939,7 @@ export default function AdminPage() {
                     <div style={{ marginBottom: '24px' }}>
                       <LockerDashboard
                         lockers={globalState.lockers.filter(locker => locker.tenantId === selectedTenant)}
+                        lockerUsages={globalState.lockerUsages?.filter(u => u.tenantId === selectedTenant)}
                         searchTerm={dashboardSearchTerm}
                       />
                     </div>
@@ -954,6 +956,7 @@ export default function AdminPage() {
                           const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
                           return user?.tenantId === selectedTenant
                         })}
+                        badgeSwipes={globalState.badgeSwipes?.filter(s => s.tenantId === selectedTenant)}
                         searchTerm={dashboardSearchTerm}
                       />
                     </div>
@@ -1061,7 +1064,7 @@ export default function AdminPage() {
                           <td style={{ padding: '16px 24px', textAlign: 'right' }}>
                             <button onClick={() => {
                               setSelectedTenant(tenant.id);
-                              setActiveSection('tenantEdit');
+                              setActiveSection('dashboard');
                             }} style={{
                               backgroundColor: 'transparent',
                               border: '1px solid #1E293B',
