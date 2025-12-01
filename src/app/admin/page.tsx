@@ -11,6 +11,7 @@ import VisitorDashboard from '../../components/VisitorDashboard'
 import ParkingDashboard from '../../components/ParkingDashboard'
 import LockerDashboard from '../../components/LockerDashboard'
 import BadgesDashboard from '../../components/BadgesDashboard'
+import DashboardFilters from '../../components/DashboardFilters'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -156,6 +157,11 @@ export default function AdminPage() {
     'Lockers': 'Vecos',
     'Space Management': 'NEOX'
   })
+
+  // Dashboard filter state
+  const [dashboardStartDate, setDashboardStartDate] = useState('')
+  const [dashboardEndDate, setDashboardEndDate] = useState('')
+  const [dashboardSearchTerm, setDashboardSearchTerm] = useState('')
 
   // Load white label settings when tenant changes
   useEffect(() => {
@@ -881,31 +887,35 @@ export default function AdminPage() {
               {/* Tenant-Specific Dashboards */}
               {selectedTenant !== 'all' && (
                 <div style={{ marginBottom: '32px' }}>
-                  <div style={{
-                    marginBottom: '24px',
-                    padding: '20px',
-                    backgroundColor: '#162032',
-                    borderRadius: '12px',
-                    border: '1px solid #1E293B'
-                  }}>
-                    <h2 style={{ color: '#F1F5F9', fontSize: '22px', fontWeight: '600', margin: 0, marginBottom: '8px' }}>
-                      {globalState.tenants.find(t => t.id === selectedTenant)?.name} - Analytics Dashboard
-                    </h2>
-                    <p style={{ color: '#64748B', fontSize: '14px', margin: 0 }}>
-                      Comprehensive analytics and KPIs for the selected tenant
-                    </p>
-                  </div>
+                  {/* Unified Dashboard Filters */}
+                  <DashboardFilters
+                    startDate={dashboardStartDate}
+                    endDate={dashboardEndDate}
+                    searchTerm={dashboardSearchTerm}
+                    onStartDateChange={setDashboardStartDate}
+                    onEndDateChange={setDashboardEndDate}
+                    onSearchChange={setDashboardSearchTerm}
+                    onExportCSV={() => {
+                      // Export all filtered data to CSV
+                      alert('Exporting all dashboard data to CSV')
+                    }}
+                    onExportXLS={() => {
+                      // Export all filtered data to XLS
+                      alert('Exporting all dashboard data to XLS')
+                    }}
+                  />
 
                   {/* Visitor Management Dashboard */}
                   {globalState.tenants.find(t => t.id === selectedTenant)?.modules.includes('Visitor Management') && (
                     <div style={{ marginBottom: '24px' }}>
                       <VisitorDashboard
                         invitations={globalState.invitations.filter(inv => {
-                          // Filter by tenant - match by location or host
                           const host = globalState.users.find(u => u.id === inv.hostId)
                           return host?.tenantId === selectedTenant
                         })}
-                        tenantId={selectedTenant}
+                        startDate={dashboardStartDate}
+                        endDate={dashboardEndDate}
+                        searchTerm={dashboardSearchTerm}
                       />
                     </div>
                   )}
@@ -915,7 +925,7 @@ export default function AdminPage() {
                     <div style={{ marginBottom: '24px' }}>
                       <ParkingDashboard
                         parkingSpaces={globalState.parkingSpaces.filter(space => space.tenantId === selectedTenant)}
-                        tenantId={selectedTenant}
+                        searchTerm={dashboardSearchTerm}
                       />
                     </div>
                   )}
@@ -925,7 +935,7 @@ export default function AdminPage() {
                     <div style={{ marginBottom: '24px' }}>
                       <LockerDashboard
                         lockers={globalState.lockers.filter(locker => locker.tenantId === selectedTenant)}
-                        tenantId={selectedTenant}
+                        searchTerm={dashboardSearchTerm}
                       />
                     </div>
                   )}
@@ -941,7 +951,7 @@ export default function AdminPage() {
                           const user = globalState.users.find(u => u.email === badge.email || u.id === badge.userId)
                           return user?.tenantId === selectedTenant
                         })}
-                        tenantId={selectedTenant}
+                        searchTerm={dashboardSearchTerm}
                       />
                     </div>
                   )}
