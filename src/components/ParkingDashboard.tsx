@@ -265,9 +265,9 @@ export default function ParkingDashboard({ parkingSpaces, parkingBookings = [] }
         <div style={{ position: 'relative', zIndex: 1 }}>
           <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700', marginBottom: '28px', margin: '0 0 28px 0' }}>Parking Zone Distribution</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {Object.entries(zoneDistribution).sort((a, b) => b[1] - a[1]).map((entry, index) => {
-              const [zone, count] = entry
-              const maxZoneValue = Math.max(...Object.values(zoneDistribution), 1)
+            {zoneDistribution.sort((a, b) => b.count - a.count).map((item, index) => {
+              const { zone, count } = item
+              const maxZoneValue = Math.max(...zoneDistribution.map(z => z.count), 1)
               const percentage = (count / maxZoneValue) * 100
               const colors = ['#6366F1', '#8B5CF6', '#06B6D4', '#0EA5E9', '#A855F7', '#EC4899']
               const color = colors[index % colors.length]
