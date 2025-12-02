@@ -9,6 +9,7 @@ import VisitorDashboard from '../../components/VisitorDashboard'
 import ParkingDashboard from '../../components/ParkingDashboard'
 import LockerDashboard from '../../components/LockerDashboard'
 import BadgesDashboard from '../../components/BadgesDashboard'
+import SpaceBookingDashboard from '../../components/SpaceBookingDashboard'
 import DashboardFilters from '../../components/DashboardFilters'
 
 export default function TenantPage() {
@@ -1173,6 +1174,21 @@ export default function TenantPage() {
                     />
                   </div>
                 )}
+
+                {/* Space Booking Dashboard */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
+                  padding: '24px',
+                  marginBottom: '24px',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                }}>
+                  <SpaceBookingDashboard
+                    spaces={globalState.spaces.filter(space => space.tenantId === selectedTenantId)}
+                    searchTerm=""
+                  />
+                </div>
               </div>
             </>
           )}
