@@ -102,6 +102,7 @@ export interface Invitation {
   purpose: string
   location: string
   status: 'pending' | 'approved' | 'rejected' | 'completed'
+  visitorType?: 'business' | 'child' | 'vip' | 'dog' | 'other'
   accessCode?: string
   createdAt: string
 }
@@ -112,6 +113,7 @@ export interface ParkingSpace {
   name?: string
   building: string
   location: string
+  zone?: string
   level?: string
   floor?: string
   status: 'available' | 'occupied' | 'reserved'
