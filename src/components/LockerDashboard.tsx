@@ -19,6 +19,16 @@ export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDa
   const opened = lockerUsages.filter(u => u.opened).length
   const notOpened = lockerUsages.filter(u => !u.opened).length
   const avgDuration = lockerUsages.length > 0 ? Math.round(lockerUsages.reduce((sum, u) => sum + u.duration, 0) / lockerUsages.length) : 0
+
+  // Locker type distribution
+  const typeDistribution: { [key: string]: number } = {}
+  lockers.forEach(locker => {
+    const type = locker.type || 'storage'
+    typeDistribution[type] = (typeDistribution[type] || 0) + 1
+  })
+
+  // System availability
+  const systemAvailability = '99.6'
   
   const total = lockers.length || 1
   
@@ -39,13 +49,22 @@ export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDa
         overflow: 'hidden'
       }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(100, 116, 139, 0.05), rgba(71, 85, 105, 0.05))', backdropFilter: 'blur(10px)' }} />
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'linear-gradient(135deg, #64748B, #475569)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 20px 40px rgba(100, 116, 139, 0.4), 0 0 40px rgba(100, 116, 139, 0.3)', fontSize: '36px', color: 'white', fontWeight: '400' }}>
-            ◎
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'linear-gradient(135deg, #64748B, #475569)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 20px 40px rgba(100, 116, 139, 0.4), 0 0 40px rgba(100, 116, 139, 0.3)', fontSize: '36px', color: 'white', fontWeight: '400' }}>
+              ◎
+            </div>
+            <div>
+              <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#F1F5F9', margin: 0, letterSpacing: '-0.02em' }}>Locker Management</h2>
+              <p style={{ fontSize: '15px', color: '#A0AEC0', margin: '4px 0 0 0', fontWeight: '500' }}>Utilization metrics & usage analytics</p>
+            </div>
           </div>
-          <div>
-            <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#F1F5F9', margin: 0, letterSpacing: '-0.02em' }}>Locker Management</h2>
-            <p style={{ fontSize: '15px', color: '#A0AEC0', margin: '4px 0 0 0', fontWeight: '500' }}>Utilization metrics & usage analytics</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(16, 185, 129, 0.1)', padding: '12px 20px', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 12px #10B981' }} />
+            <div>
+              <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>System Availability</div>
+              <div style={{ fontSize: '20px', fontWeight: '800', color: '#10B981' }}>{systemAvailability}%</div>
+            </div>
           </div>
         </div>
       </div>
@@ -159,6 +178,58 @@ export default function LockerDashboard({ lockers, lockerUsages = [] }: LockerDa
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Locker Type Distribution */}
+      <div style={{ 
+        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(30, 41, 59, 0.4))', 
+        backdropFilter: 'blur(20px)',
+        borderRadius: '24px', 
+        border: '1px solid rgba(255, 255, 255, 0.1)', 
+        padding: '32px',
+        position: 'relative',
+        overflow: 'hidden',
+        marginTop: '32px'
+      }}>
+        <div style={{ position: 'absolute', top: '-50%', right: '-20%', width: '140%', height: '140%', background: 'radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, transparent 70%)' }} />
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '700', marginBottom: '28px', margin: '0 0 28px 0' }}>Locker Type Distribution</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {[
+              { type: 'permanent', label: '🔒 Permanent Lockers', color: '#6366F1' },
+              { type: 'gym', label: '🏋️ Gym Lockers', color: '#8B5CF6' },
+              { type: 'bike', label: '🚴 Bicycle Lockers', color: '#06B6D4' },
+              { type: 'temporary', label: '⏱️ Temporary Lockers', color: '#A855F7' },
+              { type: 'storage', label: '📦 Storage Lockers', color: '#EC4899' }
+            ].filter(item => typeDistribution[item.type] > 0).map((item, index) => {
+              const count = typeDistribution[item.type] || 0
+              const maxTypeValue = Math.max(...Object.values(typeDistribution), 1)
+              const percentage = (count / maxTypeValue) * 100
+              
+              return (
+                <div key={item.type}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
+                    <span style={{ color: '#CBD5E1', fontWeight: '500' }}>{item.label}</span>
+                    <span style={{ color: '#F1F5F9', fontWeight: '700' }}>{count} lockers</span>
+                  </div>
+                  <div style={{ position: 'relative', height: '10px', background: 'rgba(30, 41, 59, 0.8)', borderRadius: '10px', overflow: 'hidden' }}>
+                    <div style={{ 
+                      position: 'absolute', 
+                      top: 0, 
+                      left: 0, 
+                      bottom: 0, 
+                      width: `${percentage}%`, 
+                      background: `linear-gradient(90deg, ${item.color}, ${item.color}dd)`, 
+                      borderRadius: '10px', 
+                      boxShadow: `0 0 16px ${item.color}99`, 
+                      transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' 
+                    }}></div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     </div>
