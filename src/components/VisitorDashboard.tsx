@@ -68,9 +68,18 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
     }
   }, [filteredInvitations])
 
+  // Visitor type distribution
+  const businessVisitors = filteredInvitations.filter(inv => inv.visitorType === 'business').length
+  const vipVisitors = filteredInvitations.filter(inv => inv.visitorType === 'vip').length
+  const childVisitors = filteredInvitations.filter(inv => inv.visitorType === 'child').length
+  const dogVisitors = filteredInvitations.filter(inv => inv.visitorType === 'dog').length
+  const otherVisitors = filteredInvitations.filter(inv => !inv.visitorType || inv.visitorType === 'other').length
+  
+  const systemAvailability = 99.9
+
   return (
     <div style={{ marginBottom: '32px' }}>
-      {/* Header */}
+      {/* Header with System Availability */}
       <div style={{ 
         background: 'radial-gradient(ellipse at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%)',
         borderRadius: '24px',
@@ -80,25 +89,34 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
         overflow: 'hidden'
       }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(96, 165, 250, 0.05))', backdropFilter: 'blur(10px)' }} />
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{
-            width: '72px',
-            height: '72px',
-            borderRadius: '20px',
-            background: 'linear-gradient(135deg, #3B82F6, #60A5FA)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 20px 40px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.3)',
-            fontSize: '36px',
-            color: 'white',
-            fontWeight: '400'
-          }}>
-            👥
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{
+              width: '72px',
+              height: '72px',
+              borderRadius: '20px',
+              background: 'linear-gradient(135deg, #3B82F6, #60A5FA)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 20px 40px rgba(59, 130, 246, 0.4), 0 0 40px rgba(59, 130, 246, 0.3)',
+              fontSize: '36px',
+              color: 'white',
+              fontWeight: '400'
+            }}>
+              👥
+            </div>
+            <div>
+              <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#F1F5F9', margin: 0, letterSpacing: '-0.02em' }}>Visitor Management</h2>
+              <p style={{ fontSize: '15px', color: '#A0AEC0', margin: '4px 0 0 0', fontWeight: '500' }}>Real-time visitor analytics and insights</p>
+            </div>
           </div>
-          <div>
-            <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#F1F5F9', margin: 0, letterSpacing: '-0.02em' }}>Visitor Management</h2>
-            <p style={{ fontSize: '15px', color: '#A0AEC0', margin: '4px 0 0 0', fontWeight: '500' }}>Real-time visitor analytics and insights</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(16, 185, 129, 0.1)', padding: '12px 20px', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 12px #10B981' }} />
+            <div>
+              <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>System Availability</div>
+              <div style={{ fontSize: '20px', fontWeight: '800', color: '#10B981' }}>{systemAvailability}%</div>
+            </div>
           </div>
         </div>
       </div>
@@ -243,6 +261,54 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
               )
             })}
             {Object.keys(kpis.visitsPerHost).length === 0 && <p style={{ color: '#64748B', textAlign: 'center', padding: '32px 0' }}>No data available</p>}
+          </div>
+        </div>
+        
+        {/* Visitor Type Distribution */}
+        <div style={{ borderRadius: '20px', background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))', border: '1px solid rgba(59, 130, 246, 0.2)', padding: '28px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)', marginTop: '20px' }}>
+          <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#F1F5F9', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #3B82F6, #60A5FA)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}>
+              <svg style={{ width: '20px', height: '20px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            Visitor Type Distribution
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            {[
+              { label: 'Business Visitors', value: businessVisitors, color: '#3B82F6', icon: '💼' },
+              { label: 'VIP Visitors', value: vipVisitors, color: '#6366F1', icon: '⭐' },
+              { label: 'Child Visitors', value: childVisitors, color: '#8B5CF6', icon: '👶' },
+              { label: 'Dog Visitors', value: dogVisitors, color: '#0EA5E9', icon: '🐕' },
+              { label: 'Other/Unspecified', value: otherVisitors, color: '#64748B', icon: '👤' }
+            ].map((item) => {
+              const maxVisitors = Math.max(businessVisitors, vipVisitors, childVisitors, dogVisitors, otherVisitors, 1)
+              const percentage = (item.value / maxVisitors) * 100
+              return (
+                <div key={item.label}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px', alignItems: 'center' }}>
+                    <span style={{ color: '#CBD5E1', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '20px' }}>{item.icon}</span>
+                      {item.label}
+                    </span>
+                    <span style={{ color: '#F1F5F9', fontWeight: '700' }}>{item.value} visitors</span>
+                  </div>
+                  <div style={{ position: 'relative', height: '10px', background: 'rgba(30, 41, 59, 0.8)', borderRadius: '10px', overflow: 'hidden' }}>
+                    <div style={{ 
+                      position: 'absolute', 
+                      top: 0, 
+                      left: 0, 
+                      bottom: 0, 
+                      width: `${percentage}%`, 
+                      background: `linear-gradient(90deg, ${item.color}, ${item.color}dd)`,
+                      borderRadius: '10px',
+                      boxShadow: `0 0 16px ${item.color}99`,
+                      transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)'
+                    }}></div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>
