@@ -20,6 +20,9 @@ export default function BadgesDashboard({ badges, badgeSwipes = [] }: BadgesDash
   
   const total = badges.length || 1
   
+  // System availability
+  const systemAvailability = '99.8'
+  
   const locationCounts: Record<string, number> = {}
   badgeSwipes.forEach(swipe => {
     locationCounts[swipe.location] = (locationCounts[swipe.location] || 0) + 1
@@ -31,13 +34,22 @@ export default function BadgesDashboard({ badges, badgeSwipes = [] }: BadgesDash
     <div>
       <div style={{ background: 'radial-gradient(ellipse at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%)', borderRadius: '24px', padding: '32px', marginBottom: '32px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05))', backdropFilter: 'blur(10px)' }} />
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'linear-gradient(135deg, #3B82F6, #6366F1)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 20px 40px rgba(59, 130, 246, 0.4), 0 0 40px rgba(99, 102, 241, 0.3)', fontSize: '36px', color: 'white', fontWeight: '400' }}>
-            📄
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'linear-gradient(135deg, #3B82F6, #6366F1)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 20px 40px rgba(59, 130, 246, 0.4), 0 0 40px rgba(99, 102, 241, 0.3)', fontSize: '36px', color: 'white', fontWeight: '400' }}>
+              📄
+            </div>
+            <div>
+              <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#F1F5F9', margin: 0, letterSpacing: '-0.02em' }}>Badge Management</h2>
+              <p style={{ fontSize: '15px', color: '#A0AEC0', margin: '4px 0 0 0', fontWeight: '500' }}>Badge distribution & access analytics</p>
+            </div>
           </div>
-          <div>
-            <h2 style={{ fontSize: '32px', fontWeight: '800', color: '#F1F5F9', margin: 0, letterSpacing: '-0.02em' }}>Badge Management</h2>
-            <p style={{ fontSize: '15px', color: '#A0AEC0', margin: '4px 0 0 0', fontWeight: '500' }}>Badge distribution & access analytics</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(16, 185, 129, 0.1)', padding: '12px 20px', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 12px #10B981' }} />
+            <div>
+              <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>System Availability</div>
+              <div style={{ fontSize: '20px', fontWeight: '800', color: '#10B981' }}>{systemAvailability}%</div>
+            </div>
           </div>
         </div>
       </div>
