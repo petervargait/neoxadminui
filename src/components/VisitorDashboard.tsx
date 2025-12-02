@@ -280,10 +280,9 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
               { label: 'Business Visitors', value: businessVisitors, color: '#3B82F6', Icon: BriefcaseRegular },
               { label: 'VIP Visitors', value: vipVisitors, color: '#6366F1', Icon: StarRegular },
               { label: 'Child Visitors', value: childVisitors, color: '#8B5CF6', Icon: PersonRegular },
-              { label: 'Dog Visitors', value: dogVisitors, color: '#0EA5E9', Icon: AnimalDogRegular },
-              { label: 'Other/Unspecified', value: otherVisitors, color: '#64748B', Icon: QuestionCircleRegular }
-            ].map((item) => {
-              const maxVisitors = Math.max(businessVisitors, vipVisitors, childVisitors, dogVisitors, otherVisitors, 1)
+              { label: 'Dog Visitors', value: dogVisitors, color: '#0EA5E9', Icon: AnimalDogRegular }
+            ].filter(item => item.value > 0).map((item) => {
+              const maxVisitors = Math.max(businessVisitors, vipVisitors, childVisitors, dogVisitors, 1)
               const percentage = (item.value / maxVisitors) * 100
               const IconComponent = item.Icon
               return (
