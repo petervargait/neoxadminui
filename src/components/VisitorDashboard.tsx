@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react'
 import { Invitation } from '../context/GlobalStateContext'
+import { BriefcaseRegular, StarRegular, PersonRegular, AnimalDogRegular, QuestionCircleRegular } from '@fluentui/react-icons'
 
 interface VisitorDashboardProps {
   invitations: Invitation[]
@@ -276,19 +277,20 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             {[
-              { label: 'Business Visitors', value: businessVisitors, color: '#3B82F6', icon: '💼' },
-              { label: 'VIP Visitors', value: vipVisitors, color: '#6366F1', icon: '⭐' },
-              { label: 'Child Visitors', value: childVisitors, color: '#8B5CF6', icon: '👶' },
-              { label: 'Dog Visitors', value: dogVisitors, color: '#0EA5E9', icon: '🐕' },
-              { label: 'Other/Unspecified', value: otherVisitors, color: '#64748B', icon: '👤' }
+              { label: 'Business Visitors', value: businessVisitors, color: '#3B82F6', Icon: BriefcaseRegular },
+              { label: 'VIP Visitors', value: vipVisitors, color: '#6366F1', Icon: StarRegular },
+              { label: 'Child Visitors', value: childVisitors, color: '#8B5CF6', Icon: PersonRegular },
+              { label: 'Dog Visitors', value: dogVisitors, color: '#0EA5E9', Icon: AnimalDogRegular },
+              { label: 'Other/Unspecified', value: otherVisitors, color: '#64748B', Icon: QuestionCircleRegular }
             ].map((item) => {
               const maxVisitors = Math.max(businessVisitors, vipVisitors, childVisitors, dogVisitors, otherVisitors, 1)
               const percentage = (item.value / maxVisitors) * 100
+              const IconComponent = item.Icon
               return (
                 <div key={item.label}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px', alignItems: 'center' }}>
                     <span style={{ color: '#CBD5E1', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '20px' }}>{item.icon}</span>
+                      <IconComponent style={{ fontSize: '20px', width: '20px', height: '20px', color: item.color }} />
                       {item.label}
                     </span>
                     <span style={{ color: '#F1F5F9', fontWeight: '700' }}>{item.value} visitors</span>
