@@ -379,6 +379,54 @@ export default function Home() {
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>API Documentation</h2>
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Access comprehensive API docs and integration guides</p>
             </Link>
+
+            <Link
+              href="/integration-studio"
+              style={{
+                display: 'block',
+                padding: '40px 32px',
+                backgroundColor: '#162032',
+                border: '1px solid #1E293B',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#1E293B'
+                e.currentTarget.style.transform = 'translateY(-4px)'
+                e.currentTarget.style.boxShadow = '0 8px 25px -3px rgba(0, 0, 0, 0.2)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#162032'
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px auto',
+                boxShadow: '0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(139, 92, 246, 0.3)'
+              }}>
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="6" cy="16" r="3.5" stroke="#8B5CF6" strokeWidth="1.8"/>
+                  <circle cx="26" cy="8" r="3.5" stroke="#8B5CF6" strokeWidth="1.8"/>
+                  <circle cx="26" cy="24" r="3.5" stroke="#8B5CF6" strokeWidth="1.8"/>
+                  <line x1="9.2" y1="14.5" x2="22.8" y2="9.5" stroke="#8B5CF6" strokeWidth="1.5" strokeLinecap="round"/>
+                  <line x1="9.2" y1="17.5" x2="22.8" y2="22.5" stroke="#8B5CF6" strokeWidth="1.5" strokeLinecap="round"/>
+                  <circle cx="16" cy="16" r="2.2" fill="#8B5CF6" opacity="0.7"/>
+                </svg>
+              </div>
+              <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Integration Studio</h2>
+              <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Configure vendor integrations, map APIs, and manage connector workflows</p>
+            </Link>
           </div>
 
           {/* Footer */}

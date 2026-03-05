@@ -295,6 +295,48 @@ export interface Building {
   updatedAt: string
 }
 
+export interface ExternalSystem {
+  id: string
+  name: string
+  domainType: string // 'Parking' | 'Access Control' | 'Visitor Management' | 'Lockers' | 'Meeting Room Booking' | 'AV/VC' | 'Issue Backend' | 'Identity Provider'
+  vendor: string
+  product: string
+  version: string
+  tenantId: string
+  siteId: string
+  status: 'active' | 'inactive' | 'maintenance'
+  endpoints: { env: string; baseUrl: string; healthUrl?: string }[]
+  createdAt: string
+}
+
+export interface IntegrationAuthProfile {
+  id: string
+  name: string
+  authType: 'api-key' | 'oauth2-client' | 'oauth2-code' | 'mtls' | 'jwt' | 'basic'
+  secretRef: string
+  tokenUrl?: string
+  scopes?: string
+  tenantId: string
+  createdAt: string
+}
+
+export interface IntegrationConnector {
+  id: string
+  name: string
+  domain: string
+  externalSystemId: string
+  externalSystemName: string
+  authProfileId: string
+  coveragePercent: number
+  health: 'ok' | 'warning' | 'critical'
+  versions: { env: string; version: string; deployedAt: string }[]
+  status: 'active' | 'paused' | 'draft'
+  lastTestResult?: 'pass' | 'fail'
+  lastTestAt?: string
+  tenantId: string
+  createdAt: string
+}
+
 interface GlobalState {
   users: User[]
   tenants: Tenant[]
@@ -315,6 +357,9 @@ interface GlobalState {
   whiteLabelSettings: Record<string, WhiteLabelSettings>
   systemSettings: Record<string, SystemSettings>
   moduleStates: Record<string, boolean>
+  externalSystems: ExternalSystem[]
+  integrationAuthProfiles: IntegrationAuthProfile[]
+  integrationConnectors: IntegrationConnector[]
 }
 
 interface GlobalStateContextType extends GlobalState {
@@ -357,6 +402,15 @@ interface GlobalStateContextType extends GlobalState {
   toggleModule: (moduleName: string) => void
   clearAllData: () => void
   resetDashboardData: () => void
+  addExternalSystem: (system: Omit<ExternalSystem, 'id' | 'createdAt'>) => ExternalSystem
+  updateExternalSystem: (id: string, updates: Partial<ExternalSystem>) => void
+  deleteExternalSystem: (id: string) => void
+  addIntegrationAuthProfile: (profile: Omit<IntegrationAuthProfile, 'id' | 'createdAt'>) => IntegrationAuthProfile
+  updateIntegrationAuthProfile: (id: string, updates: Partial<IntegrationAuthProfile>) => void
+  deleteIntegrationAuthProfile: (id: string) => void
+  addIntegrationConnector: (connector: Omit<IntegrationConnector, 'id' | 'createdAt'>) => IntegrationConnector
+  updateIntegrationConnector: (id: string, updates: Partial<IntegrationConnector>) => void
+  deleteIntegrationConnector: (id: string) => void
 }
 
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(undefined)
@@ -378,6 +432,9 @@ const getInitialState = (): GlobalState => {
           badgeSwipes: parsedState.badgeSwipes || [],
           parkingBookings: parsedState.parkingBookings || [],
           lockerUsages: parsedState.lockerUsages || [],
+          externalSystems: parsedState.externalSystems || [],
+          integrationAuthProfiles: parsedState.integrationAuthProfiles || [],
+          integrationConnectors: parsedState.integrationConnectors || [],
           systemSettings: parsedState.systemSettings || {
             'global': {
               tenantId: 'global',
@@ -978,7 +1035,251 @@ const getInitialState = (): GlobalState => {
       'Private Delivery': false,
       'Authentication': true,
       'Reporting': true
-    }
+    },
+    externalSystems: [
+      {
+        id: 'ext_parking_1',
+        name: 'ParkVision HQ',
+        domainType: 'Parking',
+        vendor: 'ParkVision',
+        product: 'ParkVision Enterprise',
+        version: '4.2.1',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.parkvision.example.com/v4', healthUrl: 'https://api.parkvision.example.com/v4/health' },
+          { env: 'staging', baseUrl: 'https://staging-api.parkvision.example.com/v4', healthUrl: 'https://staging-api.parkvision.example.com/v4/health' }
+        ],
+        createdAt: '2024-03-01T10:00:00.000Z'
+      },
+      {
+        id: 'ext_ac_1',
+        name: 'Genetec Security Center',
+        domainType: 'Access Control',
+        vendor: 'Genetec',
+        product: 'Security Center',
+        version: '5.11',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://genetec.acme.example.com/api', healthUrl: 'https://genetec.acme.example.com/api/status' }
+        ],
+        createdAt: '2024-02-15T08:00:00.000Z'
+      },
+      {
+        id: 'ext_vm_1',
+        name: 'Envoy Visitor Platform',
+        domainType: 'Visitor Management',
+        vendor: 'Envoy',
+        product: 'Envoy Visitors',
+        version: '3.0',
+        tenantId: 'mbank',
+        siteId: 'site_mbank_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://app.envoyapp.com/api/v3', healthUrl: 'https://app.envoyapp.com/api/v3/ping' }
+        ],
+        createdAt: '2024-04-10T09:00:00.000Z'
+      },
+      {
+        id: 'ext_itsm_1',
+        name: 'ServiceNow ITSM',
+        domainType: 'Issue Backend',
+        vendor: 'ServiceNow',
+        product: 'IT Service Management',
+        version: 'Tokyo',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://acme.service-now.com/api/now', healthUrl: 'https://acme.service-now.com/api/now/health' },
+          { env: 'staging', baseUrl: 'https://acmedev.service-now.com/api/now' }
+        ],
+        createdAt: '2023-11-20T12:00:00.000Z'
+      },
+      {
+        id: 'ext_idp_1',
+        name: 'Microsoft Entra ID',
+        domainType: 'Identity Provider',
+        vendor: 'Microsoft',
+        product: 'Entra ID',
+        version: '2.0',
+        tenantId: 'globaladmin',
+        siteId: 'site_global',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://graph.microsoft.com/v1.0', healthUrl: 'https://graph.microsoft.com/v1.0/$metadata' }
+        ],
+        createdAt: '2023-09-01T00:00:00.000Z'
+      },
+      {
+        id: 'ext_locker_1',
+        name: 'Quadient Locker System',
+        domainType: 'Lockers',
+        vendor: 'Quadient',
+        product: 'Parcel Pending',
+        version: '2.5.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'maintenance',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.parcelpending.com/v2', healthUrl: 'https://api.parcelpending.com/v2/status' }
+        ],
+        createdAt: '2024-05-05T11:00:00.000Z'
+      }
+    ],
+    integrationAuthProfiles: [
+      {
+        id: 'auth_oauth2_1',
+        name: 'Genetec OAuth2 Client',
+        authType: 'oauth2-client',
+        secretRef: 'vault:secret/integrations/genetec/client-credentials',
+        tokenUrl: 'https://genetec.acme.example.com/oauth/token',
+        scopes: 'read:access-events write:access-rules',
+        tenantId: 'acme',
+        createdAt: '2024-02-15T08:30:00.000Z'
+      },
+      {
+        id: 'auth_apikey_1',
+        name: 'ParkVision API Key',
+        authType: 'api-key',
+        secretRef: 'vault:secret/integrations/parkvision/api-key',
+        tenantId: 'acme',
+        createdAt: '2024-03-01T10:30:00.000Z'
+      },
+      {
+        id: 'auth_mtls_1',
+        name: 'ServiceNow mTLS Certificate',
+        authType: 'mtls',
+        secretRef: 'vault:secret/integrations/servicenow/mtls-cert',
+        tenantId: 'acme',
+        createdAt: '2023-11-20T13:00:00.000Z'
+      },
+      {
+        id: 'auth_jwt_1',
+        name: 'Entra ID JWT Bearer',
+        authType: 'jwt',
+        secretRef: 'vault:secret/integrations/entra/jwt-signing-key',
+        tokenUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+        scopes: 'https://graph.microsoft.com/.default',
+        tenantId: 'globaladmin',
+        createdAt: '2023-09-01T00:30:00.000Z'
+      }
+    ],
+    integrationConnectors: [
+      {
+        id: 'conn_parking_1',
+        name: 'Parking Space Sync',
+        domain: 'Parking',
+        externalSystemId: 'ext_parking_1',
+        externalSystemName: 'ParkVision HQ',
+        authProfileId: 'auth_apikey_1',
+        coveragePercent: 94,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '1.3.2', deployedAt: '2025-01-15T09:00:00.000Z' },
+          { env: 'staging', version: '1.4.0-beta', deployedAt: '2025-02-01T11:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-03-10T12:00:00.000Z'
+      },
+      {
+        id: 'conn_ac_1',
+        name: 'Access Control Events',
+        domain: 'Access Control',
+        externalSystemId: 'ext_ac_1',
+        externalSystemName: 'Genetec Security Center',
+        authProfileId: 'auth_oauth2_1',
+        coveragePercent: 88,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '2.1.0', deployedAt: '2025-01-20T10:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-02-20T09:00:00.000Z'
+      },
+      {
+        id: 'conn_vm_1',
+        name: 'Visitor Pre-Registration Sync',
+        domain: 'Visitor Management',
+        externalSystemId: 'ext_vm_1',
+        externalSystemName: 'Envoy Visitor Platform',
+        authProfileId: 'auth_apikey_1',
+        coveragePercent: 72,
+        health: 'warning',
+        versions: [
+          { env: 'production', version: '1.0.5', deployedAt: '2024-11-10T08:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'fail',
+        lastTestAt: '2025-03-03T06:00:00.000Z',
+        tenantId: 'mbank',
+        createdAt: '2024-04-15T10:00:00.000Z'
+      },
+      {
+        id: 'conn_itsm_1',
+        name: 'Ticket Bidirectional Sync',
+        domain: 'Issue Backend',
+        externalSystemId: 'ext_itsm_1',
+        externalSystemName: 'ServiceNow ITSM',
+        authProfileId: 'auth_mtls_1',
+        coveragePercent: 99,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '3.0.1', deployedAt: '2025-02-10T14:00:00.000Z' },
+          { env: 'staging', version: '3.1.0-rc1', deployedAt: '2025-03-01T09:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2023-12-01T10:00:00.000Z'
+      },
+      {
+        id: 'conn_idp_1',
+        name: 'Entra ID User Provisioning',
+        domain: 'Identity Provider',
+        externalSystemId: 'ext_idp_1',
+        externalSystemName: 'Microsoft Entra ID',
+        authProfileId: 'auth_jwt_1',
+        coveragePercent: 100,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '4.2.0', deployedAt: '2025-01-05T08:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'globaladmin',
+        createdAt: '2023-09-05T09:00:00.000Z'
+      },
+      {
+        id: 'conn_locker_1',
+        name: 'Locker Availability Feed',
+        domain: 'Lockers',
+        externalSystemId: 'ext_locker_1',
+        externalSystemName: 'Quadient Locker System',
+        authProfileId: 'auth_apikey_1',
+        coveragePercent: 55,
+        health: 'critical',
+        versions: [
+          { env: 'production', version: '0.9.3', deployedAt: '2024-10-01T12:00:00.000Z' }
+        ],
+        status: 'paused',
+        lastTestResult: 'fail',
+        lastTestAt: '2025-03-02T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-05-10T13:00:00.000Z'
+      }
+    ]
   }
 }
 
@@ -1383,6 +1684,84 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const addExternalSystem = (system: Omit<ExternalSystem, 'id' | 'createdAt'>) => {
+    const newSystem: ExternalSystem = {
+      ...system,
+      id: `ext_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString()
+    }
+    setState(prev => ({ ...prev, externalSystems: [...prev.externalSystems, newSystem] }))
+    addAuditLog({ user: 'system', action: `Created external system "${newSystem.name}"`, status: 'Success' })
+    return newSystem
+  }
+
+  const updateExternalSystem = (id: string, updates: Partial<ExternalSystem>) => {
+    setState(prev => ({
+      ...prev,
+      externalSystems: prev.externalSystems.map(s => s.id === id ? { ...s, ...updates } : s)
+    }))
+    const system = state.externalSystems.find(s => s.id === id)
+    addAuditLog({ user: 'system', action: `Updated external system "${system?.name}"`, status: 'Success' })
+  }
+
+  const deleteExternalSystem = (id: string) => {
+    const system = state.externalSystems.find(s => s.id === id)
+    setState(prev => ({ ...prev, externalSystems: prev.externalSystems.filter(s => s.id !== id) }))
+    addAuditLog({ user: 'system', action: `Deleted external system "${system?.name}" (ID: ${id})`, status: 'Success' })
+  }
+
+  const addIntegrationAuthProfile = (profile: Omit<IntegrationAuthProfile, 'id' | 'createdAt'>) => {
+    const newProfile: IntegrationAuthProfile = {
+      ...profile,
+      id: `auth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString()
+    }
+    setState(prev => ({ ...prev, integrationAuthProfiles: [...prev.integrationAuthProfiles, newProfile] }))
+    addAuditLog({ user: 'system', action: `Created integration auth profile "${newProfile.name}"`, status: 'Success' })
+    return newProfile
+  }
+
+  const updateIntegrationAuthProfile = (id: string, updates: Partial<IntegrationAuthProfile>) => {
+    setState(prev => ({
+      ...prev,
+      integrationAuthProfiles: prev.integrationAuthProfiles.map(p => p.id === id ? { ...p, ...updates } : p)
+    }))
+    const profile = state.integrationAuthProfiles.find(p => p.id === id)
+    addAuditLog({ user: 'system', action: `Updated integration auth profile "${profile?.name}"`, status: 'Success' })
+  }
+
+  const deleteIntegrationAuthProfile = (id: string) => {
+    const profile = state.integrationAuthProfiles.find(p => p.id === id)
+    setState(prev => ({ ...prev, integrationAuthProfiles: prev.integrationAuthProfiles.filter(p => p.id !== id) }))
+    addAuditLog({ user: 'system', action: `Deleted integration auth profile "${profile?.name}" (ID: ${id})`, status: 'Success' })
+  }
+
+  const addIntegrationConnector = (connector: Omit<IntegrationConnector, 'id' | 'createdAt'>) => {
+    const newConnector: IntegrationConnector = {
+      ...connector,
+      id: `conn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString()
+    }
+    setState(prev => ({ ...prev, integrationConnectors: [...prev.integrationConnectors, newConnector] }))
+    addAuditLog({ user: 'system', action: `Created integration connector "${newConnector.name}"`, status: 'Success' })
+    return newConnector
+  }
+
+  const updateIntegrationConnector = (id: string, updates: Partial<IntegrationConnector>) => {
+    setState(prev => ({
+      ...prev,
+      integrationConnectors: prev.integrationConnectors.map(c => c.id === id ? { ...c, ...updates } : c)
+    }))
+    const connector = state.integrationConnectors.find(c => c.id === id)
+    addAuditLog({ user: 'system', action: `Updated integration connector "${connector?.name}"`, status: 'Success' })
+  }
+
+  const deleteIntegrationConnector = (id: string) => {
+    const connector = state.integrationConnectors.find(c => c.id === id)
+    setState(prev => ({ ...prev, integrationConnectors: prev.integrationConnectors.filter(c => c.id !== id) }))
+    addAuditLog({ user: 'system', action: `Deleted integration connector "${connector?.name}" (ID: ${id})`, status: 'Success' })
+  }
+
   const value: GlobalStateContextType = {
     ...state,
     addUser,
@@ -1423,7 +1802,16 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     getSystemSettings,
     toggleModule,
     clearAllData,
-    resetDashboardData
+    resetDashboardData,
+    addExternalSystem,
+    updateExternalSystem,
+    deleteExternalSystem,
+    addIntegrationAuthProfile,
+    updateIntegrationAuthProfile,
+    deleteIntegrationAuthProfile,
+    addIntegrationConnector,
+    updateIntegrationConnector,
+    deleteIntegrationConnector
   }
 
   return (
