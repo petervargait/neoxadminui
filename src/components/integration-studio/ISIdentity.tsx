@@ -12,6 +12,7 @@ import {
   ISTabBar,
   StatusBadge,
 } from './ISShared'
+import { PersonRegular, WarningRegular, CheckmarkRegular } from '@fluentui/react-icons'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -634,8 +635,11 @@ function IdentityCorrelationTab() {
               <span style={{
                 ...fontBase, fontWeight: 700, fontSize: '13px',
                 color: v > 0 ? IS.orange : IS.green,
+                display: 'inline-flex', alignItems: 'center', gap: '4px',
               }}>
-                {v > 0 ? `⚠ ${v}` : '✓ 0'}
+                {v > 0
+                  ? <><WarningRegular style={{ width: '13px', height: '13px' }} /> {v}</>
+                  : <><CheckmarkRegular style={{ width: '13px', height: '13px' }} /> 0</>}
               </span>
             )},
           ]}
@@ -741,10 +745,7 @@ export default function ISIdentity() {
             backgroundColor: `${IS.purple}1A`, border: `1px solid ${IS.purple}40`,
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={IS.purple} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
+            <PersonRegular style={{ width: '20px', height: '20px', color: IS.purple }} />
           </div>
           <div>
             <h1 style={{ ...fontBase, margin: 0, color: IS.textWhite, fontSize: '20px', fontWeight: 800, letterSpacing: '-0.01em' }}>

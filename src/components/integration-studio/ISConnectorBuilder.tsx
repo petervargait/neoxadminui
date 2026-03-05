@@ -9,6 +9,11 @@ import {
   ISInput,
   ISSelect,
 } from './ISShared'
+import {
+  CheckmarkRegular,
+  DismissRegular,
+  SubtractRegular,
+} from '@fluentui/react-icons'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface WizardState {
@@ -236,11 +241,11 @@ function ToggleSwitch({
 
 function TestResultRow({ result }: { result: TestResult }) {
   const statusConfig = {
-    pass: { color: IS.green, icon: '✓', label: 'Pass' },
-    fail: { color: IS.red,   icon: '✗', label: 'Fail' },
-    skip: { color: IS.muted, icon: '—', label: 'Skip' },
+    pass: { color: IS.green, Icon: CheckmarkRegular, label: 'Pass' },
+    fail: { color: IS.red,   Icon: DismissRegular,   label: 'Fail' },
+    skip: { color: IS.muted, Icon: SubtractRegular,  label: 'Skip' },
   }
-  const { color, icon, label } = statusConfig[result.status]
+  const { color, Icon, label } = statusConfig[result.status]
 
   return (
     <div style={{
@@ -253,7 +258,7 @@ function TestResultRow({ result }: { result: TestResult }) {
       border: `1px solid ${color}25`,
       marginBottom: '8px',
     }}>
-      <span style={{ color, fontSize: '16px', fontWeight: 700, width: '18px', textAlign: 'center' }}>{icon}</span>
+      <Icon style={{ color, width: '18px', height: '18px', flexShrink: 0 }} />
       <span style={{ color: IS.text, fontSize: '13px', fontWeight: 600, flex: 1 }}>{result.operation}</span>
       <span style={{ color: IS.muted, fontSize: '12px' }}>{result.latencyMs} ms</span>
       <span style={{

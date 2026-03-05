@@ -4,6 +4,22 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import NeoxLogo from '../../components/NeoxLogo'
 import { useGlobalState } from '../../context/GlobalStateContext'
+import {
+  DataBarVerticalRegular,
+  ServerRegular,
+  KeyRegular,
+  DocumentRegular,
+  PlugConnectedRegular,
+  ArrowSyncRegular,
+  FlowRegular,
+  CalendarSyncRegular,
+  BeakerRegular,
+  HeartPulseRegular,
+  WarningRegular,
+  TicketHorizontalRegular,
+  PersonRegular,
+  BookTemplateRegular,
+} from '@fluentui/react-icons'
 import ISDashboard from '../../components/integration-studio/ISDashboard'
 import ISExternalSystems from '../../components/integration-studio/ISExternalSystems'
 import ISAuthProfiles from '../../components/integration-studio/ISAuthProfiles'
@@ -43,20 +59,20 @@ export default function IntegrationStudioPage() {
   if (!isAuthenticated) return null
 
   const sections = [
-    { id: 'dashboard',       label: 'Dashboard',        icon: '◈', color: '#3B82F6' },
-    { id: 'externalSystems', label: 'External Systems',  icon: '◧', color: '#D4A847' },
-    { id: 'authProfiles',    label: 'Auth Profiles',     icon: '◆', color: '#8B5CF6' },
-    { id: 'canonicalAPIs',   label: 'Canonical APIs',    icon: '◩', color: '#10B981' },
-    { id: 'connectors',      label: 'Connectors',        icon: '◫', color: '#3B82F6' },
-    { id: 'mappingDesigner', label: 'Mapping Designer',  icon: '◬', color: '#D4A847' },
-    { id: 'flows',           label: 'Flows',             icon: '▤', color: '#06B6D4' },
-    { id: 'eventsSync',      label: 'Events & Sync',     icon: '▥', color: '#8B5CF6' },
-    { id: 'testing',         label: 'Testing',           icon: '▦', color: '#10B981' },
-    { id: 'healthLogs',      label: 'Health & Logs',     icon: '▧', color: '#3B82F6' },
-    { id: 'incidents',       label: 'Incidents',         icon: '▨', color: '#EF4444' },
-    { id: 'issueReporting',  label: 'Issue Reporting',   icon: '◉', color: '#D4A847' },
-    { id: 'identity',        label: 'Identity',          icon: '◎', color: '#06B6D4' },
-    { id: 'templates',       label: 'Templates',         icon: '▩', color: '#10B981' },
+    { id: 'dashboard',       label: 'Dashboard',        Icon: DataBarVerticalRegular,  color: '#3B82F6' },
+    { id: 'externalSystems', label: 'External Systems',  Icon: ServerRegular,           color: '#D4A847' },
+    { id: 'authProfiles',    label: 'Auth Profiles',     Icon: KeyRegular,              color: '#8B5CF6' },
+    { id: 'canonicalAPIs',   label: 'Canonical APIs',    Icon: DocumentRegular,         color: '#10B981' },
+    { id: 'connectors',      label: 'Connectors',        Icon: PlugConnectedRegular,    color: '#3B82F6' },
+    { id: 'mappingDesigner', label: 'Mapping Designer',  Icon: ArrowSyncRegular,        color: '#D4A847' },
+    { id: 'flows',           label: 'Flows',             Icon: FlowRegular,             color: '#06B6D4' },
+    { id: 'eventsSync',      label: 'Events & Sync',     Icon: CalendarSyncRegular,     color: '#8B5CF6' },
+    { id: 'testing',         label: 'Testing',           Icon: BeakerRegular,           color: '#10B981' },
+    { id: 'healthLogs',      label: 'Health & Logs',     Icon: HeartPulseRegular,       color: '#3B82F6' },
+    { id: 'incidents',       label: 'Incidents',         Icon: WarningRegular,          color: '#EF4444' },
+    { id: 'issueReporting',  label: 'Issue Reporting',   Icon: TicketHorizontalRegular, color: '#D4A847' },
+    { id: 'identity',        label: 'Identity',          Icon: PersonRegular,           color: '#06B6D4' },
+    { id: 'templates',       label: 'Templates',         Icon: BookTemplateRegular,     color: '#10B981' },
   ]
 
   return (
@@ -197,13 +213,14 @@ export default function IntegrationStudioPage() {
                   }
                 }}
               >
-                <span style={{
-                  fontSize: '18px',
-                  color: activeSection === s.id ? s.color : '#64748B',
-                  flexShrink: 0
-                }}>
-                  {s.icon}
-                </span>
+                <s.Icon
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    color: activeSection === s.id ? s.color : '#64748B',
+                    flexShrink: 0
+                  }}
+                />
                 {!sidebarCollapsed && <span>{s.label}</span>}
               </button>
             ))}

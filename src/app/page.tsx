@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../components/NeoxLogo'
 import { useGlobalState } from '../context/GlobalStateContext'
-import { DataBarVerticalRegular, WeatherMoonRegular } from '@fluentui/react-icons'
+import { DataBarVerticalRegular, WeatherMoonRegular, PlugConnectedRegular, DocumentRegular, BuildingRegular, PeopleRegular, BuildingMultipleRegular, BuildingSkyscraperRegular, BuildingFactoryRegular, BuildingShopRegular } from '@fluentui/react-icons'
 
 export default function Home() {
   const router = useRouter()
@@ -211,7 +211,7 @@ export default function Home() {
                 margin: '0 auto 24px auto',
                 boxShadow: '0 0 20px rgba(215, 187, 145, 0.5), 0 0 40px rgba(215, 187, 145, 0.3)'
               }}>
-                <span style={{ fontSize: '32px', color: '#D7BB91' }}>◈</span>
+                <BuildingRegular style={{ fontSize: '32px', width: '32px', height: '32px', color: '#D7BB91' }} />
               </div>
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Global Admin</h2>
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage tenants, users, and system-wide settings</p>
@@ -251,7 +251,7 @@ export default function Home() {
                 margin: '0 auto 24px auto',
                 boxShadow: '0 0 20px rgba(96, 165, 250, 0.5), 0 0 40px rgba(96, 165, 250, 0.3)'
               }}>
-                <span style={{ fontSize: '32px', color: '#60A5FA' }}>◎</span>
+                <PeopleRegular style={{ fontSize: '32px', width: '32px', height: '32px', color: '#60A5FA' }} />
               </div>
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Tenant Admin</h2>
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage your organization&apos;s users and settings</p>
@@ -374,7 +374,7 @@ export default function Home() {
                 margin: '0 auto 24px auto',
                 boxShadow: '0 0 20px rgba(148, 163, 184, 0.5), 0 0 40px rgba(148, 163, 184, 0.3)'
               }}>
-                <span style={{ fontSize: '32px', color: '#94A3B8' }}>▨</span>
+                <DocumentRegular style={{ fontSize: '32px', width: '32px', height: '32px', color: '#94A3B8' }} />
               </div>
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>API Documentation</h2>
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Access comprehensive API docs and integration guides</p>
@@ -415,14 +415,7 @@ export default function Home() {
                 margin: '0 auto 24px auto',
                 boxShadow: '0 0 20px rgba(139, 92, 246, 0.5), 0 0 40px rgba(139, 92, 246, 0.3)'
               }}>
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="6" cy="16" r="3.5" stroke="#8B5CF6" strokeWidth="1.8"/>
-                  <circle cx="26" cy="8" r="3.5" stroke="#8B5CF6" strokeWidth="1.8"/>
-                  <circle cx="26" cy="24" r="3.5" stroke="#8B5CF6" strokeWidth="1.8"/>
-                  <line x1="9.2" y1="14.5" x2="22.8" y2="9.5" stroke="#8B5CF6" strokeWidth="1.5" strokeLinecap="round"/>
-                  <line x1="9.2" y1="17.5" x2="22.8" y2="22.5" stroke="#8B5CF6" strokeWidth="1.5" strokeLinecap="round"/>
-                  <circle cx="16" cy="16" r="2.2" fill="#8B5CF6" opacity="0.7"/>
-                </svg>
+                <PlugConnectedRegular style={{ fontSize: '32px', width: '32px', height: '32px', color: '#8B5CF6' }} />
               </div>
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Integration Studio</h2>
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Configure vendor integrations, map APIs, and manage connector workflows</p>
@@ -492,9 +485,9 @@ export default function Home() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '400px', overflow: 'auto' }}>
               {globalState.tenants.filter(t => t.status === 'active').map((tenant, idx) => {
                 const colors = ['#D7BB91', '#60A5FA', '#22C55E', '#A78BFA', '#F59E0B'];
-                const logos = ['◎', '◆', '◈', '◧', '■'];
+                const LogoIcons = [BuildingRegular, BuildingMultipleRegular, BuildingSkyscraperRegular, BuildingFactoryRegular, BuildingShopRegular];
                 const color = colors[idx % colors.length];
-                const logo = logos[idx % logos.length];
+                const LogoIcon = LogoIcons[idx % LogoIcons.length];
                 const userCount = globalState.users.filter(u => u.tenantId === tenant.id).length;
                 
                 return (
@@ -534,11 +527,9 @@ export default function Home() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '20px',
-                      color: color,
                       boxShadow: `0 0 12px ${color}35`
                     }}>
-                      {logo}
+                      <LogoIcon style={{ width: '20px', height: '20px', color: color }} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>

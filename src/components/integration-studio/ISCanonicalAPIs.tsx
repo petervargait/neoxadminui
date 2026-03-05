@@ -3,6 +3,23 @@
 import React, { useState } from 'react'
 import { IS, ISCard, SchemaTree } from './ISShared'
 import { useGlobalState } from '@/context/GlobalStateContext'
+import {
+  BuildingRegular,
+  VideoRegular,
+  WifiWarningRegular,
+  LockClosedRegular,
+  PersonBoardRegular,
+  VehicleCarParkingRegular,
+  TicketHorizontalRegular,
+  ElevatorRegular,
+  PersonRegular,
+  CalendarRegular,
+  TicketDiagonalRegular,
+  FoodRegular,
+  RecycleRegular,
+  ShieldKeyholeRegular,
+  PersonPasskeyRegular,
+} from '@fluentui/react-icons'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Operation {
@@ -24,7 +41,7 @@ interface SchemaField {
 interface CanonicalDomain {
   id: string
   name: string
-  icon: string
+  Icon: React.ComponentType<{ style?: React.CSSProperties }>
   description: string
   color: string
   operations: Operation[]
@@ -68,7 +85,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'bms',
     name: 'BMS',
-    icon: '🏢',
+    Icon: BuildingRegular,
     description: 'Building Management System: HVAC, lighting, energy metering, and environmental control.',
     color: IS.blue,
     operations: [
@@ -119,7 +136,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'av-vc',
     name: 'AV/VC',
-    icon: '📡',
+    Icon: VideoRegular,
     description: 'Audiovisual and video conferencing resource control and meeting launch.',
     color: IS.purple,
     operations: [
@@ -165,7 +182,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'iot-sensors',
     name: 'IoT Sensors',
-    icon: '📶',
+    Icon: WifiWarningRegular,
     description: 'Occupancy, environmental, and presence sensors for real-time space intelligence.',
     color: IS.cyan,
     operations: [
@@ -210,7 +227,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'access-control',
     name: 'Access Control',
-    icon: '🔐',
+    Icon: ShieldKeyholeRegular,
     description: 'Physical access rules, door events, and credential lifecycle management.',
     color: IS.purple,
     operations: [
@@ -257,7 +274,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'digital-badge',
     name: 'Digital Badge',
-    icon: '💳',
+    Icon: PersonPasskeyRegular,
     description: 'Mobile and physical credential issuance, revocation, and NFC/BLE provisioning.',
     color: IS.gold,
     operations: [
@@ -306,7 +323,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'lockers',
     name: 'Lockers',
-    icon: '🔒',
+    Icon: LockClosedRegular,
     description: 'Locker assignment, release, usage tracking, and OTP unlock flows.',
     color: IS.orange,
     operations: [
@@ -348,7 +365,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'ticketing',
     name: 'Ticketing',
-    icon: '🎫',
+    Icon: TicketHorizontalRegular,
     description: 'Facility issue tickets (Issue Reporting), SLA tracking, and ITSM bidirectional sync.',
     color: IS.red,
     operations: [
@@ -401,7 +418,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'elevator',
     name: 'Elevator',
-    icon: '🛗',
+    Icon: ElevatorRegular,
     description: 'Elevator destination dispatch, access control, and floor authorization.',
     color: IS.muted,
     operations: [
@@ -443,7 +460,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'visitor-management',
     name: 'Visitor Management',
-    icon: '🏷️',
+    Icon: PersonBoardRegular,
     description: 'Invitation lifecycle, check-in/out flows, badge printing, and ID verification.',
     color: IS.cyan,
     operations: [
@@ -483,7 +500,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'parking',
     name: 'Parking',
-    icon: '🅿️',
+    Icon: VehicleCarParkingRegular,
     description: 'Parking space inventory, reservations, and real-time availability feeds.',
     color: IS.gold,
     operations: [
@@ -543,7 +560,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'event-management',
     name: 'Event Management',
-    icon: '🎪',
+    Icon: TicketDiagonalRegular,
     description: 'Corporate event registration, capacity management, and attendee coordination.',
     color: IS.cyan,
     operations: [
@@ -588,7 +605,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'restaurant',
     name: 'Restaurant',
-    icon: '🍽️',
+    Icon: FoodRegular,
     description: 'Canteen and restaurant menu, pre-ordering, payments, and meal plan management.',
     color: IS.orange,
     operations: [
@@ -642,7 +659,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'waste-management',
     name: 'Waste Management',
-    icon: '♻️',
+    Icon: RecycleRegular,
     description: 'Waste container fill-level monitoring, collection scheduling, and reporting.',
     color: IS.green,
     operations: [
@@ -685,7 +702,7 @@ const CANONICAL_DOMAINS: CanonicalDomain[] = [
   {
     id: 'meeting-rooms',
     name: 'Meeting Rooms',
-    icon: '📅',
+    Icon: CalendarRegular,
     description: 'Room booking, no-show detection, calendar sync, occupancy, and equipment management.',
     color: IS.green,
     operations: [
@@ -945,7 +962,7 @@ function DomainRow({
         }} />
 
         {/* Icon */}
-        <span style={{ fontSize: '20px', flexShrink: 0 }}>{domain.icon}</span>
+        <domain.Icon style={{ width: '20px', height: '20px', color: domain.color, flexShrink: 0 }} />
 
         {/* Name & description */}
         <div style={{ flex: 1, minWidth: 0 }}>

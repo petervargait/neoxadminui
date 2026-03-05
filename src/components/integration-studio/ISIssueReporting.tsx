@@ -12,6 +12,7 @@ import {
   ISTabBar,
   StatusBadge,
 } from './ISShared'
+import { TicketHorizontalRegular } from '@fluentui/react-icons'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -1038,11 +1039,7 @@ export default function ISIssueReporting() {
             backgroundColor: `${IS.orange}1A`, border: `1px solid ${IS.orange}40`,
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={IS.orange} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
+            <TicketHorizontalRegular style={{ width: '20px', height: '20px', color: IS.orange }} />
           </div>
           <div>
             <h1 style={{ ...fontBase, margin: 0, color: IS.textWhite, fontSize: '20px', fontWeight: 800, letterSpacing: '-0.01em' }}>

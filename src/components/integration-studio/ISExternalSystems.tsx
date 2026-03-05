@@ -13,6 +13,12 @@ import {
 } from './ISShared'
 import { useGlobalState } from '@/context/GlobalStateContext'
 import type { ExternalSystem } from '@/context/GlobalStateContext'
+import {
+  ServerRegular,
+  CheckmarkCircleRegular,
+  WrenchRegular,
+  CircleRegular,
+} from '@fluentui/react-icons'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const DOMAIN_TYPES = [
@@ -750,10 +756,10 @@ export default function ISExternalSystems() {
         gap: '14px',
       }}>
         {[
-          { label: 'Total Systems',    value: externalSystems.length, color: IS.blue,   icon: '⊞' },
-          { label: 'Active',           value: activeCount,            color: IS.green,  icon: '●' },
-          { label: 'Maintenance',      value: maintenanceCount,       color: IS.yellow, icon: '⚙' },
-          { label: 'Inactive',         value: inactiveCount,          color: IS.muted,  icon: '○' },
+          { label: 'Total Systems',    value: externalSystems.length, color: IS.blue,   Icon: ServerRegular },
+          { label: 'Active',           value: activeCount,            color: IS.green,  Icon: CheckmarkCircleRegular },
+          { label: 'Maintenance',      value: maintenanceCount,       color: IS.yellow, Icon: WrenchRegular },
+          { label: 'Inactive',         value: inactiveCount,          color: IS.muted,  Icon: CircleRegular },
         ].map((kpi, i) => (
           <div key={i} style={{
             backgroundColor: IS.cardBg,
@@ -766,12 +772,13 @@ export default function ISExternalSystems() {
           }}>
             <div style={{
               color: kpi.color,
-              fontSize: '20px',
               lineHeight: 1,
               width: '32px',
-              textAlign: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}>
-              {kpi.icon}
+              <kpi.Icon style={{ width: '20px', height: '20px', color: kpi.color }} />
             </div>
             <div>
               <div style={{ color: kpi.color, fontSize: '22px', fontWeight: 800, lineHeight: 1 }}>

@@ -9,18 +9,33 @@ import {
 } from './ISShared'
 import { useGlobalState } from '@/context/GlobalStateContext'
 import type { IntegrationConnector } from '@/context/GlobalStateContext'
+import {
+  PersonRegular,
+  DoorArrowRightRegular,
+  PersonBoardRegular,
+  VehicleCarParkingRegular,
+  LockClosedRegular,
+  CalendarRegular,
+  VideoRegular,
+  TicketDiagonalRegular,
+  TicketHorizontalRegular,
+  PlugConnectedRegular,
+  CheckmarkCircleRegular,
+  AlertRegular,
+  HeartPulseRegular,
+} from '@fluentui/react-icons'
 
 // ─── Domain definitions ───────────────────────────────────────────────────────
-const DOMAINS: { key: string; label: string; icon: string }[] = [
-  { key: 'Identity Provider',       label: 'Identity',         icon: '🔐' },
-  { key: 'Access Control',          label: 'Access Control',   icon: '🚪' },
-  { key: 'Visitor Management',      label: 'Visitor',          icon: '👤' },
-  { key: 'Parking',                 label: 'Parking',          icon: '🅿' },
-  { key: 'Lockers',                 label: 'Lockers',          icon: '🔒' },
-  { key: 'Meeting Room Booking',    label: 'Meeting Rooms',    icon: '📅' },
-  { key: 'AV/VC',                   label: 'AV / VC',          icon: '📽' },
-  { key: 'Events',                  label: 'Events',           icon: '🎟' },
-  { key: 'Issue Backend',           label: 'Issue Reporting',  icon: '🎫' },
+const DOMAINS: { key: string; label: string; Icon: React.ComponentType<{ style?: React.CSSProperties }> }[] = [
+  { key: 'Identity Provider',       label: 'Identity',         Icon: PersonRegular },
+  { key: 'Access Control',          label: 'Access Control',   Icon: DoorArrowRightRegular },
+  { key: 'Visitor Management',      label: 'Visitor',          Icon: PersonBoardRegular },
+  { key: 'Parking',                 label: 'Parking',          Icon: VehicleCarParkingRegular },
+  { key: 'Lockers',                 label: 'Lockers',          Icon: LockClosedRegular },
+  { key: 'Meeting Room Booking',    label: 'Meeting Rooms',    Icon: CalendarRegular },
+  { key: 'AV/VC',                   label: 'AV / VC',          Icon: VideoRegular },
+  { key: 'Events',                  label: 'Events',           Icon: TicketDiagonalRegular },
+  { key: 'Issue Backend',           label: 'Issue Reporting',  Icon: TicketHorizontalRegular },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -150,12 +165,12 @@ function ErrorRateBarChart({ connectors }: { connectors: IntegrationConnector[] 
 // ─── Domain Health Card ───────────────────────────────────────────────────────
 function DomainHealthCard({
   label,
-  icon,
+  Icon,
   status,
   connectorCount,
 }: {
   label: string
-  icon: string
+  Icon: React.ComponentType<{ style?: React.CSSProperties }>
   status: 'ok' | 'warning' | 'critical' | 'inactive'
   connectorCount: number
 }) {
@@ -190,7 +205,7 @@ function DomainHealthCard({
       }} />
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '20px', lineHeight: 1 }}>{icon}</span>
+        <Icon style={{ width: '20px', height: '20px', color: borderColor }} />
         <StatusBadge status={status} />
       </div>
 
@@ -486,10 +501,10 @@ export default function ISDashboard() {
         gap: '16px',
       }}>
         {[
-          { label: 'Total Connectors',  value: totalConnectors,  color: IS.blue,   icon: '⚡' },
-          { label: 'Active Connectors', value: activeConnectors, color: IS.green,  icon: '✓' },
-          { label: 'Critical Issues',   value: criticalCount,    color: IS.red,    icon: '!' },
-          { label: 'Healthy Domains',   value: healthyDomains,   color: IS.purple, icon: '◈' },
+          { label: 'Total Connectors',  value: totalConnectors,  color: IS.blue,   Icon: PlugConnectedRegular },
+          { label: 'Active Connectors', value: activeConnectors, color: IS.green,  Icon: CheckmarkCircleRegular },
+          { label: 'Critical Issues',   value: criticalCount,    color: IS.red,    Icon: AlertRegular },
+          { label: 'Healthy Domains',   value: healthyDomains,   color: IS.purple, Icon: HeartPulseRegular },
         ].map((kpi, i) => (
           <div key={i} style={{
             backgroundColor: IS.cardBg,
@@ -509,10 +524,9 @@ export default function ISDashboard() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '18px',
               flexShrink: 0,
             }}>
-              {kpi.icon}
+              <kpi.Icon style={{ width: '18px', height: '18px', color: kpi.color }} />
             </div>
             <div>
               <div style={{ color: kpi.color, fontSize: '24px', fontWeight: 800, lineHeight: 1 }}>
@@ -537,7 +551,7 @@ export default function ISDashboard() {
             <DomainHealthCard
               key={d.key}
               label={d.label}
-              icon={d.icon}
+              Icon={d.Icon}
               status={d.status}
               connectorCount={d.connectorCount}
             />
