@@ -298,7 +298,7 @@ export interface Building {
 export interface ExternalSystem {
   id: string
   name: string
-  domainType: string // 'Parking' | 'Access Control' | 'Visitor Management' | 'Lockers' | 'Meeting Room Booking' | 'AV/VC' | 'Issue Backend' | 'Identity Provider'
+  domainType: string // 'Parking' | 'Access Control' | 'Visitor Management' | 'Lockers' | 'AV/VC' | 'Ticketing' | 'Digital Badge' | 'BMS' | 'IoT' | 'Elevator' | 'Event Management' | 'Restaurant' | 'Waste Management' | 'Meeting Rooms'
   vendor: string
   product: string
   version: string
@@ -1039,133 +1039,169 @@ const getInitialState = (): GlobalState => {
     externalSystems: [
       {
         id: 'ext_parking_1',
-        name: 'ParkVision HQ',
+        name: 'SkiData Parking',
         domainType: 'Parking',
-        vendor: 'ParkVision',
-        product: 'ParkVision Enterprise',
-        version: '4.2.1',
+        vendor: 'SkiData',
+        product: 'SkiData Parking Pro',
+        version: '5.1.0',
         tenantId: 'acme',
         siteId: 'site_acme_hq',
         status: 'active',
         endpoints: [
-          { env: 'production', baseUrl: 'https://api.parkvision.example.com/v4', healthUrl: 'https://api.parkvision.example.com/v4/health' },
-          { env: 'staging', baseUrl: 'https://staging-api.parkvision.example.com/v4', healthUrl: 'https://staging-api.parkvision.example.com/v4/health' }
+          { env: 'production', baseUrl: 'https://api.skidata.example.com/v5', healthUrl: 'https://api.skidata.example.com/v5/health' },
+          { env: 'staging', baseUrl: 'https://staging-api.skidata.example.com/v5', healthUrl: 'https://staging-api.skidata.example.com/v5/health' }
         ],
         createdAt: '2024-03-01T10:00:00.000Z'
       },
       {
         id: 'ext_ac_1',
-        name: 'Genetec Security Center',
+        name: 'Avigilon Access',
         domainType: 'Access Control',
-        vendor: 'Genetec',
-        product: 'Security Center',
-        version: '5.11',
+        vendor: 'Avigilon',
+        product: 'Avigilon Unity',
+        version: '7.4',
         tenantId: 'acme',
         siteId: 'site_acme_hq',
         status: 'active',
         endpoints: [
-          { env: 'production', baseUrl: 'https://genetec.acme.example.com/api', healthUrl: 'https://genetec.acme.example.com/api/status' }
+          { env: 'production', baseUrl: 'https://avigilon.acme.example.com/api', healthUrl: 'https://avigilon.acme.example.com/api/status' }
         ],
         createdAt: '2024-02-15T08:00:00.000Z'
       },
       {
         id: 'ext_vm_1',
-        name: 'Envoy Visitor Platform',
+        name: 'TDS Visitor',
         domainType: 'Visitor Management',
-        vendor: 'Envoy',
-        product: 'Envoy Visitors',
+        vendor: 'TDS',
+        product: 'TDS Visitor Pro',
         version: '3.0',
         tenantId: 'mbank',
         siteId: 'site_mbank_hq',
         status: 'active',
         endpoints: [
-          { env: 'production', baseUrl: 'https://app.envoyapp.com/api/v3', healthUrl: 'https://app.envoyapp.com/api/v3/ping' }
+          { env: 'production', baseUrl: 'https://api.tds-visitor.example.com/v3', healthUrl: 'https://api.tds-visitor.example.com/v3/ping' }
         ],
         createdAt: '2024-04-10T09:00:00.000Z'
       },
       {
-        id: 'ext_itsm_1',
-        name: 'ServiceNow ITSM',
-        domainType: 'Issue Backend',
-        vendor: 'ServiceNow',
-        product: 'IT Service Management',
-        version: 'Tokyo',
+        id: 'ext_ticketing_1',
+        name: 'IBM Ticketing',
+        domainType: 'Ticketing',
+        vendor: 'IBM',
+        product: 'IBM Maximo',
+        version: '7.6.1',
         tenantId: 'acme',
         siteId: 'site_acme_hq',
         status: 'active',
         endpoints: [
-          { env: 'production', baseUrl: 'https://acme.service-now.com/api/now', healthUrl: 'https://acme.service-now.com/api/now/health' },
-          { env: 'staging', baseUrl: 'https://acmedev.service-now.com/api/now' }
+          { env: 'production', baseUrl: 'https://maximo.acme.example.com/api/os', healthUrl: 'https://maximo.acme.example.com/api/os/health' },
+          { env: 'staging', baseUrl: 'https://maximo-staging.acme.example.com/api/os' }
         ],
         createdAt: '2023-11-20T12:00:00.000Z'
       },
       {
-        id: 'ext_idp_1',
-        name: 'Microsoft Entra ID',
-        domainType: 'Identity Provider',
-        vendor: 'Microsoft',
-        product: 'Entra ID',
+        id: 'ext_badge_1',
+        name: 'HID Origo',
+        domainType: 'Digital Badge',
+        vendor: 'HID',
+        product: 'HID Origo',
         version: '2.0',
-        tenantId: 'globaladmin',
-        siteId: 'site_global',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
         status: 'active',
         endpoints: [
-          { env: 'production', baseUrl: 'https://graph.microsoft.com/v1.0', healthUrl: 'https://graph.microsoft.com/v1.0/$metadata' }
+          { env: 'production', baseUrl: 'https://origo.hidglobal.com/api/v2', healthUrl: 'https://origo.hidglobal.com/api/v2/health' }
         ],
-        createdAt: '2023-09-01T00:00:00.000Z'
+        createdAt: '2024-01-10T09:00:00.000Z'
       },
       {
         id: 'ext_locker_1',
-        name: 'Quadient Locker System',
+        name: 'Vecos Lockers',
         domainType: 'Lockers',
-        vendor: 'Quadient',
-        product: 'Parcel Pending',
-        version: '2.5.0',
+        vendor: 'Vecos',
+        product: 'Vecos Smart Locker',
+        version: '4.1.0',
         tenantId: 'acme',
         siteId: 'site_acme_hq',
-        status: 'maintenance',
+        status: 'active',
         endpoints: [
-          { env: 'production', baseUrl: 'https://api.parcelpending.com/v2', healthUrl: 'https://api.parcelpending.com/v2/status' }
+          { env: 'production', baseUrl: 'https://api.vecos.example.com/v4', healthUrl: 'https://api.vecos.example.com/v4/status' }
         ],
         createdAt: '2024-05-05T11:00:00.000Z'
+      },
+      {
+        id: 'ext_bms_1',
+        name: 'Nective BMS',
+        domainType: 'BMS',
+        vendor: 'Nective',
+        product: 'Nective Platform',
+        version: '3.2.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.nective.example.com/v3', healthUrl: 'https://api.nective.example.com/v3/health' }
+        ],
+        createdAt: '2024-06-01T08:00:00.000Z'
+      },
+      {
+        id: 'ext_av_1',
+        name: 'Crestron AV',
+        domainType: 'AV/VC',
+        vendor: 'Crestron',
+        product: 'Crestron Flex',
+        version: '2.3.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://crestron.acme.example.com/api', healthUrl: 'https://crestron.acme.example.com/api/status' }
+        ],
+        createdAt: '2024-07-15T10:00:00.000Z'
       }
     ],
     integrationAuthProfiles: [
       {
         id: 'auth_oauth2_1',
-        name: 'Genetec OAuth2 Client',
+        name: 'Avigilon OAuth2 Client',
         authType: 'oauth2-client',
-        secretRef: 'vault:secret/integrations/genetec/client-credentials',
-        tokenUrl: 'https://genetec.acme.example.com/oauth/token',
+        secretRef: 'vault:secret/integrations/avigilon/client-credentials',
+        tokenUrl: 'https://avigilon.acme.example.com/oauth/token',
         scopes: 'read:access-events write:access-rules',
         tenantId: 'acme',
         createdAt: '2024-02-15T08:30:00.000Z'
       },
       {
         id: 'auth_apikey_1',
-        name: 'ParkVision API Key',
+        name: 'SkiData API Key',
         authType: 'api-key',
-        secretRef: 'vault:secret/integrations/parkvision/api-key',
+        secretRef: 'vault:secret/integrations/skidata/api-key',
         tenantId: 'acme',
         createdAt: '2024-03-01T10:30:00.000Z'
       },
       {
         id: 'auth_mtls_1',
-        name: 'ServiceNow mTLS Certificate',
+        name: 'IBM Maximo mTLS Certificate',
         authType: 'mtls',
-        secretRef: 'vault:secret/integrations/servicenow/mtls-cert',
+        secretRef: 'vault:secret/integrations/ibm-maximo/mtls-cert',
         tenantId: 'acme',
         createdAt: '2023-11-20T13:00:00.000Z'
       },
       {
-        id: 'auth_jwt_1',
-        name: 'Entra ID JWT Bearer',
-        authType: 'jwt',
-        secretRef: 'vault:secret/integrations/entra/jwt-signing-key',
-        tokenUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-        scopes: 'https://graph.microsoft.com/.default',
-        tenantId: 'globaladmin',
-        createdAt: '2023-09-01T00:30:00.000Z'
+        id: 'auth_apikey_2',
+        name: 'HID Origo API Key',
+        authType: 'api-key',
+        secretRef: 'vault:secret/integrations/hid-origo/api-key',
+        tenantId: 'acme',
+        createdAt: '2024-01-10T09:30:00.000Z'
+      },
+      {
+        id: 'auth_apikey_3',
+        name: 'Nective API Key',
+        authType: 'api-key',
+        secretRef: 'vault:secret/integrations/nective/api-key',
+        tenantId: 'acme',
+        createdAt: '2024-06-01T08:30:00.000Z'
       }
     ],
     integrationConnectors: [
@@ -1174,7 +1210,7 @@ const getInitialState = (): GlobalState => {
         name: 'Parking Space Sync',
         domain: 'Parking',
         externalSystemId: 'ext_parking_1',
-        externalSystemName: 'ParkVision HQ',
+        externalSystemName: 'SkiData Parking',
         authProfileId: 'auth_apikey_1',
         coveragePercent: 94,
         health: 'ok',
@@ -1193,7 +1229,7 @@ const getInitialState = (): GlobalState => {
         name: 'Access Control Events',
         domain: 'Access Control',
         externalSystemId: 'ext_ac_1',
-        externalSystemName: 'Genetec Security Center',
+        externalSystemName: 'Avigilon Access',
         authProfileId: 'auth_oauth2_1',
         coveragePercent: 88,
         health: 'ok',
@@ -1211,7 +1247,7 @@ const getInitialState = (): GlobalState => {
         name: 'Visitor Pre-Registration Sync',
         domain: 'Visitor Management',
         externalSystemId: 'ext_vm_1',
-        externalSystemName: 'Envoy Visitor Platform',
+        externalSystemName: 'TDS Visitor',
         authProfileId: 'auth_apikey_1',
         coveragePercent: 72,
         health: 'warning',
@@ -1225,11 +1261,11 @@ const getInitialState = (): GlobalState => {
         createdAt: '2024-04-15T10:00:00.000Z'
       },
       {
-        id: 'conn_itsm_1',
+        id: 'conn_ticketing_1',
         name: 'Ticket Bidirectional Sync',
-        domain: 'Issue Backend',
-        externalSystemId: 'ext_itsm_1',
-        externalSystemName: 'ServiceNow ITSM',
+        domain: 'Ticketing',
+        externalSystemId: 'ext_ticketing_1',
+        externalSystemName: 'IBM Ticketing',
         authProfileId: 'auth_mtls_1',
         coveragePercent: 99,
         health: 'ok',
@@ -1244,40 +1280,76 @@ const getInitialState = (): GlobalState => {
         createdAt: '2023-12-01T10:00:00.000Z'
       },
       {
-        id: 'conn_idp_1',
-        name: 'Entra ID User Provisioning',
-        domain: 'Identity Provider',
-        externalSystemId: 'ext_idp_1',
-        externalSystemName: 'Microsoft Entra ID',
-        authProfileId: 'auth_jwt_1',
+        id: 'conn_badge_1',
+        name: 'Digital Badge Provisioning',
+        domain: 'Digital Badge',
+        externalSystemId: 'ext_badge_1',
+        externalSystemName: 'HID Origo',
+        authProfileId: 'auth_apikey_2',
         coveragePercent: 100,
         health: 'ok',
         versions: [
-          { env: 'production', version: '4.2.0', deployedAt: '2025-01-05T08:00:00.000Z' }
+          { env: 'production', version: '2.0.0', deployedAt: '2025-01-10T08:00:00.000Z' }
         ],
         status: 'active',
         lastTestResult: 'pass',
         lastTestAt: '2025-03-04T06:00:00.000Z',
-        tenantId: 'globaladmin',
-        createdAt: '2023-09-05T09:00:00.000Z'
+        tenantId: 'acme',
+        createdAt: '2024-01-15T09:00:00.000Z'
       },
       {
         id: 'conn_locker_1',
         name: 'Locker Availability Feed',
         domain: 'Lockers',
         externalSystemId: 'ext_locker_1',
-        externalSystemName: 'Quadient Locker System',
+        externalSystemName: 'Vecos Lockers',
         authProfileId: 'auth_apikey_1',
-        coveragePercent: 55,
-        health: 'critical',
+        coveragePercent: 97,
+        health: 'ok',
         versions: [
-          { env: 'production', version: '0.9.3', deployedAt: '2024-10-01T12:00:00.000Z' }
+          { env: 'production', version: '1.2.0', deployedAt: '2025-01-20T12:00:00.000Z' }
         ],
-        status: 'paused',
-        lastTestResult: 'fail',
-        lastTestAt: '2025-03-02T06:00:00.000Z',
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
         tenantId: 'acme',
         createdAt: '2024-05-10T13:00:00.000Z'
+      },
+      {
+        id: 'conn_bms_1',
+        name: 'BMS Data Feed',
+        domain: 'BMS',
+        externalSystemId: 'ext_bms_1',
+        externalSystemName: 'Nective BMS',
+        authProfileId: 'auth_apikey_3',
+        coveragePercent: 85,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '1.0.0', deployedAt: '2025-02-01T09:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-06-05T08:00:00.000Z'
+      },
+      {
+        id: 'conn_av_1',
+        name: 'AV Room Control',
+        domain: 'AV/VC',
+        externalSystemId: 'ext_av_1',
+        externalSystemName: 'Crestron AV',
+        authProfileId: 'auth_apikey_1',
+        coveragePercent: 90,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '1.1.0', deployedAt: '2025-02-15T10:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-07-20T10:00:00.000Z'
       }
     ]
   }

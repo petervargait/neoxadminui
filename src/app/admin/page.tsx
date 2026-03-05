@@ -157,14 +157,20 @@ export default function AdminPage() {
   
   // Integrations state
   const [moduleIntegrations, setModuleIntegrations] = useState<Record<string, string>>({
-    'User Management': 'NEOX',
+    'BMS': 'NONE',
+    'AV/VC': 'NONE',
+    'IoT Sensors': 'NONE',
+    'Access Control': 'NONE',
+    'Digital Badge': 'NONE',
+    'Lockers': 'Vecos',
+    'Ticketing': 'NONE',
+    'Elevator': 'NONE',
     'Visitor Management': 'NEOX',
     'Parking': 'NEOX',
-    'Emergency': 'NEOX',
-    'Restaurant': 'Delirest',
-    'Ticketing': 'NEOX',
-    'Service Hub': 'Life1',
-    'Lockers': 'Vecos',
+    'Event Management': 'NEOX',
+    'Restaurant': 'NEOX',
+    'Waste Management': 'NONE',
+    'Meeting Rooms': 'NEOX',
     'Space Management': 'NEOX'
   })
 
@@ -2845,110 +2851,86 @@ export default function AdminPage() {
                         if (!tenant) return null;
                         
                         const integrationOptions: Record<string, string[]> = {
-                          'User Management': ['NONE', 'NEOX', 'Entra', 'Okta', 'JumpCloud', 'Ping Identity', 'CyberArk', 'OneLogin', 'Clerk'],
-                          'Visitor Management': ['NONE', 'NEOX', 'TDS', 'Tablog', 'Sine', 'Envoy', 'Eptura', 'VisitUs'],
-                          'Parking': ['NONE', 'NEOX', 'Parkl', 'SkiData'],
-                          'Emergency': ['NONE', 'NEOX', 'IBM Tririga'],
-                          'Map': ['NONE', 'NEOX', 'Mapbox', 'Google Maps', 'Azure Maps'],
-                          'Restaurant': ['NONE', 'Delirest', 'Gundel'],
-                          'Ticketing': ['NONE', 'NEOX', 'IBM Tririga', 'IBM Maximo', 'ServiceNow', 'Jira'],
-                          'Service Hub': ['NONE', 'Life1', 'Luxuria', 'AYCM', 'EXOS'],
-                          'Lockers': ['NONE', 'Vecos', 'Digilock', 'Fleclock'],
-                          'News': ['NONE', 'NEOX', 'SharePoint', 'Workplace', 'Simpplr'],
-                          'AI Assistant': ['NONE', 'NEOX', 'OpenAI', 'Azure OpenAI', 'Google AI'],
-                          'Space Management': ['NONE', 'NEOX', 'IBM Tririga', 'Tablog'],
-                          'Private Delivery': ['NONE', 'NEOX', 'Parcel Pending', 'Package Concierge', 'Luxer One'],
-                          'Building Automation': ['NONE', 'Siemens', 'Schneider Electric', 'Nective'],
-                          'Smart Sensors': ['NONE', 'bGrid', 'Haltian', 'Motorola'],
-                          'Access Management': ['NONE', 'NEOX', 'HID', 'ThirdMillennium', 'Avigilon', 'Seawing', 'Kantech']
+                          'BMS': ['NONE', 'Nective', 'Schneider', 'Siemens', 'bGrid*'],
+                          'AV/VC': ['NONE', 'Crestron', 'Cisco'],
+                          'IoT Sensors': ['NONE', 'bGrid', 'Haltian', 'XYSense', 'Avigilon (Motorola Halo)'],
+                          'Access Control': ['NONE', 'Locksense', 'Avigilon', 'ThirdMillennium', 'HID Origo', 'HikCentral', 'SeaWing*'],
+                          'Digital Badge': ['NONE', 'HID', 'Legic', 'Desfire 4K/8K'],
+                          'Lockers': ['NONE', 'Vecos', 'Digilock', 'Flexlock'],
+                          'Ticketing': ['NONE', 'IBM', 'Cisco', 'APFM', 'Facilio*'],
+                          'Elevator': ['NONE', 'KONE*', 'Otis*'],
+                          'Visitor Management': ['NONE', 'TDS', 'NEOX'],
+                          'Parking': ['NONE', 'SkiData', 'Desigua*', 'Swarco*', 'Parkl*', 'ParkHelp*', 'NEOX'],
+                          'Event Management': ['NONE', 'NEOX'],
+                          'Restaurant': ['NONE', 'NEOX'],
+                          'Waste Management': ['NONE', 'WasteTracker'],
+                          'Meeting Rooms': ['NONE', 'NEOX'],
+                          'Space Management': ['NONE', 'NEOX'],
                         };
                         
                         // Company logos for visual identification (based on brand colors)
                         const providerLogos: Record<string, string> = {
                           // Default
                           'NONE': '⚪',
-                          
+
                           // NEOX Platform
                           'NEOX': '🔷',
-                          
-                          // Identity & Access Management
-                          'Entra': '🟦',        // Microsoft blue
-                          'Okta': '🔵',         // Okta blue
-                          'JumpCloud': '🟢',    // JumpCloud green
-                          'Ping Identity': '🟡', // Ping yellow
-                          'CyberArk': '🔴',     // CyberArk red
-                          'OneLogin': '🟠',     // OneLogin orange
-                          'Clerk': '🟣',        // Clerk purple
-                          
-                          // Visitor Management
-                          'TDS': '🔵',
-                          'Tablog': '🟢',
-                          'Sine': '🟠',
-                          'Envoy': '🔴',
-                          'Eptura': '🔵',
-                          'VisitUs': '🟣',
-                          
-                          // Parking
-                          'Parkl': '🟢',
-                          'SkiData': '🔴',
-                          
-                          // Building Management & IWMS
-                          'IBM Tririga': '🔵',
-                          'IBM Maximo': '⚙️',
-                          
-                          // Ticketing & Service Management
-                          'ServiceNow': '🟢',
-                          'Jira': '🔵',
-                          
-                          // Restaurant & Services
-                          'Delirest': '🍽️',
-                          'Gundel': '🍷',
-                          'Life1': '🟣',
-                          'Luxuria': '🟡',
-                          'AYCM': '🔵',
-                          'EXOS': '🟠',
-                          
+
+                          // BMS
+                          'Nective': '🔵',
+                          'Schneider': '🟢',
+                          'Siemens': '🟢',
+                          'bGrid*': '🟣',
+
+                          // AV/VC
+                          'Crestron': '🟠',
+                          'Cisco': '🔵',
+
+                          // IoT Sensors
+                          'bGrid': '🟣',
+                          'Haltian': '🔵',
+                          'XYSense': '🟢',
+                          'Avigilon (Motorola Halo)': '🔴',
+
+                          // Access Control
+                          'Locksense': '🟡',
+                          'Avigilon': '🔴',
+                          'ThirdMillennium': '🟡',
+                          'HID Origo': '🔴',
+                          'HikCentral': '🟠',
+                          'SeaWing*': '🔵',
+
+                          // Digital Badge
+                          'HID': '🔴',
+                          'Legic': '🟢',
+                          'Desfire 4K/8K': '🟣',
+
                           // Lockers
                           'Vecos': '🔵',
                           'Digilock': '🟢',
-                          'Fleclock': '🟠',
-                          
-                          // Maps
-                          'Mapbox': '🗺️',
-                          'Google Maps': '🔴',
-                          'Azure Maps': '🔵',
-                          
-                          // News & Communication
-                          'SharePoint': '🟦',
-                          'Workplace': '🔵',
-                          'Simpplr': '🟣',
-                          
-                          // AI Assistants
-                          'OpenAI': '🤖',
-                          'Azure OpenAI': '🔵',
-                          'Google AI': '🔴',
-                          
-                          // Package & Delivery
-                          'Parcel Pending': '📦',
-                          'Package Concierge': '🟠',
-                          'Luxer One': '🔵',
-                          
-                          // Building Automation
-                          'Siemens': '🟢',
-                          'Schneider Electric': '🟢',
-                          'Nective': '🔵',
-                          
-                          // Smart Sensors
-                          'bGrid': '🟣',
-                          'Haltian': '🔵',
-                          'Motorola': '🔵',
-                          
-                          // Access Control
-                          'HID': '🔴',
-                          'ThirdMillennium': '🟡',
-                          'Avigilon': '🔴',
-                          'Seawing': '🔵',
-                          'Kantech': '🟢'
+                          'Flexlock': '🟠',
+
+                          // Ticketing
+                          'IBM': '🔵',
+                          'APFM': '🟠',
+                          'Facilio*': '🟢',
+
+                          // Elevator
+                          'KONE*': '🔵',
+                          'Otis*': '🔴',
+
+                          // Visitor Management
+                          'TDS': '🔵',
+
+                          // Parking
+                          'SkiData': '🔴',
+                          'Desigua*': '🟢',
+                          'Swarco*': '🟡',
+                          'Parkl*': '🟢',
+                          'ParkHelp*': '🟠',
+
+                          // Waste Management
+                          'WasteTracker': '🟢',
                         };
                         
                         return tenant.modules
