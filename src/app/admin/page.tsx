@@ -13,6 +13,7 @@ import LockerDashboard from '../../components/LockerDashboard'
 import BadgesDashboard from '../../components/BadgesDashboard'
 import SpaceBookingDashboard from '../../components/SpaceBookingDashboard'
 import DashboardFilters from '../../components/DashboardFilters'
+import SmartSpacesDashboard from '../../components/SmartSpacesDashboard'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -105,9 +106,17 @@ export default function AdminPage() {
     name: string
     basementLevels: number
     topFloor: number
+    floors?: { floorNumber: number; floorLabel: string; zones: string[] }[]
   } | null>(null)
   const [selectedFloorForZones, setSelectedFloorForZones] = useState<number | null>(null)
   
+  // Visitor Check-in state
+  const [checkInTab, setCheckInTab] = useState<'expected' | 'checked-in' | 'walk-in'>('expected')
+  const [checkInSearchTerm, setCheckInSearchTerm] = useState('')
+  const [checkInBadgeNumber, setCheckInBadgeNumber] = useState('')
+  const [checkInIdVerified, setCheckInIdVerified] = useState(false)
+  const [checkingInVisitorId, setCheckingInVisitorId] = useState<string | null>(null)
+
   // Building selection state for modals
   const [selectedParkingBuilding, setSelectedParkingBuilding] = useState<string>('')
   const [selectedLockerBuilding, setSelectedLockerBuilding] = useState<string>('')
@@ -660,6 +669,8 @@ export default function AdminPage() {
             { icon: '◎', label: 'Locker Management', action: () => setActiveSection('lockerManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◩', label: 'Space Management', action: () => setActiveSection('spaceManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◫', label: 'Building Management', action: () => setActiveSection('buildingManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '◉', label: 'Visitor Check-in', action: () => setActiveSection('visitorCheckin'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '◬', label: 'Smart Spaces', action: () => setActiveSection('smartSpaces'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: 'ticket', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: true, iconType: 'ticket' },
             { icon: 'alert', label: 'Notifications', action: () => setActiveSection('notifications'), enabled: true, isFluentIcon: true, iconType: 'alert' },
             { icon: 'status', label: 'System Status', action: () => setActiveSection('systemStatus'), enabled: true, isFluentIcon: true, iconType: 'status' },
@@ -808,6 +819,8 @@ export default function AdminPage() {
               {activeSection === 'lockerManagement' && 'Locker Management'}
               {activeSection === 'spaceManagement' && 'Space Management'}
               {activeSection === 'buildingManagement' && 'Building Management'}
+              {activeSection === 'visitorCheckin' && 'Visitor Check-in / Check-out'}
+              {activeSection === 'smartSpaces' && 'Smart Spaces Analytics'}
               {activeSection === 'ticketManagement' && 'Ticket Management'}
               {activeSection === 'notifications' && 'Notifications'}
               {activeSection === 'systemStatus' && 'System Status'}
@@ -4274,7 +4287,8 @@ export default function AdminPage() {
                           id: building.id,
                           name: building.name,
                           basementLevels: building.basementLevels,
-                          topFloor: building.topFloor
+                          topFloor: building.topFloor,
+                          floors: building.floors
                         });
                         setShowBuildingModal(true);
                       }} style={{
@@ -4385,6 +4399,351 @@ export default function AdminPage() {
                   }}>+ Add Building</button>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Visitor Check-in / Check-out */}
+          {activeSection === 'visitorCheckin' && selectedTenant !== 'all' && (() => {
+            const today = new Date().toISOString().split('T')[0]
+            const tenantInvitations = globalState.invitations.filter(inv => {
+              const host = globalState.users.find(u => u.id === inv.hostId)
+              return host?.tenantId === selectedTenant
+            })
+            const todayExpected = tenantInvitations.filter(inv => inv.visitDate === today && (inv.status === 'approved' || inv.status === 'pending'))
+            const checkedIn = tenantInvitations.filter(inv => inv.status === 'checked-in')
+            const checkedOutToday = tenantInvitations.filter(inv => inv.status === 'checked-out' && inv.checkOutTime?.startsWith(today))
+            const walkInsToday = tenantInvitations.filter(inv => inv.isWalkIn && inv.visitDate === today)
+            const tenantUsers = globalState.users.filter(u => u.tenantId === selectedTenant)
+
+            const calculateDuration = (checkInTime: string): string => {
+              const diff = Date.now() - new Date(checkInTime).getTime()
+              const hours = Math.floor(diff / 3600000)
+              const minutes = Math.floor((diff % 3600000) / 60000)
+              return `${hours}h ${minutes}m`
+            }
+
+            const filteredExpected = todayExpected.filter(inv =>
+              !checkInSearchTerm ||
+              inv.visitorName.toLowerCase().includes(checkInSearchTerm.toLowerCase()) ||
+              inv.accessCode?.toLowerCase().includes(checkInSearchTerm.toLowerCase()) ||
+              inv.visitorEmail.toLowerCase().includes(checkInSearchTerm.toLowerCase())
+            )
+
+            const filteredCheckedIn = checkedIn.filter(inv =>
+              !checkInSearchTerm ||
+              inv.visitorName.toLowerCase().includes(checkInSearchTerm.toLowerCase()) ||
+              inv.badgeNumber?.toLowerCase().includes(checkInSearchTerm.toLowerCase())
+            )
+
+            return (
+              <div>
+                {/* Stats Overview */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+                  <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Expected Today</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{todayExpected.length}</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Currently Checked In</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#10B981' }}>{checkedIn.length}</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Checked Out Today</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#3B82F6' }}>{checkedOutToday.length}</div>
+                  </div>
+                  <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B' }}>
+                    <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Walk-ins Today</h4>
+                    <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#8B5CF6' }}>{walkInsToday.length}</div>
+                  </div>
+                </div>
+
+                {/* Tab Bar */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+                  {(['expected', 'checked-in', 'walk-in'] as const).map(tab => (
+                    <button key={tab} onClick={() => setCheckInTab(tab)} style={{
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      border: checkInTab === tab ? 'none' : '1px solid #334155',
+                      backgroundColor: checkInTab === tab ? (tab === 'expected' ? '#F59E0B' : tab === 'checked-in' ? '#10B981' : '#8B5CF6') : 'transparent',
+                      color: checkInTab === tab ? '#0F1629' : '#94A3B8',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}>
+                      {tab === 'expected' ? `Expected (${todayExpected.length})` : tab === 'checked-in' ? `Checked In (${checkedIn.length})` : 'Walk-in Registration'}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Search Bar (for expected and checked-in tabs) */}
+                {checkInTab !== 'walk-in' && (
+                  <div style={{ marginBottom: '24px' }}>
+                    <input
+                      type="text"
+                      placeholder={checkInTab === 'expected' ? 'Search by name, email or access code...' : 'Search by name or badge number...'}
+                      value={checkInSearchTerm}
+                      onChange={(e) => setCheckInSearchTerm(e.target.value)}
+                      style={{
+                        width: '100%',
+                        maxWidth: '500px',
+                        padding: '12px 16px',
+                        backgroundColor: '#1E293B',
+                        border: '1px solid #475569',
+                        borderRadius: '8px',
+                        color: '#F1F5F9',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Expected Tab */}
+                {checkInTab === 'expected' && (
+                  <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: '#0F1629' }}>
+                          {['Visitor', 'Company', 'Host', 'Time', 'Purpose', 'Access Code', 'Status', 'Action'].map(h => (
+                            <th key={h} style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', textTransform: 'uppercase', fontWeight: '600', letterSpacing: '0.05em' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredExpected.length === 0 ? (
+                          <tr><td colSpan={8} style={{ padding: '48px 24px', textAlign: 'center', color: '#64748B', fontSize: '14px' }}>No expected visitors for today</td></tr>
+                        ) : filteredExpected.map(inv => (
+                          <tr key={inv.id} style={{ borderBottom: '1px solid #1E293B' }}>
+                            <td style={{ padding: '12px 16px' }}>
+                              <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{inv.visitorName}</div>
+                              <div style={{ color: '#64748B', fontSize: '12px' }}>{inv.visitorEmail}</div>
+                            </td>
+                            <td style={{ padding: '12px 16px', color: '#94A3B8', fontSize: '14px' }}>{inv.visitorCompany || '-'}</td>
+                            <td style={{ padding: '12px 16px', color: '#F1F5F9', fontSize: '14px' }}>{inv.hostName}</td>
+                            <td style={{ padding: '12px 16px', color: '#94A3B8', fontSize: '14px' }}>{inv.visitTime}</td>
+                            <td style={{ padding: '12px 16px', color: '#94A3B8', fontSize: '14px' }}>{inv.purpose}</td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600', backgroundColor: 'rgba(215, 187, 145, 0.1)', color: '#D7BB91' }}>{inv.accessCode || 'N/A'}</span>
+                            </td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '600', backgroundColor: inv.status === 'approved' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: inv.status === 'approved' ? '#10B981' : '#F59E0B' }}>{inv.status}</span>
+                            </td>
+                            <td style={{ padding: '12px 16px' }}>
+                              {checkingInVisitorId === inv.id ? (
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                  <input
+                                    type="text"
+                                    placeholder="Badge #"
+                                    value={checkInBadgeNumber}
+                                    onChange={(e) => setCheckInBadgeNumber(e.target.value)}
+                                    style={{ width: '80px', padding: '6px 8px', backgroundColor: '#1E293B', border: '1px solid #475569', borderRadius: '4px', color: '#F1F5F9', fontSize: '12px' }}
+                                  />
+                                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#94A3B8', fontSize: '12px', cursor: 'pointer' }}>
+                                    <input type="checkbox" checked={checkInIdVerified} onChange={(e) => setCheckInIdVerified(e.target.checked)} />
+                                    ID
+                                  </label>
+                                  <button onClick={() => {
+                                    globalState.updateInvitation(inv.id, {
+                                      status: 'checked-in',
+                                      checkInTime: new Date().toISOString(),
+                                      badgeNumber: checkInBadgeNumber || `V-${Math.floor(Math.random() * 9000) + 1000}`,
+                                      idVerified: checkInIdVerified
+                                    })
+                                    setCheckingInVisitorId(null)
+                                    setCheckInBadgeNumber('')
+                                    setCheckInIdVerified(false)
+                                  }} style={{ padding: '6px 12px', backgroundColor: '#10B981', color: 'white', border: 'none', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>Confirm</button>
+                                  <button onClick={() => { setCheckingInVisitorId(null); setCheckInBadgeNumber(''); setCheckInIdVerified(false); }} style={{ padding: '6px 8px', backgroundColor: 'transparent', color: '#EF4444', border: '1px solid #475569', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}>Cancel</button>
+                                </div>
+                              ) : (
+                                <button onClick={() => setCheckingInVisitorId(inv.id)} style={{
+                                  padding: '8px 16px',
+                                  backgroundColor: '#10B981',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: '600',
+                                  cursor: 'pointer',
+                                  boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)'
+                                }}>Check In</button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Checked-in Tab */}
+                {checkInTab === 'checked-in' && (
+                  <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: '#0F1629' }}>
+                          {['Visitor', 'Company', 'Host', 'Badge #', 'Checked In', 'Duration', 'ID Verified', 'Action'].map(h => (
+                            <th key={h} style={{ padding: '12px 16px', textAlign: 'left', color: '#64748B', fontSize: '12px', textTransform: 'uppercase', fontWeight: '600', letterSpacing: '0.05em' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredCheckedIn.length === 0 ? (
+                          <tr><td colSpan={8} style={{ padding: '48px 24px', textAlign: 'center', color: '#64748B', fontSize: '14px' }}>No visitors currently checked in</td></tr>
+                        ) : filteredCheckedIn.map(inv => (
+                          <tr key={inv.id} style={{ borderBottom: '1px solid #1E293B' }}>
+                            <td style={{ padding: '12px 16px' }}>
+                              <div style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500' }}>{inv.visitorName}</div>
+                              <div style={{ color: '#64748B', fontSize: '12px' }}>{inv.visitorEmail}</div>
+                            </td>
+                            <td style={{ padding: '12px 16px', color: '#94A3B8', fontSize: '14px' }}>{inv.visitorCompany || '-'}</td>
+                            <td style={{ padding: '12px 16px', color: '#F1F5F9', fontSize: '14px' }}>{inv.hostName}</td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6' }}>{inv.badgeNumber || '-'}</span>
+                            </td>
+                            <td style={{ padding: '12px 16px', color: '#94A3B8', fontSize: '14px' }}>{inv.checkInTime ? new Date(inv.checkInTime).toLocaleTimeString() : '-'}</td>
+                            <td style={{ padding: '12px 16px', color: '#D7BB91', fontSize: '14px', fontWeight: '600' }}>{inv.checkInTime ? calculateDuration(inv.checkInTime) : '-'}</td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <span style={{ padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '600', backgroundColor: inv.idVerified ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: inv.idVerified ? '#10B981' : '#F59E0B' }}>{inv.idVerified ? 'Verified' : 'Not verified'}</span>
+                            </td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <button onClick={() => {
+                                globalState.updateInvitation(inv.id, {
+                                  status: 'checked-out',
+                                  checkOutTime: new Date().toISOString()
+                                })
+                              }} style={{
+                                padding: '8px 16px',
+                                backgroundColor: '#3B82F6',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                boxShadow: '0 0 10px rgba(59, 130, 246, 0.3)'
+                              }}>Check Out</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Walk-in Registration Tab */}
+                {checkInTab === 'walk-in' && (
+                  <div style={{ backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #1E293B', padding: '32px', maxWidth: '700px' }}>
+                    <h3 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', marginBottom: '8px' }}>Walk-in Visitor Registration</h3>
+                    <p style={{ color: '#64748B', fontSize: '14px', marginBottom: '24px' }}>Register an unscheduled visitor and check them in immediately.</p>
+                    <form onSubmit={(e) => {
+                      e.preventDefault()
+                      const formData = new FormData(e.currentTarget)
+                      const visitorName = formData.get('walkInName') as string
+                      const visitorEmail = formData.get('walkInEmail') as string
+                      const visitorCompany = formData.get('walkInCompany') as string
+                      const hostId = formData.get('walkInHost') as string
+                      const purpose = formData.get('walkInPurpose') as string
+                      const location = formData.get('walkInLocation') as string
+                      const badgeNum = formData.get('walkInBadge') as string
+
+                      const host = tenantUsers.find(u => u.id === hostId)
+
+                      globalState.addInvitation({
+                        visitorName,
+                        visitorEmail,
+                        visitorCompany,
+                        hostId: hostId || 'walk-in',
+                        hostName: host?.name || 'Walk-in',
+                        visitDate: today,
+                        visitTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        purpose: purpose || 'Walk-in visit',
+                        location: location || 'Main Lobby',
+                        status: 'checked-in',
+                        visitorType: 'business',
+                        accessCode: `WI-${Math.floor(Math.random() * 9000) + 1000}`,
+                        checkInTime: new Date().toISOString(),
+                        badgeNumber: badgeNum || `V-${Math.floor(Math.random() * 9000) + 1000}`,
+                        idVerified: false,
+                        isWalkIn: true
+                      })
+                      alert('Walk-in visitor registered and checked in!')
+                      ;(e.target as HTMLFormElement).reset()
+                    }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div>
+                          <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visitor Name *</label>
+                          <input type="text" name="walkInName" required placeholder="Full name" style={{ width: '100%', padding: '12px', backgroundColor: '#1E293B', border: '1px solid #475569', borderRadius: '8px', color: '#F1F5F9', fontSize: '14px' }} />
+                        </div>
+                        <div>
+                          <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email</label>
+                          <input type="email" name="walkInEmail" placeholder="visitor@company.com" style={{ width: '100%', padding: '12px', backgroundColor: '#1E293B', border: '1px solid #475569', borderRadius: '8px', color: '#F1F5F9', fontSize: '14px' }} />
+                        </div>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div>
+                          <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Company</label>
+                          <input type="text" name="walkInCompany" placeholder="Company name" style={{ width: '100%', padding: '12px', backgroundColor: '#1E293B', border: '1px solid #475569', borderRadius: '8px', color: '#F1F5F9', fontSize: '14px' }} />
+                        </div>
+                        <div>
+                          <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Host *</label>
+                          <select name="walkInHost" required style={{ width: '100%', padding: '12px', backgroundColor: '#1E293B', border: '1px solid #475569', borderRadius: '8px', color: '#F1F5F9', fontSize: '14px' }}>
+                            <option value="">Select host...</option>
+                            {tenantUsers.map(u => (
+                              <option key={u.id} value={u.id}>{u.name} ({u.department})</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div>
+                          <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Purpose</label>
+                          <select name="walkInPurpose" style={{ width: '100%', padding: '12px', backgroundColor: '#1E293B', border: '1px solid #475569', borderRadius: '8px', color: '#F1F5F9', fontSize: '14px' }}>
+                            <option value="Meeting">Meeting</option>
+                            <option value="Interview">Interview</option>
+                            <option value="Delivery">Delivery</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Location</label>
+                          <input type="text" name="walkInLocation" placeholder="e.g., Main Lobby" defaultValue="Main Lobby" style={{ width: '100%', padding: '12px', backgroundColor: '#1E293B', border: '1px solid #475569', borderRadius: '8px', color: '#F1F5F9', fontSize: '14px' }} />
+                        </div>
+                      </div>
+                      <div>
+                        <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Badge Number</label>
+                        <input type="text" name="walkInBadge" placeholder="Auto-generated if empty" style={{ width: '100%', maxWidth: '250px', padding: '12px', backgroundColor: '#1E293B', border: '1px solid #475569', borderRadius: '8px', color: '#F1F5F9', fontSize: '14px' }} />
+                      </div>
+                      <button type="submit" style={{
+                        alignSelf: 'flex-start',
+                        padding: '12px 32px',
+                        backgroundColor: '#8B5CF6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        boxShadow: '0 0 15px rgba(139, 92, 246, 0.4)'
+                      }}>Register &amp; Check In</button>
+                    </form>
+                  </div>
+                )}
+              </div>
+            )
+          })()}
+
+          {/* Smart Spaces Analytics */}
+          {activeSection === 'smartSpaces' && selectedTenant !== 'all' && (
+            <div>
+              <SmartSpacesDashboard
+                buildings={globalState.buildings.filter(b => b.tenantId === selectedTenant)}
+                invitations={globalState.invitations.filter(inv => {
+                  const host = globalState.users.find(u => u.id === inv.hostId)
+                  return host?.tenantId === selectedTenant
+                })}
+              />
             </div>
           )}
 
@@ -6768,13 +7127,14 @@ export default function AdminPage() {
                   {Array.from({ length: editingBuilding.basementLevels }, (_, i) => {
                     const floorNum = -(editingBuilding.basementLevels - i);
                     const floorLabel = `B${Math.abs(floorNum)}`;
+                    const existingFloor = editingBuilding.floors?.find(f => f.floorNumber === floorNum);
                     return (
                       <div key={floorNum} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                         <span style={{ color: '#8B5CF6', fontSize: '14px', fontWeight: '600', minWidth: '80px' }}>{floorLabel}</span>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           name={`zones_${floorNum}`}
-                          defaultValue="Parking, Storage"
+                          defaultValue={existingFloor ? existingFloor.zones.join(', ') : 'Parking, Storage'}
                           placeholder="Parking, Storage"
                           style={{
                             flex: 1,
@@ -6793,10 +7153,10 @@ export default function AdminPage() {
                   {/* Ground floor */}
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                     <span style={{ color: '#10B981', fontSize: '14px', fontWeight: '600', minWidth: '80px' }}>Ground</span>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       name="zones_0"
-                      defaultValue="Lobby, Reception, Security"
+                      defaultValue={editingBuilding.floors?.find(f => f.floorNumber === 0)?.zones.join(', ') || 'Lobby, Reception, Security'}
                       placeholder="Lobby, Reception"
                       style={{
                         flex: 1,
@@ -6813,13 +7173,14 @@ export default function AdminPage() {
                   {/* Upper floors */}
                   {Array.from({ length: editingBuilding.topFloor }, (_, i) => {
                     const floorNum = i + 1;
+                    const existingFloor = editingBuilding.floors?.find(f => f.floorNumber === floorNum);
                     return (
                       <div key={floorNum} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                         <span style={{ color: '#3B82F6', fontSize: '14px', fontWeight: '600', minWidth: '80px' }}>Floor {floorNum}</span>
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           name={`zones_${floorNum}`}
-                          defaultValue="Zone A, Zone B"
+                          defaultValue={existingFloor ? existingFloor.zones.join(', ') : 'Zone A, Zone B'}
                           placeholder="Zone A, Zone B"
                           style={{
                             flex: 1,

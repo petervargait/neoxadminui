@@ -55,15 +55,19 @@ export default function VisitorDashboard({ invitations, startDate, endDate, sear
       const visitDate = new Date(inv.visitDate)
       return visitDate < now && inv.status === 'pending'
     }).length
-    const totalPastVisits = filteredInvitations.filter(inv => new Date(inv.visitDate) < now).length
+    const totalPastVisits = filteredInvitations.filter(inv => new Date(inv.visitDate) < now && inv.status !== 'checked-in' && inv.status !== 'checked-out').length
     const noShowRate = totalPastVisits > 0 ? ((noShows / totalPastVisits) * 100).toFixed(1) : '0.0'
-    
+    const checkedInCount = filteredInvitations.filter(inv => inv.status === 'checked-in').length
+    const checkedOutCount = filteredInvitations.filter(inv => inv.status === 'checked-out').length
+
     return {
       totalVisits: filteredInvitations.length,
       visitsPerSite,
       visitsPerHost,
       avgLeadTime,
       noShowRate,
+      checkedInCount,
+      checkedOutCount,
       sites,
       hosts
     }

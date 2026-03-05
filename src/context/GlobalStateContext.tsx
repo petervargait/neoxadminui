@@ -101,10 +101,15 @@ export interface Invitation {
   visitTime: string
   purpose: string
   location: string
-  status: 'pending' | 'approved' | 'rejected' | 'completed'
+  status: 'pending' | 'approved' | 'rejected' | 'checked-in' | 'checked-out' | 'completed'
   visitorType?: 'business' | 'child' | 'vip' | 'dog' | 'other'
   accessCode?: string
   createdAt: string
+  checkInTime?: string
+  checkOutTime?: string
+  badgeNumber?: string
+  idVerified?: boolean
+  isWalkIn?: boolean
 }
 
 export interface ParkingSpace {
@@ -817,7 +822,33 @@ const getInitialState = (): GlobalState => {
         updatedAt: new Date().toISOString()
       }
     ],
-    tickets: [],
+    tickets: [
+      { id: 'tkt-1', ticketNumber: 'TKT-001', title: 'Meeting room touch panel not working', description: '12H.001.M Teams touch panel is unresponsive', category: 'Meeting rooms', priority: 'high', status: 'resolved', createdBy: 'user1', createdByName: 'Alice Johnson', assignedTo: 'user3', assignedToName: 'Charlie Davis', tenantId: 'acme', createdAt: '2025-02-01T09:00:00Z', updatedAt: '2025-02-01T09:45:00Z' },
+      { id: 'tkt-2', ticketNumber: 'TKT-002', title: 'Locker card reader malfunction', description: 'Floor A locker section card reader not functioning', category: 'Locker', priority: 'high', status: 'resolved', createdBy: 'user2', createdByName: 'Bob Smith', tenantId: 'acme', createdAt: '2025-02-01T10:30:00Z', updatedAt: '2025-02-01T11:15:00Z' },
+      { id: 'tkt-3', ticketNumber: 'TKT-003', title: 'Furniture damage in common area', description: 'Purple couch on 5th floor has been damaged', category: 'Furniture', priority: 'medium', status: 'resolved', createdBy: 'user1', createdByName: 'Alice Johnson', tenantId: 'acme', createdAt: '2025-02-02T08:00:00Z', updatedAt: '2025-02-02T10:00:00Z' },
+      { id: 'tkt-4', ticketNumber: 'TKT-004', title: 'Lights not working on 10th floor', description: 'Team area lights are off and cannot be turned on', category: 'Electric systems', priority: 'high', status: 'resolved', createdBy: 'user3', createdByName: 'Charlie Davis', tenantId: 'acme', createdAt: '2025-02-02T14:00:00Z', updatedAt: '2025-02-02T14:30:00Z' },
+      { id: 'tkt-5', ticketNumber: 'TKT-005', title: 'Heating issue on 17th floor', description: 'Very cold on 17th floor, heating seems broken', category: 'Heating/AC', priority: 'critical', status: 'resolved', createdBy: 'user2', createdByName: 'Bob Smith', tenantId: 'acme', createdAt: '2025-02-03T07:30:00Z', updatedAt: '2025-02-03T08:15:00Z' },
+      { id: 'tkt-6', ticketNumber: 'TKT-006', title: 'Parking visitor spot request', description: 'Need parking for visitor AAAEAF699 on 08.02', category: 'Business visitor parking', priority: 'medium', status: 'resolved', createdBy: 'user1', createdByName: 'Alice Johnson', tenantId: 'acme', createdAt: '2025-02-04T09:00:00Z', updatedAt: '2025-02-04T09:20:00Z' },
+      { id: 'tkt-7', ticketNumber: 'TKT-007', title: 'Kitchen table wobbling', description: '10th floor kitchen table 2 is unstable', category: 'Furniture', priority: 'low', status: 'resolved', createdBy: 'user3', createdByName: 'Charlie Davis', tenantId: 'acme', createdAt: '2025-02-05T11:00:00Z', updatedAt: '2025-02-05T15:00:00Z' },
+      { id: 'tkt-8', ticketNumber: 'TKT-008', title: 'AC noise on 3rd floor right side', description: 'Loud AC noise making it hard to work', category: 'Heating/AC', priority: 'high', status: 'resolved', createdBy: 'user2', createdByName: 'Bob Smith', tenantId: 'acme', createdAt: '2025-02-06T08:00:00Z', updatedAt: '2025-02-06T09:00:00Z' },
+      { id: 'tkt-9', ticketNumber: 'TKT-009', title: 'Elevator button not responding', description: '22nd floor elevator call button intermittent', category: 'Other', priority: 'medium', status: 'open', createdBy: 'user1', createdByName: 'Alice Johnson', tenantId: 'acme', createdAt: '2025-02-07T13:00:00Z', updatedAt: '2025-02-07T13:00:00Z' },
+      { id: 'tkt-10', ticketNumber: 'TKT-010', title: 'Locker won\'t open via app', description: 'Locker app unlock not working', category: 'Locker', priority: 'high', status: 'resolved', createdBy: 'user3', createdByName: 'Charlie Davis', tenantId: 'acme', createdAt: '2025-02-08T10:00:00Z', updatedAt: '2025-02-08T10:30:00Z' },
+      { id: 'tkt-11', ticketNumber: 'TKT-011', title: 'Cable missing from focus box', description: 'First floor focus box cable tray is empty', category: 'Meeting rooms', priority: 'low', status: 'resolved', createdBy: 'user2', createdByName: 'Bob Smith', tenantId: 'acme', createdAt: '2025-02-09T09:00:00Z', updatedAt: '2025-02-09T12:00:00Z' },
+      { id: 'tkt-12', ticketNumber: 'TKT-012', title: 'Strange noise from ceiling', description: 'Buzzing noise from ceiling on 8th floor', category: 'Electric systems', priority: 'medium', status: 'in-progress', createdBy: 'user1', createdByName: 'Alice Johnson', tenantId: 'acme', createdAt: '2025-02-10T14:00:00Z', updatedAt: '2025-02-10T16:00:00Z' },
+      { id: 'tkt-13', ticketNumber: 'TKT-013', title: 'Visitor parking request XZT-123', description: 'Need 2-day parking for XZT-123', category: 'Business visitor parking', priority: 'medium', status: 'resolved', createdBy: 'user3', createdByName: 'Charlie Davis', tenantId: 'acme', createdAt: '2025-02-11T08:00:00Z', updatedAt: '2025-02-11T08:10:00Z' },
+      { id: 'tkt-14', ticketNumber: 'TKT-014', title: 'Warranty claim for desk chair', description: 'Hydraulic cylinder failed on desk chair', category: 'Furniture', priority: 'low', status: 'open', createdBy: 'user2', createdByName: 'Bob Smith', tenantId: 'acme', createdAt: '2025-02-12T10:00:00Z', updatedAt: '2025-02-12T10:00:00Z' },
+      { id: 'tkt-15', ticketNumber: 'TKT-015', title: 'Meeting room display blank', description: 'Conference room C3 display not showing', category: 'Meeting rooms', priority: 'high', status: 'resolved', createdBy: 'user1', createdByName: 'Alice Johnson', tenantId: 'acme', createdAt: '2025-02-13T11:00:00Z', updatedAt: '2025-02-13T11:20:00Z' },
+      { id: 'tkt-16', ticketNumber: 'TKT-016', title: 'Heating too strong on 5th floor', description: 'Temperature above 28C on 5th floor east wing', category: 'Heating/AC', priority: 'high', status: 'resolved', createdBy: 'user3', createdByName: 'Charlie Davis', tenantId: 'acme', createdAt: '2025-02-14T07:00:00Z', updatedAt: '2025-02-14T08:00:00Z' },
+      { id: 'tkt-17', ticketNumber: 'TKT-017', title: 'Locker assignment error', description: 'Locker shows occupied but nobody assigned', category: 'Locker', priority: 'medium', status: 'resolved', createdBy: 'user2', createdByName: 'Bob Smith', tenantId: 'acme', createdAt: '2025-02-15T09:00:00Z', updatedAt: '2025-02-15T10:00:00Z' },
+      { id: 'tkt-18', ticketNumber: 'TKT-018', title: 'Parking gate stuck', description: 'Level -2 parking gate not opening', category: 'Other', priority: 'critical', status: 'resolved', createdBy: 'user1', createdByName: 'Alice Johnson', tenantId: 'acme', createdAt: '2025-02-16T06:30:00Z', updatedAt: '2025-02-16T07:00:00Z' },
+      { id: 'tkt-19', ticketNumber: 'TKT-019', title: 'Visitor parking for event', description: 'Need 10 visitor spots for Feb 20 event', category: 'Business visitor parking', priority: 'medium', status: 'resolved', createdBy: 'user3', createdByName: 'Charlie Davis', tenantId: 'acme', createdAt: '2025-02-17T10:00:00Z', updatedAt: '2025-02-17T10:15:00Z' },
+      { id: 'tkt-20', ticketNumber: 'TKT-020', title: 'Light flickering in restroom', description: 'Ground floor main restroom lights flickering', category: 'Electric systems', priority: 'low', status: 'resolved', createdBy: 'user2', createdByName: 'Bob Smith', tenantId: 'acme', createdAt: '2025-02-18T14:00:00Z', updatedAt: '2025-02-18T16:00:00Z' },
+      { id: 'tkt-21', ticketNumber: 'TKT-021', title: 'Broken window handle', description: '15th floor corner office window handle snapped', category: 'Other', priority: 'medium', status: 'in-progress', createdBy: 'user1', createdByName: 'Alice Johnson', tenantId: 'acme', createdAt: '2025-02-19T09:00:00Z', updatedAt: '2025-02-20T09:00:00Z' },
+      { id: 'tkt-22', ticketNumber: 'TKT-022', title: 'Locker door hinge broken', description: 'Gym locker G12 door hinge is broken', category: 'Locker', priority: 'medium', status: 'open', createdBy: 'user3', createdByName: 'Charlie Davis', tenantId: 'acme', createdAt: '2025-02-20T11:00:00Z', updatedAt: '2025-02-20T11:00:00Z' },
+      { id: 'tkt-23', ticketNumber: 'TKT-023', title: 'AC unit leaking water', description: 'Water dripping from AC on 9th floor', category: 'Heating/AC', priority: 'critical', status: 'resolved', createdBy: 'user2', createdByName: 'Bob Smith', tenantId: 'acme', createdAt: '2025-02-21T08:00:00Z', updatedAt: '2025-02-21T09:30:00Z' },
+      { id: 'tkt-24', ticketNumber: 'TKT-024', title: 'Electric outlet sparking', description: 'Team area outlet on 12th floor sparking', category: 'Electric systems', priority: 'critical', status: 'resolved', createdBy: 'user1', createdByName: 'Alice Johnson', tenantId: 'acme', createdAt: '2025-02-22T10:00:00Z', updatedAt: '2025-02-22T10:20:00Z' },
+      { id: 'tkt-25', ticketNumber: 'TKT-025', title: 'Meeting room booking conflict', description: 'Double booking on room 2B.101.W', category: 'Meeting rooms', priority: 'medium', status: 'resolved', createdBy: 'user3', createdByName: 'Charlie Davis', tenantId: 'acme', createdAt: '2025-02-23T13:00:00Z', updatedAt: '2025-02-23T13:30:00Z' },
+    ],
     policyFiles: {
       'GDPR': null,
       'Terms & Conditions': null,

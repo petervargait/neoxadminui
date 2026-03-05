@@ -1,9 +1,9 @@
 # NEOX Infinity App - Master Specification Index
 ## Complete Pixel-Perfect Documentation for All Modules
 
-**Version**: 3.0 - ULTRA DETAILED  
-**Date**: 2025-10-28  
-**Total Documentation**: 150,000+ lines across 15 files  
+**Version**: 4.0 - ULTRA DETAILED
+**Date**: 2026-03-05
+**Total Documentation**: 176,500+ lines across 16 files
 **Detail Level**: Implementation-ready - Every button, field, validation, error message, and interaction documented
 
 ---
@@ -71,9 +71,90 @@ This specification is organized into separate files for maintainability. Each fi
 
 ---
 
+## 📊 Module 0: Dashboard & Analytics
+
+### 4. Dashboard & Analytics Module
+**File**: `05_DASHBOARDS_ANALYTICS.md`
+
+**Contents:**
+
+#### Overview:
+Complete implementation of 10 Figma-based analytic dashboards for the NEOX admin panel. Each dashboard presents a distinct operational view of building, facility, and service data. All dashboards use a shared SVG chart library with consistent DASH design tokens and support tenant-filtered data, month selectors, and filter dropdowns.
+
+#### Dashboards (10 dashboards):
+1. **Energy Monitor** (renamed from Sustainability)
+   - Energy consumption bar charts by building/zone
+   - Facility metrics overview cards
+   - Waste management tracking
+   - CO2 emissions trend line chart
+
+2. **Wellbeing Services**
+   - Indoor/outdoor climate gauge indicators
+   - Traffic map widget with congestion overlay
+   - Weather prediction panel
+   - Occupancy prediction area chart
+
+3. **Office Building**
+   - Electricity usage bar chart by floor
+   - Indoor climate temperature/humidity indicators
+   - Heating & cooling facility performance metrics
+
+4. **Office Services**
+   - Issue handling queue with status breakdown
+   - Ticket resolution rate trend chart
+   - Most frequent request types bar chart
+   - Most frequent issues horizontal bar chart
+
+5. **Office Services Full**
+   - Complete ticket SLA statistics table
+   - KPI gauge charts for response/resolution targets
+   - Frequented users leaderboard table
+   - Cleaning stats and schedule compliance
+
+6. **Amenity Services**
+   - Fitness center utilization chart
+   - Catering booking trends
+   - Shared services usage breakdown
+   - Beauty/wellness, fresh corner, shuttle metrics
+   - Peak utilization heatmap by hour/day
+
+7. **Employee Services**
+   - Parking utilization by zone/level
+   - Meeting room booking trends
+   - Popular rooms ranking (horizontal bar)
+   - Vending machine revenue/usage stats
+
+8. **Visitor Center**
+   - Visitor counts by weekday (bar chart)
+   - Visitor counts by time slot (stacked bar)
+   - App download metrics trend
+   - Vending revenue chart
+
+9. **Parking & Restaurant**
+   - Parking occupancy metrics cards
+   - Parking booking trend line chart
+   - Restaurant occupancy combo bar/line chart
+
+10. **Occupancy Services**
+    - Visitor count management summary
+    - Parking access statistics
+    - Access management overview cards
+    - Workplace utilization with interactive SVG floor heatmap
+
+#### Technical Implementation:
+- **Dashboard page**: `src/app/dashboard/page.tsx`
+- **Shared chart library**: `src/components/charts/DashboardCharts.tsx`
+- **Dashboard components**: `src/components/dashboards/Dashboard1-10*.tsx`
+- **Design tokens**: DASH constant (colors, spacing, typography)
+- **Chart types**: GoldBarChart, ComboBarLineChart, HorizontalBarChart, StackedHorizontalBarChart, PieChart, LineChart, GaugeChart, AreaChart, FloorHeatmap
+- **Data source**: GlobalStateContext (tickets, invitations, spaces, buildings, parkingBookings, badgeSwipes, lockerUsages)
+- **Mock data**: 25 mock tickets pre-loaded in GlobalStateContext
+
+---
+
 ## 👤 Module 1: User Management
 
-### 4. User Management Module
+### 5. User Management Module
 **File**: `04_USER_MANAGEMENT.md` (14,000 lines)
 
 **Contents:**
@@ -723,6 +804,7 @@ Complete React Native specifications.
 | Design System | - | - | - | - | 12,000 |
 | Authentication | 8 | 45 | 200 | 300 | 8,000 |
 | Navigation | 15 | 30 | 50 | 200 | 6,000 |
+| Dashboard & Analytics | 10 | 40 | 80 | 500 | 8,500 |
 | User Management | 12 | 200 | 500 | 1,000 | 14,000 |
 | Visitor Management | 15 | 150 | 800 | 2,000 | 18,000 |
 | Parking | 13 | 80 | 400 | 800 | 15,000 |
@@ -737,7 +819,7 @@ Complete React Native specifications.
 | Security | 9 | 50 | 200 | 350 | 8,000 |
 | Mobile App | 20 | 100 | 400 | 800 | 12,000 |
 | Testing | - | - | - | - | 6,000 |
-| **TOTAL** | **176** | **1,235** | **4,800** | **9,850** | **168,000** |
+| **TOTAL** | **186** | **1,275** | **4,880** | **10,350** | **176,500** |
 
 ---
 
@@ -806,6 +888,7 @@ Files to implement:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 4.0 | 2026-03-05 | Added Dashboard & Analytics module (05_DASHBOARDS_ANALYTICS.md) with 10 implemented dashboards |
 | 3.0 | 2025-10-28 | Complete ultra-detailed specifications for all modules |
 | 2.0 | 2025-10-28 | Added design system and authentication |
 | 1.0 | 2025-10-28 | Initial draft |

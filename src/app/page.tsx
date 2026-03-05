@@ -257,14 +257,15 @@ export default function Home() {
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Manage your organization&apos;s users and settings</p>
             </div>
 
-            <div
-              onClick={() => alert('Dashboard & Analytics\n\nAdvanced analytics and reporting features are coming soon. Stay tuned for comprehensive insights into your building operations!')}
+            <Link
+              href="/dashboard"
               style={{
                 display: 'block',
                 padding: '40px 32px',
                 backgroundColor: '#162032',
                 border: '1px solid #1E293B',
                 borderRadius: '12px',
+                textDecoration: 'none',
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                 transition: 'all 0.2s ease',
                 cursor: 'pointer'
@@ -295,7 +296,7 @@ export default function Home() {
               </div>
               <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#F1F5F9', marginBottom: '12px' }}>Dashboard & Analytics</h2>
               <p style={{ fontSize: '16px', color: '#64748B', lineHeight: '1.5' }}>Advanced reporting and data visualization</p>
-            </div>
+            </Link>
 
             <Link
               href="/energy"
