@@ -147,6 +147,29 @@ function getFirstDayOfMonth(year: number, month: number): number {
   return day === 0 ? 6 : day - 1 // Monday = 0
 }
 
+function getWeekDays(baseDate?: Date): { date: Date; dateStr: string; label: string; shortDay: string }[] {
+  const d = baseDate ? new Date(baseDate) : new Date()
+  const day = d.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  const monday = new Date(d)
+  monday.setDate(d.getDate() + diff)
+  const days: { date: Date; dateStr: string; label: string; shortDay: string }[] = []
+  const shortDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  for (let i = 0; i < 7; i++) {
+    const dd = new Date(monday)
+    dd.setDate(monday.getDate() + i)
+    days.push({
+      date: dd,
+      dateStr: dd.toISOString().split('T')[0],
+      label: dd.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
+      shortDay: shortDays[i],
+    })
+  }
+  return days
+}
+
+const HOUR_SLOTS = Array.from({ length: 14 }, (_, i) => i + 7) // 07:00 to 20:00
+
 const statusColors: Record<string, { bg: string; text: string; border: string }> = {
   pending: { bg: 'rgba(212, 168, 71, 0.15)', text: '#D4A847', border: 'rgba(212, 168, 71, 0.3)' },
   approved: { bg: 'rgba(59, 130, 246, 0.15)', text: '#3B82F6', border: 'rgba(59, 130, 246, 0.3)' },
@@ -861,103 +884,231 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
       {/* ── Calendar View ──────────────────────────────────────────────── */}
       {viewMode === 'calendar' && (
         <div style={cardStyle}>
-          {/* Month navigation */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <button onClick={prevMonth} style={iconBtnStyle}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </button>
-            <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: colors.text }}>
-              {monthNames[calendarMonth]} {calendarYear}
-            </h2>
-            <button onClick={nextMonth} style={iconBtnStyle}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Day labels */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '8px' }}>
-            {dayLabels.map(d => (
-              <div key={d} style={{
-                textAlign: 'center',
-                fontSize: '11px',
-                fontWeight: 700,
-                color: colors.muted,
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                padding: '8px 0',
-              }}>
-                {d}
-              </div>
-            ))}
-          </div>
-
-          {/* Calendar grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
-            {/* Empty cells before first day */}
-            {Array.from({ length: getFirstDayOfMonth(calendarYear, calendarMonth) }).map((_, i) => (
-              <div key={`empty-${i}`} style={{ minHeight: '80px' }} />
-            ))}
-
-            {/* Day cells */}
-            {Array.from({ length: getDaysInMonth(calendarYear, calendarMonth) }).map((_, i) => {
-              const dayNum = i + 1
-              const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
-              const dayInvitations = invitationsByDay[dateStr] || []
-              const isToday = dateStr === todayStr()
-              const hasVisitors = dayInvitations.length > 0
-
-              return (
-                <div
-                  key={dayNum}
-                  onClick={() => hasVisitors ? setCalendarDayModal(dateStr) : undefined}
-                  style={{
-                    minHeight: '80px',
-                    padding: '8px',
-                    borderRadius: '8px',
-                    background: isToday ? 'rgba(59, 130, 246, 0.08)' : 'rgba(255,255,255,0.02)',
-                    border: isToday ? `1px solid rgba(59, 130, 246, 0.3)` : `1px solid ${colors.cardBorder}`,
-                    cursor: hasVisitors ? 'pointer' : 'default',
-                    transition: 'background 0.15s',
-                    position: 'relative',
-                  }}
-                  onMouseEnter={e => {
-                    if (hasVisitors) (e.currentTarget as HTMLDivElement).style.background = 'rgba(59, 130, 246, 0.12)'
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLDivElement).style.background = isToday ? 'rgba(59, 130, 246, 0.08)' : 'rgba(255,255,255,0.02)'
-                  }}
-                >
-                  <div style={{
-                    fontSize: '13px',
-                    fontWeight: isToday ? 800 : 600,
-                    color: isToday ? colors.blue : colors.text,
-                    marginBottom: '6px',
-                  }}>
-                    {dayNum}
-                  </div>
-                  {hasVisitors && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        background: colors.blue,
-                        boxShadow: `0 0 6px ${colors.blue}`,
-                        flexShrink: 0,
-                      }} />
-                      <span style={{ fontSize: '12px', color: colors.secondary, fontWeight: 600 }}>
-                        {dayInvitations.length} visitor{dayInvitations.length !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-                  )}
+          {/* ── Day View (Today) ── */}
+          {dateFilter === 'today' && (() => {
+            const todayDate = todayStr()
+            const todayInvitations = tenantInvitations.filter(inv => inv.visitDate === todayDate)
+            return (
+              <>
+                <h2 style={{ fontSize: '20px', fontWeight: 700, margin: '0 0 20px 0', color: colors.text }}>
+                  {formatDate(todayDate)}
+                </h2>
+                <div style={{ position: 'relative' }}>
+                  {HOUR_SLOTS.map(hour => {
+                    const hourStr = String(hour).padStart(2, '0')
+                    const slotInvitations = todayInvitations.filter(inv => inv.visitTime && inv.visitTime.startsWith(hourStr + ':'))
+                    return (
+                      <div key={hour} style={{
+                        display: 'flex',
+                        minHeight: '60px',
+                        borderBottom: `1px solid ${colors.cardBorder}`,
+                      }}>
+                        <div style={{
+                          width: '70px',
+                          flexShrink: 0,
+                          padding: '8px 12px 8px 0',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          color: colors.muted,
+                          textAlign: 'right',
+                          borderRight: `1px solid ${colors.cardBorder}`,
+                        }}>
+                          {hourStr}:00
+                        </div>
+                        <div style={{ flex: 1, padding: '4px 8px', display: 'flex', flexWrap: 'wrap', gap: '4px', alignContent: 'flex-start' }}>
+                          {slotInvitations.map(inv => {
+                            const sc = statusColors[inv.status] || statusColors.pending
+                            return (
+                              <div key={inv.id} style={{
+                                padding: '6px 10px',
+                                borderRadius: '6px',
+                                background: sc.bg,
+                                border: `1px solid ${sc.border}`,
+                                fontSize: '12px',
+                                color: sc.text,
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }} onClick={() => setCalendarDayModal(todayDate)}>
+                                {formatTime(inv.visitTime)} — {inv.visitorName}
+                                {inv.visitorCompany ? ` (${inv.visitorCompany})` : ''}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
-              )
-            })}
-          </div>
+              </>
+            )
+          })()}
+
+          {/* ── Week View ── */}
+          {dateFilter === 'week' && (() => {
+            const weekDays = getWeekDays()
+            const todayDate = todayStr()
+            return (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: '70px repeat(7, 1fr)', gap: 0 }}>
+                  {/* Header row */}
+                  <div style={{ borderBottom: `2px solid ${colors.cardBorder}`, padding: '8px 0' }} />
+                  {weekDays.map(wd => (
+                    <div key={wd.dateStr} style={{
+                      textAlign: 'center',
+                      padding: '8px 4px',
+                      borderBottom: `2px solid ${colors.cardBorder}`,
+                      borderLeft: `1px solid ${colors.cardBorder}`,
+                      background: wd.dateStr === todayDate ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
+                    }}>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: wd.dateStr === todayDate ? colors.blue : colors.muted, textTransform: 'uppercase' }}>
+                        {wd.shortDay}
+                      </div>
+                      <div style={{ fontSize: '16px', fontWeight: wd.dateStr === todayDate ? 800 : 600, color: wd.dateStr === todayDate ? colors.blue : colors.text, marginTop: '2px' }}>
+                        {wd.date.getDate()}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Hour rows */}
+                  {HOUR_SLOTS.map(hour => {
+                    const hourStr = String(hour).padStart(2, '0')
+                    return (
+                      <React.Fragment key={hour}>
+                        <div style={{
+                          padding: '8px 8px 8px 0',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          color: colors.muted,
+                          textAlign: 'right',
+                          borderBottom: `1px solid ${colors.cardBorder}`,
+                          borderRight: `1px solid ${colors.cardBorder}`,
+                        }}>
+                          {hourStr}:00
+                        </div>
+                        {weekDays.map(wd => {
+                          const slotInvitations = tenantInvitations.filter(inv => inv.visitDate === wd.dateStr && inv.visitTime && inv.visitTime.startsWith(hourStr + ':'))
+                          return (
+                            <div key={wd.dateStr} style={{
+                              minHeight: '48px',
+                              padding: '2px 4px',
+                              borderBottom: `1px solid ${colors.cardBorder}`,
+                              borderLeft: `1px solid ${colors.cardBorder}`,
+                              background: wd.dateStr === todayDate ? 'rgba(59, 130, 246, 0.04)' : 'transparent',
+                            }}>
+                              {slotInvitations.map(inv => {
+                                const sc = statusColors[inv.status] || statusColors.pending
+                                return (
+                                  <div key={inv.id} style={{
+                                    padding: '3px 6px',
+                                    borderRadius: '4px',
+                                    background: sc.bg,
+                                    border: `1px solid ${sc.border}`,
+                                    fontSize: '10px',
+                                    color: sc.text,
+                                    fontWeight: 600,
+                                    marginBottom: '2px',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    cursor: 'pointer',
+                                  }} title={`${inv.visitorName} - ${formatTime(inv.visitTime)}`}
+                                     onClick={() => setCalendarDayModal(wd.dateStr)}>
+                                    {inv.visitorName}
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )
+                        })}
+                      </React.Fragment>
+                    )
+                  })}
+                </div>
+              </>
+            )
+          })()}
+
+          {/* ── Month View (default) ── */}
+          {(dateFilter === 'month' || dateFilter === 'custom') && (
+            <>
+              {/* Month navigation */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <button onClick={prevMonth} style={iconBtnStyle}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                </button>
+                <h2 style={{ fontSize: '20px', fontWeight: 700, margin: 0, color: colors.text }}>
+                  {monthNames[calendarMonth]} {calendarYear}
+                </h2>
+                <button onClick={nextMonth} style={iconBtnStyle}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Day labels */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '8px' }}>
+                {dayLabels.map(d => (
+                  <div key={d} style={{
+                    textAlign: 'center',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: colors.muted,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    padding: '8px 0',
+                  }}>
+                    {d}
+                  </div>
+                ))}
+              </div>
+
+              {/* Calendar grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
+                {Array.from({ length: getFirstDayOfMonth(calendarYear, calendarMonth) }).map((_, i) => (
+                  <div key={`empty-${i}`} style={{ minHeight: '80px' }} />
+                ))}
+                {Array.from({ length: getDaysInMonth(calendarYear, calendarMonth) }).map((_, i) => {
+                  const dayNum = i + 1
+                  const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`
+                  const dayInvitations = invitationsByDay[dateStr] || []
+                  const isToday = dateStr === todayStr()
+                  const hasVisitors = dayInvitations.length > 0
+                  return (
+                    <div
+                      key={dayNum}
+                      onClick={() => hasVisitors ? setCalendarDayModal(dateStr) : undefined}
+                      style={{
+                        minHeight: '80px',
+                        padding: '8px',
+                        borderRadius: '8px',
+                        background: isToday ? 'rgba(59, 130, 246, 0.08)' : 'rgba(255,255,255,0.02)',
+                        border: isToday ? `1px solid rgba(59, 130, 246, 0.3)` : `1px solid ${colors.cardBorder}`,
+                        cursor: hasVisitors ? 'pointer' : 'default',
+                        transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={e => { if (hasVisitors) (e.currentTarget as HTMLDivElement).style.background = 'rgba(59, 130, 246, 0.12)' }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = isToday ? 'rgba(59, 130, 246, 0.08)' : 'rgba(255,255,255,0.02)' }}
+                    >
+                      <div style={{ fontSize: '13px', fontWeight: isToday ? 800 : 600, color: isToday ? colors.blue : colors.text, marginBottom: '6px' }}>
+                        {dayNum}
+                      </div>
+                      {hasVisitors && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: colors.blue, boxShadow: `0 0 6px ${colors.blue}`, flexShrink: 0 }} />
+                          <span style={{ fontSize: '12px', color: colors.secondary, fontWeight: 600 }}>
+                            {dayInvitations.length} visitor{dayInvitations.length !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
         </div>
       )}
 

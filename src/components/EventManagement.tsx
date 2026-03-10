@@ -127,6 +127,29 @@ function getFirstDayOfMonth(year: number, month: number): number {
   return new Date(year, month, 1).getDay()
 }
 
+function getWeekDaysForEvent(baseDate?: Date): { date: Date; dateStr: string; label: string; shortDay: string }[] {
+  const d = baseDate ? new Date(baseDate) : new Date()
+  const day = d.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  const monday = new Date(d)
+  monday.setDate(d.getDate() + diff)
+  const days: { date: Date; dateStr: string; label: string; shortDay: string }[] = []
+  const shortDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  for (let i = 0; i < 7; i++) {
+    const dd = new Date(monday)
+    dd.setDate(monday.getDate() + i)
+    days.push({
+      date: dd,
+      dateStr: dd.toISOString().split('T')[0],
+      label: dd.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
+      shortDay: shortDays[i],
+    })
+  }
+  return days
+}
+
+const EVENT_HOUR_SLOTS = Array.from({ length: 14 }, (_, i) => i + 7) // 07:00 to 20:00
+
 function createEmptyParticipant(): EventParticipant {
   return {
     id: `p_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -1016,130 +1039,252 @@ export default function EventManagement({ tenantId }: EventManagementProps) {
       {/* ================================================================ */}
       {viewMode === 'calendar' && (
         <div style={cardStyle}>
-          {/* Calendar header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-            <button style={{ ...btnSecondary, padding: '8px 14px' }} onClick={prevMonth}>
-              <svg style={{ width: '16px', height: '16px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: COLORS.text }}>
-              {monthNames[calendarMonth]} {calendarYear}
-            </h3>
-            <button style={{ ...btnSecondary, padding: '8px 14px' }} onClick={nextMonth}>
-              <svg style={{ width: '16px', height: '16px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Day headers */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '4px' }}>
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-              <div key={d} style={{ textAlign: 'center', fontSize: '12px', fontWeight: 600, color: COLORS.muted, padding: '8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {d}
-              </div>
-            ))}
-          </div>
-
-          {/* Calendar grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
-            {/* Empty cells for offset */}
-            {Array.from({ length: getFirstDayOfMonth(calendarYear, calendarMonth) }).map((_, i) => (
-              <div key={`empty-${i}`} style={{ minHeight: '90px', background: 'rgba(255,255,255,0.01)', borderRadius: '6px' }} />
-            ))}
-
-            {/* Day cells */}
-            {Array.from({ length: getDaysInMonth(calendarYear, calendarMonth) }).map((_, i) => {
-              const day = i + 1
-              const dayEvents = calendarEvents[day] || []
-              const isToday = day === now.getDate() && calendarMonth === now.getMonth() && calendarYear === now.getFullYear()
-              const isSelected = selectedCalendarDay === day
-
-              return (
-                <div
-                  key={day}
-                  onClick={() => setSelectedCalendarDay(isSelected ? null : day)}
-                  style={{
-                    minHeight: '90px',
-                    background: isSelected ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.02)',
-                    borderRadius: '6px',
-                    padding: '8px',
-                    cursor: dayEvents.length > 0 ? 'pointer' : 'default',
-                    border: isToday ? `1px solid ${COLORS.blue}40` : isSelected ? `1px solid ${COLORS.blue}` : '1px solid transparent',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  <div style={{
-                    fontSize: '13px',
-                    fontWeight: isToday ? 700 : 500,
-                    color: isToday ? COLORS.blue : COLORS.secondary,
-                    marginBottom: '6px',
-                  }}>
-                    {day}
-                  </div>
-                  {dayEvents.slice(0, 3).map(ev => (
-                    <div
-                      key={ev.id}
-                      style={{
+          {/* ── Day View (Today) ── */}
+          {dateFilter === 'today' && (() => {
+            const todayDate = new Date().toISOString().split('T')[0]
+            const todayEvents = tenantEvents.filter(e => e.eventDate === todayDate)
+            return (
+              <>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 20px', color: COLORS.text }}>
+                  {formatDate(todayDate)}
+                </h3>
+                <div style={{ position: 'relative' }}>
+                  {EVENT_HOUR_SLOTS.map(hour => {
+                    const hourStr = String(hour).padStart(2, '0')
+                    const slotEvents = todayEvents.filter(ev => ev.eventTime && ev.eventTime.startsWith(hourStr + ':'))
+                    return (
+                      <div key={hour} style={{
                         display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        marginBottom: '3px',
-                        fontSize: '11px',
-                        color: COLORS.text,
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      <div style={{
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        flexShrink: 0,
-                        background: ev.status === 'published' ? COLORS.blue :
-                          ev.status === 'draft' ? COLORS.secondary :
-                          ev.status === 'completed' ? COLORS.green : COLORS.red,
-                      }} />
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{ev.eventName}</span>
-                    </div>
-                  ))}
-                  {dayEvents.length > 3 && (
-                    <div style={{ fontSize: '10px', color: COLORS.muted }}>+{dayEvents.length - 3} more</div>
-                  )}
+                        minHeight: '60px',
+                        borderBottom: `1px solid ${COLORS.cardBorder}`,
+                      }}>
+                        <div style={{
+                          width: '70px',
+                          flexShrink: 0,
+                          padding: '8px 12px 8px 0',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          color: COLORS.muted,
+                          textAlign: 'right',
+                          borderRight: `1px solid ${COLORS.cardBorder}`,
+                        }}>
+                          {hourStr}:00
+                        </div>
+                        <div style={{ flex: 1, padding: '4px 8px', display: 'flex', flexWrap: 'wrap', gap: '4px', alignContent: 'flex-start' }}>
+                          {slotEvents.map(ev => {
+                            const evColor = ev.status === 'published' ? COLORS.blue : ev.status === 'draft' ? COLORS.secondary : ev.status === 'completed' ? COLORS.green : COLORS.red
+                            return (
+                              <div key={ev.id} style={{
+                                padding: '6px 10px',
+                                borderRadius: '6px',
+                                background: `${evColor}20`,
+                                border: `1px solid ${evColor}40`,
+                                fontSize: '12px',
+                                color: evColor,
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }} onClick={() => openEditModal(ev)}>
+                                {formatTime(ev.eventTime)} — {ev.eventName} ({ev.participants.length} participants)
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
-              )
-            })}
-          </div>
+              </>
+            )
+          })()}
 
-          {/* Selected day detail */}
-          {selectedCalendarDay !== null && calendarEvents[selectedCalendarDay] && calendarEvents[selectedCalendarDay].length > 0 && (
-            <div style={{ marginTop: '20px', borderTop: `1px solid ${COLORS.cardBorder}`, paddingTop: '20px' }}>
-              <h4 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 16px', color: COLORS.text }}>
-                Events on {monthNames[calendarMonth]} {selectedCalendarDay}, {calendarYear}
-              </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {calendarEvents[selectedCalendarDay].map(ev => (
-                  <div key={ev.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '14px 16px', border: `1px solid ${COLORS.cardBorder}` }}>
-                    <div>
-                      <div style={{ fontSize: '15px', fontWeight: 600, color: COLORS.text, marginBottom: '4px' }}>
-                        {ev.eventName}
-                      </div>
-                      <div style={{ fontSize: '12px', color: COLORS.secondary }}>
-                        {formatTime(ev.eventTime)}{ev.eventEndTime ? ` - ${formatTime(ev.eventEndTime)}` : ''} &middot; {ev.eventLocation} &middot; {ev.participants.length} participant{ev.participants.length !== 1 ? 's' : ''}
-                      </div>
+          {/* ── Week View ── */}
+          {dateFilter === 'thisWeek' && (() => {
+            const weekDays = getWeekDaysForEvent()
+            const todayDate = new Date().toISOString().split('T')[0]
+            return (
+              <div style={{ display: 'grid', gridTemplateColumns: '70px repeat(7, 1fr)', gap: 0 }}>
+                {/* Header row */}
+                <div style={{ borderBottom: `2px solid ${COLORS.cardBorder}`, padding: '8px 0' }} />
+                {weekDays.map(wd => (
+                  <div key={wd.dateStr} style={{
+                    textAlign: 'center',
+                    padding: '8px 4px',
+                    borderBottom: `2px solid ${COLORS.cardBorder}`,
+                    borderLeft: `1px solid ${COLORS.cardBorder}`,
+                    background: wd.dateStr === todayDate ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
+                  }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: wd.dateStr === todayDate ? COLORS.blue : COLORS.muted, textTransform: 'uppercase' }}>
+                      {wd.shortDay}
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <span style={statusBadgeStyle(ev.status)}>{ev.status}</span>
-                      <button style={{ ...btnSecondary, padding: '6px 12px', fontSize: '12px' }} onClick={() => openEditModal(ev)}>
-                        Edit
-                      </button>
+                    <div style={{ fontSize: '16px', fontWeight: wd.dateStr === todayDate ? 800 : 600, color: wd.dateStr === todayDate ? COLORS.blue : COLORS.text, marginTop: '2px' }}>
+                      {wd.date.getDate()}
                     </div>
                   </div>
                 ))}
+
+                {/* Hour rows */}
+                {EVENT_HOUR_SLOTS.map(hour => {
+                  const hourStr = String(hour).padStart(2, '0')
+                  return (
+                    <React.Fragment key={hour}>
+                      <div style={{
+                        padding: '8px 8px 8px 0',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        color: COLORS.muted,
+                        textAlign: 'right',
+                        borderBottom: `1px solid ${COLORS.cardBorder}`,
+                        borderRight: `1px solid ${COLORS.cardBorder}`,
+                      }}>
+                        {hourStr}:00
+                      </div>
+                      {weekDays.map(wd => {
+                        const slotEvents = tenantEvents.filter(ev => ev.eventDate === wd.dateStr && ev.eventTime && ev.eventTime.startsWith(hourStr + ':'))
+                        return (
+                          <div key={wd.dateStr} style={{
+                            minHeight: '48px',
+                            padding: '2px 4px',
+                            borderBottom: `1px solid ${COLORS.cardBorder}`,
+                            borderLeft: `1px solid ${COLORS.cardBorder}`,
+                            background: wd.dateStr === todayDate ? 'rgba(59, 130, 246, 0.04)' : 'transparent',
+                          }}>
+                            {slotEvents.map(ev => {
+                              const evColor = ev.status === 'published' ? COLORS.blue : ev.status === 'draft' ? COLORS.secondary : ev.status === 'completed' ? COLORS.green : COLORS.red
+                              return (
+                                <div key={ev.id} style={{
+                                  padding: '3px 6px',
+                                  borderRadius: '4px',
+                                  background: `${evColor}20`,
+                                  border: `1px solid ${evColor}40`,
+                                  fontSize: '10px',
+                                  color: evColor,
+                                  fontWeight: 600,
+                                  marginBottom: '2px',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  cursor: 'pointer',
+                                }} title={`${ev.eventName} - ${formatTime(ev.eventTime)}`}
+                                   onClick={() => openEditModal(ev)}>
+                                  {ev.eventName}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )
+                      })}
+                    </React.Fragment>
+                  )
+                })}
               </div>
-            </div>
+            )
+          })()}
+
+          {/* ── Month View (default) ── */}
+          {(dateFilter === 'thisMonth' || dateFilter === 'custom') && (
+            <>
+              {/* Calendar header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <button style={{ ...btnSecondary, padding: '8px 14px' }} onClick={prevMonth}>
+                  <svg style={{ width: '16px', height: '16px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: COLORS.text }}>
+                  {monthNames[calendarMonth]} {calendarYear}
+                </h3>
+                <button style={{ ...btnSecondary, padding: '8px 14px' }} onClick={nextMonth}>
+                  <svg style={{ width: '16px', height: '16px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Day headers */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '4px' }}>
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                  <div key={d} style={{ textAlign: 'center', fontSize: '12px', fontWeight: 600, color: COLORS.muted, padding: '8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {d}
+                  </div>
+                ))}
+              </div>
+
+              {/* Calendar grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
+                {Array.from({ length: getFirstDayOfMonth(calendarYear, calendarMonth) }).map((_, i) => (
+                  <div key={`empty-${i}`} style={{ minHeight: '90px', background: 'rgba(255,255,255,0.01)', borderRadius: '6px' }} />
+                ))}
+                {Array.from({ length: getDaysInMonth(calendarYear, calendarMonth) }).map((_, i) => {
+                  const day = i + 1
+                  const dayEvents = calendarEvents[day] || []
+                  const isToday = day === now.getDate() && calendarMonth === now.getMonth() && calendarYear === now.getFullYear()
+                  const isSelected = selectedCalendarDay === day
+                  return (
+                    <div
+                      key={day}
+                      onClick={() => setSelectedCalendarDay(isSelected ? null : day)}
+                      style={{
+                        minHeight: '90px',
+                        background: isSelected ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.02)',
+                        borderRadius: '6px',
+                        padding: '8px',
+                        cursor: dayEvents.length > 0 ? 'pointer' : 'default',
+                        border: isToday ? `1px solid ${COLORS.blue}40` : isSelected ? `1px solid ${COLORS.blue}` : '1px solid transparent',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      <div style={{ fontSize: '13px', fontWeight: isToday ? 700 : 500, color: isToday ? COLORS.blue : COLORS.secondary, marginBottom: '6px' }}>
+                        {day}
+                      </div>
+                      {dayEvents.slice(0, 3).map(ev => (
+                        <div key={ev.id} style={{
+                          display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px',
+                          fontSize: '11px', color: COLORS.text, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                        }}>
+                          <div style={{
+                            width: '6px', height: '6px', borderRadius: '50%', flexShrink: 0,
+                            background: ev.status === 'published' ? COLORS.blue : ev.status === 'draft' ? COLORS.secondary : ev.status === 'completed' ? COLORS.green : COLORS.red,
+                          }} />
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{ev.eventName}</span>
+                        </div>
+                      ))}
+                      {dayEvents.length > 3 && (
+                        <div style={{ fontSize: '10px', color: COLORS.muted }}>+{dayEvents.length - 3} more</div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Selected day detail */}
+              {selectedCalendarDay !== null && calendarEvents[selectedCalendarDay] && calendarEvents[selectedCalendarDay].length > 0 && (
+                <div style={{ marginTop: '20px', borderTop: `1px solid ${COLORS.cardBorder}`, paddingTop: '20px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 16px', color: COLORS.text }}>
+                    Events on {monthNames[calendarMonth]} {selectedCalendarDay}, {calendarYear}
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {calendarEvents[selectedCalendarDay].map(ev => (
+                      <div key={ev.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '14px 16px', border: `1px solid ${COLORS.cardBorder}` }}>
+                        <div>
+                          <div style={{ fontSize: '15px', fontWeight: 600, color: COLORS.text, marginBottom: '4px' }}>
+                            {ev.eventName}
+                          </div>
+                          <div style={{ fontSize: '12px', color: COLORS.secondary }}>
+                            {formatTime(ev.eventTime)}{ev.eventEndTime ? ` - ${formatTime(ev.eventEndTime)}` : ''} &middot; {ev.eventLocation} &middot; {ev.participants.length} participant{ev.participants.length !== 1 ? 's' : ''}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <span style={statusBadgeStyle(ev.status)}>{ev.status}</span>
+                          <button style={{ ...btnSecondary, padding: '6px 12px', fontSize: '12px' }} onClick={() => openEditModal(ev)}>
+                            Edit
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
