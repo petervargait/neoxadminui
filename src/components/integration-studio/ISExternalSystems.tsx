@@ -23,15 +23,20 @@ import {
 // ─── Constants ────────────────────────────────────────────────────────────────
 const DOMAIN_TYPES = [
   { value: '',                    label: '— Select domain type —' },
-  { value: 'Identity Provider',   label: 'Identity Provider' },
+  { value: 'BMS',                 label: 'BMS' },
+  { value: 'AV/VC',               label: 'AV / UC' },
+  { value: 'IoT',                 label: 'IoT' },
   { value: 'Access Control',      label: 'Access Control' },
-  { value: 'Visitor Management',  label: 'Visitor Management' },
+  { value: 'Digital Badge',       label: 'Digital Badge' },
   { value: 'Lockers',             label: 'Lockers' },
-  { value: 'Meeting Room Booking',label: 'Meeting Room Booking' },
-  { value: 'AV/VC',               label: 'AV / VC' },
-  { value: 'Events',              label: 'Events' },
-  { value: 'Issue Backend',       label: 'Issue Backend' },
+  { value: 'Ticketing',           label: 'Ticketing' },
+  { value: 'Elevator',            label: 'Elevator' },
+  { value: 'Visitor Management',  label: 'Visitor Management' },
   { value: 'Parking',             label: 'Parking' },
+  { value: 'Event Management',    label: 'Event Management' },
+  { value: 'Restaurant',          label: 'Restaurant' },
+  { value: 'Waste Management',    label: 'Waste Management' },
+  { value: 'Identity Provider',   label: 'Identity Provider' },
 ]
 
 const STATUS_OPTIONS = [
@@ -49,9 +54,15 @@ const EMPTY_FORM = {
   tenantId:   '',
   siteId:     '',
   status:     'active' as ExternalSystem['status'],
-  endpointDev:  '',
-  endpointTest: '',
-  endpointProd: '',
+  endpointDev:    '',
+  endpointTest:   '',
+  endpointProd:   '',
+  apiKeyDev:      '',
+  apiTokenDev:    '',
+  apiKeyTest:     '',
+  apiTokenTest:   '',
+  apiKeyProd:     '',
+  apiTokenProd:   '',
 }
 
 type FormState = typeof EMPTY_FORM
@@ -66,12 +77,14 @@ function SystemFormModal({
   onSave,
   initial,
   title,
+  tenantOptions,
 }: {
   open: boolean
   onClose: () => void
   onSave: (form: FormState) => void
   initial?: FormState
   title: string
+  tenantOptions: { value: string; label: string }[]
 }) {
   const [form, setForm] = useState<FormState>(initial ?? EMPTY_FORM)
   const [testState, setTestState] = useState<TestState>('idle')
@@ -248,11 +261,11 @@ function SystemFormModal({
         {/* Tenant + Site */}
         {fieldRow(
           <>
-            <ISInput
-              label="Tenant ID"
+            <ISSelect
+              label="Tenant"
               value={form.tenantId}
+              options={tenantOptions}
               onChange={set('tenantId')}
-              placeholder="tenant_abc123"
             />
             <ISInput
               label="Site ID"
@@ -281,27 +294,110 @@ function SystemFormModal({
           <div style={{ height: '1px', flex: 1, backgroundColor: IS.cardBorder }} />
         </div>
 
-        <ISInput
-          label="Dev Base URL"
-          value={form.endpointDev}
-          onChange={set('endpointDev')}
-          placeholder="https://dev.api.example.com"
-          type="url"
-        />
-        <ISInput
-          label="Test Base URL"
-          value={form.endpointTest}
-          onChange={set('endpointTest')}
-          placeholder="https://test.api.example.com"
-          type="url"
-        />
-        <ISInput
-          label="Prod Base URL"
-          value={form.endpointProd}
-          onChange={set('endpointProd')}
-          placeholder="https://api.example.com"
-          type="url"
-        />
+        {/* ── Dev environment ── */}
+        <div style={{
+          padding: '14px',
+          borderRadius: '10px',
+          backgroundColor: `${IS.blue}08`,
+          border: `1px solid ${IS.blue}20`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+        }}>
+          <span style={{
+            color: IS.blue,
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            fontFamily: "'Inter', sans-serif",
+          }}>
+            Dev
+          </span>
+          <ISInput
+            label="Base URL"
+            value={form.endpointDev}
+            onChange={set('endpointDev')}
+            placeholder="https://dev.api.example.com"
+            type="url"
+          />
+          {fieldRow(
+            <>
+              <ISInput label="API Key" value={form.apiKeyDev} onChange={set('apiKeyDev')} placeholder="Dev API key" />
+              <ISInput label="API Token" value={form.apiTokenDev} onChange={set('apiTokenDev')} placeholder="Dev API token" />
+            </>
+          )}
+        </div>
+
+        {/* ── Test environment ── */}
+        <div style={{
+          padding: '14px',
+          borderRadius: '10px',
+          backgroundColor: `${IS.yellow}08`,
+          border: `1px solid ${IS.yellow}20`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+        }}>
+          <span style={{
+            color: IS.yellow,
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            fontFamily: "'Inter', sans-serif",
+          }}>
+            Test
+          </span>
+          <ISInput
+            label="Base URL"
+            value={form.endpointTest}
+            onChange={set('endpointTest')}
+            placeholder="https://test.api.example.com"
+            type="url"
+          />
+          {fieldRow(
+            <>
+              <ISInput label="API Key" value={form.apiKeyTest} onChange={set('apiKeyTest')} placeholder="Test API key" />
+              <ISInput label="API Token" value={form.apiTokenTest} onChange={set('apiTokenTest')} placeholder="Test API token" />
+            </>
+          )}
+        </div>
+
+        {/* ── Prod environment ── */}
+        <div style={{
+          padding: '14px',
+          borderRadius: '10px',
+          backgroundColor: `${IS.green}08`,
+          border: `1px solid ${IS.green}20`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+        }}>
+          <span style={{
+            color: IS.green,
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            fontFamily: "'Inter', sans-serif",
+          }}>
+            Prod
+          </span>
+          <ISInput
+            label="Base URL"
+            value={form.endpointProd}
+            onChange={set('endpointProd')}
+            placeholder="https://api.example.com"
+            type="url"
+          />
+          {fieldRow(
+            <>
+              <ISInput label="API Key" value={form.apiKeyProd} onChange={set('apiKeyProd')} placeholder="Prod API key" />
+              <ISInput label="API Token" value={form.apiTokenProd} onChange={set('apiTokenProd')} placeholder="Prod API token" />
+            </>
+          )}
+        </div>
 
         {/* Connectivity test result */}
         {testState !== 'idle' && (
@@ -316,7 +412,6 @@ function SystemFormModal({
             fontFamily: "'Inter', sans-serif",
           }}>
             {testState === 'testing' ? (
-              // Spinner
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={testColor} strokeWidth="2.5" strokeLinecap="round">
                 <path d="M21 12a9 9 0 1 1-6.219-8.56" />
               </svg>
@@ -458,9 +553,9 @@ function systemStatusBadge(status: ExternalSystem['status']) {
 // ─── Form ↔ ExternalSystem conversion helpers ─────────────────────────────────
 function formToSystem(form: FormState): Omit<ExternalSystem, 'id' | 'createdAt'> {
   const endpoints: ExternalSystem['endpoints'] = []
-  if (form.endpointDev)  endpoints.push({ env: 'Dev',  baseUrl: form.endpointDev })
-  if (form.endpointTest) endpoints.push({ env: 'Test', baseUrl: form.endpointTest })
-  if (form.endpointProd) endpoints.push({ env: 'Prod', baseUrl: form.endpointProd })
+  if (form.endpointDev)  endpoints.push({ env: 'Dev',  baseUrl: form.endpointDev,  apiKey: form.apiKeyDev.trim()  || undefined, apiToken: form.apiTokenDev.trim()  || undefined })
+  if (form.endpointTest) endpoints.push({ env: 'Test', baseUrl: form.endpointTest, apiKey: form.apiKeyTest.trim() || undefined, apiToken: form.apiTokenTest.trim() || undefined })
+  if (form.endpointProd) endpoints.push({ env: 'Prod', baseUrl: form.endpointProd, apiKey: form.apiKeyProd.trim() || undefined, apiToken: form.apiTokenProd.trim() || undefined })
 
   return {
     name:       form.name.trim(),
@@ -476,22 +571,28 @@ function formToSystem(form: FormState): Omit<ExternalSystem, 'id' | 'createdAt'>
 }
 
 function systemToForm(system: ExternalSystem): FormState {
-  const endpointDev  = system.endpoints.find(e => e.env === 'Dev')?.baseUrl  ?? ''
-  const endpointTest = system.endpoints.find(e => e.env === 'Test')?.baseUrl ?? ''
-  const endpointProd = system.endpoints.find(e => e.env === 'Prod')?.baseUrl ?? ''
+  const dev  = system.endpoints.find(e => e.env === 'Dev'  || e.env === 'dev')
+  const test = system.endpoints.find(e => e.env === 'Test' || e.env === 'test' || e.env === 'staging')
+  const prod = system.endpoints.find(e => e.env === 'Prod' || e.env === 'prod' || e.env === 'production')
 
   return {
-    name:       system.name,
-    domainType: system.domainType,
-    vendor:     system.vendor,
-    product:    system.product,
-    version:    system.version,
-    tenantId:   system.tenantId,
-    siteId:     system.siteId,
-    status:     system.status,
-    endpointDev,
-    endpointTest,
-    endpointProd,
+    name:           system.name,
+    domainType:     system.domainType,
+    vendor:         system.vendor,
+    product:        system.product,
+    version:        system.version,
+    tenantId:       system.tenantId,
+    siteId:         system.siteId,
+    status:         system.status,
+    endpointDev:    dev?.baseUrl  ?? '',
+    endpointTest:   test?.baseUrl ?? '',
+    endpointProd:   prod?.baseUrl ?? '',
+    apiKeyDev:      dev?.apiKey   ?? '',
+    apiTokenDev:    dev?.apiToken ?? '',
+    apiKeyTest:     test?.apiKey  ?? '',
+    apiTokenTest:   test?.apiToken ?? '',
+    apiKeyProd:     prod?.apiKey  ?? '',
+    apiTokenProd:   prod?.apiToken ?? '',
   }
 }
 
@@ -502,7 +603,14 @@ export default function ISExternalSystems() {
     addExternalSystem,
     updateExternalSystem,
     deleteExternalSystem,
+    tenants,
   } = useGlobalState()
+
+  // Build tenant options for dropdown
+  const tenantOptions = useMemo(() => [
+    { value: '', label: '— Select tenant —' },
+    ...tenants.map(t => ({ value: t.id, label: t.name })),
+  ], [tenants])
 
   // Modal state
   const [createOpen, setCreateOpen]         = useState(false)
@@ -631,6 +739,43 @@ export default function ISExternalSystems() {
         if (!system) return null
         return (
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            {/* API Test Link */}
+            {system.endpoints.length > 0 && (
+              <button
+                onClick={e => {
+                  e.stopPropagation()
+                  const url = system.endpoints[0]?.baseUrl
+                  if (url) window.open(url, '_blank', 'noopener,noreferrer')
+                }}
+                title="Open API Endpoint"
+                style={{
+                  background: 'none',
+                  border: `1px solid ${IS.inputBorder}`,
+                  borderRadius: '6px',
+                  padding: '5px 8px',
+                  cursor: 'pointer',
+                  color: IS.label,
+                  display: 'flex',
+                  alignItems: 'center',
+                  transition: 'color 0.15s, border-color 0.15s',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLButtonElement).style.color = IS.green
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = IS.green
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLButtonElement).style.color = IS.label
+                  ;(e.currentTarget as HTMLButtonElement).style.borderColor = IS.inputBorder
+                }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </button>
+            )}
+
             {/* Edit */}
             <button
               onClick={e => { e.stopPropagation(); setEditSystem(system) }}
@@ -951,6 +1096,7 @@ export default function ISExternalSystems() {
         onClose={() => setCreateOpen(false)}
         onSave={handleCreate}
         title="Add External System"
+        tenantOptions={tenantOptions}
       />
 
       {/* ── Edit Modal ─────────────────────────────────────────────────────── */}
@@ -960,6 +1106,7 @@ export default function ISExternalSystems() {
         onSave={handleEdit}
         initial={editSystem ? systemToForm(editSystem) : undefined}
         title={editSystem ? `Edit — ${editSystem.name}` : 'Edit External System'}
+        tenantOptions={tenantOptions}
       />
 
       {/* ── Delete Confirm Modal ───────────────────────────────────────────── */}

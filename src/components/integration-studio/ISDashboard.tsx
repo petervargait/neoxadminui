@@ -15,7 +15,6 @@ import {
   PersonBoardRegular,
   VehicleCarParkingRegular,
   LockClosedRegular,
-  CalendarRegular,
   VideoRegular,
   TicketDiagonalRegular,
   TicketHorizontalRegular,
@@ -23,19 +22,29 @@ import {
   CheckmarkCircleRegular,
   AlertRegular,
   HeartPulseRegular,
+  BuildingRegular,
+  Wifi1Regular,
+  ShieldKeyholeRegular,
+  ArrowUpRegular,
+  FoodRegular,
+  DeleteRegular,
 } from '@fluentui/react-icons'
 
 // ─── Domain definitions ───────────────────────────────────────────────────────
 const DOMAINS: { key: string; label: string; Icon: React.ComponentType<{ style?: React.CSSProperties }> }[] = [
-  { key: 'Identity Provider',       label: 'Identity',         Icon: PersonRegular },
+  { key: 'BMS',                     label: 'BMS',              Icon: BuildingRegular },
+  { key: 'AV/VC',                   label: 'AV / UC',          Icon: VideoRegular },
+  { key: 'IoT',                     label: 'IoT',              Icon: Wifi1Regular },
   { key: 'Access Control',          label: 'Access Control',   Icon: DoorArrowRightRegular },
+  { key: 'Digital Badge',           label: 'Digital Badge',    Icon: ShieldKeyholeRegular },
+  { key: 'Lockers',                 label: 'Lockers',          Icon: LockClosedRegular },
+  { key: 'Ticketing',               label: 'Ticketing',        Icon: TicketHorizontalRegular },
+  { key: 'Elevator',                label: 'Elevator',         Icon: ArrowUpRegular },
   { key: 'Visitor Management',      label: 'Visitor',          Icon: PersonBoardRegular },
   { key: 'Parking',                 label: 'Parking',          Icon: VehicleCarParkingRegular },
-  { key: 'Lockers',                 label: 'Lockers',          Icon: LockClosedRegular },
-  { key: 'Meeting Room Booking',    label: 'Meeting Rooms',    Icon: CalendarRegular },
-  { key: 'AV/VC',                   label: 'AV / VC',          Icon: VideoRegular },
-  { key: 'Events',                  label: 'Events',           Icon: TicketDiagonalRegular },
-  { key: 'Issue Backend',           label: 'Issue Reporting',  Icon: TicketHorizontalRegular },
+  { key: 'Event Management',        label: 'Events',           Icon: TicketDiagonalRegular },
+  { key: 'Restaurant',              label: 'Restaurant',       Icon: FoodRegular },
+  { key: 'Waste Management',        label: 'Waste Mgmt',      Icon: DeleteRegular },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

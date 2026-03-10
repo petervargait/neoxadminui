@@ -14,6 +14,8 @@ import BadgesDashboard from '../../components/BadgesDashboard'
 import SpaceBookingDashboard from '../../components/SpaceBookingDashboard'
 import DashboardFilters from '../../components/DashboardFilters'
 import SmartSpacesDashboard from '../../components/SmartSpacesDashboard'
+import VisitorManagement from '../../components/VisitorManagement'
+import EventManagement from '../../components/EventManagement'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -676,6 +678,8 @@ export default function AdminPage() {
             { icon: '◩', label: 'Space Management', action: () => setActiveSection('spaceManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◫', label: 'Building Management', action: () => setActiveSection('buildingManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◉', label: 'Visitor Check-in', action: () => setActiveSection('visitorCheckin'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '📋', label: 'Visitor Management', action: () => setActiveSection('visitorManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: '🎫', label: 'Event Management', action: () => setActiveSection('eventManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◬', label: 'Smart Spaces', action: () => setActiveSection('smartSpaces'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: 'ticket', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: true, iconType: 'ticket' },
             { icon: 'alert', label: 'Notifications', action: () => setActiveSection('notifications'), enabled: true, isFluentIcon: true, iconType: 'alert' },
@@ -827,6 +831,8 @@ export default function AdminPage() {
               {activeSection === 'buildingManagement' && 'Building Management'}
               {activeSection === 'visitorCheckin' && 'Visitor Check-in / Check-out'}
               {activeSection === 'smartSpaces' && 'Smart Spaces Analytics'}
+              {activeSection === 'visitorManagement' && 'Visitor Management'}
+              {activeSection === 'eventManagement' && 'Event Management'}
               {activeSection === 'ticketManagement' && 'Ticket Management'}
               {activeSection === 'notifications' && 'Notifications'}
               {activeSection === 'systemStatus' && 'System Status'}
@@ -4727,6 +4733,16 @@ export default function AdminPage() {
                 })}
               />
             </div>
+          )}
+
+          {/* Visitor Management */}
+          {activeSection === 'visitorManagement' && selectedTenant !== 'all' && (
+            <VisitorManagement tenantId={selectedTenant} />
+          )}
+
+          {/* Event Management */}
+          {activeSection === 'eventManagement' && selectedTenant !== 'all' && (
+            <EventManagement tenantId={selectedTenant} />
           )}
 
           {/* Parking Management */}

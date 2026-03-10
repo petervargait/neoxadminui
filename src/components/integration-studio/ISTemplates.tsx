@@ -17,20 +17,28 @@ import {
   TicketHorizontalRegular,
   PersonRegular,
   BookTemplateRegular,
+  Wifi1Regular,
+  ArrowUpRegular,
+  FoodRegular,
+  DeleteRegular,
 } from '@fluentui/react-icons'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Domain =
-  | 'Parking'
-  | 'Access Control'
-  | 'Visitor'
-  | 'Locker'
-  | 'Rooms'
+  | 'BMS'
   | 'AV/VC'
-  | 'Events'
-  | 'Issue Reporting'
-  | 'Identity'
+  | 'IoT'
+  | 'Access Control'
+  | 'Digital Badge'
+  | 'Locker'
+  | 'Ticketing'
+  | 'Elevator'
+  | 'Visitor'
+  | 'Parking'
+  | 'Event Management'
+  | 'Restaurant'
+  | 'Waste Management'
 
 interface Template {
   id: string
@@ -48,37 +56,92 @@ interface Template {
 
 const TEMPLATES: Template[] = [
   {
-    id: 'tpl-parking-reservation',
-    domain: 'Parking',
-    name: 'Parking Reservation',
-    description: 'Full reservation lifecycle: search availability, create booking, modify/cancel, send confirmation notification, and release space on check-out.',
-    coverage: 92,
-    vendors: ['SKIDATA', 'Parkmobile', 'YellowGate'],
-    protocols: ['REST', 'Webhook'],
-    flowCount: 6,
-    version: '2.3.1',
+    id: 'tpl-bms-zone-control',
+    domain: 'BMS',
+    name: 'BMS Zone Control & Monitoring',
+    description: 'Full zone management: read status, set setpoints, monitor energy metrics, handle alarms, and sync environmental data across building systems.',
+    coverage: 90,
+    vendors: ['Nective', 'Schneider EcoStruxure', 'Siemens Desigo', 'bGrid'],
+    protocols: ['REST', 'BACnet/IP', 'Webhook'],
+    flowCount: 7,
+    version: '2.1.0',
   },
   {
-    id: 'tpl-parking-whitelist',
-    domain: 'Parking',
-    name: 'Parking Whitelist Sync',
-    description: 'Synchronize license plate whitelists and permit allocations between the identity directory and parking barrier control systems.',
-    coverage: 85,
-    vendors: ['SKIDATA', 'Nedap', 'Amano'],
-    protocols: ['REST', 'SFTP'],
-    flowCount: 4,
-    version: '1.8.0',
+    id: 'tpl-avvc-device',
+    domain: 'AV/VC',
+    name: 'AV Device Status & Control',
+    description: 'Poll or receive push events for AV device health (codec, display, DSP), normalize to a common schema, start/end meetings, and route alerts to AV NOC.',
+    coverage: 81,
+    vendors: ['Crestron', 'Cisco Webex Devices'],
+    protocols: ['REST', 'xAPI', 'Webhook'],
+    flowCount: 6,
+    version: '2.1.0',
+  },
+  {
+    id: 'tpl-iot-occupancy',
+    domain: 'IoT',
+    name: 'IoT Sensor & Occupancy Feed',
+    description: 'Ingest sensor readings (temperature, humidity, CO2, occupancy), normalize to canonical schema, generate occupancy heatmaps, and trigger environment alerts.',
+    coverage: 88,
+    vendors: ['bGrid', 'Haltian', 'XYSense', 'Avigilon Halo'],
+    protocols: ['REST', 'MQTT', 'Webhook'],
+    flowCount: 6,
+    version: '1.5.0',
   },
   {
     id: 'tpl-access-credential',
     domain: 'Access Control',
     name: 'Credential Lifecycle',
-    description: 'Provision, update, suspend, and revoke access credentials (physical badge or mobile key) driven by HR/directory lifecycle events.',
+    description: 'Provision, update, suspend, and revoke access credentials driven by HR/directory lifecycle events across multiple access control vendors.',
     coverage: 94,
-    vendors: ['Lenel S2', 'Genetec', 'Honeywell Pro-Watch', 'ASSA ABLOY'],
-    protocols: ['REST', 'SDK'],
+    vendors: ['Avigilon', 'Locksense', 'ThirdMillennium', 'HID Origo', 'HikCentral'],
+    protocols: ['REST', 'SDK', 'Webhook'],
     flowCount: 8,
     version: '3.1.0',
+  },
+  {
+    id: 'tpl-badge-provisioning',
+    domain: 'Digital Badge',
+    name: 'Digital Badge Provisioning',
+    description: 'Issue, manage, and revoke digital badges (physical and mobile). Supports multi-technology credentials with lifecycle automation.',
+    coverage: 92,
+    vendors: ['HID Origo', 'Legic Connect', 'NXP DESFire'],
+    protocols: ['REST', 'NFC', 'BLE'],
+    flowCount: 5,
+    version: '2.0.0',
+  },
+  {
+    id: 'tpl-locker-booking',
+    domain: 'Locker',
+    name: 'Locker Booking & Unlock',
+    description: 'Reserve a locker for a session or recurring period, auto-assign based on proximity rules, and trigger remote unlock via mobile or badge.',
+    coverage: 85,
+    vendors: ['Vecos', 'Digilock', 'Flexlock'],
+    protocols: ['REST', 'BLE'],
+    flowCount: 5,
+    version: '1.5.0',
+  },
+  {
+    id: 'tpl-ticketing-lifecycle',
+    domain: 'Ticketing',
+    name: 'Ticket Lifecycle Management',
+    description: 'Create, update, escalate, and close FM/IT issue tickets across heterogeneous backends with unified status tracking and SLA monitoring.',
+    coverage: 90,
+    vendors: ['IBM Maximo', 'Cisco Spaces', 'APFM', 'Facilio'],
+    protocols: ['REST', 'Webhook'],
+    flowCount: 8,
+    version: '2.4.1',
+  },
+  {
+    id: 'tpl-elevator-dispatch',
+    domain: 'Elevator',
+    name: 'Elevator Dispatch & Floor Authorization',
+    description: 'Request elevator to specific floor, authorize floor access based on user credentials, monitor elevator status and availability.',
+    coverage: 72,
+    vendors: ['KONE DX', 'Otis ONE'],
+    protocols: ['REST', 'SDK'],
+    flowCount: 4,
+    version: '1.0.0',
   },
   {
     id: 'tpl-visitor-prereg',
@@ -86,99 +149,61 @@ const TEMPLATES: Template[] = [
     name: 'Visitor Pre-registration & Approval',
     description: 'Host-initiated visitor invite, multi-step approval workflow, automatic temp-badge provisioning on approval, and check-in/check-out audit trail.',
     coverage: 88,
-    vendors: ['Envoy', 'ProxyClick', 'Honeywell VEMS', 'Lenel S2'],
+    vendors: ['TDS', 'NEOX Visitor'],
     protocols: ['REST', 'Webhook', 'SMTP'],
     flowCount: 7,
     version: '2.0.2',
   },
   {
-    id: 'tpl-locker-booking',
-    domain: 'Locker',
-    name: 'Locker Booking & Unlock',
-    description: 'Reserve a locker for a session or recurring period, auto-assign based on proximity rules, and trigger remote unlock via mobile or badge.',
-    coverage: 79,
-    vendors: ['Sievert', 'Bisley Smart', 'Veska'],
-    protocols: ['REST', 'BLE'],
+    id: 'tpl-parking-reservation',
+    domain: 'Parking',
+    name: 'Parking Reservation & Whitelist',
+    description: 'Full reservation lifecycle: search availability, create booking, modify/cancel, whitelist sync, and barrier control integration.',
+    coverage: 92,
+    vendors: ['SkiData', 'NEOX Parking', 'Designa', 'Swarco', 'Parkl', 'ParkHelp'],
+    protocols: ['REST', 'Webhook', 'SFTP'],
+    flowCount: 8,
+    version: '2.3.1',
+  },
+  {
+    id: 'tpl-event-management',
+    domain: 'Event Management',
+    name: 'Event Lifecycle & Attendee Management',
+    description: 'Create events, manage registrations, validate tickets at entry, track attendance, and generate occupancy reports.',
+    coverage: 95,
+    vendors: ['NEOX Events'],
+    protocols: ['REST', 'Webhook', 'QR/NFC'],
+    flowCount: 6,
+    version: '2.0.0',
+  },
+  {
+    id: 'tpl-restaurant-ordering',
+    domain: 'Restaurant',
+    name: 'Restaurant Menu & Ordering',
+    description: 'Retrieve menu items, place and manage orders, track order status, and handle cancellations with notification workflow.',
+    coverage: 93,
+    vendors: ['NEOX Restaurant'],
+    protocols: ['REST', 'Webhook'],
     flowCount: 5,
     version: '1.5.0',
   },
   {
-    id: 'tpl-rooms-availability',
-    domain: 'Rooms',
-    name: 'Room Availability & Booking',
-    description: 'Real-time room availability feed, instant booking with conflict prevention, room release on no-show, and calendar integration for meeting platforms.',
-    coverage: 96,
-    vendors: ['Condeco', 'Planon', 'EMS', 'Robin', 'Microsoft Places'],
-    protocols: ['REST', 'GraphAPI', 'Exchange EWS'],
-    flowCount: 9,
-    version: '4.2.0',
-  },
-  {
-    id: 'tpl-avvc-device',
-    domain: 'AV/VC',
-    name: 'AV Device Status & Alerting',
-    description: 'Poll or receive push events for AV device health (codec, display, DSP), normalize to a common schema, and route alerts to the AV NOC or ITSM.',
-    coverage: 81,
-    vendors: ['Cisco Webex', 'Poly', 'Crestron', 'QSC', 'Extron'],
-    protocols: ['REST', 'xAPI', 'SNMP', 'Webhook'],
-    flowCount: 6,
-    version: '2.1.0',
-  },
-  {
-    id: 'tpl-events-ticket',
-    domain: 'Events',
-    name: 'Event Ticket Validation',
-    description: 'Ingest ticket scan events, validate against booking system, grant or deny access, handle duplicates, and produce real-time occupancy counts.',
-    coverage: 76,
-    vendors: ['Ticketmaster', 'Eventbrite', 'Secutix', 'Lenel S2'],
-    protocols: ['REST', 'Webhook', 'QR/NFC'],
-    flowCount: 5,
+    id: 'tpl-waste-tracking',
+    domain: 'Waste Management',
+    name: 'Waste Container Tracking',
+    description: 'Monitor container fill levels, schedule pickups, track collection routes, and generate sustainability reports.',
+    coverage: 82,
+    vendors: ['WasteTracker'],
+    protocols: ['REST', 'MQTT'],
+    flowCount: 4,
     version: '1.2.0',
-  },
-  {
-    id: 'tpl-issue-ticket',
-    domain: 'Issue Reporting',
-    name: 'Issue Ticket Lifecycle',
-    description: 'Create, update, escalate, and close FM/IT/AV issue tickets across heterogeneous backends (CAFM, ITSM, AV NOC) with unified status tracking.',
-    coverage: 90,
-    vendors: ['ServiceNow', 'Archibus', 'Jira SM', 'IBM Maximo'],
-    protocols: ['REST', 'Webhook'],
-    flowCount: 8,
-    version: '2.4.1',
-  },
-  {
-    id: 'tpl-identity-entra',
-    domain: 'Identity',
-    name: 'Entra OIDC + Directory Sync',
-    description: 'Full Microsoft Entra ID integration: OIDC SSO with JIT provisioning, scheduled group/user delta sync, and automated role assignment from group claims.',
-    coverage: 97,
-    vendors: ['Microsoft Entra', 'Azure AD'],
-    protocols: ['OIDC', 'MS Graph API', 'SCIM 2.0'],
-    flowCount: 7,
-    version: '3.0.0',
   },
 ]
 
 // ─── Domain config ────────────────────────────────────────────────────────────
 
 const DOMAIN_CONFIG: Record<Domain, { color: string; icon: React.ReactNode }> = {
-  'Parking': {
-    color: IS.blue,
-    icon: <VehicleCarParkingRegular style={{ width: '20px', height: '20px' }} />,
-  },
-  'Access Control': {
-    color: IS.red,
-    icon: <ShieldKeyholeRegular style={{ width: '20px', height: '20px' }} />,
-  },
-  'Visitor': {
-    color: IS.green,
-    icon: <PersonBoardRegular style={{ width: '20px', height: '20px' }} />,
-  },
-  'Locker': {
-    color: IS.yellow,
-    icon: <LockClosedRegular style={{ width: '20px', height: '20px' }} />,
-  },
-  'Rooms': {
+  'BMS': {
     color: IS.cyan,
     icon: <BuildingRegular style={{ width: '20px', height: '20px' }} />,
   },
@@ -186,17 +211,49 @@ const DOMAIN_CONFIG: Record<Domain, { color: string; icon: React.ReactNode }> = 
     color: IS.purple,
     icon: <VideoRegular style={{ width: '20px', height: '20px' }} />,
   },
-  'Events': {
+  'IoT': {
+    color: IS.green,
+    icon: <Wifi1Regular style={{ width: '20px', height: '20px' }} />,
+  },
+  'Access Control': {
+    color: IS.red,
+    icon: <ShieldKeyholeRegular style={{ width: '20px', height: '20px' }} />,
+  },
+  'Digital Badge': {
+    color: IS.gold,
+    icon: <ShieldKeyholeRegular style={{ width: '20px', height: '20px' }} />,
+  },
+  'Locker': {
+    color: IS.yellow,
+    icon: <LockClosedRegular style={{ width: '20px', height: '20px' }} />,
+  },
+  'Ticketing': {
+    color: IS.orange,
+    icon: <TicketHorizontalRegular style={{ width: '20px', height: '20px' }} />,
+  },
+  'Elevator': {
+    color: IS.blue,
+    icon: <ArrowUpRegular style={{ width: '20px', height: '20px' }} />,
+  },
+  'Visitor': {
+    color: IS.green,
+    icon: <PersonBoardRegular style={{ width: '20px', height: '20px' }} />,
+  },
+  'Parking': {
+    color: IS.blue,
+    icon: <VehicleCarParkingRegular style={{ width: '20px', height: '20px' }} />,
+  },
+  'Event Management': {
     color: IS.orange,
     icon: <TicketDiagonalRegular style={{ width: '20px', height: '20px' }} />,
   },
-  'Issue Reporting': {
+  'Restaurant': {
     color: IS.gold,
-    icon: <TicketHorizontalRegular style={{ width: '20px', height: '20px' }} />,
+    icon: <FoodRegular style={{ width: '20px', height: '20px' }} />,
   },
-  'Identity': {
-    color: IS.purple,
-    icon: <PersonRegular style={{ width: '20px', height: '20px' }} />,
+  'Waste Management': {
+    color: IS.cyan,
+    icon: <DeleteRegular style={{ width: '20px', height: '20px' }} />,
   },
 }
 

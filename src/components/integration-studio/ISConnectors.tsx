@@ -213,7 +213,7 @@ function ConnectorDetailModal({
           <InfoRow label="ID" value={connector.id} mono />
           <InfoRow label="Domain" value={connector.domain} />
           <InfoRow label="External System" value={connector.externalSystemName} />
-          <InfoRow label="Auth Profile ID" value={connector.authProfileId} mono />
+          <InfoRow label="Auth Profile ID" value={connector.authProfileId ?? '—'} mono />
           <InfoRow label="Tenant" value={connector.tenantId} />
           <InfoRow label="Created" value={fmtDate(connector.createdAt)} />
         </Section>

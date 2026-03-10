@@ -150,6 +150,56 @@
 - Connected to GlobalStateContext.invitations
 **Files Modified:** `src/app/tenant/page.tsx`
 
+### ✅ 13. Integration Studio (NEW — Complete Platform)
+**Status:** Fully Implemented
+- Complete Integration Studio platform at `/integration-studio` with 13 sidebar modules
+- 38 external vendor systems across 13 canonical domains (BMS, AV/UC, IoT, Access Control, Digital Badge, Lockers, Ticketing, Elevator, Visitor Management, Parking, Event Management, Restaurant, Waste Management)
+- Per-environment (Dev/Test/Prod) API Key and Token fields on each external system
+- Tenant dropdown (from existing GlobalState tenants) replacing free-text tenant ID
+- Auth Profiles removed as separate section — auth now embedded per external system endpoint
+- All modules reference real building/FM vendor systems (not generic SaaS)
+
+**16 Integration Studio modules implemented:**
+1. **Dashboard** — Domain health cards (13 domains), top failing connectors, error rate chart, recent deployments
+2. **External Systems** — 38 vendor systems with CRUD, connectivity test, per-env API credentials, Open API link
+3. **Canonical APIs** — 13 domain API catalogs with operations, methods, paths, schemas
+4. **Connectors** — Connector list with coverage %, health badges, environment versions, actions
+5. **Connector Builder** — Multi-step wizard for new connectors
+6. **Mapping Designer** — Split-pane canonical↔vendor schema tree with mapping rules
+7. **Flows** — Multi-step flow orchestration with compensation steps
+8. **Events & Sync** — 7 webhook subscriptions + 7 polling jobs + replay (all real vendor systems)
+9. **Testing** — Test console with 14 connectors, per-domain operations, dry-run/live toggle
+10. **Health & Logs** — 16 connector health cards + request log table with correlation IDs
+11. **Incidents** — 6 incidents with severity S1-S4, assignment, linked logs
+12. **Issue Reporting** — Taxonomy tree, routing rules, backend connectors
+13. **Identity** — SSO providers, directory sync, role mapping, identity correlation
+14. **Templates** — 13 pre-built connector templates (one per domain)
+
+**Shared component library:** ISShared.tsx with StatusBadge, EnvironmentBadge, CoverageBadge, ISTable, ISModal, ISInput, ISSelect, ISButton, ISTabBar, JsonPreview, WizardStepper, SchemaTree
+
+**Files Added:**
+- `src/app/integration-studio/page.tsx`
+- `src/components/integration-studio/ISShared.tsx`
+- `src/components/integration-studio/ISDashboard.tsx`
+- `src/components/integration-studio/ISExternalSystems.tsx`
+- `src/components/integration-studio/ISAuthProfiles.tsx`
+- `src/components/integration-studio/ISCanonicalAPIs.tsx`
+- `src/components/integration-studio/ISConnectors.tsx`
+- `src/components/integration-studio/ISConnectorBuilder.tsx`
+- `src/components/integration-studio/ISMappingDesigner.tsx`
+- `src/components/integration-studio/ISFlows.tsx`
+- `src/components/integration-studio/ISEventsSync.tsx`
+- `src/components/integration-studio/ISTesting.tsx`
+- `src/components/integration-studio/ISHealthLogs.tsx`
+- `src/components/integration-studio/ISIncidents.tsx`
+- `src/components/integration-studio/ISIssueReporting.tsx`
+- `src/components/integration-studio/ISIdentity.tsx`
+- `src/components/integration-studio/ISTemplates.tsx`
+
+**Files Modified:**
+- `src/app/page.tsx` — Added Integration Studio card
+- `src/context/GlobalStateContext.tsx` — Added ExternalSystem, IntegrationAuthProfile, IntegrationConnector interfaces + 38 external systems + 20 auth profiles + 22 connectors + CRUD methods
+
 ## Remaining Tasks (6 items)
 
 ### Still To Do
@@ -240,7 +290,7 @@
 
 ## Statistics
 
-### Features Completed: 12 of 14 (86%)
+### Features Completed: 13 of 14 (93%)
 ### High Priority Items: 2 of 2 completed (100%)
 - ✅ Policy visibility
 - ✅ Visitor invitations

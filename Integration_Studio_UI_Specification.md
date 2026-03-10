@@ -138,15 +138,22 @@ You need an **Integration UI** that lets your team map vendor capabilities to a 
 ## Domain Scope and Canonical Contracts
 
 ### Top-level canonical domains
-- **Identity (NEW)**
-- **Access Control**
-- **Visitor Management**
-- **Parking**
-- **Lockers**
-- **Meeting Room Booking**
-- **AV/VC**
-- **Event Management**
-- **Issue Reporting (Service Desk)** ← *CAFM is not a domain; it is an Issue Backend*
+- **BMS** — Building Management Systems (Nective, Schneider EcoStruxure, Siemens Desigo, bGrid*)
+- **AV/UC** — Audio Visual / Unified Communications (Crestron, Cisco Webex Devices)
+- **IoT** — IoT Sensors & Occupancy (bGrid, Haltian, XYSense, Avigilon Halo)
+- **Access Control** — Physical access (Avigilon, Locksense, ThirdMillennium, HID Origo, HikCentral, SeaWing*)
+- **Digital Badge** — Badge provisioning (HID Origo, Legic Connect, NXP DESFire EV3)
+- **Lockers** — Smart locker management (Vecos, Digilock, Flexlock)
+- **Ticketing** — Facility & IT ticketing (IBM Maximo, Cisco Spaces, APFM, Facilio*)
+- **Elevator** — Elevator dispatch & floor auth (KONE DX*, Otis ONE*)
+- **Visitor Management** — Visitor lifecycle (TDS, NEOX Visitor)
+- **Parking** — Parking reservation & whitelist (SkiData, NEOX Parking, Designa*, Swarco*, Parkl*, ParkHelp*)
+- **Event Management** — Event lifecycle (NEOX Events)
+- **Restaurant** — Menu & ordering (NEOX Restaurant)
+- **Waste Management** — Container tracking (WasteTracker)
+
+> *Items marked with \* are on the roadmap (inactive/planned).*
+> **Identity** is a cross-cutting domain (see below), not listed here as a canonical integration domain.
 
 ### Issue Reporting as the canonical domain
 Issue Reporting is the single unified “ticket” contract. Under it:
@@ -175,24 +182,12 @@ Identity provides:
 ### External system registry
 | Object | Description | Key fields |
 |---|---|---|
-| ExternalSystem | Vendor instance at tenant/site | systemId, domainType, vendor, product, version, site scope |
-| Endpoint | Environment-specific endpoint | env, baseUrl, healthUrl, region |
+| ExternalSystem | Vendor instance at tenant/site | systemId, domainType, vendor, product, version, tenantId (dropdown), siteId |
+| Endpoint | Environment-specific endpoint with credentials | env (Dev/Test/Prod), baseUrl, healthUrl, apiKey, apiToken |
 | Capability | Supported feature flags | supportedOps list, limits |
 | RateLimitPolicy | Vendor constraints | rpm, burst, concurrency |
 
-### Authentication & secrets
-| Object | Description | Key fields |
-|---|---|---|
-| AuthProfile | Auth method + secret reference | authType, secretRef, scopes, tokenUrl, certRef |
-| SecretRef | Vault reference | vaultKeyId, rotationPolicyId |
-
-Auth types required:
-- API key (header/query)
-- OAuth2 client credentials
-- OAuth2 auth code (rare; more SSO)
-- mTLS (client cert)
-- Signed JWT / HMAC signature
-- Basic auth (discouraged, but supported)
+> **Note:** Auth Profiles have been merged into External Systems. Each endpoint (Dev/Test/Prod) carries its own `apiKey` and `apiToken`. The tenant field uses a dropdown populated from existing tenants. An "Open API Endpoint" button is available to directly access the system's base URL.
 
 ### Integration configuration
 | Object | Description | Key fields |
@@ -217,34 +212,22 @@ Auth types required:
 
 ## UI Information Architecture
 
-### Primary navigation
-- **Dashboard**
-- **Systems**
-  - External Systems
-  - Auth Profiles & Certificates
-- **Canonical APIs**
-- **Connectors**
-- **Flows**
-- **Events & Sync**
-- **Testing**
-- **Operations**
-  - Health
-  - Logs
-  - Incidents
-  - Replay / DLQ
-- **Issue Reporting**
-  - Taxonomy
-  - Routing & Dispatch
-  - Backends
-- **Identity**
-  - SSO Providers
-  - Directory Sync
-  - Role Mapping
-  - Identity Correlation
-- **Administration**
-  - Tenants, Sites, RBAC
-  - Audit & Change History
-  - Templates Library
+### Primary navigation (sidebar)
+- **Dashboard** — Health overview with 13 domain cards
+- **External Systems** — Vendor system registry (38 systems across 13 domains). Each system has per-environment (Dev/Test/Prod) endpoints with API Key and Token. Tenant selected via dropdown.
+- **Canonical APIs** — Internal contract catalog (13 domains with operations)
+- **Connectors** — Connector list with coverage %, health, versioning
+- **Mapping Designer** — Field-level mapping UI
+- **Flows** — Multi-step orchestration designer
+- **Events & Sync** — Webhooks (7 subscriptions) + Polling (7 jobs) + Replay
+- **Testing** — Test console with 14 connectors and per-domain operations
+- **Health & Logs** — Connector health cards (16 connectors) + request logs
+- **Incidents** — Error grouping with severity S1-S4 and assignment
+- **Issue Reporting** — Taxonomy, Routing & Dispatch, Backends
+- **Identity** — SSO Providers, Directory Sync, Role Mapping, Identity Correlation
+- **Templates** — 13 pre-built connector templates (one per domain)
+
+> **Note:** Auth Profiles was removed as a separate section. Authentication (API Key/Token) is now configured per-environment directly on each External System.
 
 ---
 
@@ -270,19 +253,45 @@ Auth types required:
 
 ---
 
-### 2) Systems → External Systems Registry
-**Purpose:** Register vendor systems and connectivity.
+### 2) External Systems Registry
+**Purpose:** Register vendor systems, endpoints, and API credentials.
 
-**Create/Edit External System**
-- domainType (Parking/Access/Issue Backend/Identity Provider/…)
-- vendor, product, version
-- tenant + site scope
-- endpoints per environment (Dev/Test/Prod)
-- optional metadata: region, timezone, contact, vendor support URL
+**Create/Edit External System modal — sections:**
 
-**Connectivity tests**
+*System Identity*
+- System Name, Domain Type (13 domain types: BMS, AV/UC, IoT, Access Control, Digital Badge, Lockers, Ticketing, Elevator, Visitor Management, Parking, Event Management, Restaurant, Waste Management, Identity Provider)
+- Vendor, Product, Version, Status (Active/Inactive/Maintenance)
+- Tenant (dropdown from existing tenants), Site ID
+
+*Endpoints (per-environment cards)*
+Each environment (Dev, Test, Prod) is a color-coded card containing:
+- Base URL
+- API Key
+- API Token
+
+*Connectivity test*
 - DNS resolution, TLS validation, health endpoint call
-- show result with timestamp; store last success time
+- Show result with timestamp; store last success time
+
+**Table columns:** Name, Domain, Vendor, Product, Site, Status, Actions (Open API Endpoint, Edit, Delete)
+
+**Registered vendor systems (38 total):**
+
+| Domain | Vendors (Active) | Roadmap (*) |
+|--------|-----------------|-------------|
+| BMS | Nective, Schneider EcoStruxure, Siemens Desigo | bGrid* |
+| AV/UC | Crestron, Cisco Webex | — |
+| IoT | bGrid, Haltian, XYSense, Avigilon Halo | — |
+| Access Control | Avigilon, Locksense, ThirdMillennium, HID Origo, HikCentral | SeaWing* |
+| Digital Badge | HID Origo, Legic, NXP DESFire EV3 | — |
+| Lockers | Vecos, Digilock, Flexlock | — |
+| Ticketing | IBM Maximo, Cisco Spaces, APFM | Facilio* |
+| Elevator | — | KONE*, Otis* |
+| Visitor Management | TDS, NEOX Visitor | — |
+| Parking | SkiData, NEOX Parking | Designa*, Swarco*, Parkl*, ParkHelp* |
+| Event Management | NEOX Events | — |
+| Restaurant | NEOX Restaurant | — |
+| Waste Management | WasteTracker | — |
 
 **Validations**
 - baseUrl must be https (except local dev)
@@ -293,25 +302,8 @@ Auth types required:
 - Admin can create globally
 
 **Acceptance criteria**
-- Engineer can add a system and verify connectivity without leaving the UI.
-
----
-
-### 3) Systems → Auth Profiles & Certificates
-**Purpose:** Configure auth methods via vault references.
-
-**Auth Profile fields**
-- name, description
-- authType
-- secretRef (vault key ID) + rotation policy reference
-- optional: tokenUrl, scopes, audience, certRef
-
-**Security**
-- UI never displays secrets; only references.
-- Audit log captures profile changes without exposing values.
-
-**Acceptance criteria**
-- Engineer can switch a connector from API key to OAuth2 by selecting a different profile.
+- Engineer can add a system with per-environment API credentials and verify connectivity without leaving the UI.
+- Each external system has an "Open API Endpoint" action button to directly open the production base URL.
 
 ---
 

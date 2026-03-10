@@ -77,6 +77,42 @@
 - GoldBarChart, ComboBarLineChart, HorizontalBarChart, StackedHorizontalBarChart
 - PieChart, LineChart, GaugeChart, AreaChart, FloorHeatmap
 
+### Batch 7: Integration Studio (Complete ✅)
+- ✅ Integration Studio page at `/integration-studio` with collapsible sidebar (13 modules)
+- ✅ External Systems Registry — 38 vendor systems, 13 canonical domains, per-env API Key/Token, tenant dropdown
+- ✅ Auth Profiles merged into External Systems (removed as separate section)
+- ✅ Canonical APIs catalog — 13 domains with full operation definitions
+- ✅ Connectors list — 22 connectors with coverage %, health, versioning
+- ✅ Connector Builder — multi-step wizard
+- ✅ Mapping Designer — split-pane schema tree mapping
+- ✅ Flows — multi-step orchestration designer
+- ✅ Events & Sync — 7 webhooks + 7 polling jobs (real vendor systems)
+- ✅ Testing console — 14 connectors with per-domain operations
+- ✅ Health & Logs — 16 connector health cards + request logs
+- ✅ Incidents — 6 incidents with S1-S4 severity
+- ✅ Issue Reporting — taxonomy, routing, backends
+- ✅ Identity — SSO, directory sync, role mapping, correlation
+- ✅ Templates — 13 pre-built templates (one per domain)
+- ✅ ISShared.tsx component library (StatusBadge, ISTable, ISModal, etc.)
+- ✅ GlobalStateContext extended with ExternalSystem, IntegrationConnector interfaces + CRUD
+
+**Vendor Systems by Domain:**
+| Domain | Count | Active Vendors |
+|--------|-------|----------------|
+| BMS | 4 | Nective, Schneider, Siemens, bGrid* |
+| AV/UC | 2 | Crestron, Cisco |
+| IoT | 4 | bGrid, Haltian, XYSense, Avigilon Halo |
+| Access Control | 6 | Avigilon, Locksense, ThirdMillennium, HID Origo, HikCentral, SeaWing* |
+| Digital Badge | 3 | HID Origo, Legic, NXP DESFire |
+| Lockers | 3 | Vecos, Digilock, Flexlock |
+| Ticketing | 4 | IBM Maximo, Cisco Spaces, APFM, Facilio* |
+| Elevator | 2 | KONE*, Otis* |
+| Visitor Management | 2 | TDS, NEOX |
+| Parking | 6 | SkiData, NEOX, Designa*, Swarco*, Parkl*, ParkHelp* |
+| Event Management | 1 | NEOX |
+| Restaurant | 1 | NEOX |
+| Waste Management | 1 | WasteTracker |
+
 ## Key Achievements
 
 1. **Data Persistence**: All changes now persist to localStorage
@@ -134,6 +170,9 @@ interface GlobalState {
   buildings: Building[]
   parkingBookings: ParkingBooking[]
   systemSettings: SystemSettings
+  externalSystems: ExternalSystem[]
+  integrationAuthProfiles: IntegrationAuthProfile[]
+  integrationConnectors: IntegrationConnector[]
 }
 ```
 
@@ -147,6 +186,9 @@ interface GlobalState {
 - `uploadPolicy`, `downloadPolicy`
 - `updateWhiteLabel`, `getWhiteLabel`
 - `addAuditLog`, `addTask`, `approveTask`, `rejectTask`
+- `addExternalSystem`, `updateExternalSystem`, `deleteExternalSystem`
+- `addIntegrationAuthProfile`, `updateIntegrationAuthProfile`, `deleteIntegrationAuthProfile`
+- `addIntegrationConnector`, `updateIntegrationConnector`, `deleteIntegrationConnector`
 
 ## Next Steps
 

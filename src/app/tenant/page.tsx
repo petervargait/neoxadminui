@@ -11,6 +11,8 @@ import LockerDashboard from '../../components/LockerDashboard'
 import BadgesDashboard from '../../components/BadgesDashboard'
 import SpaceBookingDashboard from '../../components/SpaceBookingDashboard'
 import DashboardFilters from '../../components/DashboardFilters'
+import VisitorManagement from '../../components/VisitorManagement'
+import EventManagement from '../../components/EventManagement'
 
 export default function TenantPage() {
   const router = useRouter()
@@ -500,7 +502,8 @@ export default function TenantPage() {
             { icon: '✓', label: 'Tasks', action: () => setActiveSection('tasks'), isFluentIcon: false, iconType: null, badge: globalState.tasks.filter(t => t.status === 'pending' && (t.data as {tenantId?: string}).tenantId === selectedTenantId).length },
             { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), isFluentIcon: false, iconType: null },
             { icon: 'people', label: 'Users', action: () => setActiveSection('users'), isFluentIcon: true, iconType: 'people' },
-            { icon: 'person', label: 'Invitations', action: () => setActiveSection('invitations'), isFluentIcon: true, iconType: 'person' },
+            { icon: 'person', label: 'Visitor Management', action: () => setActiveSection('visitorManagement'), isFluentIcon: true, iconType: 'person' },
+            { icon: '🎫', label: 'Event Management', action: () => setActiveSection('eventManagement'), isFluentIcon: false, iconType: null },
             { icon: 'vehicle', label: 'Parking', action: () => setActiveSection('parking'), isFluentIcon: true, iconType: 'vehicle' },
             { icon: '◎', label: 'Lockers', action: () => setActiveSection('lockers'), isFluentIcon: false, iconType: null },
             { icon: '◩', label: 'Spaces', action: () => setActiveSection('spaces'), isFluentIcon: false, iconType: null },
@@ -651,6 +654,8 @@ export default function TenantPage() {
               {activeSection === 'analytics' && 'Analytics Dashboard'}
               {activeSection === 'users' && 'User Management'}
               {activeSection === 'invitations' && 'Invitation Management'}
+              {activeSection === 'visitorManagement' && 'Visitor Management'}
+              {activeSection === 'eventManagement' && 'Event Management'}
               {activeSection === 'parking' && 'Parking Management'}
               {activeSection === 'lockers' && 'Locker Management'}
               {activeSection === 'spaces' && 'Space Management'}
@@ -1707,7 +1712,17 @@ export default function TenantPage() {
             </div>
           )}
 
-          {/* Invitation Management Section */}
+          {/* Visitor Management */}
+          {activeSection === 'visitorManagement' && (
+            <VisitorManagement tenantId={selectedTenantId} />
+          )}
+
+          {/* Event Management */}
+          {activeSection === 'eventManagement' && (
+            <EventManagement tenantId={selectedTenantId} />
+          )}
+
+          {/* Legacy Invitation Management Section (hidden — replaced by Visitor Management) */}
           {activeSection === 'invitations' && (
             <div>
               <div style={{

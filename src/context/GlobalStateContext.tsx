@@ -110,6 +110,58 @@ export interface Invitation {
   badgeNumber?: string
   idVerified?: boolean
   isWalkIn?: boolean
+  bookParking?: boolean
+  useWifi?: boolean
+  useLocker?: boolean
+  needIdVerification?: boolean
+  customQuestion1?: string
+  customQuestion2?: string
+  customQuestion3?: string
+  customAnswer1?: string
+  customAnswer2?: string
+  customAnswer3?: string
+  tenantId?: string
+}
+
+export interface EventParticipant {
+  id: string
+  name: string
+  email: string
+  company?: string
+  status: 'invited' | 'confirmed' | 'declined' | 'attended' | 'no-show'
+  bookParking?: boolean
+  useWifi?: boolean
+  useLocker?: boolean
+  needIdVerification?: boolean
+  hasFoodAllergy?: boolean
+  foodAllergyDetails?: string
+  needsSpecialAssistance?: boolean
+  specialAssistanceDetails?: string
+  dietaryRequirements?: string
+  customQuestion1?: string
+  customQuestion2?: string
+  customQuestion3?: string
+  customAnswer1?: string
+  customAnswer2?: string
+  customAnswer3?: string
+  checkedIn?: boolean
+  checkedInAt?: string
+}
+
+export interface EventInvitation {
+  id: string
+  eventName: string
+  eventDate: string
+  eventTime: string
+  eventEndTime?: string
+  eventLocation: string
+  eventDescription?: string
+  organizer: string
+  organizerId: string
+  tenantId: string
+  status: 'draft' | 'published' | 'cancelled' | 'completed'
+  participants: EventParticipant[]
+  createdAt: string
 }
 
 export interface ParkingSpace {
@@ -305,7 +357,7 @@ export interface ExternalSystem {
   tenantId: string
   siteId: string
   status: 'active' | 'inactive' | 'maintenance'
-  endpoints: { env: string; baseUrl: string; healthUrl?: string }[]
+  endpoints: { env: string; baseUrl: string; healthUrl?: string; apiKey?: string; apiToken?: string }[]
   createdAt: string
 }
 
@@ -326,7 +378,7 @@ export interface IntegrationConnector {
   domain: string
   externalSystemId: string
   externalSystemName: string
-  authProfileId: string
+  authProfileId?: string
   coveragePercent: number
   health: 'ok' | 'warning' | 'critical'
   versions: { env: string; version: string; deployedAt: string }[]
@@ -357,6 +409,7 @@ interface GlobalState {
   whiteLabelSettings: Record<string, WhiteLabelSettings>
   systemSettings: Record<string, SystemSettings>
   moduleStates: Record<string, boolean>
+  events: EventInvitation[]
   externalSystems: ExternalSystem[]
   integrationAuthProfiles: IntegrationAuthProfile[]
   integrationConnectors: IntegrationConnector[]
@@ -402,6 +455,9 @@ interface GlobalStateContextType extends GlobalState {
   toggleModule: (moduleName: string) => void
   clearAllData: () => void
   resetDashboardData: () => void
+  addEvent: (event: Omit<EventInvitation, 'id' | 'createdAt'>) => EventInvitation
+  updateEvent: (id: string, updates: Partial<EventInvitation>) => void
+  deleteEvent: (id: string) => void
   addExternalSystem: (system: Omit<ExternalSystem, 'id' | 'createdAt'>) => ExternalSystem
   updateExternalSystem: (id: string, updates: Partial<ExternalSystem>) => void
   deleteExternalSystem: (id: string) => void
@@ -432,6 +488,7 @@ const getInitialState = (): GlobalState => {
           badgeSwipes: parsedState.badgeSwipes || [],
           parkingBookings: parsedState.parkingBookings || [],
           lockerUsages: parsedState.lockerUsages || [],
+          events: parsedState.events || [],
           externalSystems: parsedState.externalSystems || [],
           integrationAuthProfiles: parsedState.integrationAuthProfiles || [],
           integrationConnectors: parsedState.integrationConnectors || [],
@@ -1036,6 +1093,106 @@ const getInitialState = (): GlobalState => {
       'Authentication': true,
       'Reporting': true
     },
+    events: [
+      {
+        id: 'evt_1',
+        eventName: 'Q1 Building Safety Briefing',
+        eventDate: '2026-03-15',
+        eventTime: '09:00',
+        eventEndTime: '11:00',
+        eventLocation: 'HQ - Auditorium A',
+        eventDescription: 'Mandatory quarterly safety and compliance briefing for all building occupants.',
+        organizer: 'Sarah Johnson',
+        organizerId: 'usr_acme_1',
+        tenantId: 'acme',
+        status: 'published',
+        participants: [
+          { id: 'ep_1', name: 'Alex Rivera', email: 'alex@techcorp.com', company: 'TechCorp', status: 'confirmed', bookParking: true, useWifi: true, useLocker: false, needIdVerification: true, hasFoodAllergy: false, needsSpecialAssistance: false },
+          { id: 'ep_2', name: 'Maria Chen', email: 'maria@innovate.io', company: 'Innovate.io', status: 'confirmed', bookParking: false, useWifi: true, useLocker: false, needIdVerification: true, hasFoodAllergy: true, foodAllergyDetails: 'Nut allergy', needsSpecialAssistance: false },
+          { id: 'ep_3', name: 'James Wilson', email: 'jwilson@acme.com', company: 'ACME', status: 'invited', bookParking: true, useWifi: false, useLocker: true, needIdVerification: false, hasFoodAllergy: false, needsSpecialAssistance: true, specialAssistanceDetails: 'Wheelchair access required' },
+          { id: 'ep_4', name: 'Lisa Park', email: 'lpark@acme.com', company: 'ACME', status: 'confirmed', bookParking: false, useWifi: true, useLocker: false, needIdVerification: false, hasFoodAllergy: false, needsSpecialAssistance: false },
+          { id: 'ep_5', name: 'Robert Taylor', email: 'rtaylor@vendor.com', company: 'VendorCo', status: 'declined', bookParking: false, useWifi: false, useLocker: false, needIdVerification: true, hasFoodAllergy: false, needsSpecialAssistance: false },
+        ],
+        createdAt: '2026-02-20T10:00:00.000Z',
+      },
+      {
+        id: 'evt_2',
+        eventName: 'Smart Building Technology Showcase',
+        eventDate: '2026-03-22',
+        eventTime: '13:00',
+        eventEndTime: '17:00',
+        eventLocation: 'HQ - Conference Center B',
+        eventDescription: 'Demo day for new IoT sensors and BMS integrations with vendor partners.',
+        organizer: 'David Martinez',
+        organizerId: 'usr_acme_2',
+        tenantId: 'acme',
+        status: 'draft',
+        participants: [
+          { id: 'ep_6', name: 'Tom Haltian', email: 'tom@haltian.com', company: 'Haltian', status: 'invited', bookParking: true, useWifi: true, useLocker: false, needIdVerification: true, hasFoodAllergy: false, needsSpecialAssistance: false, dietaryRequirements: 'Vegetarian' },
+          { id: 'ep_7', name: 'Sandra bGrid', email: 'sandra@bgrid.io', company: 'bGrid', status: 'invited', bookParking: true, useWifi: true, useLocker: false, needIdVerification: true, hasFoodAllergy: true, foodAllergyDetails: 'Gluten intolerance', needsSpecialAssistance: false },
+          { id: 'ep_8', name: 'Mike Nective', email: 'mike@nective.com', company: 'Nective', status: 'invited', bookParking: false, useWifi: true, useLocker: true, needIdVerification: true, hasFoodAllergy: false, needsSpecialAssistance: false },
+        ],
+        createdAt: '2026-03-01T14:00:00.000Z',
+      },
+      {
+        id: 'evt_3',
+        eventName: 'Annual Tenant Appreciation Lunch',
+        eventDate: '2026-04-05',
+        eventTime: '12:00',
+        eventEndTime: '14:00',
+        eventLocation: 'HQ - Restaurant',
+        eventDescription: 'Annual lunch event for all building tenants and their teams.',
+        organizer: 'Emily Chen',
+        organizerId: 'usr_acme_3',
+        tenantId: 'acme',
+        status: 'published',
+        participants: [
+          { id: 'ep_9', name: 'Anna Kowalski', email: 'anna@mbank.com', company: 'M Bank', status: 'confirmed', bookParking: true, useWifi: false, useLocker: false, needIdVerification: false, hasFoodAllergy: true, foodAllergyDetails: 'Lactose intolerant', needsSpecialAssistance: false, dietaryRequirements: 'Dairy-free' },
+          { id: 'ep_10', name: 'Peter Novak', email: 'peter@mbank.com', company: 'M Bank', status: 'confirmed', bookParking: true, useWifi: false, useLocker: false, needIdVerification: false, hasFoodAllergy: false, needsSpecialAssistance: false, dietaryRequirements: 'No preference' },
+          { id: 'ep_11', name: 'Sophie Laurent', email: 'sophie@techflow.io', company: 'TechFlow', status: 'invited', bookParking: false, useWifi: true, useLocker: false, needIdVerification: true, hasFoodAllergy: false, needsSpecialAssistance: false },
+          { id: 'ep_12', name: 'Carlos Mendez', email: 'carlos@techflow.io', company: 'TechFlow', status: 'invited', bookParking: false, useWifi: true, useLocker: false, needIdVerification: true, hasFoodAllergy: false, needsSpecialAssistance: true, specialAssistanceDetails: 'Hearing aid loop required' },
+          { id: 'ep_13', name: 'Yuki Tanaka', email: 'yuki@globalsolutions.com', company: 'Global Solutions', status: 'confirmed', bookParking: true, useWifi: true, useLocker: true, needIdVerification: true, hasFoodAllergy: false, needsSpecialAssistance: false, dietaryRequirements: 'Halal' },
+          { id: 'ep_14', name: 'Fatima Al-Hassan', email: 'fatima@innovationlabs.com', company: 'Innovation Labs', status: 'confirmed', bookParking: false, useWifi: true, useLocker: false, needIdVerification: true, hasFoodAllergy: true, foodAllergyDetails: 'Shellfish allergy', needsSpecialAssistance: false, dietaryRequirements: 'No shellfish' },
+        ],
+        createdAt: '2026-03-05T09:00:00.000Z',
+      },
+      {
+        id: 'evt_4',
+        eventName: 'Fire Drill & Evacuation Training',
+        eventDate: '2026-02-28',
+        eventTime: '14:00',
+        eventEndTime: '15:30',
+        eventLocation: 'HQ - All Floors',
+        eventDescription: 'Bi-annual fire drill and evacuation procedure training.',
+        organizer: 'Sarah Johnson',
+        organizerId: 'usr_acme_1',
+        tenantId: 'acme',
+        status: 'completed',
+        participants: [
+          { id: 'ep_15', name: 'All Building Occupants', email: 'building@acme.com', company: 'ACME', status: 'attended', bookParking: false, useWifi: false, useLocker: false, needIdVerification: false, hasFoodAllergy: false, needsSpecialAssistance: false },
+        ],
+        createdAt: '2026-02-15T08:00:00.000Z',
+      },
+      {
+        id: 'evt_5',
+        eventName: 'M Bank Board Meeting',
+        eventDate: '2026-03-20',
+        eventTime: '10:00',
+        eventEndTime: '16:00',
+        eventLocation: 'M Bank HQ - Board Room',
+        eventDescription: 'Quarterly board of directors meeting with external advisors.',
+        organizer: 'Anna Kowalski',
+        organizerId: 'usr_mbank_1',
+        tenantId: 'mbank',
+        status: 'published',
+        participants: [
+          { id: 'ep_16', name: 'Dr. Hans Mueller', email: 'hmueller@advisory.com', company: 'Advisory Group', status: 'confirmed', bookParking: true, useWifi: true, useLocker: true, needIdVerification: true, hasFoodAllergy: false, needsSpecialAssistance: false, dietaryRequirements: 'Kosher' },
+          { id: 'ep_17', name: 'Claire Dubois', email: 'cdubois@legal.eu', company: 'Legal Partners EU', status: 'confirmed', bookParking: true, useWifi: true, useLocker: false, needIdVerification: true, hasFoodAllergy: false, needsSpecialAssistance: false },
+          { id: 'ep_18', name: 'Raj Patel', email: 'rpatel@finserv.com', company: 'FinServ', status: 'invited', bookParking: true, useWifi: true, useLocker: false, needIdVerification: true, hasFoodAllergy: true, foodAllergyDetails: 'Peanut allergy', needsSpecialAssistance: false },
+        ],
+        createdAt: '2026-03-01T12:00:00.000Z',
+      },
+    ],
     externalSystems: [
       {
         id: 'ext_parking_1',
@@ -1048,8 +1205,8 @@ const getInitialState = (): GlobalState => {
         siteId: 'site_acme_hq',
         status: 'active',
         endpoints: [
-          { env: 'production', baseUrl: 'https://api.skidata.example.com/v5', healthUrl: 'https://api.skidata.example.com/v5/health' },
-          { env: 'staging', baseUrl: 'https://staging-api.skidata.example.com/v5', healthUrl: 'https://staging-api.skidata.example.com/v5/health' }
+          { env: 'production', baseUrl: 'https://api.skidata.example.com/v5', healthUrl: 'https://api.skidata.example.com/v5/health', apiKey: 'sk_live_skidata_a1b2c3d4e5f6', apiToken: 'skt_prod_7g8h9i0j1k2l3m4n' },
+          { env: 'staging', baseUrl: 'https://staging-api.skidata.example.com/v5', healthUrl: 'https://staging-api.skidata.example.com/v5/health', apiKey: 'sk_test_skidata_x9y8z7w6', apiToken: 'skt_test_v5u4t3s2r1' }
         ],
         createdAt: '2024-03-01T10:00:00.000Z'
       },
@@ -1064,7 +1221,7 @@ const getInitialState = (): GlobalState => {
         siteId: 'site_acme_hq',
         status: 'active',
         endpoints: [
-          { env: 'production', baseUrl: 'https://avigilon.acme.example.com/api', healthUrl: 'https://avigilon.acme.example.com/api/status' }
+          { env: 'production', baseUrl: 'https://avigilon.acme.example.com/api', healthUrl: 'https://avigilon.acme.example.com/api/status', apiKey: 'ak_avigilon_x9y8z7w6v5u4', apiToken: 'at_avigilon_prod_t3s2r1q0p9' }
         ],
         createdAt: '2024-02-15T08:00:00.000Z'
       },
@@ -1158,6 +1315,442 @@ const getInitialState = (): GlobalState => {
           { env: 'production', baseUrl: 'https://crestron.acme.example.com/api', healthUrl: 'https://crestron.acme.example.com/api/status' }
         ],
         createdAt: '2024-07-15T10:00:00.000Z'
+      },
+      {
+        id: 'ext_av_2',
+        name: 'Cisco AV/UC',
+        domainType: 'AV/VC',
+        vendor: 'Cisco',
+        product: 'Cisco Webex Devices',
+        version: '11.2',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://webexapis.com/v1/devices', healthUrl: 'https://webexapis.com/v1/health' }
+        ],
+        createdAt: '2024-08-01T09:00:00.000Z'
+      },
+      {
+        id: 'ext_iot_1',
+        name: 'bGrid IoT',
+        domainType: 'IoT',
+        vendor: 'bGrid',
+        product: 'bGrid Smart Building',
+        version: '3.5.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.bgrid.io/v3', healthUrl: 'https://api.bgrid.io/v3/health' },
+          { env: 'staging', baseUrl: 'https://staging.bgrid.io/v3' }
+        ],
+        createdAt: '2024-04-20T10:00:00.000Z'
+      },
+      {
+        id: 'ext_iot_2',
+        name: 'Haltian IoT',
+        domainType: 'IoT',
+        vendor: 'Haltian',
+        product: 'Haltian Empathic Building',
+        version: '2.1.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.haltian.com/v2', healthUrl: 'https://api.haltian.com/v2/status' }
+        ],
+        createdAt: '2024-05-15T08:00:00.000Z'
+      },
+      {
+        id: 'ext_iot_3',
+        name: 'XYSense',
+        domainType: 'IoT',
+        vendor: 'XYSense',
+        product: 'XYSense Occupancy',
+        version: '4.0',
+        tenantId: 'mbank',
+        siteId: 'site_mbank_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.xysense.com/v4', healthUrl: 'https://api.xysense.com/v4/health' }
+        ],
+        createdAt: '2024-06-10T09:00:00.000Z'
+      },
+      {
+        id: 'ext_iot_4',
+        name: 'Avigilon Halo',
+        domainType: 'IoT',
+        vendor: 'Avigilon (Motorola)',
+        product: 'Avigilon Halo',
+        version: '3.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://halo.avigilon.com/api/v3', healthUrl: 'https://halo.avigilon.com/api/v3/health' }
+        ],
+        createdAt: '2024-07-01T10:00:00.000Z'
+      },
+      {
+        id: 'ext_ac_2',
+        name: 'Locksense Access',
+        domainType: 'Access Control',
+        vendor: 'Locksense',
+        product: 'Locksense Platform',
+        version: '2.4',
+        tenantId: 'mbank',
+        siteId: 'site_mbank_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.locksense.io/v2', healthUrl: 'https://api.locksense.io/v2/health' }
+        ],
+        createdAt: '2024-03-15T09:00:00.000Z'
+      },
+      {
+        id: 'ext_ac_3',
+        name: 'ThirdMillennium Access',
+        domainType: 'Access Control',
+        vendor: 'ThirdMillennium',
+        product: 'ThirdMillennium ACS',
+        version: '5.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.thirdmillennium.com/v5', healthUrl: 'https://api.thirdmillennium.com/v5/ping' }
+        ],
+        createdAt: '2024-02-01T08:00:00.000Z'
+      },
+      {
+        id: 'ext_ac_4',
+        name: 'HikCentral',
+        domainType: 'Access Control',
+        vendor: 'Hikvision',
+        product: 'HikCentral Professional',
+        version: '2.5.1',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://hikcentral.acme.example.com/api/v2', healthUrl: 'https://hikcentral.acme.example.com/api/v2/health' }
+        ],
+        createdAt: '2024-04-01T10:00:00.000Z'
+      },
+      {
+        id: 'ext_ac_5',
+        name: 'SeaWing Access',
+        domainType: 'Access Control',
+        vendor: 'SeaWing',
+        product: 'SeaWing Cloud ACS',
+        version: '1.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'inactive',
+        endpoints: [],
+        createdAt: '2025-01-01T00:00:00.000Z'
+      },
+      {
+        id: 'ext_badge_2',
+        name: 'Legic Badge',
+        domainType: 'Digital Badge',
+        vendor: 'Legic',
+        product: 'Legic Connect',
+        version: '3.1',
+        tenantId: 'mbank',
+        siteId: 'site_mbank_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://connect.legic.com/api/v3', healthUrl: 'https://connect.legic.com/api/v3/health' }
+        ],
+        createdAt: '2024-03-20T09:00:00.000Z'
+      },
+      {
+        id: 'ext_badge_3',
+        name: 'Desfire Credential',
+        domainType: 'Digital Badge',
+        vendor: 'NXP',
+        product: 'MIFARE DESFire EV3 4K/8K',
+        version: 'EV3',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://desfire-mgmt.acme.example.com/api', healthUrl: 'https://desfire-mgmt.acme.example.com/api/status' }
+        ],
+        createdAt: '2024-01-20T10:00:00.000Z'
+      },
+      {
+        id: 'ext_locker_2',
+        name: 'Digilock Lockers',
+        domainType: 'Lockers',
+        vendor: 'Digilock',
+        product: 'Digilock Axis',
+        version: '3.0',
+        tenantId: 'mbank',
+        siteId: 'site_mbank_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.digilock.com/v3', healthUrl: 'https://api.digilock.com/v3/health' }
+        ],
+        createdAt: '2024-06-15T10:00:00.000Z'
+      },
+      {
+        id: 'ext_locker_3',
+        name: 'Flexlock Lockers',
+        domainType: 'Lockers',
+        vendor: 'Flexlock',
+        product: 'Flexlock Smart',
+        version: '2.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.flexlock.io/v2', healthUrl: 'https://api.flexlock.io/v2/status' }
+        ],
+        createdAt: '2024-07-20T08:00:00.000Z'
+      },
+      {
+        id: 'ext_ticketing_2',
+        name: 'Cisco Ticketing',
+        domainType: 'Ticketing',
+        vendor: 'Cisco',
+        product: 'Cisco Spaces',
+        version: '2.1',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://spaces.cisco.com/api/v2', healthUrl: 'https://spaces.cisco.com/api/v2/health' }
+        ],
+        createdAt: '2024-05-01T09:00:00.000Z'
+      },
+      {
+        id: 'ext_ticketing_3',
+        name: 'APFM Ticketing',
+        domainType: 'Ticketing',
+        vendor: 'APFM',
+        product: 'APFM Service',
+        version: '1.5',
+        tenantId: 'mbank',
+        siteId: 'site_mbank_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.apfm-service.com/v1', healthUrl: 'https://api.apfm-service.com/v1/ping' }
+        ],
+        createdAt: '2024-08-10T10:00:00.000Z'
+      },
+      {
+        id: 'ext_ticketing_4',
+        name: 'Facilio FM',
+        domainType: 'Ticketing',
+        vendor: 'Facilio',
+        product: 'Facilio Platform',
+        version: '2.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'inactive',
+        endpoints: [],
+        createdAt: '2025-02-01T00:00:00.000Z'
+      },
+      {
+        id: 'ext_elevator_1',
+        name: 'KONE Elevator',
+        domainType: 'Elevator',
+        vendor: 'KONE',
+        product: 'KONE DX API',
+        version: '2.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'inactive',
+        endpoints: [],
+        createdAt: '2025-01-15T00:00:00.000Z'
+      },
+      {
+        id: 'ext_elevator_2',
+        name: 'Otis Elevator',
+        domainType: 'Elevator',
+        vendor: 'Otis',
+        product: 'Otis ONE API',
+        version: '1.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'inactive',
+        endpoints: [],
+        createdAt: '2025-02-01T00:00:00.000Z'
+      },
+      {
+        id: 'ext_vm_2',
+        name: 'NEOX Visitor',
+        domainType: 'Visitor Management',
+        vendor: 'NEOX',
+        product: 'NEOX Visitor Management',
+        version: '2.5.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.neox.io/visitor/v2', healthUrl: 'https://api.neox.io/visitor/v2/health' },
+          { env: 'staging', baseUrl: 'https://staging-api.neox.io/visitor/v2' }
+        ],
+        createdAt: '2024-01-01T08:00:00.000Z'
+      },
+      {
+        id: 'ext_parking_2',
+        name: 'NEOX Parking',
+        domainType: 'Parking',
+        vendor: 'NEOX',
+        product: 'NEOX Parking Module',
+        version: '3.0.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.neox.io/parking/v3', healthUrl: 'https://api.neox.io/parking/v3/health' },
+          { env: 'staging', baseUrl: 'https://staging-api.neox.io/parking/v3' }
+        ],
+        createdAt: '2024-01-01T08:00:00.000Z'
+      },
+      {
+        id: 'ext_parking_3',
+        name: 'Designa Parking',
+        domainType: 'Parking',
+        vendor: 'Designa',
+        product: 'Designa ABACUS',
+        version: '6.0',
+        tenantId: 'mbank',
+        siteId: 'site_mbank_hq',
+        status: 'inactive',
+        endpoints: [],
+        createdAt: '2025-01-01T00:00:00.000Z'
+      },
+      {
+        id: 'ext_parking_4',
+        name: 'Swarco Parking',
+        domainType: 'Parking',
+        vendor: 'Swarco',
+        product: 'Swarco MyCity',
+        version: '3.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'inactive',
+        endpoints: [],
+        createdAt: '2025-02-01T00:00:00.000Z'
+      },
+      {
+        id: 'ext_parking_5',
+        name: 'Parkl',
+        domainType: 'Parking',
+        vendor: 'Parkl',
+        product: 'Parkl Smart Parking',
+        version: '2.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'inactive',
+        endpoints: [],
+        createdAt: '2025-03-01T00:00:00.000Z'
+      },
+      {
+        id: 'ext_parking_6',
+        name: 'ParkHelp',
+        domainType: 'Parking',
+        vendor: 'ParkHelp',
+        product: 'ParkHelp Guidance',
+        version: '4.0',
+        tenantId: 'mbank',
+        siteId: 'site_mbank_hq',
+        status: 'inactive',
+        endpoints: [],
+        createdAt: '2025-01-15T00:00:00.000Z'
+      },
+      {
+        id: 'ext_events_1',
+        name: 'NEOX Events',
+        domainType: 'Event Management',
+        vendor: 'NEOX',
+        product: 'NEOX Event Management',
+        version: '2.0.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.neox.io/events/v2', healthUrl: 'https://api.neox.io/events/v2/health' },
+          { env: 'staging', baseUrl: 'https://staging-api.neox.io/events/v2' }
+        ],
+        createdAt: '2024-01-01T08:00:00.000Z'
+      },
+      {
+        id: 'ext_restaurant_1',
+        name: 'NEOX Restaurant',
+        domainType: 'Restaurant',
+        vendor: 'NEOX',
+        product: 'NEOX Restaurant Module',
+        version: '1.5.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.neox.io/restaurant/v1', healthUrl: 'https://api.neox.io/restaurant/v1/health' }
+        ],
+        createdAt: '2024-02-01T08:00:00.000Z'
+      },
+      {
+        id: 'ext_waste_1',
+        name: 'WasteTracker',
+        domainType: 'Waste Management',
+        vendor: 'WasteTracker',
+        product: 'WasteTracker Platform',
+        version: '2.3',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://api.wastetracker.io/v2', healthUrl: 'https://api.wastetracker.io/v2/health' }
+        ],
+        createdAt: '2024-09-01T10:00:00.000Z'
+      },
+      {
+        id: 'ext_bms_2',
+        name: 'Schneider BMS',
+        domainType: 'BMS',
+        vendor: 'Schneider Electric',
+        product: 'Schneider EcoStruxure',
+        version: '4.0',
+        tenantId: 'mbank',
+        siteId: 'site_mbank_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://ecostruxure.schneider.com/api/v4', healthUrl: 'https://ecostruxure.schneider.com/api/v4/health' }
+        ],
+        createdAt: '2024-03-01T08:00:00.000Z'
+      },
+      {
+        id: 'ext_bms_3',
+        name: 'Siemens BMS',
+        domainType: 'BMS',
+        vendor: 'Siemens',
+        product: 'Siemens Desigo CC',
+        version: '6.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'active',
+        endpoints: [
+          { env: 'production', baseUrl: 'https://desigo.siemens.com/api/v6', healthUrl: 'https://desigo.siemens.com/api/v6/health' }
+        ],
+        createdAt: '2024-04-15T10:00:00.000Z'
+      },
+      {
+        id: 'ext_bms_4',
+        name: 'bGrid BMS',
+        domainType: 'BMS',
+        vendor: 'bGrid',
+        product: 'bGrid Building Platform',
+        version: '3.5.0',
+        tenantId: 'acme',
+        siteId: 'site_acme_hq',
+        status: 'inactive',
+        endpoints: [],
+        createdAt: '2025-01-01T00:00:00.000Z'
       }
     ],
     integrationAuthProfiles: [
@@ -1202,6 +1795,68 @@ const getInitialState = (): GlobalState => {
         secretRef: 'vault:secret/integrations/nective/api-key',
         tenantId: 'acme',
         createdAt: '2024-06-01T08:30:00.000Z'
+      },
+      {
+        id: 'auth_apikey_4',
+        name: 'bGrid API Key',
+        authType: 'api-key',
+        secretRef: 'vault:secret/integrations/bgrid/api-key',
+        tenantId: 'acme',
+        createdAt: '2024-04-20T10:30:00.000Z'
+      },
+      {
+        id: 'auth_oauth2_2',
+        name: 'Cisco Webex OAuth2',
+        authType: 'oauth2-client',
+        secretRef: 'vault:secret/integrations/cisco-webex/client-credentials',
+        tokenUrl: 'https://webexapis.com/v1/access_token',
+        scopes: 'spark:devices_read spark:devices_write',
+        tenantId: 'acme',
+        createdAt: '2024-08-01T09:30:00.000Z'
+      },
+      {
+        id: 'auth_oauth2_3',
+        name: 'HikCentral OAuth2',
+        authType: 'oauth2-client',
+        secretRef: 'vault:secret/integrations/hikcentral/client-credentials',
+        tokenUrl: 'https://hikcentral.acme.example.com/oauth/token',
+        scopes: 'read:events write:doors',
+        tenantId: 'acme',
+        createdAt: '2024-04-01T10:30:00.000Z'
+      },
+      {
+        id: 'auth_apikey_5',
+        name: 'NEOX Internal API Key',
+        authType: 'api-key',
+        secretRef: 'vault:secret/integrations/neox-internal/api-key',
+        tenantId: 'acme',
+        createdAt: '2024-01-01T08:30:00.000Z'
+      },
+      {
+        id: 'auth_apikey_6',
+        name: 'WasteTracker API Key',
+        authType: 'api-key',
+        secretRef: 'vault:secret/integrations/wastetracker/api-key',
+        tenantId: 'acme',
+        createdAt: '2024-09-01T10:30:00.000Z'
+      },
+      {
+        id: 'auth_apikey_7',
+        name: 'Schneider EcoStruxure Key',
+        authType: 'api-key',
+        secretRef: 'vault:secret/integrations/schneider/api-key',
+        tenantId: 'mbank',
+        createdAt: '2024-03-01T08:30:00.000Z'
+      },
+      {
+        id: 'auth_oauth2_4',
+        name: 'Siemens Desigo OAuth2',
+        authType: 'oauth2-client',
+        secretRef: 'vault:secret/integrations/siemens-desigo/client-credentials',
+        tokenUrl: 'https://desigo.siemens.com/oauth/token',
+        scopes: 'read:zones write:setpoints',
+        tenantId: 'acme',
+        createdAt: '2024-04-15T10:30:00.000Z'
       }
     ],
     integrationConnectors: [
@@ -1350,6 +2005,260 @@ const getInitialState = (): GlobalState => {
         lastTestAt: '2025-03-04T06:00:00.000Z',
         tenantId: 'acme',
         createdAt: '2024-07-20T10:00:00.000Z'
+      },
+      {
+        id: 'conn_av_2',
+        name: 'Cisco Device Sync',
+        domain: 'AV/VC',
+        externalSystemId: 'ext_av_2',
+        externalSystemName: 'Cisco AV/UC',
+        authProfileId: 'auth_oauth2_2',
+        coveragePercent: 82,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '1.0.0', deployedAt: '2025-02-20T09:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-08-05T09:00:00.000Z'
+      },
+      {
+        id: 'conn_iot_1',
+        name: 'bGrid Sensor Feed',
+        domain: 'IoT',
+        externalSystemId: 'ext_iot_1',
+        externalSystemName: 'bGrid IoT',
+        authProfileId: 'auth_apikey_4',
+        coveragePercent: 91,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '2.0.0', deployedAt: '2025-01-10T08:00:00.000Z' },
+          { env: 'staging', version: '2.1.0-beta', deployedAt: '2025-02-28T11:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-04-25T10:00:00.000Z'
+      },
+      {
+        id: 'conn_iot_2',
+        name: 'Haltian Occupancy Data',
+        domain: 'IoT',
+        externalSystemId: 'ext_iot_2',
+        externalSystemName: 'Haltian IoT',
+        authProfileId: 'auth_apikey_4',
+        coveragePercent: 78,
+        health: 'warning',
+        versions: [
+          { env: 'production', version: '1.2.0', deployedAt: '2024-12-15T10:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-03T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-05-20T08:00:00.000Z'
+      },
+      {
+        id: 'conn_iot_3',
+        name: 'XYSense Occupancy',
+        domain: 'IoT',
+        externalSystemId: 'ext_iot_3',
+        externalSystemName: 'XYSense',
+        authProfileId: 'auth_apikey_4',
+        coveragePercent: 86,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '1.0.0', deployedAt: '2025-01-05T09:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'mbank',
+        createdAt: '2024-06-15T09:00:00.000Z'
+      },
+      {
+        id: 'conn_ac_2',
+        name: 'Locksense Access Events',
+        domain: 'Access Control',
+        externalSystemId: 'ext_ac_2',
+        externalSystemName: 'Locksense Access',
+        authProfileId: 'auth_apikey_1',
+        coveragePercent: 80,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '1.1.0', deployedAt: '2025-01-20T09:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'mbank',
+        createdAt: '2024-03-20T09:00:00.000Z'
+      },
+      {
+        id: 'conn_ac_3',
+        name: 'HikCentral Events',
+        domain: 'Access Control',
+        externalSystemId: 'ext_ac_4',
+        externalSystemName: 'HikCentral',
+        authProfileId: 'auth_oauth2_3',
+        coveragePercent: 75,
+        health: 'warning',
+        versions: [
+          { env: 'production', version: '1.0.2', deployedAt: '2024-11-20T10:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'fail',
+        lastTestAt: '2025-03-03T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-04-05T10:00:00.000Z'
+      },
+      {
+        id: 'conn_locker_2',
+        name: 'Digilock Availability',
+        domain: 'Lockers',
+        externalSystemId: 'ext_locker_2',
+        externalSystemName: 'Digilock Lockers',
+        authProfileId: 'auth_apikey_1',
+        coveragePercent: 83,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '1.0.0', deployedAt: '2025-01-25T10:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'mbank',
+        createdAt: '2024-06-20T10:00:00.000Z'
+      },
+      {
+        id: 'conn_bms_2',
+        name: 'Schneider BMS Feed',
+        domain: 'BMS',
+        externalSystemId: 'ext_bms_2',
+        externalSystemName: 'Schneider BMS',
+        authProfileId: 'auth_apikey_7',
+        coveragePercent: 88,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '1.1.0', deployedAt: '2025-02-01T08:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'mbank',
+        createdAt: '2024-03-05T08:00:00.000Z'
+      },
+      {
+        id: 'conn_bms_3',
+        name: 'Siemens Desigo Data',
+        domain: 'BMS',
+        externalSystemId: 'ext_bms_3',
+        externalSystemName: 'Siemens BMS',
+        authProfileId: 'auth_oauth2_4',
+        coveragePercent: 92,
+        health: 'critical',
+        versions: [
+          { env: 'production', version: '2.0.0', deployedAt: '2025-01-30T10:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'fail',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-04-20T10:00:00.000Z'
+      },
+      {
+        id: 'conn_vm_2',
+        name: 'NEOX Visitor Sync',
+        domain: 'Visitor Management',
+        externalSystemId: 'ext_vm_2',
+        externalSystemName: 'NEOX Visitor',
+        authProfileId: 'auth_apikey_5',
+        coveragePercent: 100,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '2.5.0', deployedAt: '2025-02-10T08:00:00.000Z' },
+          { env: 'staging', version: '2.6.0-beta', deployedAt: '2025-03-01T09:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-01-05T08:00:00.000Z'
+      },
+      {
+        id: 'conn_parking_2',
+        name: 'NEOX Parking Sync',
+        domain: 'Parking',
+        externalSystemId: 'ext_parking_2',
+        externalSystemName: 'NEOX Parking',
+        authProfileId: 'auth_apikey_5',
+        coveragePercent: 100,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '3.0.0', deployedAt: '2025-02-15T08:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-01-05T08:00:00.000Z'
+      },
+      {
+        id: 'conn_events_1',
+        name: 'NEOX Event Sync',
+        domain: 'Event Management',
+        externalSystemId: 'ext_events_1',
+        externalSystemName: 'NEOX Events',
+        authProfileId: 'auth_apikey_5',
+        coveragePercent: 100,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '2.0.0', deployedAt: '2025-02-10T08:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-01-05T08:00:00.000Z'
+      },
+      {
+        id: 'conn_restaurant_1',
+        name: 'NEOX Restaurant Sync',
+        domain: 'Restaurant',
+        externalSystemId: 'ext_restaurant_1',
+        externalSystemName: 'NEOX Restaurant',
+        authProfileId: 'auth_apikey_5',
+        coveragePercent: 95,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '1.5.0', deployedAt: '2025-02-01T08:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-02-05T08:00:00.000Z'
+      },
+      {
+        id: 'conn_waste_1',
+        name: 'WasteTracker Feed',
+        domain: 'Waste Management',
+        externalSystemId: 'ext_waste_1',
+        externalSystemName: 'WasteTracker',
+        authProfileId: 'auth_apikey_6',
+        coveragePercent: 87,
+        health: 'ok',
+        versions: [
+          { env: 'production', version: '1.0.0', deployedAt: '2025-01-20T10:00:00.000Z' }
+        ],
+        status: 'active',
+        lastTestResult: 'pass',
+        lastTestAt: '2025-03-04T06:00:00.000Z',
+        tenantId: 'acme',
+        createdAt: '2024-09-05T10:00:00.000Z'
       }
     ]
   }
@@ -1756,6 +2665,31 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const addEvent = (event: Omit<EventInvitation, 'id' | 'createdAt'>) => {
+    const newEvent: EventInvitation = {
+      ...event,
+      id: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString()
+    }
+    setState(prev => ({ ...prev, events: [...prev.events, newEvent] }))
+    addAuditLog({ user: 'system', action: `Created event "${newEvent.eventName}"`, status: 'Success' })
+    return newEvent
+  }
+
+  const updateEvent = (id: string, updates: Partial<EventInvitation>) => {
+    setState(prev => ({
+      ...prev,
+      events: prev.events.map(e => e.id === id ? { ...e, ...updates } : e)
+    }))
+    addAuditLog({ user: 'system', action: `Updated event (ID: ${id})`, status: 'Success' })
+  }
+
+  const deleteEvent = (id: string) => {
+    const event = state.events.find(e => e.id === id)
+    setState(prev => ({ ...prev, events: prev.events.filter(e => e.id !== id) }))
+    addAuditLog({ user: 'system', action: `Deleted event "${event?.eventName}" (ID: ${id})`, status: 'Success' })
+  }
+
   const addExternalSystem = (system: Omit<ExternalSystem, 'id' | 'createdAt'>) => {
     const newSystem: ExternalSystem = {
       ...system,
@@ -1875,6 +2809,9 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     toggleModule,
     clearAllData,
     resetDashboardData,
+    addEvent,
+    updateEvent,
+    deleteEvent,
     addExternalSystem,
     updateExternalSystem,
     deleteExternalSystem,

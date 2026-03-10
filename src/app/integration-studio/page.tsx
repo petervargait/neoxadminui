@@ -7,7 +7,6 @@ import { useGlobalState } from '../../context/GlobalStateContext'
 import {
   DataBarVerticalRegular,
   ServerRegular,
-  KeyRegular,
   DocumentRegular,
   PlugConnectedRegular,
   ArrowSyncRegular,
@@ -22,7 +21,6 @@ import {
 } from '@fluentui/react-icons'
 import ISDashboard from '../../components/integration-studio/ISDashboard'
 import ISExternalSystems from '../../components/integration-studio/ISExternalSystems'
-import ISAuthProfiles from '../../components/integration-studio/ISAuthProfiles'
 import ISCanonicalAPIs from '../../components/integration-studio/ISCanonicalAPIs'
 import ISConnectors from '../../components/integration-studio/ISConnectors'
 import ISConnectorBuilder from '../../components/integration-studio/ISConnectorBuilder'
@@ -61,7 +59,6 @@ export default function IntegrationStudioPage() {
   const sections = [
     { id: 'dashboard',       label: 'Dashboard',        Icon: DataBarVerticalRegular,  color: '#3B82F6' },
     { id: 'externalSystems', label: 'External Systems',  Icon: ServerRegular,           color: '#D4A847' },
-    { id: 'authProfiles',    label: 'Auth Profiles',     Icon: KeyRegular,              color: '#8B5CF6' },
     { id: 'canonicalAPIs',   label: 'Canonical APIs',    Icon: DocumentRegular,         color: '#10B981' },
     { id: 'connectors',      label: 'Connectors',        Icon: PlugConnectedRegular,    color: '#3B82F6' },
     { id: 'mappingDesigner', label: 'Mapping Designer',  Icon: ArrowSyncRegular,        color: '#D4A847' },
@@ -231,7 +228,7 @@ export default function IntegrationStudioPage() {
         <div style={{ flex: 1, overflow: 'auto', padding: '0' }}>
           {activeSection === 'dashboard' && <ISDashboard />}
           {activeSection === 'externalSystems' && <ISExternalSystems />}
-          {activeSection === 'authProfiles' && <ISAuthProfiles />}
+
           {activeSection === 'canonicalAPIs' && <ISCanonicalAPIs />}
           {activeSection === 'connectors' && <ISConnectors />}
           {activeSection === 'mappingDesigner' && <ISMappingDesigner />}
