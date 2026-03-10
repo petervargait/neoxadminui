@@ -3,6 +3,12 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { useGlobalState } from '@/context/GlobalStateContext'
 import type { Invitation } from '@/context/GlobalStateContext'
+import {
+  VehicleCarParkingRegular,
+  Wifi1Regular,
+  LockClosedRegular,
+  ShieldCheckmarkRegular,
+} from '@fluentui/react-icons'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -778,23 +784,23 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
                   {/* Services */}
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                     {inv.bookParking && (
-                      <span title="Parking" style={{ fontSize: '14px', background: 'rgba(59,130,246,0.1)', borderRadius: '6px', padding: '2px 6px', lineHeight: 1.4 }}>
-                        🅿️
+                      <span title="Parking" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(59,130,246,0.1)', borderRadius: '6px', padding: '2px 6px', color: '#3B82F6' }}>
+                        <VehicleCarParkingRegular style={{ width: '14px', height: '14px' }} />
                       </span>
                     )}
                     {inv.useWifi && (
-                      <span title="WiFi" style={{ fontSize: '14px', background: 'rgba(16,185,129,0.1)', borderRadius: '6px', padding: '2px 6px', lineHeight: 1.4 }}>
-                        📶
+                      <span title="WiFi" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(16,185,129,0.1)', borderRadius: '6px', padding: '2px 6px', color: '#10B981' }}>
+                        <Wifi1Regular style={{ width: '14px', height: '14px' }} />
                       </span>
                     )}
                     {inv.useLocker && (
-                      <span title="Locker" style={{ fontSize: '14px', background: 'rgba(139,92,246,0.1)', borderRadius: '6px', padding: '2px 6px', lineHeight: 1.4 }}>
-                        🔒
+                      <span title="Locker" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(139,92,246,0.1)', borderRadius: '6px', padding: '2px 6px', color: '#8B5CF6' }}>
+                        <LockClosedRegular style={{ width: '14px', height: '14px' }} />
                       </span>
                     )}
                     {inv.needIdVerification && (
-                      <span title="ID Verification" style={{ fontSize: '14px', background: 'rgba(212,168,71,0.1)', borderRadius: '6px', padding: '2px 6px', lineHeight: 1.4 }}>
-                        ✓
+                      <span title="ID Verification" style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(212,168,71,0.1)', borderRadius: '6px', padding: '2px 6px', color: '#D4A847' }}>
+                        <ShieldCheckmarkRegular style={{ width: '14px', height: '14px' }} />
                       </span>
                     )}
                     {!inv.bookParking && !inv.useWifi && !inv.useLocker && !inv.needIdVerification && (
@@ -1260,10 +1266,10 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 {([
-                  { key: 'bookParking' as const, label: 'Book Parking', icon: '🅿️' },
-                  { key: 'useWifi' as const, label: 'Use WiFi', icon: '📶' },
-                  { key: 'useLocker' as const, label: 'Use Locker', icon: '🔒' },
-                  { key: 'needIdVerification' as const, label: 'Need ID Verification', icon: '✓' },
+                  { key: 'bookParking' as const, label: 'Book Parking', icon: <VehicleCarParkingRegular style={{ width: '16px', height: '16px' }} /> },
+                  { key: 'useWifi' as const, label: 'Use WiFi', icon: <Wifi1Regular style={{ width: '16px', height: '16px' }} /> },
+                  { key: 'useLocker' as const, label: 'Use Locker', icon: <LockClosedRegular style={{ width: '16px', height: '16px' }} /> },
+                  { key: 'needIdVerification' as const, label: 'Need ID Verification', icon: <ShieldCheckmarkRegular style={{ width: '16px', height: '16px' }} /> },
                 ]).map(svc => (
                   <label
                     key={svc.key}

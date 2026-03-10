@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { AlertRegular, StatusRegular, DocumentBulletListRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, DocumentRegular, BuildingRegular, SettingsRegular, ErrorCircleRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular } from '@fluentui/react-icons'
+import { AlertRegular, StatusRegular, DocumentBulletListRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, DocumentRegular, BuildingRegular, SettingsRegular, ErrorCircleRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular, PersonBoardRegular, CalendarStarRegular } from '@fluentui/react-icons'
 import { useGlobalState } from '../../context/GlobalStateContext'
 import ColorPicker, { ColorConfig } from '../../components/ColorPicker'
 import FontFamilySelector, { FontFamily } from '../../components/FontFamilySelector'
@@ -678,8 +678,8 @@ export default function AdminPage() {
             { icon: '◩', label: 'Space Management', action: () => setActiveSection('spaceManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◫', label: 'Building Management', action: () => setActiveSection('buildingManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: '◉', label: 'Visitor Check-in', action: () => setActiveSection('visitorCheckin'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
-            { icon: '📋', label: 'Visitor Management', action: () => setActiveSection('visitorManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
-            { icon: '🎫', label: 'Event Management', action: () => setActiveSection('eventManagement'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
+            { icon: 'personBoard', label: 'Visitor Management', action: () => setActiveSection('visitorManagement'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'personBoard' },
+            { icon: 'calendarStar', label: 'Event Management', action: () => setActiveSection('eventManagement'), enabled: selectedTenant !== 'all', isFluentIcon: true, iconType: 'calendarStar' },
             { icon: '◬', label: 'Smart Spaces', action: () => setActiveSection('smartSpaces'), enabled: selectedTenant !== 'all', isFluentIcon: false, iconType: null },
             { icon: 'ticket', label: 'Ticket Management', action: () => setActiveSection('ticketManagement'), enabled: true, isFluentIcon: true, iconType: 'ticket' },
             { icon: 'alert', label: 'Notifications', action: () => setActiveSection('notifications'), enabled: true, isFluentIcon: true, iconType: 'alert' },
@@ -733,6 +733,10 @@ export default function AdminPage() {
                   <StatusRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : item.iconType === 'ticket' ? (
                   <DocumentBulletListRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'personBoard' ? (
+                  <PersonBoardRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'calendarStar' ? (
+                  <CalendarStarRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : (
                   <span style={{ fontSize: '18px' }}>{item.icon}</span>
                 )

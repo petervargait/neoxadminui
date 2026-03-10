@@ -3,6 +3,12 @@
 import React, { useState, useMemo, useRef, useCallback } from 'react'
 import { useGlobalState } from '@/context/GlobalStateContext'
 import type { EventInvitation, EventParticipant } from '@/context/GlobalStateContext'
+import {
+  VehicleCarParkingRegular,
+  Wifi1Regular,
+  LockClosedRegular,
+  ShieldCheckmarkRegular,
+} from '@fluentui/react-icons'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -976,10 +982,10 @@ export default function EventManagement({ tenantId }: EventManagementProps) {
                               </td>
                               <td style={{ padding: '10px 12px' }}>
                                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                  {p.bookParking && <span style={{ fontSize: '11px', background: 'rgba(59,130,246,0.12)', color: COLORS.blue, padding: '2px 8px', borderRadius: '4px' }}>Parking</span>}
-                                  {p.useWifi && <span style={{ fontSize: '11px', background: 'rgba(139,92,246,0.12)', color: COLORS.purple, padding: '2px 8px', borderRadius: '4px' }}>WiFi</span>}
-                                  {p.useLocker && <span style={{ fontSize: '11px', background: 'rgba(212,168,71,0.12)', color: COLORS.yellow, padding: '2px 8px', borderRadius: '4px' }}>Locker</span>}
-                                  {p.needIdVerification && <span style={{ fontSize: '11px', background: 'rgba(16,185,129,0.12)', color: COLORS.green, padding: '2px 8px', borderRadius: '4px' }}>ID</span>}
+                                  {p.bookParking && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '11px', background: 'rgba(59,130,246,0.12)', color: COLORS.blue, padding: '2px 8px', borderRadius: '4px' }}><VehicleCarParkingRegular style={{ width: '12px', height: '12px' }} /> Parking</span>}
+                                  {p.useWifi && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '11px', background: 'rgba(139,92,246,0.12)', color: COLORS.purple, padding: '2px 8px', borderRadius: '4px' }}><Wifi1Regular style={{ width: '12px', height: '12px' }} /> WiFi</span>}
+                                  {p.useLocker && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '11px', background: 'rgba(212,168,71,0.12)', color: COLORS.yellow, padding: '2px 8px', borderRadius: '4px' }}><LockClosedRegular style={{ width: '12px', height: '12px' }} /> Locker</span>}
+                                  {p.needIdVerification && <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '11px', background: 'rgba(16,185,129,0.12)', color: COLORS.green, padding: '2px 8px', borderRadius: '4px' }}><ShieldCheckmarkRegular style={{ width: '12px', height: '12px' }} /> ID</span>}
                                   {!p.bookParking && !p.useWifi && !p.useLocker && !p.needIdVerification && <span style={{ color: COLORS.muted }}>-</span>}
                                 </div>
                               </td>

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular, BuildingRegular } from '@fluentui/react-icons'
+import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular, BuildingRegular, CalendarStarRegular } from '@fluentui/react-icons'
 import { useGlobalState } from '../../context/GlobalStateContext'
 import VisitorDashboard from '../../components/VisitorDashboard'
 import ParkingDashboard from '../../components/ParkingDashboard'
@@ -503,7 +503,7 @@ export default function TenantPage() {
             { icon: '◐', label: 'Analytics', action: () => setActiveSection('analytics'), isFluentIcon: false, iconType: null },
             { icon: 'people', label: 'Users', action: () => setActiveSection('users'), isFluentIcon: true, iconType: 'people' },
             { icon: 'person', label: 'Visitor Management', action: () => setActiveSection('visitorManagement'), isFluentIcon: true, iconType: 'person' },
-            { icon: '🎫', label: 'Event Management', action: () => setActiveSection('eventManagement'), isFluentIcon: false, iconType: null },
+            { icon: 'calendarStar', label: 'Event Management', action: () => setActiveSection('eventManagement'), isFluentIcon: true, iconType: 'calendarStar' },
             { icon: 'vehicle', label: 'Parking', action: () => setActiveSection('parking'), isFluentIcon: true, iconType: 'vehicle' },
             { icon: '◎', label: 'Lockers', action: () => setActiveSection('lockers'), isFluentIcon: false, iconType: null },
             { icon: '◩', label: 'Spaces', action: () => setActiveSection('spaces'), isFluentIcon: false, iconType: null },
@@ -553,6 +553,8 @@ export default function TenantPage() {
                   <SettingsRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : item.iconType === 'building' ? (
                   <BuildingRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
+                ) : item.iconType === 'calendarStar' ? (
+                  <CalendarStarRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} />
                 ) : (
                   <span style={{ fontSize: '18px' }}>{item.icon}</span>
                 )
