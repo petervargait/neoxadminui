@@ -389,6 +389,15 @@ export interface IntegrationConnector {
   createdAt: string
 }
 
+export interface OperationalMessage {
+  id: string
+  systemName: string
+  severity: 'info' | 'warning' | 'error' | 'critical'
+  message: string
+  timestamp: string
+  state: 'active' | 'resolved'
+}
+
 interface GlobalState {
   users: User[]
   tenants: Tenant[]
@@ -413,6 +422,7 @@ interface GlobalState {
   externalSystems: ExternalSystem[]
   integrationAuthProfiles: IntegrationAuthProfile[]
   integrationConnectors: IntegrationConnector[]
+  operationalMessages: OperationalMessage[]
 }
 
 interface GlobalStateContextType extends GlobalState {
@@ -492,6 +502,7 @@ const getInitialState = (): GlobalState => {
           externalSystems: parsedState.externalSystems || [],
           integrationAuthProfiles: parsedState.integrationAuthProfiles || [],
           integrationConnectors: parsedState.integrationConnectors || [],
+          operationalMessages: parsedState.operationalMessages || [],
           systemSettings: parsedState.systemSettings || {
             'global': {
               tenantId: 'global',
@@ -2260,6 +2271,13 @@ const getInitialState = (): GlobalState => {
         tenantId: 'acme',
         createdAt: '2024-09-05T10:00:00.000Z'
       }
+    ],
+    operationalMessages: [
+      { id: 'opmsg_1', systemName: 'Siemens Desigo', severity: 'critical', message: 'BACnet gateway returning 500 errors intermittently. BMS team investigating.', timestamp: '2026-03-05T10:30:00.000Z', state: 'active' },
+      { id: 'opmsg_2', systemName: 'HikCentral', severity: 'critical', message: 'Backend not responding within 5s timeout. Network path investigation ongoing.', timestamp: '2026-03-05T01:05:00.000Z', state: 'active' },
+      { id: 'opmsg_3', systemName: 'Haltian IoT', severity: 'warning', message: 'Rate limit exceeded during high-frequency polling. Backoff applied.', timestamp: '2026-03-05T14:38:00.000Z', state: 'active' },
+      { id: 'opmsg_4', systemName: 'TDS Visitor', severity: 'warning', message: 'P95 latency elevated (>700ms) during peak hours.', timestamp: '2026-03-05T12:00:00.000Z', state: 'active' },
+      { id: 'opmsg_5', systemName: 'Vecos Lockers', severity: 'info', message: 'Scheduled maintenance window completed successfully.', timestamp: '2026-03-04T06:00:00.000Z', state: 'resolved' },
     ]
   }
 }

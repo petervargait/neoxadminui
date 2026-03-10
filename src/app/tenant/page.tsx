@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import NeoxLogo from '../../components/NeoxLogo'
-import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular, BuildingRegular, CalendarStarRegular } from '@fluentui/react-icons'
+import { AlertRegular, MailRegular, AlertOnRegular, DeleteRegular, ArrowUploadRegular, AddRegular, ArrowDownloadRegular, PeopleRegular, VehicleCarRegular, DocumentRegular, PersonRegular, SettingsRegular, PhoneRegular, ClockRegular, WarningRegular, InfoRegular, CheckmarkCircleRegular, BuildingRegular, CalendarStarRegular, StatusRegular, ErrorCircleRegular } from '@fluentui/react-icons'
 import { useGlobalState } from '../../context/GlobalStateContext'
 import VisitorDashboard from '../../components/VisitorDashboard'
 import ParkingDashboard from '../../components/ParkingDashboard'
@@ -118,6 +118,7 @@ export default function TenantPage() {
   const [userSortField, setUserSortField] = useState<'name' | 'email' | 'role' | 'department' | 'status'>('name')
   const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc')
   const [expandedUserRow, setExpandedUserRow] = useState<number | null>(null)
+  const [showBulkUploadArea, setShowBulkUploadArea] = useState(false)
   const [showTemplateEditor, setShowTemplateEditor] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<{name: string; subject?: string; status?: string} | null>(null)
   const [showParkingModal, setShowParkingModal] = useState(false)
@@ -156,6 +157,21 @@ export default function TenantPage() {
     setDashboardEndDate('')
     setAppliedStartDate('')
     setAppliedEndDate('')
+  }
+
+  const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && file.type === 'text/csv') {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const csv = e.target?.result as string
+        console.log('CSV uploaded:', csv)
+        alert(`CSV file "${file.name}" uploaded successfully! Processing ${csv.split('\n').length - 1} users.`)
+      }
+      reader.readAsText(file)
+    } else {
+      alert('Please select a valid CSV file')
+    }
   }
 
   // Export dashboard data to CSV
@@ -1196,6 +1212,125 @@ export default function TenantPage() {
                     searchTerm=""
                   />
                 </div>
+
+                {/* Operational Systems Status */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8))',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
+                  padding: '24px',
+                  marginBottom: '24px',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                    <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <StatusRegular style={{ fontSize: '20px', width: '20px', height: '20px', color: '#10B981' }} />
+                      Integrated Systems Status
+                    </h2>
+                    {(() => {
+                      const tenantConnectors = globalState.integrationConnectors.filter(c => c.tenantId === selectedTenantId)
+                      return (
+                        <span style={{
+                          padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '500',
+                          backgroundColor: tenantConnectors.some(c => c.health === 'critical')
+                            ? 'rgba(239, 68, 68, 0.1)' : tenantConnectors.some(c => c.health === 'warning')
+                            ? 'rgba(234, 179, 8, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                          color: tenantConnectors.some(c => c.health === 'critical')
+                            ? '#EF4444' : tenantConnectors.some(c => c.health === 'warning')
+                            ? '#EAB308' : '#10B981'
+                        }}>
+                          {tenantConnectors.some(c => c.health === 'critical') ? 'Degraded'
+                            : tenantConnectors.some(c => c.health === 'warning') ? 'Warnings' : 'All Healthy'}
+                        </span>
+                      )
+                    })()}
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                    gap: '12px',
+                    marginBottom: '20px'
+                  }}>
+                    {globalState.externalSystems.filter(s => s.tenantId === selectedTenantId).map(system => {
+                      const connector = globalState.integrationConnectors.find(c => c.externalSystemId === system.id)
+                      const effectiveStatus = system.status === 'maintenance' ? 'maintenance'
+                        : system.status === 'inactive' ? 'offline'
+                        : connector?.health === 'critical' ? 'offline'
+                        : connector?.health === 'warning' ? 'degraded'
+                        : 'online'
+                      const statusConfig = {
+                        online:      { color: '#10B981', bg: 'rgba(16, 185, 129, 0.1)', label: 'Online' },
+                        offline:     { color: '#EF4444', bg: 'rgba(239, 68, 68, 0.1)', label: 'Offline' },
+                        degraded:    { color: '#EAB308', bg: 'rgba(234, 179, 8, 0.1)', label: 'Degraded' },
+                        maintenance: { color: '#3B82F6', bg: 'rgba(59, 130, 246, 0.1)', label: 'Maintenance' }
+                      }[effectiveStatus]
+                      return (
+                        <div key={system.id} style={{
+                          padding: '14px',
+                          backgroundColor: 'rgba(30, 41, 59, 0.6)',
+                          borderRadius: '8px',
+                          border: `1px solid ${effectiveStatus === 'offline' ? 'rgba(239, 68, 68, 0.3)' : effectiveStatus === 'degraded' ? 'rgba(234, 179, 8, 0.3)' : '#334155'}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between'
+                        }}>
+                          <div>
+                            <div style={{ color: '#F1F5F9', fontSize: '13px', fontWeight: '500' }}>{system.name}</div>
+                            <div style={{ color: '#64748B', fontSize: '11px', marginTop: '2px' }}>{system.domainType}</div>
+                          </div>
+                          <span style={{
+                            padding: '3px 8px', borderRadius: '20px', fontSize: '10px', fontWeight: '600',
+                            backgroundColor: statusConfig.bg, color: statusConfig.color
+                          }}>
+                            {statusConfig.label}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {(() => {
+                    const tenantSystems = globalState.externalSystems.filter(s => s.tenantId === selectedTenantId).map(s => s.name)
+                    const tenantMessages = (globalState.operationalMessages || []).filter((m: { state: string; systemName: string }) => m.state === 'active' && tenantSystems.includes(m.systemName))
+                    if (tenantMessages.length === 0) return null
+                    return (
+                      <div>
+                        <h3 style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '600', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <AlertRegular style={{ fontSize: '14px', width: '14px', height: '14px' }} />
+                          System Messages
+                          <span style={{ padding: '2px 6px', borderRadius: '10px', fontSize: '10px', fontWeight: '600', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#EF4444' }}>
+                            {tenantMessages.length}
+                          </span>
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          {tenantMessages.map((msg: { id: string; severity: string; systemName: string; timestamp: string; message: string }) => (
+                            <div key={msg.id} style={{
+                              padding: '10px 14px',
+                              backgroundColor: msg.severity === 'critical' || msg.severity === 'error' ? 'rgba(239, 68, 68, 0.05)' : 'rgba(234, 179, 8, 0.05)',
+                              borderRadius: '6px',
+                              border: `1px solid ${msg.severity === 'critical' || msg.severity === 'error' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(234, 179, 8, 0.2)'}`,
+                              display: 'flex',
+                              alignItems: 'flex-start',
+                              gap: '10px'
+                            }}>
+                              {msg.severity === 'critical' || msg.severity === 'error' ? (
+                                <ErrorCircleRegular style={{ fontSize: '14px', width: '14px', height: '14px', color: '#EF4444', flexShrink: 0, marginTop: '2px' }} />
+                              ) : (
+                                <WarningRegular style={{ fontSize: '14px', width: '14px', height: '14px', color: '#EAB308', flexShrink: 0, marginTop: '2px' }} />
+                              )}
+                              <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                                  <span style={{ color: '#F1F5F9', fontSize: '12px', fontWeight: '600' }}>{msg.systemName}</span>
+                                  <span style={{ color: '#64748B', fontSize: '10px' }}>{new Date(msg.timestamp).toLocaleString()}</span>
+                                </div>
+                                <div style={{ color: '#94A3B8', fontSize: '12px' }}>{msg.message}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </div>
               </div>
             </>
           )}
@@ -1451,24 +1586,115 @@ export default function TenantPage() {
                   <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', margin: 0 }}>User Management</h2>
                   <p style={{ color: '#64748B', fontSize: '14px', margin: '4px 0 0 0' }}>Manage organization users and permissions</p>
                 </div>
-                <button onClick={() => { 
-                  setEditingUser(null); 
-                  setSelectedProfileId(''); 
-                  setShowUserModal(true); 
-                }} style={{
-                  backgroundColor: '#3B82F6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '10px 16px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer'
-                }}>
-                  + Add User
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => setShowBulkUploadArea(!showBulkUploadArea)} style={{
+                    backgroundColor: 'transparent',
+                    color: '#60A5FA',
+                    border: '1px solid #60A5FA',
+                    borderRadius: '8px',
+                    padding: '10px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <ArrowUploadRegular style={{ fontSize: '16px', width: '16px', height: '16px' }} />
+                    Bulk Upload
+                  </button>
+                  <button onClick={() => {
+                    setEditingUser(null);
+                    setSelectedProfileId('');
+                    setShowUserModal(true);
+                  }} style={{
+                    backgroundColor: '#3B82F6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}>
+                    + Add User
+                  </button>
+                </div>
               </div>
-              
+
+              {showBulkUploadArea && (
+                <div style={{ padding: '24px', borderBottom: '1px solid #1E293B', backgroundColor: '#0F1629' }}>
+                  <div style={{ marginBottom: '16px', padding: '16px', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                    <h3 style={{ color: '#3b82f6', fontSize: '16px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <InfoRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} /> CSV Format Requirements
+                    </h3>
+                    <p style={{ color: '#F1F5F9', fontSize: '14px', margin: '0 0 12px 0' }}>
+                      Your CSV file should include the following columns (in order):
+                    </p>
+                    <div style={{ fontFamily: 'monospace', backgroundColor: '#1E293B', padding: '12px', borderRadius: '6px', color: '#F1F5F9', fontSize: '12px' }}>
+                      name,email,role,department
+                    </div>
+                    <div style={{ marginTop: '12px' }}>
+                      <button style={{
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        color: '#fff',
+                        border: '1px solid rgba(59, 130, 246, 0.3)',
+                        borderRadius: '6px',
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }} onClick={() => {
+                        const csvContent = "name,email,role,department\nJohn Smith,john@company.com,user,IT\nJane Doe,jane@company.com,admin,HR\nBob Johnson,bob@company.com,manager,Sales"
+                        const blob = new Blob([csvContent], { type: 'text/csv' })
+                        const url = window.URL.createObjectURL(blob)
+                        const a = document.createElement('a')
+                        a.href = url
+                        a.download = 'users_template.csv'
+                        a.click()
+                        window.URL.revokeObjectURL(url)
+                      }}>
+                        <ArrowDownloadRegular style={{ fontSize: '14px', width: '14px', height: '14px' }} /> Download Template
+                      </button>
+                    </div>
+                  </div>
+                  <div style={{ border: '2px dashed #475569', borderRadius: '12px', padding: '32px', textAlign: 'center', backgroundColor: '#1E293B' }}>
+                    <input type="file" accept=".csv" onChange={handleCSVUpload} style={{ display: 'none' }} id="csv-upload-tenant-users" />
+                    <label htmlFor="csv-upload-tenant-users" style={{
+                      backgroundColor: '#3B82F6',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '12px 24px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}>
+                      <ArrowUploadRegular style={{ fontSize: '16px', width: '16px', height: '16px' }} /> Choose CSV File
+                    </label>
+                    <p style={{ color: '#64748B', marginTop: '12px', fontSize: '14px' }}>
+                      Select a CSV file to upload multiple users at once
+                    </p>
+                  </div>
+                  <div style={{ marginTop: '16px', padding: '16px', backgroundColor: 'rgba(234, 179, 8, 0.1)', borderRadius: '8px', border: '1px solid rgba(234, 179, 8, 0.3)' }}>
+                    <h3 style={{ color: '#eab308', fontSize: '16px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <WarningRegular style={{ fontSize: '18px', width: '18px', height: '18px' }} /> Upload Process
+                    </h3>
+                    <ul style={{ color: '#F1F5F9', fontSize: '14px', margin: 0, paddingLeft: '20px' }}>
+                      <li>Users will be validated before creation</li>
+                      <li>Duplicate emails will be skipped</li>
+                      <li>Invalid entries will be reported</li>
+                      <li>Email invitations will be sent automatically</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
               <div style={{ padding: '24px' }}>
                 <div style={{ marginBottom: '20px', display: 'flex', gap: '12px' }}>
                   <input type="search" placeholder="Search users..." style={{

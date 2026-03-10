@@ -1371,9 +1371,35 @@ export default function EventManagement({ tenantId }: EventManagementProps) {
                       >
                         Upload CSV File
                       </button>
-                      <p style={{ fontSize: '12px', color: COLORS.muted, marginTop: '12px', marginBottom: 0 }}>
+                      <p style={{ fontSize: '12px', color: COLORS.muted, marginTop: '12px', marginBottom: '8px' }}>
                         Upload CSV file with columns: <strong style={{ color: COLORS.secondary }}>name, email, company</strong>
                       </p>
+                      <button
+                        style={{
+                          backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                          color: '#fff',
+                          border: '1px solid rgba(59, 130, 246, 0.3)',
+                          borderRadius: '6px',
+                          padding: '6px 12px',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                        onClick={() => {
+                          const csvContent = "name,email,company\nJohn Smith,john@company.com,Acme Corp\nJane Doe,jane@example.com,Tech Inc\nBob Johnson,bob@company.com,Global Solutions"
+                          const blob = new Blob([csvContent], { type: 'text/csv' })
+                          const url = window.URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = 'event_participants_template.csv'
+                          a.click()
+                          window.URL.revokeObjectURL(url)
+                        }}
+                      >
+                        Download Template
+                      </button>
                     </div>
 
                     {/* CSV preview */}
