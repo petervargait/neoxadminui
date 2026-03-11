@@ -317,7 +317,7 @@ export default function Dashboard7OccupancyServices({
             </p>
           </div>
           <div style={{ position: 'relative' }}>
-            <BuildingModel3D height={520} onFloorSelect={(floorNum, floorName) => { setSelectedFloor(floorNum); setSelectedFloorName(floorName) }} />
+            <BuildingModel3D height={520} selectedFloor={selectedFloor} onFloorSelect={(floorNum, floorName) => { setSelectedFloor(floorNum); setSelectedFloorName(floorName) }} />
             {/* "All" button — reset to whole building view */}
             {selectedFloor !== null && (
               <button onClick={() => { setSelectedFloor(null); setSelectedFloorName('') }}

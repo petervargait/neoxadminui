@@ -3,12 +3,12 @@
 import React from 'react'
 
 // ---------------------------------------------------------------------------
-// Types — circles positioned as percentage of floorplan dimensions
+// Types — circles positioned as percentage of floorplan image dimensions
 // ---------------------------------------------------------------------------
 interface Blob {
   cx: number       // center X as % of image width (0-100)
   cy: number       // center Y as % of image height (0-100)
-  r: number        // radius as % of image width (0-100)
+  r: number        // radius as % of image width
   occupancy: number // 0-100
 }
 
@@ -19,142 +19,198 @@ interface FloorplanWithZonesProps {
 }
 
 // ---------------------------------------------------------------------------
-// Occupancy blob definitions per floor — circles within the building interior
-// Each floor has blobs of varying sizes placed inside the building walls.
-// Occupancy determines color: Red >=80%, Amber >=50%, Green >=20%, none <20%
+// Blob positions traced from actual floorplan images.
+// Only RED (>=80%) and AMBER (>=50%) are rendered.
+//
+// Floor 0-3: Long horizontal building footprint
+//   Walls roughly: x 5%-93%, y 15%-78%
+// Floor 4-9: Hourglass/bowtie shape
+//   Left wing x 5%-40% y 12%-88%, neck x 35%-65% y 25%-75%, right wing x 60%-95% y 12%-88%
+// Floor 10+: Three separate towers
+//   Left tower x 4%-28% y 8%-72%, Center tower x 34%-58% y 5%-68%, Right tower x 64%-96% y 8%-78%
 // ---------------------------------------------------------------------------
-// All blobs centered within building footprint (cy ~18-30 to stay within clipped walls)
 const FLOOR_BLOBS: Record<number, Blob[]> = {
+  // Floors 0-3: Long horizontal building
   0: [
-    { cx: 18, cy: 22, r: 8, occupancy: 85 },
-    { cx: 32, cy: 18, r: 6, occupancy: 72 },
-    { cx: 48, cy: 24, r: 10, occupancy: 45 },
-    { cx: 65, cy: 20, r: 7, occupancy: 30 },
-    { cx: 82, cy: 22, r: 6, occupancy: 15 },
+    { cx: 14, cy: 38, r: 9, occupancy: 92 },
+    { cx: 28, cy: 35, r: 7, occupancy: 85 },
+    { cx: 22, cy: 55, r: 8, occupancy: 78 },
+    { cx: 42, cy: 42, r: 11, occupancy: 65 },
+    { cx: 55, cy: 38, r: 10, occupancy: 58 },
+    { cx: 68, cy: 45, r: 8, occupancy: 52 },
+    { cx: 80, cy: 35, r: 9, occupancy: 70 },
+    { cx: 88, cy: 50, r: 7, occupancy: 60 },
   ],
   1: [
-    { cx: 18, cy: 20, r: 9, occupancy: 72 },
-    { cx: 35, cy: 17, r: 6, occupancy: 88 },
-    { cx: 50, cy: 24, r: 10, occupancy: 60 },
-    { cx: 68, cy: 20, r: 6, occupancy: 55 },
-    { cx: 84, cy: 24, r: 5, occupancy: 18 },
+    { cx: 12, cy: 40, r: 8, occupancy: 88 },
+    { cx: 24, cy: 35, r: 7, occupancy: 92 },
+    { cx: 18, cy: 58, r: 9, occupancy: 75 },
+    { cx: 38, cy: 40, r: 10, occupancy: 82 },
+    { cx: 50, cy: 45, r: 12, occupancy: 68 },
+    { cx: 65, cy: 38, r: 8, occupancy: 55 },
+    { cx: 78, cy: 42, r: 9, occupancy: 72 },
+    { cx: 88, cy: 38, r: 7, occupancy: 60 },
   ],
   2: [
-    { cx: 20, cy: 20, r: 9, occupancy: 65 },
-    { cx: 42, cy: 18, r: 7, occupancy: 50 },
-    { cx: 60, cy: 24, r: 6, occupancy: 40 },
-    { cx: 78, cy: 20, r: 7, occupancy: 25 },
+    { cx: 13, cy: 38, r: 9, occupancy: 82 },
+    { cx: 26, cy: 42, r: 8, occupancy: 70 },
+    { cx: 40, cy: 38, r: 11, occupancy: 65 },
+    { cx: 55, cy: 45, r: 9, occupancy: 58 },
+    { cx: 70, cy: 40, r: 8, occupancy: 52 },
+    { cx: 84, cy: 42, r: 7, occupancy: 55 },
   ],
   3: [
-    { cx: 22, cy: 22, r: 10, occupancy: 78 },
-    { cx: 48, cy: 18, r: 8, occupancy: 90 },
-    { cx: 68, cy: 24, r: 6, occupancy: 55 },
-    { cx: 84, cy: 20, r: 5, occupancy: 42 },
+    { cx: 14, cy: 40, r: 10, occupancy: 90 },
+    { cx: 28, cy: 35, r: 8, occupancy: 85 },
+    { cx: 42, cy: 42, r: 12, occupancy: 78 },
+    { cx: 58, cy: 38, r: 9, occupancy: 65 },
+    { cx: 72, cy: 45, r: 8, occupancy: 72 },
+    { cx: 85, cy: 40, r: 7, occupancy: 55 },
   ],
+
+  // Floors 4-9: Hourglass/bowtie shape
   4: [
-    { cx: 20, cy: 20, r: 8, occupancy: 28 },
-    { cx: 40, cy: 24, r: 9, occupancy: 25 },
-    { cx: 60, cy: 18, r: 7, occupancy: 35 },
-    { cx: 80, cy: 22, r: 5, occupancy: 18 },
+    { cx: 15, cy: 30, r: 8, occupancy: 72 },
+    { cx: 25, cy: 50, r: 9, occupancy: 65 },
+    { cx: 15, cy: 70, r: 7, occupancy: 58 },
+    { cx: 48, cy: 45, r: 8, occupancy: 55 },
+    { cx: 72, cy: 30, r: 9, occupancy: 68 },
+    { cx: 82, cy: 55, r: 8, occupancy: 80 },
+    { cx: 75, cy: 72, r: 7, occupancy: 62 },
   ],
   5: [
-    { cx: 18, cy: 22, r: 8, occupancy: 30 },
-    { cx: 40, cy: 18, r: 10, occupancy: 32 },
-    { cx: 62, cy: 24, r: 6, occupancy: 40 },
-    { cx: 82, cy: 20, r: 5, occupancy: 22 },
+    { cx: 14, cy: 28, r: 9, occupancy: 85 },
+    { cx: 24, cy: 52, r: 10, occupancy: 78 },
+    { cx: 16, cy: 72, r: 7, occupancy: 65 },
+    { cx: 45, cy: 42, r: 8, occupancy: 60 },
+    { cx: 70, cy: 28, r: 9, occupancy: 82 },
+    { cx: 80, cy: 50, r: 10, occupancy: 75 },
+    { cx: 78, cy: 74, r: 7, occupancy: 55 },
   ],
   6: [
-    { cx: 18, cy: 20, r: 8, occupancy: 26 },
-    { cx: 38, cy: 24, r: 9, occupancy: 28 },
-    { cx: 58, cy: 18, r: 7, occupancy: 32 },
-    { cx: 78, cy: 22, r: 5, occupancy: 18 },
+    { cx: 15, cy: 30, r: 9, occupancy: 80 },
+    { cx: 22, cy: 55, r: 8, occupancy: 72 },
+    { cx: 14, cy: 72, r: 7, occupancy: 60 },
+    { cx: 48, cy: 45, r: 7, occupancy: 55 },
+    { cx: 73, cy: 30, r: 9, occupancy: 78 },
+    { cx: 83, cy: 52, r: 8, occupancy: 70 },
+    { cx: 76, cy: 72, r: 7, occupancy: 58 },
   ],
   7: [
-    { cx: 20, cy: 22, r: 9, occupancy: 33 },
-    { cx: 42, cy: 18, r: 10, occupancy: 35 },
-    { cx: 64, cy: 24, r: 6, occupancy: 42 },
-    { cx: 84, cy: 20, r: 5, occupancy: 25 },
+    { cx: 16, cy: 28, r: 10, occupancy: 88 },
+    { cx: 24, cy: 52, r: 9, occupancy: 82 },
+    { cx: 15, cy: 74, r: 7, occupancy: 68 },
+    { cx: 46, cy: 44, r: 8, occupancy: 62 },
+    { cx: 72, cy: 28, r: 10, occupancy: 85 },
+    { cx: 82, cy: 52, r: 9, occupancy: 78 },
+    { cx: 77, cy: 75, r: 7, occupancy: 60 },
   ],
   8: [
-    { cx: 18, cy: 20, r: 8, occupancy: 31 },
-    { cx: 40, cy: 24, r: 10, occupancy: 33 },
-    { cx: 62, cy: 18, r: 7, occupancy: 38 },
-    { cx: 82, cy: 22, r: 5, occupancy: 22 },
+    { cx: 15, cy: 30, r: 9, occupancy: 82 },
+    { cx: 24, cy: 54, r: 8, occupancy: 75 },
+    { cx: 16, cy: 72, r: 7, occupancy: 62 },
+    { cx: 48, cy: 45, r: 7, occupancy: 58 },
+    { cx: 74, cy: 30, r: 9, occupancy: 80 },
+    { cx: 82, cy: 55, r: 8, occupancy: 72 },
+    { cx: 78, cy: 74, r: 6, occupancy: 55 },
   ],
   9: [
-    { cx: 20, cy: 22, r: 8, occupancy: 23 },
-    { cx: 42, cy: 18, r: 9, occupancy: 25 },
-    { cx: 62, cy: 24, r: 6, occupancy: 28 },
-    { cx: 80, cy: 20, r: 5, occupancy: 15 },
+    { cx: 16, cy: 28, r: 8, occupancy: 70 },
+    { cx: 22, cy: 52, r: 9, occupancy: 65 },
+    { cx: 15, cy: 72, r: 7, occupancy: 55 },
+    { cx: 47, cy: 44, r: 7, occupancy: 52 },
+    { cx: 72, cy: 28, r: 8, occupancy: 68 },
+    { cx: 80, cy: 52, r: 9, occupancy: 60 },
   ],
+
+  // Floors 10+: Three separate towers (left ~4-28%, center ~34-58%, right ~64-96%)
   10: [
-    { cx: 20, cy: 20, r: 7, occupancy: 19 },
-    { cx: 42, cy: 24, r: 8, occupancy: 20 },
-    { cx: 62, cy: 18, r: 6, occupancy: 22 },
-    { cx: 80, cy: 22, r: 5, occupancy: 12 },
+    { cx: 14, cy: 28, r: 7, occupancy: 72 },
+    { cx: 18, cy: 50, r: 8, occupancy: 65 },
+    { cx: 12, cy: 62, r: 6, occupancy: 55 },
+    { cx: 44, cy: 25, r: 8, occupancy: 78 },
+    { cx: 48, cy: 48, r: 9, occupancy: 70 },
+    { cx: 78, cy: 28, r: 8, occupancy: 82 },
+    { cx: 82, cy: 52, r: 7, occupancy: 68 },
+    { cx: 76, cy: 68, r: 6, occupancy: 55 },
   ],
   11: [
-    { cx: 22, cy: 22, r: 8, occupancy: 12 },
-    { cx: 48, cy: 18, r: 9, occupancy: 13 },
-    { cx: 72, cy: 24, r: 6, occupancy: 15 },
+    { cx: 14, cy: 30, r: 7, occupancy: 62 },
+    { cx: 17, cy: 52, r: 6, occupancy: 55 },
+    { cx: 44, cy: 28, r: 8, occupancy: 68 },
+    { cx: 47, cy: 50, r: 7, occupancy: 58 },
+    { cx: 78, cy: 30, r: 7, occupancy: 72 },
+    { cx: 82, cy: 55, r: 6, occupancy: 60 },
   ],
   12: [
-    { cx: 22, cy: 20, r: 8, occupancy: 15 },
-    { cx: 48, cy: 24, r: 8, occupancy: 16 },
-    { cx: 72, cy: 18, r: 6, occupancy: 18 },
+    { cx: 15, cy: 32, r: 7, occupancy: 65 },
+    { cx: 18, cy: 55, r: 6, occupancy: 52 },
+    { cx: 45, cy: 28, r: 8, occupancy: 70 },
+    { cx: 48, cy: 52, r: 7, occupancy: 58 },
+    { cx: 79, cy: 30, r: 7, occupancy: 75 },
+    { cx: 82, cy: 54, r: 6, occupancy: 62 },
   ],
   13: [
-    { cx: 20, cy: 22, r: 8, occupancy: 24 },
-    { cx: 42, cy: 18, r: 10, occupancy: 26 },
-    { cx: 64, cy: 24, r: 6, occupancy: 30 },
-    { cx: 84, cy: 20, r: 5, occupancy: 16 },
+    { cx: 14, cy: 30, r: 7, occupancy: 68 },
+    { cx: 17, cy: 54, r: 6, occupancy: 55 },
+    { cx: 44, cy: 26, r: 8, occupancy: 72 },
+    { cx: 47, cy: 48, r: 7, occupancy: 60 },
+    { cx: 78, cy: 28, r: 8, occupancy: 80 },
+    { cx: 82, cy: 52, r: 7, occupancy: 65 },
   ],
   14: [
-    { cx: 22, cy: 20, r: 8, occupancy: 20 },
-    { cx: 48, cy: 24, r: 9, occupancy: 22 },
-    { cx: 72, cy: 18, r: 6, occupancy: 24 },
+    { cx: 15, cy: 32, r: 7, occupancy: 62 },
+    { cx: 45, cy: 28, r: 7, occupancy: 65 },
+    { cx: 48, cy: 50, r: 6, occupancy: 55 },
+    { cx: 79, cy: 30, r: 7, occupancy: 70 },
+    { cx: 82, cy: 55, r: 6, occupancy: 58 },
   ],
   15: [
-    { cx: 22, cy: 22, r: 8, occupancy: 22 },
-    { cx: 48, cy: 18, r: 10, occupancy: 24 },
-    { cx: 72, cy: 24, r: 6, occupancy: 26 },
+    { cx: 14, cy: 30, r: 7, occupancy: 65 },
+    { cx: 17, cy: 52, r: 6, occupancy: 52 },
+    { cx: 44, cy: 26, r: 8, occupancy: 72 },
+    { cx: 47, cy: 48, r: 7, occupancy: 60 },
+    { cx: 78, cy: 28, r: 8, occupancy: 78 },
+    { cx: 82, cy: 52, r: 7, occupancy: 62 },
   ],
   16: [
-    { cx: 22, cy: 20, r: 8, occupancy: 21 },
-    { cx: 48, cy: 24, r: 9, occupancy: 22 },
-    { cx: 72, cy: 18, r: 6, occupancy: 24 },
+    { cx: 15, cy: 32, r: 6, occupancy: 58 },
+    { cx: 45, cy: 28, r: 7, occupancy: 65 },
+    { cx: 79, cy: 30, r: 7, occupancy: 68 },
+    { cx: 82, cy: 55, r: 6, occupancy: 55 },
   ],
   17: [
-    { cx: 22, cy: 22, r: 8, occupancy: 17 },
-    { cx: 48, cy: 18, r: 9, occupancy: 18 },
-    { cx: 72, cy: 24, r: 6, occupancy: 10 },
+    { cx: 14, cy: 30, r: 6, occupancy: 55 },
+    { cx: 44, cy: 26, r: 7, occupancy: 60 },
+    { cx: 78, cy: 28, r: 7, occupancy: 62 },
+    { cx: 82, cy: 52, r: 6, occupancy: 52 },
   ],
   18: [
-    { cx: 22, cy: 20, r: 7, occupancy: 11 },
-    { cx: 48, cy: 24, r: 8, occupancy: 12 },
-    { cx: 72, cy: 18, r: 6, occupancy: 8 },
+    { cx: 15, cy: 32, r: 6, occupancy: 52 },
+    { cx: 45, cy: 28, r: 6, occupancy: 55 },
+    { cx: 79, cy: 30, r: 6, occupancy: 58 },
   ],
   19: [
-    { cx: 25, cy: 22, r: 8, occupancy: 15 },
-    { cx: 50, cy: 18, r: 6, occupancy: 22 },
-    { cx: 75, cy: 24, r: 5, occupancy: 10 },
+    { cx: 14, cy: 30, r: 6, occupancy: 55 },
+    { cx: 44, cy: 26, r: 7, occupancy: 62 },
+    { cx: 78, cy: 28, r: 7, occupancy: 58 },
   ],
   20: [
-    { cx: 25, cy: 20, r: 7, occupancy: 15 },
-    { cx: 50, cy: 24, r: 6, occupancy: 20 },
-    { cx: 75, cy: 18, r: 5, occupancy: 5 },
+    { cx: 15, cy: 32, r: 6, occupancy: 52 },
+    { cx: 45, cy: 28, r: 6, occupancy: 58 },
+    { cx: 79, cy: 30, r: 6, occupancy: 55 },
   ],
   21: [
-    { cx: 25, cy: 22, r: 8, occupancy: 8 },
-    { cx: 50, cy: 18, r: 7, occupancy: 5 },
-    { cx: 75, cy: 24, r: 5, occupancy: 12 },
+    { cx: 14, cy: 30, r: 6, occupancy: 50 },
+    { cx: 44, cy: 28, r: 7, occupancy: 52 },
+    { cx: 80, cy: 32, r: 7, occupancy: 55 },
   ],
 }
 
 const DEFAULT_BLOBS: Blob[] = [
-  { cx: 25, cy: 22, r: 8, occupancy: 25 },
-  { cx: 50, cy: 18, r: 9, occupancy: 22 },
-  { cx: 75, cy: 24, r: 6, occupancy: 15 },
+  { cx: 15, cy: 35, r: 8, occupancy: 65 },
+  { cx: 45, cy: 40, r: 9, occupancy: 72 },
+  { cx: 78, cy: 38, r: 8, occupancy: 58 },
 ]
 
 // ---------------------------------------------------------------------------
@@ -230,25 +286,17 @@ const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
         ))}
       </div>
 
-      {/* Floorplan with blob overlay */}
+      {/* Floorplan with blob overlay — blobs as CSS divs on top of img */}
       <div style={{ flex: 1, position: 'relative', padding: '12px', overflow: 'auto' }}>
-        <div style={{ position: 'relative', width: '100%' }}>
-          {/* Floorplan image as background — blobs positioned as % on top */}
+        <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
           <img
             src={`/floorplans/Floor${floorNumber}.png`}
             alt={`${floorName} floor plan`}
-            style={{
-              width: '100%',
-              height: 'auto',
-              display: 'block',
-              borderRadius: '6px',
-            }}
+            style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '6px' }}
           />
-
-          {/* Occupancy blob overlays — only RED (>=80%) and AMBER (>=50%), no green */}
+          {/* Blobs — only >=50% occupancy (red & amber) */}
           {blobs.filter(b => b.occupancy >= 50).map((blob, i) => {
             const isRed = blob.occupancy >= 80
-            const color = isRed ? 'rgba(239,68,68,0.45)' : 'rgba(245,158,11,0.40)'
             return (
               <div
                 key={i}
@@ -259,8 +307,8 @@ const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
                   width: `${blob.r * 2}%`,
                   height: `${blob.r * 2}%`,
                   borderRadius: '50%',
-                  backgroundColor: color,
-                  filter: 'blur(6px)',
+                  backgroundColor: isRed ? 'rgba(239,68,68,0.45)' : 'rgba(245,158,11,0.40)',
+                  filter: 'blur(4px)',
                   pointerEvents: 'none',
                 }}
               />

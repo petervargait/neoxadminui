@@ -75,12 +75,13 @@ function getFloorHighlightColor(floorIndex: number): number {
 interface BuildingModel3DProps {
   onFloorSelect?: (floorIndex: number, floorName: string) => void
   height?: number
+  selectedFloor?: number | null  // Keep this floor highlighted
 }
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-const BuildingModel3D: React.FC<BuildingModel3DProps> = ({ onFloorSelect, height }) => {
+const BuildingModel3D: React.FC<BuildingModel3DProps> = ({ onFloorSelect, height, selectedFloor: selectedFloorProp }) => {
   // ---- state ---------------------------------------------------------------
   const [mode, setMode] = useState<'shaded' | 'ghost'>('ghost')
   const [loading, setLoading] = useState(true)
@@ -114,10 +115,30 @@ const BuildingModel3D: React.FC<BuildingModel3DProps> = ({ onFloorSelect, height
   const modeRef = useRef<'shaded' | 'ghost'>(mode)
   const envTextureRef = useRef<THREE.Texture | null>(null)
 
+  const selectedFloorPropRef = useRef<number | null>(null)
+
   // Keep modeRef in sync with mode state so event handlers see latest value
   useEffect(() => {
     modeRef.current = mode
   }, [mode])
+
+  // When selectedFloorProp changes, keep the floor highlighted
+  useEffect(() => {
+    selectedFloorPropRef.current = selectedFloorProp ?? null
+    if (selectedFloorProp != null && highlightGroupRef.current && floorHeightRef.current > 0) {
+      const floorIndex = selectedFloorProp + BASEMENT_COUNT
+      const floorMinY = modelMinYRef.current + floorIndex * floorHeightRef.current
+      const floorMaxY = floorMinY + floorHeightRef.current
+      clipBottomRef.current.constant = -floorMinY
+      clipTopRef.current.constant = floorMaxY
+      highlightGroupRef.current.visible = true
+      // Update color for selected floor
+      const mat = highlightGroupRef.current.children[0] as THREE.Mesh | undefined
+      if (mat && (mat as THREE.Mesh).material) {
+        ((mat as THREE.Mesh).material as THREE.MeshBasicMaterial).color.set(getFloorHighlightColor(floorIndex))
+      }
+    }
+  }, [selectedFloorProp])
 
   // ---- applyMode -----------------------------------------------------------
   const applyMode = useCallback(() => {
@@ -439,7 +460,17 @@ const BuildingModel3D: React.FC<BuildingModel3DProps> = ({ onFloorSelect, height
     }
 
     const onMouseLeave = () => {
-      if (highlightGroupRef.current) highlightGroupRef.current.visible = false
+      // If a floor is selected, keep its highlight; otherwise hide
+      if (selectedFloorPropRef.current != null && highlightGroupRef.current) {
+        const floorIndex = selectedFloorPropRef.current + BASEMENT_COUNT
+        const floorMinY = modelMinYRef.current + floorIndex * floorHeightRef.current
+        const floorMaxY = floorMinY + floorHeightRef.current
+        clipBottomRef.current.constant = -floorMinY
+        clipTopRef.current.constant = floorMaxY
+        highlightGroupRef.current.visible = true
+      } else if (highlightGroupRef.current) {
+        highlightGroupRef.current.visible = false
+      }
       setHoveredFloor('')
     }
 
