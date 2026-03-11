@@ -4,10 +4,8 @@ import React, { useState } from 'react'
 import {
   DASH,
   CardPanel,
-  MonthSelector,
   StackedHorizontalBarChart,
   GaugeChart,
-  FloorHeatmap,
   TrendArrow,
 } from '../charts/DashboardCharts'
 import { BadgeSwipe } from '../../context/GlobalStateContext'
@@ -263,30 +261,32 @@ function DailyEstimateChart({
 }
 
 // Floor data for HSE capacity and current occupancy
+// Per-floor data — current people sum to 1,247 total building occupancy
 const FLOOR_DATA: Record<number, { hse: number; current: number }> = {
-  0: { hse: 300, current: 255 },   // Ground - Reception
-  1: { hse: 200, current: 144 },   // Cafeteria
-  2: { hse: 150, current: 97 },    // Fitness
-  3: { hse: 250, current: 225 },   // Conference
-  4: { hse: 280, current: 196 },   // Office
-  5: { hse: 280, current: 224 },
-  6: { hse: 280, current: 210 },
-  7: { hse: 280, current: 252 },
-  8: { hse: 280, current: 238 },
-  9: { hse: 280, current: 196 },
-  10: { hse: 280, current: 174 },
-  11: { hse: 280, current: 112 },
-  12: { hse: 280, current: 126 },
-  13: { hse: 280, current: 202 },
-  14: { hse: 280, current: 162 },
-  15: { hse: 280, current: 182 },
-  16: { hse: 280, current: 196 },
-  17: { hse: 250, current: 145 },
-  18: { hse: 250, current: 110 },
-  19: { hse: 120, current: 48 },    // Executive
-  20: { hse: 80, current: 32 },
-  21: { hse: 100, current: 42 },    // Rooftop
+  0: { hse: 300, current: 95 },    // Ground - Reception
+  1: { hse: 200, current: 72 },    // Cafeteria
+  2: { hse: 150, current: 38 },    // Fitness
+  3: { hse: 250, current: 112 },   // Conference
+  4: { hse: 280, current: 78 },    // Office
+  5: { hse: 280, current: 85 },
+  6: { hse: 280, current: 74 },
+  7: { hse: 280, current: 92 },
+  8: { hse: 280, current: 88 },
+  9: { hse: 280, current: 65 },
+  10: { hse: 280, current: 52 },
+  11: { hse: 280, current: 34 },
+  12: { hse: 280, current: 41 },
+  13: { hse: 280, current: 68 },
+  14: { hse: 280, current: 55 },
+  15: { hse: 280, current: 62 },
+  16: { hse: 280, current: 58 },
+  17: { hse: 250, current: 42 },
+  18: { hse: 250, current: 28 },
+  19: { hse: 120, current: 18 },   // Executive
+  20: { hse: 80, current: 12 },
+  21: { hse: 100, current: 8 },    // Rooftop
 }
+// Total: 95+72+38+112+78+85+74+92+88+65+52+34+41+68+55+62+58+42+28+18+12+8 = 1,247
 
 function getFloorHSE(floor: number): string {
   return (FLOOR_DATA[floor]?.hse || 200).toLocaleString()
@@ -307,9 +307,7 @@ function getFloorOccColor(floor: number): string {
 export default function Dashboard7OccupancyServices({
   badgeSwipes,
 }: Props) {
-  const [month, setMonth] = useState('February 2025')
   const [floorFilter, setFloorFilter] = useState('')
-  const [tenant, setTenant] = useState('all')
   const [selectedFloor, setSelectedFloor] = useState<number | null>(null)
   const [selectedFloorName, setSelectedFloorName] = useState('')
 
@@ -393,120 +391,13 @@ export default function Dashboard7OccupancyServices({
 
       {/* ─── Section 2: Workplace Utilization ─────────────────────────────── */}
       <section>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '16px',
-          }}
-        >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h2 style={{ color: DASH.text, fontSize: '20px', fontWeight: 700, margin: 0 }}>
             Workplace utilization
           </h2>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <PillSelect
-              value={tenant}
-              onChange={setTenant}
-              options={TENANT_OPTIONS}
-              placeholder="Filter to tenant"
-            />
-            <MonthSelector value={month} onChange={setMonth} />
-          </div>
         </div>
 
         <CardPanel>
-          {/* Top row: Heatmap + Avg metrics + KPIs */}
-          <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', marginBottom: '32px' }}>
-            {/* Floor heatmap */}
-            <div style={{ flexShrink: 0 }}>
-              <FloorHeatmap floors={FLOOR_HEATMAP_DATA} width={180} height={480} />
-            </div>
-
-            {/* Center: occupancy stats */}
-            <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                gap: '20px',
-                paddingTop: '120px',
-              }}
-            >
-              <div>
-                <div style={{ color: DASH.muted, fontSize: '13px', marginBottom: '4px' }}>
-                  Average floor occupancy
-                </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  <span style={{ color: DASH.textWhite, fontSize: '32px', fontWeight: 800 }}>45</span>
-                  <span style={{ color: DASH.trendUp, fontSize: '14px', fontWeight: 700 }}>+10%</span>
-                </div>
-              </div>
-              <div>
-                <div style={{ color: DASH.muted, fontSize: '13px', marginBottom: '4px' }}>
-                  Peak floor occupancy
-                </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  <span style={{ color: DASH.textWhite, fontSize: '32px', fontWeight: 800 }}>93</span>
-                  <span style={{ color: DASH.trendDown, fontSize: '14px', fontWeight: 700 }}>-20%</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: HSE + Avg daily entrance */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '80px' }}>
-              <div
-                style={{
-                  backgroundColor: DASH.cardBg2,
-                  border: `1px solid ${DASH.cardBorder}`,
-                  borderRadius: '12px',
-                  padding: '16px 24px',
-                  textAlign: 'right',
-                  minWidth: '160px',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    justifyContent: 'flex-end',
-                    gap: '6px',
-                    marginBottom: '4px',
-                  }}
-                >
-                  <span style={{ color: DASH.textWhite, fontSize: '28px', fontWeight: 800 }}>1036</span>
-                  <TrendArrow direction="up" size={16} />
-                </div>
-                <div style={{ color: DASH.label, fontSize: '13px' }}>HSE Capacity</div>
-              </div>
-              <div
-                style={{
-                  backgroundColor: DASH.cardBg2,
-                  border: `1px solid ${DASH.cardBorder}`,
-                  borderRadius: '12px',
-                  padding: '16px 24px',
-                  textAlign: 'right',
-                  minWidth: '160px',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    justifyContent: 'flex-end',
-                    gap: '6px',
-                    marginBottom: '4px',
-                  }}
-                >
-                  <span style={{ color: DASH.textWhite, fontSize: '28px', fontWeight: 800 }}>1373</span>
-                  <TrendArrow direction="up" size={16} />
-                </div>
-                <div style={{ color: DASH.label, fontSize: '13px' }}>Avg. daily entrance</div>
-              </div>
-            </div>
-          </div>
-
           {/* Gauge row */}
           <div
             style={{

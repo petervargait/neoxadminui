@@ -32,233 +32,175 @@ interface FloorplanWithZonesProps {
 // ---------------------------------------------------------------------------
 
 const FLOOR_ZONES: Record<number, Zone[]> = {
-  // Floor 0 — Ground
+  // Floor 0 — Ground (zones inset within building walls)
   0: [
-    { name: 'Reception',      x: 5,  y: 10, w: 40, h: 35, occupancy: 85 },
-    { name: 'Lobby',          x: 50, y: 10, w: 45, h: 35, occupancy: 45 },
-    { name: 'Security Desk',  x: 5,  y: 52, w: 30, h: 25, occupancy: 30 },
-    { name: 'Mail Room',      x: 40, y: 52, w: 25, h: 25, occupancy: 15 },
-    { name: 'Loading Bay',    x: 70, y: 52, w: 25, h: 25, occupancy: 10 },
+    { name: 'Reception',      x: 12, y: 12, w: 28, h: 22, occupancy: 85 },
+    { name: 'Lobby',          x: 44, y: 12, w: 22, h: 22, occupancy: 45 },
+    { name: 'Security',       x: 70, y: 12, w: 18, h: 14, occupancy: 30 },
+    { name: 'Mail Room',      x: 12, y: 40, w: 18, h: 16, occupancy: 15 },
+    { name: 'Loading Bay',    x: 35, y: 40, w: 18, h: 16, occupancy: 10 },
   ],
 
   // Floor 1 — Amenity / Shared
   1: [
-    { name: 'Cafeteria',        x: 5,  y: 8,  w: 55, h: 40, occupancy: 72 },
-    { name: 'Coffee Bar',       x: 65, y: 8,  w: 30, h: 18, occupancy: 88 },
-    { name: 'Seating Area',     x: 65, y: 30, w: 30, h: 18, occupancy: 60 },
-    { name: 'Kitchen',          x: 5,  y: 54, w: 30, h: 24, occupancy: 55 },
-    { name: 'Vending Area',     x: 40, y: 54, w: 25, h: 24, occupancy: 18 },
-    { name: 'Restrooms',        x: 70, y: 54, w: 25, h: 24, occupancy: 35 },
+    { name: 'Cafeteria',        x: 12, y: 10, w: 35, h: 24, occupancy: 72 },
+    { name: 'Coffee Bar',       x: 52, y: 10, w: 18, h: 12, occupancy: 88 },
+    { name: 'Seating',          x: 52, y: 26, w: 18, h: 12, occupancy: 60 },
+    { name: 'Kitchen',          x: 74, y: 10, w: 14, h: 14, occupancy: 55 },
+    { name: 'Vending',          x: 12, y: 40, w: 14, h: 14, occupancy: 18 },
+    { name: 'Restrooms',        x: 30, y: 40, w: 14, h: 14, occupancy: 35 },
   ],
 
   // Floor 2 — Fitness & Wellness
   2: [
-    { name: 'Gym',              x: 5,  y: 8,  w: 45, h: 38, occupancy: 65 },
-    { name: 'Yoga Studio',      x: 55, y: 8,  w: 40, h: 18, occupancy: 50 },
-    { name: 'Spin Room',        x: 55, y: 30, w: 40, h: 16, occupancy: 40 },
-    { name: 'Locker Rooms',     x: 5,  y: 52, w: 35, h: 28, occupancy: 38 },
-    { name: 'Wellness Room',    x: 45, y: 52, w: 25, h: 28, occupancy: 22 },
+    { name: 'Gym',              x: 12, y: 10, w: 30, h: 24, occupancy: 65 },
+    { name: 'Yoga Studio',      x: 46, y: 10, w: 20, h: 12, occupancy: 50 },
+    { name: 'Spin Room',        x: 46, y: 26, w: 20, h: 12, occupancy: 40 },
+    { name: 'Lockers',          x: 70, y: 10, w: 18, h: 14, occupancy: 38 },
+    { name: 'Wellness',         x: 12, y: 40, w: 18, h: 14, occupancy: 22 },
     { name: 'Juice Bar',        x: 75, y: 52, w: 20, h: 28, occupancy: 30 },
   ],
 
-  // Floor 3 — Conference & Training
+  // Floor 3 — Conference
   3: [
-    { name: 'Conference Center', x: 5,  y: 8,  w: 50, h: 35, occupancy: 78 },
-    { name: 'Training Room A',   x: 60, y: 8,  w: 35, h: 16, occupancy: 90 },
-    { name: 'Training Room B',   x: 60, y: 28, w: 35, h: 15, occupancy: 55 },
-    { name: 'Breakout Space',    x: 5,  y: 50, w: 30, h: 28, occupancy: 42 },
-    { name: 'AV Control',        x: 40, y: 50, w: 20, h: 28, occupancy: 25 },
-    { name: 'Pre-function Area',  x: 65, y: 50, w: 30, h: 28, occupancy: 35 },
+    { name: 'Conference',    x: 15, y: 12, w: 30, h: 20, occupancy: 78 },
+    { name: 'Training A',    x: 50, y: 12, w: 18, h: 12, occupancy: 90 },
+    { name: 'Training B',    x: 50, y: 28, w: 18, h: 10, occupancy: 55 },
+    { name: 'Breakout',      x: 72, y: 12, w: 16, h: 14, occupancy: 42 },
+    { name: 'AV Control',    x: 15, y: 38, w: 14, h: 12, occupancy: 25 },
   ],
 
-  // Floor 4 — Office (lower occupancy)
+  // Floors 4-18: Office floors (use a helper pattern — smaller inset zones)
   4: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 52 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 48 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 60 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 30 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 45 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 55 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 28 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 25 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 35 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 18 },
+    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 22 },
   ],
-
-  // Floor 5 — Office (busy)
   5: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 82 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 78 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 85 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 55 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 70 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 65 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 30 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 32 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 40 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 22 },
+    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 28 },
   ],
-
-  // Floor 6 — Office (busy)
   6: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 88 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 80 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 90 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 60 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 75 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 70 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 26 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 28 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 32 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 18 },
+    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 20 },
   ],
-
-  // Floor 7 — Office (very busy)
   7: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 92 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 85 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 95 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 68 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 80 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 72 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 33 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 35 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 42 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 25 },
+    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 30 },
   ],
-
-  // Floor 8 — Office (very busy)
   8: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 90 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 88 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 82 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 65 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 78 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 68 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 31 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 33 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 38 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 22 },
+    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 26 },
   ],
-
-  // Floor 9 — Office (busy)
   9: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 86 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 82 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 88 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 58 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 72 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 62 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 23 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 25 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 28 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 15 },
+    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 18 },
   ],
-
-  // Floor 10 — Office (very busy, peak floor)
   10: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 95 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 90 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 92 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 70 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 85 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 75 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 19 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 20 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 22 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 12 },
+    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 14 },
   ],
-
-  // Floor 11 — Office (busy)
   11: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 84 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 80 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 76 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 52 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 68 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 60 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 12 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 13 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 15 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 8 },
   ],
-
-  // Floor 12 — Office (busy)
   12: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 80 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 76 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 72 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 50 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 65 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 58 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 15 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 16 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 18 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 10 },
   ],
-
-  // Floor 13 — Office (moderate)
   13: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 68 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 62 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 55 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 40 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 50 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 45 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 24 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 26 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 30 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 16 },
   ],
-
-  // Floor 14 — Office (moderate)
   14: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 64 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 58 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 52 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 35 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 48 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 42 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 20 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 22 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 24 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 14 },
   ],
-
-  // Floor 15 — Office (moderate-low)
   15: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 58 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 52 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 48 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 28 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 40 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 38 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 22 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 24 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 26 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 15 },
   ],
-
-  // Floor 16 — Office (moderate-low)
   16: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 55 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 48 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 44 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 25 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 35 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 32 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 21 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 22 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 24 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 14 },
   ],
-
-  // Floor 17 — Office (low-moderate)
   17: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 50 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 42 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 38 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 22 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 30 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 28 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 17 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 18 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 20 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 10 },
   ],
-
-  // Floor 18 — Office (low)
   18: [
-    { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 45 },
-    { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 38 },
-    { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 32 },
-    { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 18 },
-    { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 25 },
-    { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 22 },
+    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 11 },
+    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 12 },
+    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 14 },
+    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 8 },
   ],
 
   // Floor 19 — Executive
   19: [
-    { name: 'Executive Suite',   x: 5,  y: 8,  w: 45, h: 35, occupancy: 60 },
-    { name: 'Board Room',        x: 55, y: 8,  w: 40, h: 35, occupancy: 82 },
-    { name: 'Executive Lounge',  x: 5,  y: 50, w: 35, h: 28, occupancy: 35 },
-    { name: 'EA Station',        x: 45, y: 50, w: 25, h: 28, occupancy: 70 },
-    { name: 'Private Dining',    x: 75, y: 50, w: 20, h: 28, occupancy: 15 },
+    { name: 'Exec Suite',    x: 15, y: 12, w: 28, h: 18, occupancy: 15 },
+    { name: 'Board Room',    x: 48, y: 12, w: 20, h: 14, occupancy: 22 },
+    { name: 'Lounge',        x: 72, y: 12, w: 16, h: 12, occupancy: 10 },
+    { name: 'EA Station',    x: 15, y: 36, w: 16, h: 12, occupancy: 18 },
   ],
 
   // Floor 20 — Executive
   20: [
-    { name: 'CEO Office',        x: 5,  y: 8,  w: 30, h: 35, occupancy: 50 },
-    { name: 'CFO Office',        x: 40, y: 8,  w: 25, h: 16, occupancy: 55 },
-    { name: 'CTO Office',        x: 70, y: 8,  w: 25, h: 16, occupancy: 45 },
-    { name: 'Board Room',        x: 40, y: 28, w: 55, h: 15, occupancy: 88 },
-    { name: 'Executive Lounge',  x: 5,  y: 50, w: 40, h: 28, occupancy: 30 },
-    { name: 'EA Station',        x: 50, y: 50, w: 22, h: 28, occupancy: 75 },
-    { name: 'Private Library',   x: 77, y: 50, w: 18, h: 28, occupancy: 12 },
+    { name: 'CEO Office',    x: 15, y: 12, w: 20, h: 16, occupancy: 15 },
+    { name: 'CFO Office',    x: 40, y: 12, w: 16, h: 12, occupancy: 18 },
+    { name: 'CTO Office',    x: 60, y: 12, w: 16, h: 12, occupancy: 12 },
+    { name: 'Board Room',    x: 15, y: 34, w: 24, h: 14, occupancy: 20 },
+    { name: 'Library',       x: 44, y: 34, w: 16, h: 12, occupancy: 5 },
   ],
 
   // Floor 21 — Rooftop
   21: [
-    { name: 'Sky Lounge',   x: 5,  y: 8,  w: 55, h: 35, occupancy: 42 },
-    { name: 'Terrace',      x: 65, y: 8,  w: 30, h: 35, occupancy: 28 },
-    { name: 'Event Space',  x: 5,  y: 50, w: 45, h: 28, occupancy: 18 },
-    { name: 'Bar Area',     x: 55, y: 50, w: 20, h: 28, occupancy: 55 },
-    { name: 'Observation',  x: 80, y: 50, w: 15, h: 28, occupancy: 10 },
+    { name: 'Sky Lounge',   x: 15, y: 12, w: 26, h: 18, occupancy: 8 },
+    { name: 'Terrace',      x: 46, y: 12, w: 20, h: 14, occupancy: 5 },
+    { name: 'Event Space',  x: 70, y: 12, w: 18, h: 14, occupancy: 4 },
+    { name: 'Bar',          x: 15, y: 36, w: 16, h: 12, occupancy: 12 },
   ],
 }
 
-// Default zones used as a fallback when a floor is not defined in FLOOR_ZONES
+// Default zones fallback
 const DEFAULT_ZONES: Zone[] = [
-  { name: 'Open Office A',    x: 5,  y: 8,  w: 40, h: 35, occupancy: 50 },
-  { name: 'Open Office B',    x: 50, y: 8,  w: 45, h: 35, occupancy: 45 },
-  { name: 'Meeting Rooms',    x: 5,  y: 50, w: 25, h: 28, occupancy: 40 },
-  { name: 'Kitchen/Break',    x: 35, y: 50, w: 20, h: 28, occupancy: 25 },
-  { name: 'Phone Booths',     x: 60, y: 50, w: 15, h: 28, occupancy: 30 },
-  { name: 'Manager Offices',  x: 80, y: 50, w: 15, h: 28, occupancy: 35 },
+  { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 25 },
+  { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 22 },
+  { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 28 },
+  { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 15 },
 ]
 
 // ---------------------------------------------------------------------------
@@ -367,8 +309,8 @@ const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
           {/* Zone overlays */}
           <svg
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
+            viewBox="0 0 100 70"
+            preserveAspectRatio="xMidYMid meet"
           >
             {zones.map((zone, i) => {
               const fillColor =

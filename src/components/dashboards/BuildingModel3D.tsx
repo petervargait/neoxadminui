@@ -35,31 +35,31 @@ const DASH = {
   cyan: '#06B6D4',
 } as const
 
-// Floor occupancy data for RAG coloring (floor index 0-24, where 0-2 are basements)
+// Floor occupancy % = current / hse capacity (matching Dashboard7 FLOOR_DATA)
 const FLOOR_OCCUPANCY_PCT: Record<number, number> = {
-  0: 0, 1: 0, 2: 0,          // Basements B3, B2, B1
-  3: 85,  // Floor 0 - Ground (reception)
-  4: 72,  // Floor 1 - Cafeteria
-  5: 65,  // Floor 2 - Fitness
-  6: 90,  // Floor 3 - Conference
-  7: 70,  // Floor 4 - Office
-  8: 80,  // Floor 5
-  9: 75,  // Floor 6
-  10: 90, // Floor 7
-  11: 85, // Floor 8
-  12: 70, // Floor 9
-  13: 62, // Floor 10
-  14: 40, // Floor 11
-  15: 45, // Floor 12
-  16: 72, // Floor 13
-  17: 58, // Floor 14
-  18: 65, // Floor 15
-  19: 70, // Floor 16
-  20: 58, // Floor 17
-  21: 44, // Floor 18
-  22: 40, // Floor 19 - Executive
-  23: 40, // Floor 20
-  24: 42, // Floor 21 - Rooftop
+  0: 0, 1: 0, 2: 0,       // Basements B3, B2, B1
+  3: 32,   // Floor 0 - Ground 95/300
+  4: 36,   // Floor 1 - Cafeteria 72/200
+  5: 25,   // Floor 2 - Fitness 38/150
+  6: 45,   // Floor 3 - Conference 112/250
+  7: 28,   // Floor 4 - Office 78/280
+  8: 30,   // Floor 5 - 85/280
+  9: 26,   // Floor 6 - 74/280
+  10: 33,  // Floor 7 - 92/280
+  11: 31,  // Floor 8 - 88/280
+  12: 23,  // Floor 9 - 65/280
+  13: 19,  // Floor 10 - 52/280
+  14: 12,  // Floor 11 - 34/280
+  15: 15,  // Floor 12 - 41/280
+  16: 24,  // Floor 13 - 68/280
+  17: 20,  // Floor 14 - 55/280
+  18: 22,  // Floor 15 - 62/280
+  19: 21,  // Floor 16 - 58/280
+  20: 17,  // Floor 17 - 42/250
+  21: 11,  // Floor 18 - 28/250
+  22: 15,  // Floor 19 - Executive 18/120
+  23: 15,  // Floor 20 - 12/80
+  24: 8,   // Floor 21 - Rooftop 8/100
 }
 
 function getFloorHighlightColor(floorIndex: number): number {

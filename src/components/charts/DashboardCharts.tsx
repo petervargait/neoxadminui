@@ -561,7 +561,7 @@ export function GaugeChart({ value, max = 100, label, size = 160, color = DASH.g
   const largeArc = pct > 0.5 ? 1 : 0
   const valuePath = `M ${cx + r * Math.cos(startAngle)} ${cy + r * Math.sin(startAngle)} A ${r} ${r} 0 ${largeArc} 1 ${cx + r * Math.cos(valueAngle)} ${cy + r * Math.sin(valueAngle)}`
 
-  const displayPct = typeof value === 'number' && max === 100 ? `${value}%` : `${value}%`
+  const displayPct = max === 100 ? `${value}%` : `${Math.round((value / max) * 100)}%`
 
   return (
     <div style={{ textAlign: 'center' }}>
@@ -572,7 +572,7 @@ export function GaugeChart({ value, max = 100, label, size = 160, color = DASH.g
         <text x={size - 10} y={cy + 20} textAnchor="end" fill={DASH.muted} fontSize="11">100%</text>
         <text x={cx} y={cy} textAnchor="middle" fill={DASH.textWhite} fontSize="24" fontWeight="800">{displayPct}</text>
       </svg>
-      <div style={{ color: DASH.gold, fontSize: '14px', fontWeight: 700, marginTop: '-4px' }}>{label}</div>
+      <div style={{ color: color || DASH.label, fontSize: '14px', fontWeight: 700, marginTop: '-4px' }}>{label}</div>
       {sublabel && <div style={{ color: DASH.muted, fontSize: '11px', marginTop: '2px' }}>{sublabel}</div>}
     </div>
   )
