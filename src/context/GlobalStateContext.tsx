@@ -99,6 +99,8 @@ export interface Invitation {
   hostName: string
   visitDate: string
   visitTime: string
+  visitEndDate?: string
+  visitEndTime?: string
   purpose: string
   location: string
   status: 'pending' | 'approved' | 'rejected' | 'checked-in' | 'checked-out' | 'completed'
@@ -185,6 +187,8 @@ export interface ParkingSpace {
   assignedToName?: string
   vehiclePlate?: string
   assignedDate?: string
+  assignmentType?: 'permanent' | 'temporary'
+  assignmentEndDate?: string
   createdAt?: string
   updatedAt?: string
 }
@@ -202,6 +206,8 @@ export interface Locker {
   assignedTo?: string
   assignedToName?: string
   assignedDate?: string
+  assignmentType?: 'permanent' | 'temporary'
+  assignmentEndDate?: string
   notes?: string
   createdAt?: string
   updatedAt?: string
@@ -222,6 +228,8 @@ export interface Space {
   assignedTo?: string
   assignedToName?: string
   assignedDate?: string
+  assignmentType?: 'permanent' | 'temporary'
+  assignmentEndDate?: string
   notes?: string
   createdAt?: string
   updatedAt?: string

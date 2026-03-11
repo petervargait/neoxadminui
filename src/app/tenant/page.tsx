@@ -136,10 +136,15 @@ export default function TenantPage() {
     visitorCompany: '',
     visitDate: '',
     visitTime: '',
+    visitEndDate: '',
+    visitEndTime: '',
     purpose: '',
     location: 'Main Office'
   })
   const [editingInvitation, setEditingInvitation] = useState<string | null>(null)
+  const [assignType, setAssignType] = useState<'permanent' | 'temporary'>('permanent')
+  const [assignStartDate, setAssignStartDate] = useState('')
+  const [assignEndDate, setAssignEndDate] = useState('')
 
   // Dashboard filter state
   const [dashboardStartDate, setDashboardStartDate] = useState('')
@@ -1963,7 +1968,7 @@ export default function TenantPage() {
                 <h2 style={{ color: '#F1F5F9', fontSize: '20px', fontWeight: '600', marginBottom: '20px' }}>{editingInvitation ? 'Edit Invitation' : 'Send New Invitation'}</h2>
                 <form onSubmit={(e) => {
                   e.preventDefault();
-                  if (!invitationForm.visitorName || !invitationForm.visitorEmail || !invitationForm.visitDate || !invitationForm.visitTime) {
+                  if (!invitationForm.visitorName || !invitationForm.visitorEmail || !invitationForm.visitDate || !invitationForm.visitTime || !invitationForm.visitEndDate || !invitationForm.visitEndTime) {
                     alert('Please fill in all required fields');
                     return;
                   }
@@ -1975,6 +1980,8 @@ export default function TenantPage() {
                       visitorCompany: invitationForm.visitorCompany,
                       visitDate: invitationForm.visitDate,
                       visitTime: invitationForm.visitTime,
+                      visitEndDate: invitationForm.visitEndDate,
+                      visitEndTime: invitationForm.visitEndTime,
                       purpose: invitationForm.purpose,
                       location: invitationForm.location
                     });
@@ -1989,6 +1996,8 @@ export default function TenantPage() {
                       hostName: username,
                       visitDate: invitationForm.visitDate,
                       visitTime: invitationForm.visitTime,
+                      visitEndDate: invitationForm.visitEndDate,
+                      visitEndTime: invitationForm.visitEndTime,
                       purpose: invitationForm.purpose,
                       location: invitationForm.location,
                       status: 'pending'
@@ -2002,6 +2011,8 @@ export default function TenantPage() {
                     visitorCompany: '',
                     visitDate: '',
                     visitTime: '',
+                    visitEndDate: '',
+                    visitEndTime: '',
                     purpose: '',
                     location: 'Main Office'
                   });
@@ -2030,29 +2041,29 @@ export default function TenantPage() {
                       fontSize: '14px'
                     }} />
                   </div>
-                  <div>
-                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Date *</label>
-                    <input type="date" required value={invitationForm.visitDate} onChange={(e) => setInvitationForm({...invitationForm, visitDate: e.target.value})} style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: '#1E293B',
-                      border: '1px solid #475569',
-                      borderRadius: '8px',
-                      color: '#F1F5F9',
-                      fontSize: '14px'
-                    }} />
-                  </div>
-                  <div>
-                    <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Visit Time *</label>
-                    <input type="time" required value={invitationForm.visitTime} onChange={(e) => setInvitationForm({...invitationForm, visitTime: e.target.value})} style={{
-                      width: '100%',
-                      padding: '12px',
-                      backgroundColor: '#1E293B',
-                      border: '1px solid #475569',
-                      borderRadius: '8px',
-                      color: '#F1F5F9',
-                      fontSize: '14px'
-                    }} />
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>Start Date *</label>
+                        <input type="date" value={invitationForm.visitDate} onChange={(e) => setInvitationForm({...invitationForm, visitDate: e.target.value})} required
+                          style={{ width: '100%', padding: '10px 12px', backgroundColor: '#162032', border: '1px solid #1E3A5F', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }} />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>Start Time *</label>
+                        <input type="time" value={invitationForm.visitTime} onChange={(e) => setInvitationForm({...invitationForm, visitTime: e.target.value})} required
+                          style={{ width: '100%', padding: '10px 12px', backgroundColor: '#162032', border: '1px solid #1E3A5F', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }} />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>End Date *</label>
+                        <input type="date" value={invitationForm.visitEndDate} onChange={(e) => setInvitationForm({...invitationForm, visitEndDate: e.target.value})} required
+                          style={{ width: '100%', padding: '10px 12px', backgroundColor: '#162032', border: '1px solid #1E3A5F', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }} />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>End Time *</label>
+                        <input type="time" value={invitationForm.visitEndTime} onChange={(e) => setInvitationForm({...invitationForm, visitEndTime: e.target.value})} required
+                          style={{ width: '100%', padding: '10px 12px', backgroundColor: '#162032', border: '1px solid #1E3A5F', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }} />
+                      </div>
+                    </div>
                   </div>
                   <div style={{ gridColumn: '1 / -1' }}>
                     <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Purpose of Visit</label>
@@ -2089,6 +2100,8 @@ export default function TenantPage() {
                           visitorCompany: '',
                           visitDate: '',
                           visitTime: '',
+                          visitEndDate: '',
+                          visitEndTime: '',
                           purpose: '',
                           location: 'Main Office'
                         });
@@ -2157,6 +2170,8 @@ export default function TenantPage() {
                             visitorCompany: inv.visitorCompany || '',
                             visitDate: inv.visitDate,
                             visitTime: inv.visitTime,
+                            visitEndDate: inv.visitEndDate || '',
+                            visitEndTime: inv.visitEndTime || '',
                             purpose: inv.purpose,
                             location: inv.location
                           });
@@ -2225,7 +2240,7 @@ export default function TenantPage() {
               }}>
                 <div style={{ padding: '24px', borderBottom: '1px solid #1E293B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Parking Spaces</h3>
-                  <button onClick={() => setShowParkingModal(true)} style={{
+                  <button onClick={() => { setAssignType('permanent'); setAssignStartDate(''); setAssignEndDate(''); setShowParkingModal(true); }} style={{
                     backgroundColor: '#3B82F6',
                     color: 'white',
                     border: 'none',
@@ -2245,6 +2260,7 @@ export default function TenantPage() {
                           onClick={() => {
                             if (!isOccupied) {
                               setSelectedParkingSpace(space.spaceNumber);
+                              setAssignType('permanent'); setAssignStartDate(''); setAssignEndDate('');
                               setShowParkingModal(true);
                             }
                           }}
@@ -2398,7 +2414,7 @@ export default function TenantPage() {
               }}>
                 <div style={{ padding: '24px', borderBottom: '1px solid #1E293B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Permanent Lockers</h3>
-                  <button onClick={() => setShowLockerModal(true)} style={{
+                  <button onClick={() => { setAssignType('permanent'); setAssignStartDate(''); setAssignEndDate(''); setShowLockerModal(true); }} style={{
                     backgroundColor: '#3B82F6',
                     color: 'white',
                     border: 'none',
@@ -2418,6 +2434,7 @@ export default function TenantPage() {
                           onClick={() => {
                             if (!isOccupied) {
                               setSelectedLocker(locker.lockerNumber);
+                              setAssignType('permanent'); setAssignStartDate(''); setAssignEndDate('');
                               setShowLockerModal(true);
                             }
                           }}
@@ -2573,7 +2590,7 @@ export default function TenantPage() {
               }}>
                 <div style={{ padding: '24px', borderBottom: '1px solid #1E293B', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: 0 }}>Bookable Spaces</h3>
-                  <button onClick={() => setShowSpaceModal(true)} style={{
+                  <button onClick={() => { setAssignType('permanent'); setAssignStartDate(''); setAssignEndDate(''); setShowSpaceModal(true); }} style={{
                     backgroundColor: '#3B82F6',
                     color: 'white',
                     border: 'none',
@@ -2601,6 +2618,7 @@ export default function TenantPage() {
                           onClick={() => {
                             if (!isOccupied) {
                               setSelectedSpace(space.spaceNumber);
+                              setAssignType('permanent'); setAssignStartDate(''); setAssignEndDate('');
                               setShowSpaceModal(true);
                             }
                           }}
@@ -4531,7 +4549,9 @@ export default function TenantPage() {
                   assignedTo: userId,
                   assignedToName: userName,
                   vehiclePlate: vehiclePlate,
-                  assignedDate: new Date().toISOString()
+                  assignedDate: assignType === 'temporary' ? assignStartDate : new Date().toISOString(),
+                  assignmentType: assignType,
+                  assignmentEndDate: assignType === 'temporary' ? assignEndDate : undefined
                 });
                 alert(`Parking space ${selectedParkingSpace} (${space.location}) assigned successfully to ${userName}!`);
               }
@@ -4568,6 +4588,36 @@ export default function TenantPage() {
                   fontSize: '14px'
                 }} />
               </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>Assignment Type</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {(['permanent', 'temporary'] as const).map(t => (
+                    <button key={t} type="button" onClick={() => { setAssignType(t); if (t === 'permanent') { setAssignStartDate(''); setAssignEndDate('') } }}
+                      style={{
+                        flex: 1, padding: '10px', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
+                        backgroundColor: assignType === t ? (t === 'permanent' ? 'rgba(16,185,129,0.15)' : 'rgba(249,115,22,0.15)') : '#162032',
+                        border: `1px solid ${assignType === t ? (t === 'permanent' ? '#10B981' : '#F97316') : '#1E3A5F'}`,
+                        color: assignType === t ? '#F1F5F9' : '#94A3B8',
+                      }}>
+                      {t === 'permanent' ? 'Permanent' : 'Temporary'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {assignType === 'temporary' && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>Start Date & Time</label>
+                    <input type="datetime-local" value={assignStartDate} onChange={(e) => setAssignStartDate(e.target.value)} required
+                      style={{ width: '100%', padding: '10px 12px', backgroundColor: '#162032', border: '1px solid #1E3A5F', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>End Date & Time</label>
+                    <input type="datetime-local" value={assignEndDate} onChange={(e) => setAssignEndDate(e.target.value)} required
+                      style={{ width: '100%', padding: '10px 12px', backgroundColor: '#162032', border: '1px solid #1E3A5F', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }} />
+                  </div>
+                </div>
+              )}
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
                   flex: 1,
@@ -4634,7 +4684,9 @@ export default function TenantPage() {
                   status: 'occupied',
                   assignedTo: userId,
                   assignedToName: userName,
-                  assignedDate: new Date().toISOString()
+                  assignedDate: assignType === 'temporary' ? assignStartDate : new Date().toISOString(),
+                  assignmentType: assignType,
+                  assignmentEndDate: assignType === 'temporary' ? assignEndDate : undefined
                 });
                 alert(`Locker ${selectedLocker} (${locker.building} - Floor ${locker.floor}) assigned successfully to ${userName}!`);
               }
@@ -4659,6 +4711,36 @@ export default function TenantPage() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>Assignment Type</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {(['permanent', 'temporary'] as const).map(t => (
+                    <button key={t} type="button" onClick={() => { setAssignType(t); if (t === 'permanent') { setAssignStartDate(''); setAssignEndDate('') } }}
+                      style={{
+                        flex: 1, padding: '10px', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
+                        backgroundColor: assignType === t ? (t === 'permanent' ? 'rgba(16,185,129,0.15)' : 'rgba(249,115,22,0.15)') : '#162032',
+                        border: `1px solid ${assignType === t ? (t === 'permanent' ? '#10B981' : '#F97316') : '#1E3A5F'}`,
+                        color: assignType === t ? '#F1F5F9' : '#94A3B8',
+                      }}>
+                      {t === 'permanent' ? 'Permanent' : 'Temporary'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {assignType === 'temporary' && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>Start Date & Time</label>
+                    <input type="datetime-local" value={assignStartDate} onChange={(e) => setAssignStartDate(e.target.value)} required
+                      style={{ width: '100%', padding: '10px 12px', backgroundColor: '#162032', border: '1px solid #1E3A5F', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>End Date & Time</label>
+                    <input type="datetime-local" value={assignEndDate} onChange={(e) => setAssignEndDate(e.target.value)} required
+                      style={{ width: '100%', padding: '10px 12px', backgroundColor: '#162032', border: '1px solid #1E3A5F', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }} />
+                  </div>
+                </div>
+              )}
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
                   flex: 1,
@@ -4725,7 +4807,9 @@ export default function TenantPage() {
                   status: 'occupied',
                   assignedTo: userId,
                   assignedToName: userName,
-                  assignedDate: new Date().toISOString()
+                  assignedDate: assignType === 'temporary' ? assignStartDate : new Date().toISOString(),
+                  assignmentType: assignType,
+                  assignmentEndDate: assignType === 'temporary' ? assignEndDate : undefined
                 });
                 alert(`Space ${selectedSpace} (${space.building} - Floor ${space.floor}) assigned successfully to ${userName}!`);
               }
@@ -4750,6 +4834,36 @@ export default function TenantPage() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>Assignment Type</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {(['permanent', 'temporary'] as const).map(t => (
+                    <button key={t} type="button" onClick={() => { setAssignType(t); if (t === 'permanent') { setAssignStartDate(''); setAssignEndDate('') } }}
+                      style={{
+                        flex: 1, padding: '10px', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s',
+                        backgroundColor: assignType === t ? (t === 'permanent' ? 'rgba(16,185,129,0.15)' : 'rgba(249,115,22,0.15)') : '#162032',
+                        border: `1px solid ${assignType === t ? (t === 'permanent' ? '#10B981' : '#F97316') : '#1E3A5F'}`,
+                        color: assignType === t ? '#F1F5F9' : '#94A3B8',
+                      }}>
+                      {t === 'permanent' ? 'Permanent' : 'Temporary'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {assignType === 'temporary' && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>Start Date & Time</label>
+                    <input type="datetime-local" value={assignStartDate} onChange={(e) => setAssignStartDate(e.target.value)} required
+                      style={{ width: '100%', padding: '10px 12px', backgroundColor: '#162032', border: '1px solid #1E3A5F', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px', color: '#94A3B8' }}>End Date & Time</label>
+                    <input type="datetime-local" value={assignEndDate} onChange={(e) => setAssignEndDate(e.target.value)} required
+                      style={{ width: '100%', padding: '10px 12px', backgroundColor: '#162032', border: '1px solid #1E3A5F', borderRadius: '8px', color: '#F1F5F9', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const }} />
+                  </div>
+                </div>
+              )}
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
                   flex: 1,

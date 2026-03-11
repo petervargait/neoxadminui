@@ -916,10 +916,12 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
                           {hourStr}:00
                         </div>
                         <div style={{ flex: 1, padding: '4px 8px', display: 'flex', flexWrap: 'wrap', gap: '4px', alignContent: 'flex-start' }}>
-                          {slotInvitations.map(inv => {
-                            const sc = statusColors[inv.status] || statusColors.pending
+                          {slotInvitations.length > 0 && (() => {
+                            const first = slotInvitations[0]
+                            const sc = statusColors[first.status] || statusColors.pending
+                            const tooltipText = slotInvitations.map(inv => `${formatTime(inv.visitTime)} - ${inv.visitorName}${inv.visitorCompany ? ` (${inv.visitorCompany})` : ''}`).join('\n')
                             return (
-                              <div key={inv.id} style={{
+                              <div style={{
                                 padding: '6px 10px',
                                 borderRadius: '6px',
                                 background: sc.bg,
@@ -928,12 +930,27 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
                                 color: sc.text,
                                 fontWeight: 600,
                                 cursor: 'pointer',
-                              }} onClick={() => setCalendarDayModal(todayDate)}>
-                                {formatTime(inv.visitTime)} — {inv.visitorName}
-                                {inv.visitorCompany ? ` (${inv.visitorCompany})` : ''}
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                position: 'relative',
+                              }} onClick={() => setCalendarDayModal(todayDate)} title={tooltipText}>
+                                <span>{formatTime(first.visitTime)} — {first.visitorName}</span>
+                                {slotInvitations.length > 1 && (
+                                  <span style={{
+                                    backgroundColor: '#C9963B',
+                                    color: '#08122E',
+                                    borderRadius: '10px',
+                                    padding: '1px 7px',
+                                    fontSize: '11px',
+                                    fontWeight: 800,
+                                    minWidth: '20px',
+                                    textAlign: 'center',
+                                  }}>+{slotInvitations.length - 1}</span>
+                                )}
                               </div>
                             )
-                          })}
+                          })()}
                         </div>
                       </div>
                     )
@@ -995,10 +1012,12 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
                               borderLeft: `1px solid ${colors.cardBorder}`,
                               background: wd.dateStr === todayDate ? 'rgba(59, 130, 246, 0.04)' : 'transparent',
                             }}>
-                              {slotInvitations.map(inv => {
-                                const sc = statusColors[inv.status] || statusColors.pending
+                              {slotInvitations.length > 0 && (() => {
+                                const first = slotInvitations[0]
+                                const sc = statusColors[first.status] || statusColors.pending
+                                const tooltipText = slotInvitations.map(inv => `${formatTime(inv.visitTime)} - ${inv.visitorName}${inv.visitorCompany ? ` (${inv.visitorCompany})` : ''}`).join('\n')
                                 return (
-                                  <div key={inv.id} style={{
+                                  <div style={{
                                     padding: '3px 6px',
                                     borderRadius: '4px',
                                     background: sc.bg,
@@ -1011,12 +1030,26 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap',
                                     cursor: 'pointer',
-                                  }} title={`${inv.visitorName} - ${formatTime(inv.visitTime)}`}
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                  }} title={tooltipText}
                                      onClick={() => setCalendarDayModal(wd.dateStr)}>
-                                    {inv.visitorName}
+                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{first.visitorName}</span>
+                                    {slotInvitations.length > 1 && (
+                                      <span style={{
+                                        backgroundColor: '#C9963B',
+                                        color: '#08122E',
+                                        borderRadius: '8px',
+                                        padding: '0 5px',
+                                        fontSize: '9px',
+                                        fontWeight: 800,
+                                        flexShrink: 0,
+                                      }}>+{slotInvitations.length - 1}</span>
+                                    )}
                                   </div>
                                 )
-                              })}
+                              })()}
                             </div>
                           )
                         })}
