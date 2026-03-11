@@ -195,71 +195,50 @@ function DayWeatherCard({
   )
 }
 
-// ─── Map Placeholder ──────────────────────────────────────────────────────────
-function MapPlaceholder({ liveTraffic, onToggle }: { liveTraffic: boolean; onToggle: () => void }) {
-  // Grid lines to suggest a map
-  const gridLines = []
-  for (let i = 1; i < 8; i++) {
-    gridLines.push(
-      <line key={`h${i}`} x1={0} y1={i * 30} x2={760} y2={i * 30} stroke="#2A3A50" strokeWidth="0.8" />,
-      <line key={`v${i}`} x1={i * 95} y1={0} x2={i * 95} y2={240} stroke="#2A3A50" strokeWidth="0.8" />
-    )
-  }
+// ─── Google Maps Embed ────────────────────────────────────────────────────────
+// Location: Árbóc utca / Göncz Árpád Városközpont area, Budapest
+// Coordinates: 47.5695, 19.0825
+const MAPS_CENTER = '47.5695,19.0825'
+const MAPS_ZOOM = 15
 
-  // Road-like paths
-  const roads = [
-    { d: 'M 0 80 L 760 95', stroke: '#1E3A5F', width: 8 },
-    { d: 'M 0 160 L 760 155', stroke: '#1E3A5F', width: 8 },
-    { d: 'M 190 0 L 185 240', stroke: '#1E3A5F', width: 8 },
-    { d: 'M 380 0 L 380 240', stroke: '#1E3A5F', width: 8 },
-    { d: 'M 570 0 L 575 240', stroke: '#1E3A5F', width: 8 },
-    { d: 'M 50 0 L 100 240', stroke: '#162032', width: 5 },
-    { d: 'M 260 0 L 270 240', stroke: '#162032', width: 5 },
-    { d: 'M 470 0 L 460 240', stroke: '#162032', width: 5 },
-    { d: 'M 650 0 L 660 240', stroke: '#162032', width: 5 },
-    { d: 'M 0 40 L 760 45', stroke: '#162032', width: 4 },
-    { d: 'M 0 120 L 760 118', stroke: '#162032', width: 4 },
-    { d: 'M 0 200 L 760 198', stroke: '#162032', width: 4 },
-    // Traffic highlight (orange = congestion)
-    { d: 'M 0 80 L 260 88', stroke: liveTraffic ? '#F97316' : '#1E3A5F', width: 6 },
-    { d: 'M 380 92 L 570 95', stroke: liveTraffic ? '#EF4444' : '#1E3A5F', width: 6 },
-  ]
-
-  // Block shapes for buildings
-  const blocks = [
-    [20, 10, 55, 25], [90, 15, 70, 20], [220, 10, 60, 25], [310, 12, 50, 22],
-    [420, 8, 65, 28], [520, 14, 45, 22], [620, 10, 60, 25],
-    [20, 105, 60, 40], [110, 110, 50, 30], [220, 100, 65, 45], [330, 108, 40, 28],
-    [430, 102, 55, 42], [530, 106, 50, 35], [625, 104, 60, 38],
-    [20, 170, 55, 35], [100, 175, 65, 30], [230, 168, 55, 38], [320, 172, 45, 30],
-    [440, 170, 60, 35], [540, 168, 50, 32], [630, 173, 55, 30],
-  ]
+// Dark mode map style for Google Maps embed (static image with dark styling)
+function GoogleMapSection({ liveTraffic, onToggle }: { liveTraffic: boolean; onToggle: () => void }) {
+  // Google Maps Embed API with dark mode: use &maptype=roadmap and layer=traffic when on
+  // We use the embed API which supports traffic layer via &layer=traffic
+  const baseUrl = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d2694.5!2d19.0825!3d47.5695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2shu!4v1`
+  const trafficUrl = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d2694.5!2d19.0825!3d47.5695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2shu!4v1&layer=traffic`
 
   return (
     <div style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', backgroundColor: '#111C2E' }}>
-      <svg width="100%" height="240" viewBox="0 0 760 240" preserveAspectRatio="xMidYMid slice">
-        {/* Base fill */}
-        <rect width="760" height="240" fill="#0B1525" />
-        {/* Grid lines */}
-        {gridLines}
-        {/* Roads */}
-        {roads.map((r, i) => (
-          <path key={i} d={r.d} stroke={r.stroke} strokeWidth={r.width} fill="none" strokeLinecap="round" />
-        ))}
-        {/* Buildings */}
-        {blocks.map((b, i) => (
-          <rect key={i} x={b[0]} y={b[1]} width={b[2]} height={b[3]} rx="2" fill="#162032" stroke="#1E293B" strokeWidth="0.5" />
-        ))}
-        {/* Green areas */}
-        <ellipse cx="340" cy="130" rx="25" ry="18" fill="#0D3320" opacity="0.7" />
-        <ellipse cx="150" cy="50" rx="18" ry="12" fill="#0D3320" opacity="0.6" />
-        <ellipse cx="600" cy="185" rx="22" ry="14" fill="#0D3320" opacity="0.6" />
-        {/* Pin marker */}
-        <circle cx="380" cy="120" r="10" fill={DASH.gold} opacity="0.9" />
-        <circle cx="380" cy="120" r="5" fill={DASH.pageBg} />
-        <line x1="380" y1="130" x2="380" y2="145" stroke={DASH.gold} strokeWidth="2" strokeLinecap="round" />
-      </svg>
-      {/* Live Traffic toggle */}
+      {/* Dark overlay to blend iframe with dashboard theme */}
+      <style>{`
+        .gmap-dark-wrapper iframe {
+          filter: invert(90%) hue-rotate(180deg) brightness(0.85) contrast(1.2) saturate(0.3);
+        }
+      `}</style>
+      <div
+        className="gmap-dark-wrapper"
+        style={{
+          width: '100%',
+          height: '320px',
+          borderRadius: '10px',
+          overflow: 'hidden',
+        }}
+      >
+        <iframe
+          key={liveTraffic ? 'traffic' : 'normal'}
+          src={liveTraffic ? trafficUrl : baseUrl}
+          width="100%"
+          height="320"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Traffic around the building - Árbóc utca, Budapest"
+        />
+      </div>
+
+      {/* Live Traffic toggle button */}
       <button
         onClick={onToggle}
         style={{
@@ -267,7 +246,7 @@ function MapPlaceholder({ liveTraffic, onToggle }: { liveTraffic: boolean; onTog
           top: '12px',
           right: '12px',
           padding: '6px 14px',
-          backgroundColor: liveTraffic ? DASH.orange : DASH.cardBg,
+          backgroundColor: liveTraffic ? DASH.orange : 'rgba(15, 26, 46, 0.9)',
           border: `1px solid ${liveTraffic ? DASH.orange : DASH.cardBorder}`,
           borderRadius: '16px',
           color: DASH.textWhite,
@@ -277,6 +256,9 @@ function MapPlaceholder({ liveTraffic, onToggle }: { liveTraffic: boolean; onTog
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
+          zIndex: 10,
+          backdropFilter: 'blur(8px)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
         }}
       >
         <span style={{
@@ -288,6 +270,30 @@ function MapPlaceholder({ liveTraffic, onToggle }: { liveTraffic: boolean; onTog
         }} />
         Live Traffic
       </button>
+
+      {/* Location label */}
+      <div style={{
+        position: 'absolute',
+        bottom: '12px',
+        left: '12px',
+        padding: '4px 12px',
+        backgroundColor: 'rgba(15, 26, 46, 0.9)',
+        border: `1px solid ${DASH.cardBorder}`,
+        borderRadius: '12px',
+        color: DASH.label,
+        fontSize: '11px',
+        fontWeight: 500,
+        zIndex: 10,
+        backdropFilter: 'blur(8px)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+      }}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" fill={DASH.gold} />
+        </svg>
+        Árbóc utca, Göncz Árpád Városközpont
+      </div>
     </div>
   )
 }
@@ -536,7 +542,7 @@ export default function Dashboard10Wellbeing({ invitations }: Props) {
         <div style={{ marginBottom: '16px' }}>
           <h2 style={{ color: DASH.textWhite, fontSize: '18px', fontWeight: 700, margin: 0 }}>Traffic around the building</h2>
         </div>
-        <MapPlaceholder liveTraffic={liveTraffic} onToggle={() => setLiveTraffic(v => !v)} />
+        <GoogleMapSection liveTraffic={liveTraffic} onToggle={() => setLiveTraffic(v => !v)} />
       </CardPanel>
 
       {/* ─── 4. Outdoor Weather Prediction ─── */}
