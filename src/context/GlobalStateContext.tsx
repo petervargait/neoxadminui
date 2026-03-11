@@ -413,6 +413,7 @@ interface GlobalState {
   buildings: Building[]
   tickets: Ticket[]
   policyFiles: Record<string, PolicyFile | null>
+  tenantPolicyFiles: Record<string, Record<string, PolicyFile | null>>
   auditLogs: AuditLog[]
   tasks: Task[]
   whiteLabelSettings: Record<string, WhiteLabelSettings>
@@ -454,6 +455,9 @@ interface GlobalStateContextType extends GlobalState {
   updateTicket: (id: string, updates: Partial<Ticket>) => void
   uploadPolicy: (policyName: string, file: PolicyFile) => void
   downloadPolicy: (policyName: string) => PolicyFile | null
+  uploadTenantPolicy: (tenantId: string, policyName: string, file: PolicyFile) => void
+  deleteTenantPolicy: (tenantId: string, policyName: string) => void
+  addTenantCustomPolicy: (tenantId: string, policyName: string) => void
   addAuditLog: (log: Omit<AuditLog, 'id' | 'timestamp'>) => void
   addTask: (task: Omit<Task, 'id' | 'createdAt'>) => Task
   approveTask: (taskId: string, reviewedBy: string) => void
@@ -503,6 +507,7 @@ const getInitialState = (): GlobalState => {
           integrationAuthProfiles: parsedState.integrationAuthProfiles || [],
           integrationConnectors: parsedState.integrationConnectors || [],
           operationalMessages: parsedState.operationalMessages || [],
+          tenantPolicyFiles: parsedState.tenantPolicyFiles || {},
           systemSettings: parsedState.systemSettings || {
             'global': {
               tenantId: 'global',
@@ -980,6 +985,7 @@ const getInitialState = (): GlobalState => {
       'Passwords': null,
       'Installation and Onboarding Guide': null
     },
+    tenantPolicyFiles: {},
     auditLogs: [],
     tasks: [],
     whiteLabelSettings: {},
@@ -2565,6 +2571,39 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     return state.policyFiles[policyName] || null
   }
 
+  const uploadTenantPolicy = (tenantId: string, policyName: string, file: PolicyFile) => {
+    setState(prev => ({
+      ...prev,
+      tenantPolicyFiles: {
+        ...prev.tenantPolicyFiles,
+        [tenantId]: { ...(prev.tenantPolicyFiles[tenantId] || {}), [policyName]: file }
+      }
+    }))
+    addAuditLog({ user: 'system', action: `Uploaded tenant policy "${policyName}" for tenant ${tenantId}`, status: 'Success' })
+  }
+
+  const deleteTenantPolicy = (tenantId: string, policyName: string) => {
+    setState(prev => {
+      const tenantPolicies = { ...(prev.tenantPolicyFiles[tenantId] || {}) }
+      delete tenantPolicies[policyName]
+      return {
+        ...prev,
+        tenantPolicyFiles: { ...prev.tenantPolicyFiles, [tenantId]: tenantPolicies }
+      }
+    })
+    addAuditLog({ user: 'system', action: `Deleted tenant policy "${policyName}" for tenant ${tenantId}`, status: 'Success' })
+  }
+
+  const addTenantCustomPolicy = (tenantId: string, policyName: string) => {
+    setState(prev => ({
+      ...prev,
+      tenantPolicyFiles: {
+        ...prev.tenantPolicyFiles,
+        [tenantId]: { ...(prev.tenantPolicyFiles[tenantId] || {}), [policyName]: null }
+      }
+    }))
+  }
+
   const addTask = (task: Omit<Task, 'id' | 'createdAt'>) => {
     const newTask: Task = {
       ...task,
@@ -2816,6 +2855,9 @@ export const GlobalStateProvider = ({ children }: { children: ReactNode }) => {
     updateTicket,
     uploadPolicy,
     downloadPolicy,
+    uploadTenantPolicy,
+    deleteTenantPolicy,
+    addTenantCustomPolicy,
     addAuditLog,
     addTask,
     approveTask,

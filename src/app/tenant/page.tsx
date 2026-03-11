@@ -3445,107 +3445,189 @@ export default function TenantPage() {
           )}
 
           {/* Policies Section */}
-          {activeSection === 'policies' && (
+          {activeSection === 'policies' && (() => {
+            const tenantId = selectedTenantId;
+            const tenantPolicies = globalState.tenantPolicyFiles[tenantId] || {};
+            const globalPolicies = globalState.policyFiles;
+            const standardPolicyNames = ['GDPR', 'Terms & Conditions', 'Passwords', 'Installation and Onboarding Guide'];
+            const customPolicyNames = Object.keys(tenantPolicies).filter(name => !standardPolicyNames.includes(name));
+            const allPolicyNames = [...standardPolicyNames, ...customPolicyNames];
+
+            const handleTenantPolicyUpload = (policyName: string, event: React.ChangeEvent<HTMLInputElement>) => {
+              const file = event.target.files?.[0];
+              if (file && file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                  const base64Data = e.target?.result as string;
+                  globalState.uploadTenantPolicy(tenantId, policyName, {
+                    name: file.name,
+                    uploadDate: new Date().toLocaleDateString(),
+                    fileData: base64Data,
+                    fileType: file.type
+                  });
+                  alert(`${policyName} tenant policy uploaded successfully!`);
+                };
+                reader.readAsDataURL(file);
+              } else {
+                alert('Please select a valid PDF file');
+              }
+            };
+
+            return (
             <div>
-              <div style={{ marginBottom: '24px' }}>
-                <p style={{ color: '#94A3B8', fontSize: '14px', marginBottom: '24px' }}>
-                  Download company policy documents. These policies are managed by your system administrator.
-                </p>
+              <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <p style={{ color: '#94A3B8', fontSize: '14px', margin: '0 0 8px 0' }}>
+                    Upload tenant-specific policy documents or use the global admin versions as defaults.
+                  </p>
+                  <p style={{ color: '#64748B', fontSize: '12px', margin: 0 }}>
+                    Tenant versions override global policies. If no tenant version is uploaded, the global admin policy applies.
+                  </p>
+                </div>
+                <button onClick={() => {
+                  const name = prompt('Enter custom policy name:');
+                  if (name && name.trim()) {
+                    globalState.addTenantCustomPolicy(tenantId, name.trim());
+                  }
+                }} style={{
+                  backgroundColor: '#3B82F6', color: 'white', border: 'none', borderRadius: '8px',
+                  padding: '10px 16px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', whiteSpace: 'nowrap',
+                }}>+ Add Custom Policy</button>
               </div>
 
-              {Object.entries(globalState.policyFiles).filter(([_, file]) => file !== null).length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '64px 24px', color: '#64748B' }}>
-                  <div style={{ fontSize: '64px', marginBottom: '16px' }}>📄</div>
-                  <div style={{ fontSize: '18px', fontWeight: '500', marginBottom: '8px' }}>No Policies Available</div>
-                  <div style={{ fontSize: '14px' }}>Policy documents will appear here once uploaded by your administrator</div>
-                </div>
-              ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
-                {Object.entries(globalState.policyFiles).filter(([_, file]) => file !== null).map(([policyName, policyFile]) => {
-                  if (!policyFile) return null;
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '20px' }}>
+                {allPolicyNames.map(policyName => {
+                  const tenantFile = tenantPolicies[policyName] || null;
+                  const globalFile = globalPolicies[policyName] || null;
+                  const isCustom = !standardPolicyNames.includes(policyName);
+                  const activeFile = tenantFile || globalFile;
+                  const source = tenantFile ? 'tenant' : globalFile ? 'global' : 'none';
+
                   return (
-                  <div key={policyName} style={{
-                    padding: '24px',
-                    backgroundColor: '#162032',
-                    borderRadius: '12px',
-                    border: '1px solid #1E293B'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', marginBottom: '20px' }}>
-                      <div style={{
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '12px',
-                        backgroundColor: '#3B82F6',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '28px',
-                        flexShrink: 0
-                      }}>
-                        📄
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <h3 style={{ color: '#F1F5F9', fontSize: '18px', fontWeight: '600', margin: '0 0 8px 0' }}>
-                          {policyName}
-                        </h3>
-                        <p style={{ color: '#94A3B8', fontSize: '14px', margin: '0 0 12px 0', lineHeight: '1.5' }}>
-                          {policyFile.name || 'Policy document'}
-                        </p>
-                        <div style={{ display: 'flex', gap: '16px', fontSize: '13px' }}>
-                          <span style={{ color: '#64748B' }}>
-                            <span style={{ color: '#94A3B8', fontWeight: '500' }}>Uploaded:</span> {policyFile.uploadDate}
-                          </span>
-                          <span style={{ color: '#64748B' }}>
-                            <span style={{ color: '#94A3B8', fontWeight: '500' }}>Type:</span> {policyFile.fileType || 'PDF'}
-                          </span>
+                    <div key={policyName} style={{
+                      padding: '24px', backgroundColor: '#162032', borderRadius: '12px',
+                      border: `1px solid ${source === 'tenant' ? 'rgba(16, 185, 129, 0.3)' : source === 'global' ? 'rgba(139, 92, 246, 0.3)' : '#1E293B'}`,
+                    }}>
+                      {/* Header */}
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', marginBottom: '16px' }}>
+                        <div style={{
+                          width: '48px', height: '48px', borderRadius: '10px',
+                          backgroundColor: source === 'tenant' ? 'rgba(16, 185, 129, 0.15)' : source === 'global' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(100, 116, 139, 0.15)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        }}>
+                          <DocumentRegular style={{ fontSize: '24px', width: '24px', height: '24px', color: source === 'tenant' ? '#10B981' : source === 'global' ? '#8B5CF6' : '#64748B' }} />
                         </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                            <h3 style={{ color: '#F1F5F9', fontSize: '16px', fontWeight: '600', margin: 0 }}>{policyName}</h3>
+                            {isCustom && (
+                              <span style={{ padding: '2px 8px', borderRadius: '10px', fontSize: '10px', fontWeight: 600, backgroundColor: 'rgba(59, 130, 246, 0.15)', color: '#3B82F6' }}>Custom</span>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{
+                              padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600,
+                              backgroundColor: source === 'tenant' ? 'rgba(16, 185, 129, 0.15)' : source === 'global' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(100, 116, 139, 0.15)',
+                              color: source === 'tenant' ? '#10B981' : source === 'global' ? '#8B5CF6' : '#64748B',
+                            }}>
+                              {source === 'tenant' ? 'Tenant Version' : source === 'global' ? 'Global Version' : 'Not Uploaded'}
+                            </span>
+                          </div>
+                        </div>
+                        {isCustom && (
+                          <button onClick={() => {
+                            if (confirm(`Delete custom policy "${policyName}"?`)) {
+                              globalState.deleteTenantPolicy(tenantId, policyName);
+                            }
+                          }} style={{
+                            backgroundColor: 'transparent', border: '1px solid #475569', borderRadius: '6px',
+                            color: '#EF4444', fontSize: '12px', padding: '4px 8px', cursor: 'pointer',
+                          }}>
+                            <DeleteRegular style={{ fontSize: '14px', width: '14px', height: '14px' }} />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Active file info */}
+                      {activeFile && (
+                        <div style={{ padding: '12px', backgroundColor: '#0F1629', borderRadius: '8px', marginBottom: '12px', fontSize: '13px' }}>
+                          <div style={{ color: '#F1F5F9', fontWeight: 500, marginBottom: '4px' }}>{activeFile.name}</div>
+                          <div style={{ color: '#64748B', fontSize: '12px' }}>
+                            Uploaded: {activeFile.uploadDate} &middot; {activeFile.fileType || 'PDF'}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tenant & Global version rows */}
+                      {!isCustom && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px', fontSize: '12px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#94A3B8' }}>
+                            <span>Global Admin:</span>
+                            <span style={{ color: globalFile ? '#8B5CF6' : '#475569' }}>{globalFile ? globalFile.name : 'Not uploaded'}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#94A3B8' }}>
+                            <span>Tenant Override:</span>
+                            <span style={{ color: tenantFile ? '#10B981' : '#475569' }}>{tenantFile ? tenantFile.name : 'None'}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {/* Download active */}
+                        {activeFile && activeFile.fileData && (
+                          <button onClick={() => {
+                            const link = document.createElement('a');
+                            link.href = activeFile.fileData!;
+                            link.download = activeFile.name || `${policyName.replace(/\s+/g, '_')}.pdf`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                          }} style={{
+                            flex: 1, padding: '10px', backgroundColor: '#3B82F6', color: 'white', border: 'none',
+                            borderRadius: '8px', fontSize: '13px', fontWeight: '500', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                          }}>
+                            <ArrowDownloadRegular style={{ fontSize: '14px', width: '14px', height: '14px' }} /> Download
+                          </button>
+                        )}
+                        {/* Upload tenant version */}
+                        <div style={{ flex: 1 }}>
+                          <input type="file" accept=".pdf,application/pdf" style={{ display: 'none' }}
+                            id={`tenant-policy-${policyName.replace(/\s+/g, '-')}`}
+                            onChange={(e) => handleTenantPolicyUpload(policyName, e)} />
+                          <label htmlFor={`tenant-policy-${policyName.replace(/\s+/g, '-')}`} style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                            padding: '10px', backgroundColor: 'transparent', color: '#10B981',
+                            border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '8px',
+                            fontSize: '13px', fontWeight: '500', cursor: 'pointer', width: '100%', boxSizing: 'border-box',
+                          }}>
+                            <ArrowUploadRegular style={{ fontSize: '14px', width: '14px', height: '14px' }} />
+                            {tenantFile ? 'Replace' : 'Upload Tenant Version'}
+                          </label>
+                        </div>
+                        {/* Remove tenant override */}
+                        {tenantFile && !isCustom && (
+                          <button onClick={() => {
+                            if (confirm(`Remove tenant override for "${policyName}"? The global version will apply.`)) {
+                              globalState.deleteTenantPolicy(tenantId, policyName);
+                            }
+                          }} style={{
+                            padding: '10px 12px', backgroundColor: 'transparent', color: '#EF4444',
+                            border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px',
+                            fontSize: '12px', cursor: 'pointer',
+                          }} title="Remove tenant override">
+                            <DeleteRegular style={{ fontSize: '14px', width: '14px', height: '14px' }} />
+                          </button>
+                        )}
                       </div>
                     </div>
-
-                    <button
-                      onClick={() => {
-                        if (policyFile.fileData) {
-                          // Create download link from base64 data
-                          const link = document.createElement('a');
-                          link.href = policyFile.fileData;
-                          link.download = `${policyName.replace(/\s+/g, '_')}.pdf`;
-                          document.body.appendChild(link);
-                          link.click();
-                          document.body.removeChild(link);
-                          alert(`Downloading ${policyName} policy...`);
-                        } else {
-                          alert('Policy file data not available');
-                        }
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '12px 20px',
-                        backgroundColor: '#3B82F6',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        transition: 'background-color 0.2s'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3B82F6'}
-                    >
-                      <span>⬇️</span>
-                      <span>Download PDF</span>
-                    </button>
-                  </div>
                   );
                 })}
               </div>
-              )}
             </div>
-          )}
+            );
+          })()}
 
           {/* Profile Management Section */}
           {activeSection === 'modules' && (
