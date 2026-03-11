@@ -39,7 +39,7 @@ interface ServiceDef {
 function makeIcon(path: string) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d={path} stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={path} stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -49,11 +49,11 @@ const SERVICES: ServiceDef[] = [
     name: 'Parking',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="6" width="18" height="12" rx="3" stroke={DASH.gold} strokeWidth="1.8" />
-        <circle cx="7.5" cy="18" r="1.5" stroke={DASH.gold} strokeWidth="1.8" />
-        <circle cx="16.5" cy="18" r="1.5" stroke={DASH.gold} strokeWidth="1.8" />
-        <path d="M5 6L7 3h10l2 3" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M7 10h4" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
+        <rect x="3" y="6" width="18" height="12" rx="3" stroke={DASH.label} strokeWidth="1.8" />
+        <circle cx="7.5" cy="18" r="1.5" stroke={DASH.label} strokeWidth="1.8" />
+        <circle cx="16.5" cy="18" r="1.5" stroke={DASH.label} strokeWidth="1.8" />
+        <path d="M5 6L7 3h10l2 3" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M7 10h4" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -61,10 +61,10 @@ const SERVICES: ServiceDef[] = [
     name: 'Visitor Management',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <circle cx="9" cy="7" r="3" stroke={DASH.gold} strokeWidth="1.8" />
-        <circle cx="17" cy="9" r="2.5" stroke={DASH.gold} strokeWidth="1.8" />
-        <path d="M2 21v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M17 14a3.5 3.5 0 0 1 3.5 3.5V21" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="9" cy="7" r="3" stroke={DASH.label} strokeWidth="1.8" />
+        <circle cx="17" cy="9" r="2.5" stroke={DASH.label} strokeWidth="1.8" />
+        <path d="M2 21v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M17 14a3.5 3.5 0 0 1 3.5 3.5V21" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -76,10 +76,10 @@ const SERVICES: ServiceDef[] = [
     name: 'IoT Sensors',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="5" y="5" width="14" height="14" rx="2" stroke={DASH.gold} strokeWidth="1.8" />
-        <circle cx="12" cy="12" r="2" stroke={DASH.gold} strokeWidth="1.8" />
-        <path d="M5 9h14M9 5v14" stroke={DASH.gold} strokeWidth="1.8" />
-        <path d="M2 2l3 3M22 2l-3 3M2 22l3-3M22 22l-3-3" stroke={DASH.gold} strokeWidth="1.4" strokeLinecap="round" />
+        <rect x="5" y="5" width="14" height="14" rx="2" stroke={DASH.label} strokeWidth="1.8" />
+        <circle cx="12" cy="12" r="2" stroke={DASH.label} strokeWidth="1.8" />
+        <path d="M5 9h14M9 5v14" stroke={DASH.label} strokeWidth="1.8" />
+        <path d="M2 2l3 3M22 2l-3 3M2 22l3-3M22 22l-3-3" stroke={DASH.label} strokeWidth="1.4" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -87,10 +87,10 @@ const SERVICES: ServiceDef[] = [
     name: 'Mobile App',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="7" y="2" width="10" height="20" rx="2" stroke={DASH.gold} strokeWidth="1.8" />
-        <path d="M11 18h2" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M7 5h10" stroke={DASH.gold} strokeWidth="1.4" />
-        <path d="M7 16h10" stroke={DASH.gold} strokeWidth="1.4" />
+        <rect x="7" y="2" width="10" height="20" rx="2" stroke={DASH.label} strokeWidth="1.8" />
+        <path d="M11 18h2" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M7 5h10" stroke={DASH.label} strokeWidth="1.4" />
+        <path d="M7 16h10" stroke={DASH.label} strokeWidth="1.4" />
       </svg>
     ),
   },
@@ -98,12 +98,12 @@ const SERVICES: ServiceDef[] = [
     name: 'Elevator',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="4" y="2" width="16" height="20" rx="2" stroke={DASH.gold} strokeWidth="1.8" />
-        <path d="M12 2v20M4 12h16" stroke={DASH.gold} strokeWidth="1.4" />
-        <path d="M8 8l-1.5-2L8 4" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-        <path d="M8 16l-1.5 2L8 20" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-        <path d="M16 8l1.5-2L16 4" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-        <path d="M16 16l1.5 2L16 20" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <rect x="4" y="2" width="16" height="20" rx="2" stroke={DASH.label} strokeWidth="1.8" />
+        <path d="M12 2v20M4 12h16" stroke={DASH.label} strokeWidth="1.4" />
+        <path d="M8 8l-1.5-2L8 4" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <path d="M8 16l-1.5 2L8 20" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <path d="M16 8l1.5-2L16 4" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <path d="M16 16l1.5 2L16 20" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
       </svg>
     ),
   },
@@ -111,8 +111,8 @@ const SERVICES: ServiceDef[] = [
     name: 'Access Control',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7l-9-5z" stroke={DASH.gold} strokeWidth="1.8" strokeLinejoin="round" />
-        <path d="M9 12l2 2 4-4" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M12 2L3 7v6c0 5.25 3.75 10.15 9 11.25C17.25 23.15 21 18.25 21 13V7l-9-5z" stroke={DASH.label} strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M9 12l2 2 4-4" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -120,12 +120,12 @@ const SERVICES: ServiceDef[] = [
     name: 'BMS',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M3 21h18" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
-        <rect x="5" y="7" width="14" height="14" rx="1" stroke={DASH.gold} strokeWidth="1.8" />
-        <path d="M9 21v-5h6v5" stroke={DASH.gold} strokeWidth="1.8" strokeLinejoin="round" />
-        <path d="M12 2l-9 5h18l-9-5z" stroke={DASH.gold} strokeWidth="1.8" strokeLinejoin="round" />
-        <rect x="8" y="10" width="3" height="3" rx="0.5" stroke={DASH.gold} strokeWidth="1.4" />
-        <rect x="13" y="10" width="3" height="3" rx="0.5" stroke={DASH.gold} strokeWidth="1.4" />
+        <path d="M3 21h18" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
+        <rect x="5" y="7" width="14" height="14" rx="1" stroke={DASH.label} strokeWidth="1.8" />
+        <path d="M9 21v-5h6v5" stroke={DASH.label} strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M12 2l-9 5h18l-9-5z" stroke={DASH.label} strokeWidth="1.8" strokeLinejoin="round" />
+        <rect x="8" y="10" width="3" height="3" rx="0.5" stroke={DASH.label} strokeWidth="1.4" />
+        <rect x="13" y="10" width="3" height="3" rx="0.5" stroke={DASH.label} strokeWidth="1.4" />
       </svg>
     ),
   },
@@ -133,10 +133,10 @@ const SERVICES: ServiceDef[] = [
     name: 'AV/UC',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="2" y="4" width="15" height="11" rx="2" stroke={DASH.gold} strokeWidth="1.8" />
-        <path d="M17 8l5-3v10l-5-3V8z" stroke={DASH.gold} strokeWidth="1.8" strokeLinejoin="round" />
-        <path d="M6 19h8" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M10 15v4" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
+        <rect x="2" y="4" width="15" height="11" rx="2" stroke={DASH.label} strokeWidth="1.8" />
+        <path d="M17 8l5-3v10l-5-3V8z" stroke={DASH.label} strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M6 19h8" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M10 15v4" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -144,11 +144,11 @@ const SERVICES: ServiceDef[] = [
     name: 'Digital Badge',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="4" y="2" width="16" height="20" rx="3" stroke={DASH.gold} strokeWidth="1.8" />
-        <circle cx="12" cy="9" r="3" stroke={DASH.gold} strokeWidth="1.8" />
-        <path d="M8 16h8" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M9 19h6" stroke={DASH.gold} strokeWidth="1.4" strokeLinecap="round" />
-        <path d="M10 2v1.5h4V2" stroke={DASH.gold} strokeWidth="1.4" />
+        <rect x="4" y="2" width="16" height="20" rx="3" stroke={DASH.label} strokeWidth="1.8" />
+        <circle cx="12" cy="9" r="3" stroke={DASH.label} strokeWidth="1.8" />
+        <path d="M8 16h8" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M9 19h6" stroke={DASH.label} strokeWidth="1.4" strokeLinecap="round" />
+        <path d="M10 2v1.5h4V2" stroke={DASH.label} strokeWidth="1.4" />
       </svg>
     ),
   },
@@ -156,8 +156,8 @@ const SERVICES: ServiceDef[] = [
     name: 'Ticketing',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4V7z" stroke={DASH.gold} strokeWidth="1.8" />
-        <path d="M9 5v2M9 17v2M9 11v2" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeDasharray="0.5 3" />
+        <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4V7z" stroke={DASH.label} strokeWidth="1.8" />
+        <path d="M9 5v2M9 17v2M9 11v2" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeDasharray="0.5 3" />
       </svg>
     ),
   },
@@ -165,11 +165,11 @@ const SERVICES: ServiceDef[] = [
     name: 'Restaurant',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M3 3v7c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V3" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M6 3v18" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M18 3v4a4 4 0 0 1-4 4" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M18 3v18" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M14 11h4" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M3 3v7c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V3" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M6 3v18" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M18 3v4a4 4 0 0 1-4 4" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M18 3v18" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M14 11h4" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -177,10 +177,10 @@ const SERVICES: ServiceDef[] = [
     name: 'Waste Management',
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M7 7l1.5 12a2 2 0 0 0 2 1.75h3a2 2 0 0 0 2-1.75L17 7" stroke={DASH.gold} strokeWidth="1.8" strokeLinejoin="round" />
-        <path d="M5 7h14" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M9 3l1-1h4l1 1" stroke={DASH.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M4 12l2.5-1.5L9 12l2.5-1.5L14 12l2.5-1.5L19 12" stroke={DASH.gold} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M7 7l1.5 12a2 2 0 0 0 2 1.75h3a2 2 0 0 0 2-1.75L17 7" stroke={DASH.label} strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M5 7h14" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M9 3l1-1h4l1 1" stroke={DASH.label} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M4 12l2.5-1.5L9 12l2.5-1.5L14 12l2.5-1.5L19 12" stroke={DASH.label} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -312,7 +312,7 @@ export default function Dashboard0OperationalOverview({ externalSystems, tickets
               fontWeight: 900,
               margin: 0,
               lineHeight: 1.2,
-              background: 'linear-gradient(135deg, #F1F5F9, #C9963B)',
+              background: 'linear-gradient(135deg, #F1F5F9, #3B82F6)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -428,7 +428,7 @@ export default function Dashboard0OperationalOverview({ externalSystems, tickets
               {/* Gradient border wrapper */}
               <div
                 style={{
-                  background: 'linear-gradient(135deg, rgba(30,58,95,0.8), rgba(201,150,59,0.3))',
+                  background: 'linear-gradient(135deg, rgba(30,58,95,0.6), rgba(59,130,246,0.15))',
                   borderRadius: '16px',
                   padding: '1px',
                 }}
@@ -449,14 +449,14 @@ export default function Dashboard0OperationalOverview({ externalSystems, tickets
                   {/* ── Top Row: Icon + Name + RAG Dot ── */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      {/* Gold circle icon background */}
+                      {/* Icon background */}
                       <div
                         style={{
                           width: '44px',
                           height: '44px',
                           borderRadius: '12px',
-                          background: 'rgba(201,150,59,0.12)',
-                          border: '1px solid rgba(201,150,59,0.25)',
+                          background: DASH.cardBg2,
+                          border: `1px solid ${DASH.cardBorder}`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -524,7 +524,7 @@ export default function Dashboard0OperationalOverview({ externalSystems, tickets
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <span
                             style={{
-                              color: DASH.gold,
+                              color: DASH.blue,
                               fontSize: '12px',
                               fontWeight: 700,
                               fontFamily: 'monospace',
@@ -592,10 +592,10 @@ export default function Dashboard0OperationalOverview({ externalSystems, tickets
                       justifyContent: 'center',
                       gap: '6px',
                       background: 'transparent',
-                      border: `1px solid ${DASH.gold}`,
+                      border: `1px solid ${DASH.blue}`,
                       borderRadius: '20px',
                       padding: '8px 20px',
-                      color: DASH.gold,
+                      color: DASH.blue,
                       fontSize: '13px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -603,14 +603,14 @@ export default function Dashboard0OperationalOverview({ externalSystems, tickets
                       width: '100%',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(201,150,59,0.12)'
-                      e.currentTarget.style.borderColor = DASH.goldLight
-                      e.currentTarget.style.color = DASH.goldLight
+                      e.currentTarget.style.background = 'rgba(59,130,246,0.12)'
+                      e.currentTarget.style.borderColor = DASH.blue
+                      e.currentTarget.style.color = DASH.blue
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.background = 'transparent'
-                      e.currentTarget.style.borderColor = DASH.gold
-                      e.currentTarget.style.color = DASH.gold
+                      e.currentTarget.style.borderColor = DASH.blue
+                      e.currentTarget.style.color = DASH.blue
                     }}
                   >
                     View Dashboard

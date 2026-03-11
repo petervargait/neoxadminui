@@ -11,6 +11,8 @@ import {
   TrendArrow,
 } from '../charts/DashboardCharts'
 import { BadgeSwipe } from '../../context/GlobalStateContext'
+import BuildingModel3D from './BuildingModel3D'
+import FloorplanWithZones from './FloorplanWithZones'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface Props {
@@ -56,22 +58,8 @@ function PillSelect({
 }
 
 // ─── Static data constants ───────────────────────────────────────────────────
-// Access Management stacked data: [Physical badge, Digital badge, Watch badge]
-const ACCESS_COMPANIES_STATIC = [
-  { rowLabel: 'Apex Data Solutions',      segments: [76, 381, 329], total: 786,  trend: 'up'      as const },
-  { rowLabel: 'Horizon Analytics',        segments: [41, 284, 206], total: 531,  trend: 'up'      as const },
-  { rowLabel: 'Lumina Insights',          segments: [68, 101, 498], total: 667,  trend: 'up'      as const },
-  { rowLabel: 'Quantum Metric Corp',      segments: [89, 381, 171], total: 641,  trend: 'up'      as const },
-  { rowLabel: 'Veridian Dynamics',        segments: [76, 271, 439], total: 786,  trend: 'up'      as const },
-  { rowLabel: 'Starlight Technologies',   segments: [79, 331, 376], total: 786,  trend: 'up'      as const },
-  { rowLabel: 'SynergyWorks Group',       segments: [79, 284, 124], total: 487,  trend: 'up'      as const },
-  { rowLabel: 'Crimson DataFlow',         segments: [91, 318,  72], total: 481,  trend: 'up'      as const },
-  { rowLabel: 'Willowbrook Consulting',   segments: [48, 221, 112], total: 381,  trend: 'up'      as const },
-]
 
-const ACCESS_COLORS = [DASH.gold, '#1E3A5F', DASH.red]
-const ACCESS_LABELS = ['Physical badge', 'Digital badge', 'Watch badge']
-
+// Floor heatmap data
 const FLOOR_HEATMAP_DATA = [
   { label: '29th', occupancy: 12 },
   { label: '28th', occupancy: 18 },
@@ -155,6 +143,21 @@ const TENANT_OPTIONS = [
   { value: 'tenant2', label: 'Tenant B' },
   { value: 'tenant3', label: 'Tenant C' },
 ]
+
+// Access by Department stacked data: [Workers, Visitors, Contractors]
+const DEPT_ACCESS_DATA = [
+  { rowLabel: 'Finance',         segments: [245, 42, 18],  total: 305, trend: 'up'      as const },
+  { rowLabel: 'IT & Digital',    segments: [312, 68, 35],  total: 415, trend: 'up'      as const },
+  { rowLabel: 'Human Resources', segments: [156, 55, 12],  total: 223, trend: 'down'    as const },
+  { rowLabel: 'Marketing',       segments: [189, 38, 8],   total: 235, trend: 'neutral' as const },
+  { rowLabel: 'Operations',      segments: [278, 95, 45],  total: 418, trend: 'up'      as const },
+  { rowLabel: 'Legal',           segments: [98, 22, 5],    total: 125, trend: 'down'    as const },
+  { rowLabel: 'Executive',       segments: [45, 15, 8],    total: 68,  trend: 'neutral' as const },
+  { rowLabel: 'Facilities',      segments: [134, 28, 62],  total: 224, trend: 'up'      as const },
+]
+
+const DEPT_COLORS = [DASH.blue, DASH.green, '#F97316']
+const DEPT_LABELS = ['Workers', 'Visitors', 'Contractors']
 
 // ─── GroupedBarChart for daily estimates ─────────────────────────────────────
 function DailyEstimateChart({
@@ -259,313 +262,331 @@ function DailyEstimateChart({
   )
 }
 
-// ─── Access Management Section ────────────────────────────────────────────────
-function AccessManagementSection({ badgeSwipes }: { badgeSwipes: BadgeSwipe[] }) {
-  const [floor, setFloor] = useState('all')
-  const [dateRange] = useState('15 -22. February 2025')
-
-  const total = ACCESS_COMPANIES_STATIC.reduce((s, d) => s + d.total, 0)
-
-  return (
-    <section>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px',
-        }}
-      >
-        <h2 style={{ color: DASH.text, fontSize: '20px', fontWeight: 700, margin: 0 }}>
-          Access Management
-        </h2>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <PillSelect
-            value={floor}
-            onChange={setFloor}
-            options={FLOOR_OPTIONS}
-            placeholder="Filter to floor"
-          />
-          <div
-            style={{
-              padding: '7px 18px',
-              backgroundColor: DASH.cardBg2,
-              border: `1px solid ${DASH.cardBorder}`,
-              borderRadius: '20px',
-              color: DASH.text,
-              fontSize: '13px',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {dateRange}
-          </div>
-        </div>
-      </div>
-      <CardPanel>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: '16px',
-          }}
-        >
-          <div>
-            <span style={{ color: DASH.text, fontWeight: 700, fontSize: '15px' }}>
-              Visitors by company
-            </span>{' '}
-            <span style={{ color: DASH.muted, fontSize: '13px' }}>compared to last period</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-            <span style={{ color: DASH.label, fontSize: '14px', fontWeight: 600 }}>Total</span>
-            <span style={{ color: DASH.textWhite, fontSize: '22px', fontWeight: 800 }}>
-              {total.toLocaleString()}
-            </span>
-          </div>
-        </div>
-        <StackedHorizontalBarChart
-          data={ACCESS_COMPANIES_STATIC}
-          colors={ACCESS_COLORS}
-          labels={ACCESS_LABELS}
-          width={620}
-          total={900}
-          showTotal={true}
-        />
-      </CardPanel>
-    </section>
-  )
-}
-
-// ─── Workplace Utilization Section ────────────────────────────────────────────
-function WorkplaceUtilizationSection() {
-  const [tenant, setTenant] = useState('all')
-  const [month, setMonth] = useState('February 2025')
-
-  return (
-    <section>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px',
-        }}
-      >
-        <h2 style={{ color: DASH.text, fontSize: '20px', fontWeight: 700, margin: 0 }}>
-          Workplace utilization
-        </h2>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <PillSelect
-            value={tenant}
-            onChange={setTenant}
-            options={TENANT_OPTIONS}
-            placeholder="Filter to tenant"
-          />
-          <MonthSelector value={month} onChange={setMonth} />
-        </div>
-      </div>
-
-      <CardPanel>
-        {/* Top row: Heatmap + Avg metrics + KPIs */}
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', marginBottom: '32px' }}>
-          {/* Floor heatmap */}
-          <div style={{ flexShrink: 0 }}>
-            <FloorHeatmap floors={FLOOR_HEATMAP_DATA} width={180} height={480} />
-          </div>
-
-          {/* Center: occupancy stats */}
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              gap: '20px',
-              paddingTop: '120px',
-            }}
-          >
-            <div>
-              <div style={{ color: DASH.muted, fontSize: '13px', marginBottom: '4px' }}>
-                Average floor occupancy
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                <span style={{ color: DASH.textWhite, fontSize: '32px', fontWeight: 800 }}>45</span>
-                <span style={{ color: DASH.trendUp, fontSize: '14px', fontWeight: 700 }}>+10%</span>
-              </div>
-            </div>
-            <div>
-              <div style={{ color: DASH.muted, fontSize: '13px', marginBottom: '4px' }}>
-                Peak floor occupancy
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                <span style={{ color: DASH.textWhite, fontSize: '32px', fontWeight: 800 }}>93</span>
-                <span style={{ color: DASH.trendDown, fontSize: '14px', fontWeight: 700 }}>-20%</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: HSE + Avg daily entrance */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '80px' }}>
-            <div
-              style={{
-                backgroundColor: DASH.cardBg2,
-                border: `1px solid ${DASH.cardBorder}`,
-                borderRadius: '12px',
-                padding: '16px 24px',
-                textAlign: 'right',
-                minWidth: '160px',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  justifyContent: 'flex-end',
-                  gap: '6px',
-                  marginBottom: '4px',
-                }}
-              >
-                <span style={{ color: DASH.textWhite, fontSize: '28px', fontWeight: 800 }}>1036</span>
-                <TrendArrow direction="up" size={16} />
-              </div>
-              <div style={{ color: DASH.label, fontSize: '13px' }}>HSE Capacity</div>
-            </div>
-            <div
-              style={{
-                backgroundColor: DASH.cardBg2,
-                border: `1px solid ${DASH.cardBorder}`,
-                borderRadius: '12px',
-                padding: '16px 24px',
-                textAlign: 'right',
-                minWidth: '160px',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  justifyContent: 'flex-end',
-                  gap: '6px',
-                  marginBottom: '4px',
-                }}
-              >
-                <span style={{ color: DASH.textWhite, fontSize: '28px', fontWeight: 800 }}>1373</span>
-                <TrendArrow direction="up" size={16} />
-              </div>
-              <div style={{ color: DASH.label, fontSize: '13px' }}>Avg. daily entrance</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Gauge row */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '24px',
-            marginBottom: '32px',
-            borderTop: `1px solid ${DASH.cardBorder}`,
-            paddingTop: '28px',
-          }}
-        >
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ color: DASH.muted, fontSize: '12px', marginBottom: '8px', lineHeight: 1.4 }}>
-              Ide jöhetne valami szöveg még magyarázásba
-            </div>
-            <GaugeChart
-              value={126}
-              max={100}
-              label="Allocation"
-              size={180}
-              color={DASH.gold}
-            />
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ color: DASH.muted, fontSize: '12px', marginBottom: '8px', lineHeight: 1.4 }}>
-              Ide jöhetne valami szöveg még magyarázásba
-            </div>
-            <GaugeChart
-              value={30}
-              max={100}
-              label="Utilization"
-              size={180}
-              color={DASH.gold}
-            />
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ color: DASH.muted, fontSize: '12px', marginBottom: '8px', lineHeight: 1.4 }}>
-              Ide jöhetne valami szöveg még magyarázásba
-            </div>
-            <GaugeChart
-              value={56}
-              max={100}
-              label="Peak utilization"
-              sublabel="56,47%"
-              size={180}
-              color={DASH.gold}
-            />
-          </div>
-        </div>
-
-        {/* Daily estimate grouped bar chart */}
-        <div style={{ borderTop: `1px solid ${DASH.cardBorder}`, paddingTop: '24px' }}>
-          <div
-            style={{
-              color: DASH.text,
-              fontWeight: 700,
-              fontSize: '15px',
-              marginBottom: '16px',
-            }}
-          >
-            Daily average people &amp; peak estimate by date
-          </div>
-          <DailyEstimateChart data={DAILY_EST_DATA} />
-        </div>
-      </CardPanel>
-    </section>
-  )
-}
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function Dashboard7OccupancyServices({
   badgeSwipes,
 }: Props) {
+  const [month, setMonth] = useState('February 2025')
+  const [floorFilter, setFloorFilter] = useState('')
+  const [tenant, setTenant] = useState('all')
+  const [selectedFloor, setSelectedFloor] = useState<number | null>(null)
+  const [selectedFloorName, setSelectedFloorName] = useState('')
+
+  const totalAccess = DEPT_ACCESS_DATA.reduce((s, d) => s + d.total, 0)
+
   return (
     <div
       style={{
-        backgroundColor: DASH.pageBg,
-        minHeight: '100vh',
+        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        color: DASH.text,
         padding: '32px 40px',
-        fontFamily: 'Inter, system-ui, sans-serif',
+        width: '100%',
+        boxSizing: 'border-box' as const,
       }}
     >
-      {/* Page header */}
-      <div
+      {/* Header */}
+      <h1
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          marginBottom: '32px',
+          color: DASH.textWhite || '#FFFFFF',
+          fontSize: '36px',
+          fontWeight: 800,
+          margin: '0 0 40px 0',
+          letterSpacing: '-0.5px',
         }}
       >
-        <h1
+        Occupancy Services
+      </h1>
+
+      {/* ─── Section 1: 3D Building Model ─────────────────────────────────── */}
+      <CardPanel style={{ marginBottom: '24px', padding: '0', overflow: 'hidden' }}>
+        <div style={{ padding: '16px 20px', borderBottom: `1px solid ${DASH.cardBorder}` }}>
+          <h2 style={{ color: '#FFFFFF', fontSize: '20px', fontWeight: 800, margin: 0 }}>
+            Building Overview
+          </h2>
+          <p style={{ color: DASH.label, fontSize: '12px', margin: '4px 0 0' }}>
+            {selectedFloor !== null
+              ? `Viewing ${selectedFloorName} floor plan`
+              : 'Click a floor in Ghost mode to view its floor plan with zone occupancy'}
+          </p>
+        </div>
+        <div
           style={{
-            color: DASH.textWhite,
-            fontSize: '36px',
-            fontWeight: 800,
-            margin: 0,
-            letterSpacing: '-0.5px',
+            display: 'flex',
+            gap: '0',
+            minHeight: '520px',
           }}
         >
-          Occupancy services
-        </h1>
-      </div>
+          <div style={{ flex: selectedFloor !== null ? '0 0 45%' : '1 1 100%', transition: 'flex 0.3s ease' }}>
+            <BuildingModel3D
+              height={520}
+              onFloorSelect={(floorNum, floorName) => {
+                setSelectedFloor(floorNum)
+                setSelectedFloorName(floorName)
+              }}
+            />
+          </div>
+          {selectedFloor !== null && (
+            <div style={{ flex: '0 0 55%', borderLeft: `1px solid ${DASH.cardBorder}` }}>
+              <FloorplanWithZones
+                floorNumber={selectedFloor}
+                floorName={selectedFloorName}
+                onClose={() => setSelectedFloor(null)}
+              />
+            </div>
+          )}
+        </div>
+      </CardPanel>
 
-      {/* Sections */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
-        <AccessManagementSection badgeSwipes={badgeSwipes} />
-        <WorkplaceUtilizationSection />
-      </div>
+      {/* ─── Section 2: Workplace Utilization ─────────────────────────────── */}
+      <section>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '16px',
+          }}
+        >
+          <h2 style={{ color: DASH.text, fontSize: '20px', fontWeight: 700, margin: 0 }}>
+            Workplace utilization
+          </h2>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <PillSelect
+              value={tenant}
+              onChange={setTenant}
+              options={TENANT_OPTIONS}
+              placeholder="Filter to tenant"
+            />
+            <MonthSelector value={month} onChange={setMonth} />
+          </div>
+        </div>
+
+        <CardPanel>
+          {/* Top row: Heatmap + Avg metrics + KPIs */}
+          <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', marginBottom: '32px' }}>
+            {/* Floor heatmap */}
+            <div style={{ flexShrink: 0 }}>
+              <FloorHeatmap floors={FLOOR_HEATMAP_DATA} width={180} height={480} />
+            </div>
+
+            {/* Center: occupancy stats */}
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                gap: '20px',
+                paddingTop: '120px',
+              }}
+            >
+              <div>
+                <div style={{ color: DASH.muted, fontSize: '13px', marginBottom: '4px' }}>
+                  Average floor occupancy
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                  <span style={{ color: DASH.textWhite, fontSize: '32px', fontWeight: 800 }}>45</span>
+                  <span style={{ color: DASH.trendUp, fontSize: '14px', fontWeight: 700 }}>+10%</span>
+                </div>
+              </div>
+              <div>
+                <div style={{ color: DASH.muted, fontSize: '13px', marginBottom: '4px' }}>
+                  Peak floor occupancy
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                  <span style={{ color: DASH.textWhite, fontSize: '32px', fontWeight: 800 }}>93</span>
+                  <span style={{ color: DASH.trendDown, fontSize: '14px', fontWeight: 700 }}>-20%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: HSE + Avg daily entrance */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '80px' }}>
+              <div
+                style={{
+                  backgroundColor: DASH.cardBg2,
+                  border: `1px solid ${DASH.cardBorder}`,
+                  borderRadius: '12px',
+                  padding: '16px 24px',
+                  textAlign: 'right',
+                  minWidth: '160px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    justifyContent: 'flex-end',
+                    gap: '6px',
+                    marginBottom: '4px',
+                  }}
+                >
+                  <span style={{ color: DASH.textWhite, fontSize: '28px', fontWeight: 800 }}>1036</span>
+                  <TrendArrow direction="up" size={16} />
+                </div>
+                <div style={{ color: DASH.label, fontSize: '13px' }}>HSE Capacity</div>
+              </div>
+              <div
+                style={{
+                  backgroundColor: DASH.cardBg2,
+                  border: `1px solid ${DASH.cardBorder}`,
+                  borderRadius: '12px',
+                  padding: '16px 24px',
+                  textAlign: 'right',
+                  minWidth: '160px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    justifyContent: 'flex-end',
+                    gap: '6px',
+                    marginBottom: '4px',
+                  }}
+                >
+                  <span style={{ color: DASH.textWhite, fontSize: '28px', fontWeight: 800 }}>1373</span>
+                  <TrendArrow direction="up" size={16} />
+                </div>
+                <div style={{ color: DASH.label, fontSize: '13px' }}>Avg. daily entrance</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Gauge row */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '24px',
+              marginBottom: '32px',
+              borderTop: `1px solid ${DASH.cardBorder}`,
+              paddingTop: '28px',
+            }}
+          >
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ color: DASH.muted, fontSize: '12px', marginBottom: '8px', lineHeight: 1.4 }}>
+                Ide jöhetne valami szöveg még magyarázásba
+              </div>
+              <GaugeChart
+                value={126}
+                max={100}
+                label="Allocation"
+                size={180}
+                color={DASH.gold}
+              />
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ color: DASH.muted, fontSize: '12px', marginBottom: '8px', lineHeight: 1.4 }}>
+                Ide jöhetne valami szöveg még magyarázásba
+              </div>
+              <GaugeChart
+                value={30}
+                max={100}
+                label="Utilization"
+                size={180}
+                color={DASH.gold}
+              />
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ color: DASH.muted, fontSize: '12px', marginBottom: '8px', lineHeight: 1.4 }}>
+                Ide jöhetne valami szöveg még magyarázásba
+              </div>
+              <GaugeChart
+                value={56}
+                max={100}
+                label="Peak utilization"
+                sublabel="56,47%"
+                size={180}
+                color={DASH.gold}
+              />
+            </div>
+          </div>
+
+          {/* Daily estimate grouped bar chart */}
+          <div style={{ borderTop: `1px solid ${DASH.cardBorder}`, paddingTop: '24px' }}>
+            <div
+              style={{
+                color: DASH.text,
+                fontWeight: 700,
+                fontSize: '15px',
+                marginBottom: '16px',
+              }}
+            >
+              Daily average people &amp; peak estimate by date
+            </div>
+            <DailyEstimateChart data={DAILY_EST_DATA} />
+          </div>
+        </CardPanel>
+      </section>
+
+      {/* ─── Section 3: Access by Department ──────────────────────────────── */}
+      <section style={{ marginTop: '36px' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '16px',
+          }}
+        >
+          <h2 style={{ color: DASH.text, fontSize: '20px', fontWeight: 700, margin: 0 }}>
+            Access by Department
+          </h2>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <PillSelect
+              value={floorFilter}
+              onChange={setFloorFilter}
+              options={FLOOR_OPTIONS}
+              placeholder="Filter to floor"
+            />
+            <div
+              style={{
+                padding: '7px 18px',
+                backgroundColor: DASH.cardBg2,
+                border: `1px solid ${DASH.cardBorder}`,
+                borderRadius: '20px',
+                color: DASH.text,
+                fontSize: '13px',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              15 -22. February 2025
+            </div>
+          </div>
+        </div>
+        <CardPanel>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'baseline',
+              marginBottom: '16px',
+            }}
+          >
+            <span style={{ color: DASH.text, fontWeight: 700, fontSize: '15px' }}>
+              Department breakdown{' '}
+              <span style={{ color: DASH.muted, fontSize: '13px', fontWeight: 400 }}>
+                Workers, Visitors &amp; Contractors
+              </span>
+            </span>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+              <span style={{ color: DASH.label, fontSize: '14px', fontWeight: 600 }}>Total</span>
+              <span style={{ color: DASH.textWhite, fontSize: '22px', fontWeight: 800 }}>
+                {totalAccess.toLocaleString()}
+              </span>
+            </div>
+          </div>
+          <StackedHorizontalBarChart
+            data={DEPT_ACCESS_DATA}
+            colors={DEPT_COLORS}
+            labels={DEPT_LABELS}
+            width={620}
+            total={500}
+            showTotal={true}
+          />
+        </CardPanel>
+      </section>
     </div>
   )
 }

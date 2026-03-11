@@ -67,6 +67,7 @@ export default function DashboardPage() {
 
   const dashboards = [
     { id: 'operationalOverview', label: 'Operational Overview', icon: '◉', color: '#10B981' },
+    { id: 'occupancyServices', label: 'Occupancy Services', icon: '▦', color: '#3B82F6' },
     { id: 'sustainability', label: 'Energy Monitor', icon: '▨', color: '#10B981' },
     { id: 'wellbeing', label: 'Wellbeing', icon: '▩', color: '#06B6D4' },
     { id: 'officeBuilding', label: 'Office Building', icon: '◈', color: '#3B82F6' },
@@ -75,7 +76,6 @@ export default function DashboardPage() {
     { id: 'employeeServices', label: 'Employee Services', icon: '◫', color: '#64748B' },
     { id: 'visitorServices', label: 'Visitor Services', icon: '▤', color: '#D4A847' },
     { id: 'parkingServices', label: 'Parking Services', icon: '▥', color: '#8B5CF6' },
-    { id: 'occupancyServices', label: 'Occupancy Services', icon: '▦', color: '#3B82F6' },
   ]
 
   const selectedTenantObj = globalState.tenants.find(t => t.id === selectedTenant)
