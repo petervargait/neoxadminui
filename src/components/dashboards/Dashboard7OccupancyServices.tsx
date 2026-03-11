@@ -322,7 +322,7 @@ export default function Dashboard7OccupancyServices({
             {selectedFloor !== null && (
               <button onClick={() => { setSelectedFloor(null); setSelectedFloorName('') }}
                 style={{
-                  position: 'absolute', top: 12, left: 200, zIndex: 10,
+                  position: 'absolute', top: 52, left: 12, zIndex: 10,
                   padding: '6px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer',
                   backgroundColor: '#1E3A5F', border: '1px solid #3B82F6', color: '#F1F5F9',
                   backdropFilter: 'blur(8px)',

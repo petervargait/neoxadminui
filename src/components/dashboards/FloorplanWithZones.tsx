@@ -220,10 +220,8 @@ const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
         }}
       >
         {[
-          { label: 'High (≥80%)', color: 'rgba(239,68,68,0.5)' },
-          { label: 'Medium (≥50%)', color: 'rgba(245,158,11,0.5)' },
-          { label: 'Low (≥20%)', color: 'rgba(16,185,129,0.5)' },
-          { label: 'Empty (<20%)', color: 'rgba(148,163,184,0.15)' },
+          { label: 'High occupancy (≥80%)', color: 'rgba(239,68,68,0.5)' },
+          { label: 'Medium occupancy (≥50%)', color: 'rgba(245,158,11,0.5)' },
         ].map((l) => (
           <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: l.color }} />
@@ -234,62 +232,40 @@ const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
 
       {/* Floorplan with blob overlay */}
       <div style={{ flex: 1, position: 'relative', padding: '12px', overflow: 'auto' }}>
-        <div style={{ position: 'relative', width: '100%', paddingBottom: '45%' }}>
-          {/* Floorplan image */}
+        <div style={{ position: 'relative', width: '100%' }}>
+          {/* Floorplan image as background — blobs positioned as % on top */}
           <img
             src={`/floorplans/Floor${floorNumber}.png`}
             alt={`${floorName} floor plan`}
             style={{
-              position: 'absolute',
-              inset: 0,
               width: '100%',
-              height: '100%',
-              objectFit: 'contain',
+              height: 'auto',
+              display: 'block',
               borderRadius: '6px',
             }}
           />
 
-          {/* Occupancy blob overlays — circles, no text */}
-          <svg
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-            viewBox="0 0 100 45"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <defs>
-              <filter id="blur-blob">
-                <feGaussianBlur stdDeviation="1.2" />
-              </filter>
-              {/* Clipping path tracing the building outer walls — keeps blobs inside */}
-              <clipPath id="building-clip">
-                <polygon points="8,8 92,8 92,12 95,12 95,42 88,42 88,38 8,38" />
-              </clipPath>
-            </defs>
-            <g clipPath="url(#building-clip)">
-            {blobs.map((blob, i) => {
-              const fillColor =
-                blob.occupancy >= 80
-                  ? 'rgba(239,68,68,0.4)'
-                  : blob.occupancy >= 50
-                    ? 'rgba(245,158,11,0.4)'
-                    : blob.occupancy >= 20
-                      ? 'rgba(16,185,129,0.35)'
-                      : 'rgba(148,163,184,0.1)'
-
-              if (blob.occupancy < 5) return null
-
-              return (
-                <circle
-                  key={i}
-                  cx={blob.cx}
-                  cy={blob.cy}
-                  r={blob.r}
-                  fill={fillColor}
-                  filter="url(#blur-blob)"
-                />
-              )
-            })}
-            </g>
-          </svg>
+          {/* Occupancy blob overlays — only RED (>=80%) and AMBER (>=50%), no green */}
+          {blobs.filter(b => b.occupancy >= 50).map((blob, i) => {
+            const isRed = blob.occupancy >= 80
+            const color = isRed ? 'rgba(239,68,68,0.45)' : 'rgba(245,158,11,0.40)'
+            return (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  left: `${blob.cx - blob.r}%`,
+                  top: `${blob.cy - blob.r}%`,
+                  width: `${blob.r * 2}%`,
+                  height: `${blob.r * 2}%`,
+                  borderRadius: '50%',
+                  backgroundColor: color,
+                  filter: 'blur(6px)',
+                  pointerEvents: 'none',
+                }}
+              />
+            )
+          })}
         </div>
       </div>
     </div>

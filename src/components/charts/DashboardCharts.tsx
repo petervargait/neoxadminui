@@ -558,7 +558,7 @@ export function GaugeChart({ value, max = 100, label, size = 160, color = DASH.g
   const valueAngle = startAngle + pct * Math.PI
 
   const bgPath = `M ${cx + r * Math.cos(startAngle)} ${cy + r * Math.sin(startAngle)} A ${r} ${r} 0 0 1 ${cx + r * Math.cos(endAngle)} ${cy + r * Math.sin(endAngle)}`
-  const largeArc = pct > 0.5 ? 1 : 0
+  const largeArc = pct > 1 ? 1 : 0
   const valuePath = `M ${cx + r * Math.cos(startAngle)} ${cy + r * Math.sin(startAngle)} A ${r} ${r} 0 ${largeArc} 1 ${cx + r * Math.cos(valueAngle)} ${cy + r * Math.sin(valueAngle)}`
 
   const displayPct = max === 100 ? `${value}%` : `${Math.round((value / max) * 100)}%`
