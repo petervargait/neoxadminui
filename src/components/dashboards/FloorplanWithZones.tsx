@@ -3,216 +3,168 @@
 import React from 'react'
 
 // ---------------------------------------------------------------------------
-// Types
+// Types — circles positioned as percentage of floorplan dimensions
 // ---------------------------------------------------------------------------
-
-interface Zone {
-  name: string
-  x: number      // percentage from left (0-100)
-  y: number      // percentage from top (0-100)
-  w: number      // width percentage (0-100)
-  h: number      // height percentage (0-100)
-  occupancy: number  // 0-100
+interface Blob {
+  cx: number       // center X as % of image width (0-100)
+  cy: number       // center Y as % of image height (0-100)
+  r: number        // radius as % of image width (0-100)
+  occupancy: number // 0-100
 }
 
 interface FloorplanWithZonesProps {
-  floorNumber: number  // 0-21 (non-basement floor number)
-  floorName: string    // e.g. "Floor 5"
+  floorNumber: number
+  floorName: string
   onClose: () => void
 }
 
 // ---------------------------------------------------------------------------
-// DASH colors (for reference)
+// Occupancy blob definitions per floor — circles within the building interior
+// Each floor has blobs of varying sizes placed inside the building walls.
+// Occupancy determines color: Red >=80%, Amber >=50%, Green >=20%, none <20%
 // ---------------------------------------------------------------------------
-// pageBg: '#08122E', cardBg: '#0F1A2E', cardBg2: '#162032', cardBorder: '#1E3A5F',
-// text: '#F1F5F9', label: '#94A3B8', muted: '#64748B'
-
-// ---------------------------------------------------------------------------
-// Zone definitions for all 22 floors (0-21)
-// ---------------------------------------------------------------------------
-
-const FLOOR_ZONES: Record<number, Zone[]> = {
-  // Floor 0 — Ground (zones inset within building walls)
-  0: [
-    { name: 'Reception',      x: 12, y: 12, w: 28, h: 22, occupancy: 85 },
-    { name: 'Lobby',          x: 44, y: 12, w: 22, h: 22, occupancy: 45 },
-    { name: 'Security',       x: 70, y: 12, w: 18, h: 14, occupancy: 30 },
-    { name: 'Mail Room',      x: 12, y: 40, w: 18, h: 16, occupancy: 15 },
-    { name: 'Loading Bay',    x: 35, y: 40, w: 18, h: 16, occupancy: 10 },
+const FLOOR_BLOBS: Record<number, Blob[]> = {
+  0: [ // Ground - Reception
+    { cx: 18, cy: 35, r: 10, occupancy: 85 },
+    { cx: 35, cy: 30, r: 7, occupancy: 72 },
+    { cx: 50, cy: 38, r: 12, occupancy: 45 },
+    { cx: 65, cy: 35, r: 9, occupancy: 30 },
+    { cx: 80, cy: 32, r: 8, occupancy: 15 },
   ],
-
-  // Floor 1 — Amenity / Shared
-  1: [
-    { name: 'Cafeteria',        x: 12, y: 10, w: 35, h: 24, occupancy: 72 },
-    { name: 'Coffee Bar',       x: 52, y: 10, w: 18, h: 12, occupancy: 88 },
-    { name: 'Seating',          x: 52, y: 26, w: 18, h: 12, occupancy: 60 },
-    { name: 'Kitchen',          x: 74, y: 10, w: 14, h: 14, occupancy: 55 },
-    { name: 'Vending',          x: 12, y: 40, w: 14, h: 14, occupancy: 18 },
-    { name: 'Restrooms',        x: 30, y: 40, w: 14, h: 14, occupancy: 35 },
+  1: [ // Cafeteria
+    { cx: 20, cy: 32, r: 11, occupancy: 72 },
+    { cx: 38, cy: 28, r: 8, occupancy: 88 },
+    { cx: 55, cy: 35, r: 13, occupancy: 60 },
+    { cx: 72, cy: 30, r: 7, occupancy: 55 },
+    { cx: 85, cy: 38, r: 6, occupancy: 18 },
   ],
-
-  // Floor 2 — Fitness & Wellness
-  2: [
-    { name: 'Gym',              x: 12, y: 10, w: 30, h: 24, occupancy: 65 },
-    { name: 'Yoga Studio',      x: 46, y: 10, w: 20, h: 12, occupancy: 50 },
-    { name: 'Spin Room',        x: 46, y: 26, w: 20, h: 12, occupancy: 40 },
-    { name: 'Lockers',          x: 70, y: 10, w: 18, h: 14, occupancy: 38 },
-    { name: 'Wellness',         x: 12, y: 40, w: 18, h: 14, occupancy: 22 },
-    { name: 'Juice Bar',        x: 75, y: 52, w: 20, h: 28, occupancy: 30 },
+  2: [ // Fitness
+    { cx: 22, cy: 30, r: 12, occupancy: 65 },
+    { cx: 45, cy: 28, r: 8, occupancy: 50 },
+    { cx: 60, cy: 35, r: 7, occupancy: 40 },
+    { cx: 78, cy: 32, r: 9, occupancy: 25 },
   ],
-
-  // Floor 3 — Conference
-  3: [
-    { name: 'Conference',    x: 15, y: 12, w: 30, h: 20, occupancy: 78 },
-    { name: 'Training A',    x: 50, y: 12, w: 18, h: 12, occupancy: 90 },
-    { name: 'Training B',    x: 50, y: 28, w: 18, h: 10, occupancy: 55 },
-    { name: 'Breakout',      x: 72, y: 12, w: 16, h: 14, occupancy: 42 },
-    { name: 'AV Control',    x: 15, y: 38, w: 14, h: 12, occupancy: 25 },
+  3: [ // Conference
+    { cx: 25, cy: 32, r: 14, occupancy: 78 },
+    { cx: 50, cy: 28, r: 9, occupancy: 90 },
+    { cx: 68, cy: 35, r: 8, occupancy: 55 },
+    { cx: 82, cy: 30, r: 6, occupancy: 42 },
   ],
-
-  // Floors 4-18: Office floors (use a helper pattern — smaller inset zones)
-  4: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 28 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 25 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 35 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 18 },
-    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 22 },
+  4: [ // Office
+    { cx: 20, cy: 30, r: 10, occupancy: 28 },
+    { cx: 40, cy: 35, r: 12, occupancy: 25 },
+    { cx: 60, cy: 30, r: 9, occupancy: 35 },
+    { cx: 78, cy: 34, r: 7, occupancy: 18 },
   ],
   5: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 30 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 32 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 40 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 22 },
-    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 28 },
+    { cx: 20, cy: 32, r: 11, occupancy: 30 },
+    { cx: 42, cy: 28, r: 13, occupancy: 32 },
+    { cx: 62, cy: 35, r: 8, occupancy: 40 },
+    { cx: 80, cy: 30, r: 6, occupancy: 22 },
   ],
   6: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 26 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 28 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 32 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 18 },
-    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 20 },
+    { cx: 18, cy: 30, r: 10, occupancy: 26 },
+    { cx: 38, cy: 34, r: 12, occupancy: 28 },
+    { cx: 58, cy: 28, r: 9, occupancy: 32 },
+    { cx: 75, cy: 35, r: 7, occupancy: 18 },
   ],
   7: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 33 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 35 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 42 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 25 },
-    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 30 },
+    { cx: 22, cy: 32, r: 12, occupancy: 33 },
+    { cx: 45, cy: 28, r: 14, occupancy: 35 },
+    { cx: 65, cy: 35, r: 8, occupancy: 42 },
+    { cx: 82, cy: 30, r: 6, occupancy: 25 },
   ],
   8: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 31 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 33 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 38 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 22 },
-    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 26 },
+    { cx: 20, cy: 30, r: 11, occupancy: 31 },
+    { cx: 42, cy: 35, r: 13, occupancy: 33 },
+    { cx: 62, cy: 28, r: 9, occupancy: 38 },
+    { cx: 80, cy: 34, r: 7, occupancy: 22 },
   ],
   9: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 23 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 25 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 28 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 15 },
-    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 18 },
+    { cx: 22, cy: 32, r: 10, occupancy: 23 },
+    { cx: 42, cy: 28, r: 12, occupancy: 25 },
+    { cx: 60, cy: 35, r: 8, occupancy: 28 },
+    { cx: 78, cy: 30, r: 6, occupancy: 15 },
   ],
   10: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 19 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 20 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 22 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 12 },
-    { name: 'Booths',      x: 32, y: 36, w: 12, h: 12, occupancy: 14 },
+    { cx: 20, cy: 30, r: 9, occupancy: 19 },
+    { cx: 40, cy: 34, r: 11, occupancy: 20 },
+    { cx: 58, cy: 28, r: 8, occupancy: 22 },
+    { cx: 75, cy: 35, r: 6, occupancy: 12 },
   ],
   11: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 12 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 13 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 15 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 8 },
+    { cx: 22, cy: 32, r: 10, occupancy: 12 },
+    { cx: 45, cy: 28, r: 12, occupancy: 13 },
+    { cx: 68, cy: 35, r: 7, occupancy: 15 },
   ],
   12: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 15 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 16 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 18 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 10 },
+    { cx: 20, cy: 30, r: 10, occupancy: 15 },
+    { cx: 42, cy: 34, r: 11, occupancy: 16 },
+    { cx: 65, cy: 28, r: 8, occupancy: 18 },
   ],
   13: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 24 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 26 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 30 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 16 },
+    { cx: 22, cy: 32, r: 11, occupancy: 24 },
+    { cx: 45, cy: 28, r: 13, occupancy: 26 },
+    { cx: 65, cy: 35, r: 8, occupancy: 30 },
+    { cx: 82, cy: 30, r: 6, occupancy: 16 },
   ],
   14: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 20 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 22 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 24 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 14 },
+    { cx: 20, cy: 30, r: 10, occupancy: 20 },
+    { cx: 42, cy: 34, r: 12, occupancy: 22 },
+    { cx: 62, cy: 28, r: 8, occupancy: 24 },
   ],
   15: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 22 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 24 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 26 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 15 },
+    { cx: 22, cy: 32, r: 11, occupancy: 22 },
+    { cx: 45, cy: 28, r: 13, occupancy: 24 },
+    { cx: 68, cy: 35, r: 7, occupancy: 26 },
   ],
   16: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 21 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 22 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 24 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 14 },
+    { cx: 20, cy: 30, r: 10, occupancy: 21 },
+    { cx: 42, cy: 34, r: 12, occupancy: 22 },
+    { cx: 62, cy: 28, r: 8, occupancy: 24 },
   ],
   17: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 17 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 18 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 20 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 10 },
+    { cx: 22, cy: 32, r: 10, occupancy: 17 },
+    { cx: 45, cy: 28, r: 12, occupancy: 18 },
+    { cx: 68, cy: 35, r: 7, occupancy: 10 },
   ],
   18: [
-    { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 11 },
-    { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 12 },
-    { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 14 },
-    { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 8 },
+    { cx: 20, cy: 30, r: 9, occupancy: 11 },
+    { cx: 42, cy: 34, r: 11, occupancy: 12 },
+    { cx: 65, cy: 28, r: 7, occupancy: 8 },
   ],
-
-  // Floor 19 — Executive
-  19: [
-    { name: 'Exec Suite',    x: 15, y: 12, w: 28, h: 18, occupancy: 15 },
-    { name: 'Board Room',    x: 48, y: 12, w: 20, h: 14, occupancy: 22 },
-    { name: 'Lounge',        x: 72, y: 12, w: 16, h: 12, occupancy: 10 },
-    { name: 'EA Station',    x: 15, y: 36, w: 16, h: 12, occupancy: 18 },
+  19: [ // Executive
+    { cx: 25, cy: 32, r: 10, occupancy: 15 },
+    { cx: 50, cy: 28, r: 8, occupancy: 22 },
+    { cx: 72, cy: 35, r: 7, occupancy: 10 },
   ],
-
-  // Floor 20 — Executive
   20: [
-    { name: 'CEO Office',    x: 15, y: 12, w: 20, h: 16, occupancy: 15 },
-    { name: 'CFO Office',    x: 40, y: 12, w: 16, h: 12, occupancy: 18 },
-    { name: 'CTO Office',    x: 60, y: 12, w: 16, h: 12, occupancy: 12 },
-    { name: 'Board Room',    x: 15, y: 34, w: 24, h: 14, occupancy: 20 },
-    { name: 'Library',       x: 44, y: 34, w: 16, h: 12, occupancy: 5 },
+    { cx: 25, cy: 30, r: 9, occupancy: 15 },
+    { cx: 50, cy: 34, r: 8, occupancy: 20 },
+    { cx: 72, cy: 28, r: 6, occupancy: 5 },
   ],
-
-  // Floor 21 — Rooftop
-  21: [
-    { name: 'Sky Lounge',   x: 15, y: 12, w: 26, h: 18, occupancy: 8 },
-    { name: 'Terrace',      x: 46, y: 12, w: 20, h: 14, occupancy: 5 },
-    { name: 'Event Space',  x: 70, y: 12, w: 18, h: 14, occupancy: 4 },
-    { name: 'Bar',          x: 15, y: 36, w: 16, h: 12, occupancy: 12 },
+  21: [ // Rooftop
+    { cx: 25, cy: 32, r: 11, occupancy: 8 },
+    { cx: 50, cy: 28, r: 9, occupancy: 5 },
+    { cx: 75, cy: 35, r: 7, occupancy: 12 },
   ],
 }
 
-// Default zones fallback
-const DEFAULT_ZONES: Zone[] = [
-  { name: 'Office A',    x: 12, y: 10, w: 26, h: 20, occupancy: 25 },
-  { name: 'Office B',    x: 42, y: 10, w: 26, h: 20, occupancy: 22 },
-  { name: 'Meetings',    x: 72, y: 10, w: 16, h: 14, occupancy: 28 },
-  { name: 'Kitchen',     x: 12, y: 36, w: 16, h: 14, occupancy: 15 },
+const DEFAULT_BLOBS: Blob[] = [
+  { cx: 25, cy: 32, r: 10, occupancy: 25 },
+  { cx: 50, cy: 28, r: 12, occupancy: 22 },
+  { cx: 75, cy: 35, r: 8, occupancy: 15 },
 ]
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-
 const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
   floorNumber,
   floorName,
   onClose,
 }) => {
-  const zones = FLOOR_ZONES[floorNumber] ?? DEFAULT_ZONES
+  const blobs = FLOOR_BLOBS[floorNumber] ?? DEFAULT_BLOBS
 
   return (
     <div
@@ -252,7 +204,7 @@ const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
             cursor: 'pointer',
           }}
         >
-          ✕ Close
+          Close
         </button>
       </div>
 
@@ -272,26 +224,16 @@ const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
           { label: 'Low (≥20%)', color: 'rgba(16,185,129,0.5)' },
           { label: 'Empty (<20%)', color: 'rgba(148,163,184,0.15)' },
         ].map((l) => (
-          <div
-            key={l.label}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <div
-              style={{
-                width: 14,
-                height: 14,
-                borderRadius: 3,
-                backgroundColor: l.color,
-              }}
-            />
+          <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: 14, height: 14, borderRadius: '50%', backgroundColor: l.color }} />
             <span style={{ color: '#94A3B8' }}>{l.label}</span>
           </div>
         ))}
       </div>
 
-      {/* Floorplan with zone overlay */}
+      {/* Floorplan with blob overlay */}
       <div style={{ flex: 1, position: 'relative', padding: '12px', overflow: 'auto' }}>
-        <div style={{ position: 'relative', width: '100%', paddingBottom: '70%' }}>
+        <div style={{ position: 'relative', width: '100%', paddingBottom: '45%' }}>
           {/* Floorplan image */}
           <img
             src={`/floorplans/Floor${floorNumber}.png`}
@@ -306,66 +248,38 @@ const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
             }}
           />
 
-          {/* Zone overlays */}
+          {/* Occupancy blob overlays — circles, no text */}
           <svg
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-            viewBox="0 0 100 70"
+            viewBox="0 0 100 45"
             preserveAspectRatio="xMidYMid meet"
           >
-            {zones.map((zone, i) => {
+            <defs>
+              <filter id="blur-blob">
+                <feGaussianBlur stdDeviation="0.8" />
+              </filter>
+            </defs>
+            {blobs.map((blob, i) => {
               const fillColor =
-                zone.occupancy >= 80
-                  ? 'rgba(239,68,68,0.3)'
-                  : zone.occupancy >= 50
-                    ? 'rgba(245,158,11,0.3)'
-                    : zone.occupancy >= 20
-                      ? 'rgba(16,185,129,0.3)'
-                      : 'transparent'
+                blob.occupancy >= 80
+                  ? 'rgba(239,68,68,0.4)'
+                  : blob.occupancy >= 50
+                    ? 'rgba(245,158,11,0.4)'
+                    : blob.occupancy >= 20
+                      ? 'rgba(16,185,129,0.35)'
+                      : 'rgba(148,163,184,0.1)'
 
-              const strokeColor =
-                zone.occupancy >= 80
-                  ? 'rgba(239,68,68,0.6)'
-                  : zone.occupancy >= 50
-                    ? 'rgba(245,158,11,0.6)'
-                    : zone.occupancy >= 20
-                      ? 'rgba(16,185,129,0.6)'
-                      : 'rgba(148,163,184,0.2)'
+              if (blob.occupancy < 5) return null
 
               return (
-                <g key={i}>
-                  <rect
-                    x={zone.x}
-                    y={zone.y}
-                    width={zone.w}
-                    height={zone.h}
-                    fill={fillColor}
-                    stroke={strokeColor}
-                    strokeWidth="0.3"
-                    rx="0.5"
-                    strokeDasharray={zone.occupancy < 20 ? '1,1' : 'none'}
-                  />
-                  <text
-                    x={zone.x + zone.w / 2}
-                    y={zone.y + zone.h / 2 - 1}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="#F1F5F9"
-                    fontSize="2.2"
-                    fontWeight="700"
-                  >
-                    {zone.name}
-                  </text>
-                  <text
-                    x={zone.x + zone.w / 2}
-                    y={zone.y + zone.h / 2 + 2}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="#94A3B8"
-                    fontSize="1.8"
-                  >
-                    {zone.occupancy}%
-                  </text>
-                </g>
+                <circle
+                  key={i}
+                  cx={blob.cx}
+                  cy={blob.cy}
+                  r={blob.r}
+                  fill={fillColor}
+                  filter="url(#blur-blob)"
+                />
               )
             })}
           </svg>
