@@ -2241,7 +2241,7 @@ export default function TenantPage() {
                     {tenantParkingSpaces.map((space) => {
                       const isOccupied = space.status === 'occupied';
                       return (
-                        <div key={space.id} 
+                        <div key={space.id}
                           onClick={() => {
                             if (!isOccupied) {
                               setSelectedParkingSpace(space.spaceNumber);
@@ -2254,20 +2254,39 @@ export default function TenantPage() {
                           border: `2px solid ${isOccupied ? '#EF4444' : '#10B981'}`,
                           borderRadius: '8px',
                           textAlign: 'center',
-                          cursor: isOccupied ? 'not-allowed' : 'pointer',
+                          cursor: 'pointer',
                           transition: 'all 0.2s',
-                          opacity: isOccupied ? 0.6 : 1
+                          opacity: isOccupied ? 0.8 : 1,
+                          position: 'relative' as const,
                         }}
                         onMouseEnter={(e) => {
-                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          const overlay = e.currentTarget.querySelector('[data-release-overlay]') as HTMLElement;
+                          if (overlay) overlay.style.opacity = '1';
                         }}
                         onMouseLeave={(e) => {
-                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.transform = 'scale(1)';
+                          const overlay = e.currentTarget.querySelector('[data-release-overlay]') as HTMLElement;
+                          if (overlay) overlay.style.opacity = '0';
                         }}>
                           <div style={{ fontSize: '18px', fontWeight: 'bold', color: isOccupied ? '#EF4444' : '#10B981', marginBottom: '4px' }}>{space.spaceNumber}</div>
                           <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{isOccupied ? 'Occupied' : 'Available'}</div>
                           {isOccupied && space.assignedToName && (
                             <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '4px' }}>{space.assignedToName}</div>
+                          )}
+                          {isOccupied && (
+                            <div data-release-overlay="" style={{
+                              position: 'absolute', inset: 0, borderRadius: '6px',
+                              background: 'rgba(239, 68, 68, 0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              opacity: 0, transition: 'opacity 0.2s',
+                            }} onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm(`Release parking space ${space.spaceNumber}?`)) {
+                                globalState.updateParkingSpace(space.id, { status: 'available', assignedTo: undefined, assignedToName: undefined, vehiclePlate: undefined, assignedDate: undefined });
+                              }
+                            }}>
+                              <span style={{ color: '#fff', fontSize: '12px', fontWeight: 700 }}>Release</span>
+                            </div>
                           )}
                         </div>
                       );
@@ -2395,7 +2414,7 @@ export default function TenantPage() {
                     {tenantLockers.map((locker) => {
                       const isOccupied = locker.status === 'occupied';
                       return (
-                        <div key={locker.id} 
+                        <div key={locker.id}
                           onClick={() => {
                             if (!isOccupied) {
                               setSelectedLocker(locker.lockerNumber);
@@ -2408,20 +2427,39 @@ export default function TenantPage() {
                           border: `2px solid ${isOccupied ? '#EF4444' : '#10B981'}`,
                           borderRadius: '8px',
                           textAlign: 'center',
-                          cursor: isOccupied ? 'not-allowed' : 'pointer',
+                          cursor: 'pointer',
                           transition: 'all 0.2s',
-                          opacity: isOccupied ? 0.6 : 1
+                          opacity: isOccupied ? 0.8 : 1,
+                          position: 'relative' as const,
                         }}
                         onMouseEnter={(e) => {
-                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          const overlay = e.currentTarget.querySelector('[data-release-overlay]') as HTMLElement;
+                          if (overlay) overlay.style.opacity = '1';
                         }}
                         onMouseLeave={(e) => {
-                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.transform = 'scale(1)';
+                          const overlay = e.currentTarget.querySelector('[data-release-overlay]') as HTMLElement;
+                          if (overlay) overlay.style.opacity = '0';
                         }}>
                           <div style={{ fontSize: '18px', fontWeight: 'bold', color: isOccupied ? '#EF4444' : '#10B981', marginBottom: '4px' }}>{locker.lockerNumber}</div>
                           <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{isOccupied ? 'Occupied' : 'Available'}</div>
                           {isOccupied && locker.assignedToName && (
                             <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '4px' }}>{locker.assignedToName}</div>
+                          )}
+                          {isOccupied && (
+                            <div data-release-overlay="" style={{
+                              position: 'absolute', inset: 0, borderRadius: '6px',
+                              background: 'rgba(239, 68, 68, 0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              opacity: 0, transition: 'opacity 0.2s',
+                            }} onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm(`Release locker ${locker.lockerNumber}?`)) {
+                                globalState.updateLocker(locker.id, { status: 'available', assignedTo: undefined, assignedToName: undefined, assignedDate: undefined });
+                              }
+                            }}>
+                              <span style={{ color: '#fff', fontSize: '12px', fontWeight: 700 }}>Release</span>
+                            </div>
                           )}
                         </div>
                       );
@@ -2559,7 +2597,7 @@ export default function TenantPage() {
                       };
                       const typeColor = typeColors[space.type] || '#64748B';
                       return (
-                        <div key={space.id} 
+                        <div key={space.id}
                           onClick={() => {
                             if (!isOccupied) {
                               setSelectedSpace(space.spaceNumber);
@@ -2572,15 +2610,20 @@ export default function TenantPage() {
                           border: `2px solid ${isOccupied ? '#EF4444' : typeColor}`,
                           borderRadius: '8px',
                           textAlign: 'center',
-                          cursor: isOccupied ? 'not-allowed' : 'pointer',
+                          cursor: 'pointer',
                           transition: 'all 0.2s',
-                          opacity: isOccupied ? 0.6 : 1
+                          opacity: isOccupied ? 0.8 : 1,
+                          position: 'relative' as const,
                         }}
                         onMouseEnter={(e) => {
-                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          const overlay = e.currentTarget.querySelector('[data-release-overlay]') as HTMLElement;
+                          if (overlay) overlay.style.opacity = '1';
                         }}
                         onMouseLeave={(e) => {
-                          if (!isOccupied) e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.transform = 'scale(1)';
+                          const overlay = e.currentTarget.querySelector('[data-release-overlay]') as HTMLElement;
+                          if (overlay) overlay.style.opacity = '0';
                         }}>
                           <div style={{ fontSize: '18px', fontWeight: 'bold', color: isOccupied ? '#EF4444' : typeColor, marginBottom: '4px' }}>{space.spaceNumber}</div>
                           <div style={{ fontSize: '10px', color: '#64748B', textTransform: 'uppercase', marginBottom: '4px' }}>
@@ -2589,6 +2632,20 @@ export default function TenantPage() {
                           <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{isOccupied ? 'Occupied' : 'Available'}</div>
                           {isOccupied && space.assignedToName && (
                             <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '4px' }}>{space.assignedToName}</div>
+                          )}
+                          {isOccupied && (
+                            <div data-release-overlay="" style={{
+                              position: 'absolute', inset: 0, borderRadius: '6px',
+                              background: 'rgba(239, 68, 68, 0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              opacity: 0, transition: 'opacity 0.2s',
+                            }} onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm(`Release space ${space.spaceNumber}?`)) {
+                                globalState.updateSpace(space.id, { status: 'available', assignedTo: undefined, assignedToName: undefined, assignedDate: undefined });
+                              }
+                            }}>
+                              <span style={{ color: '#fff', fontSize: '12px', fontWeight: 700 }}>Release</span>
+                            </div>
                           )}
                         </div>
                       );
@@ -4167,27 +4224,22 @@ export default function TenantPage() {
         </div>
       )}
 
-      {/* Template Editor Modal */}
+      {/* Template Editor Modal — Rich Email Editor */}
       {showTemplateEditor && editingTemplate && (
         <div style={{
           position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
+          top: 0, left: 0, width: '100%', height: '100%',
           backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
           zIndex: 1000
         }} onClick={() => setShowTemplateEditor(false)}>
           <div style={{
             backgroundColor: '#162032',
             borderRadius: '12px',
             padding: '32px',
-            maxWidth: '600px',
-            width: '90%',
-            maxHeight: '80vh',
+            maxWidth: '900px',
+            width: '95%',
+            maxHeight: '90vh',
             overflow: 'auto',
             border: '1px solid #1E293B'
           }} onClick={(e) => e.stopPropagation()}>
@@ -4198,67 +4250,159 @@ export default function TenantPage() {
               <div>
                 <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Template Name *</label>
                 <input type="text" defaultValue={editingTemplate.name} required style={{
-                  width: '100%',
-                  padding: '12px',
-                  backgroundColor: '#1E293B',
-                  border: '1px solid #475569',
-                  borderRadius: '8px',
-                  color: '#F1F5F9',
-                  fontSize: '14px'
+                  width: '100%', padding: '12px', backgroundColor: '#1E293B',
+                  border: '1px solid #475569', borderRadius: '8px', color: '#F1F5F9', fontSize: '14px'
                 }} />
               </div>
               {editingTemplate.subject && (
                 <div>
                   <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Subject Line *</label>
                   <input type="text" defaultValue={editingTemplate.subject} required style={{
-                    width: '100%',
-                    padding: '12px',
-                    backgroundColor: '#1E293B',
-                    border: '1px solid #475569',
-                    borderRadius: '8px',
-                    color: '#F1F5F9',
-                    fontSize: '14px'
+                    width: '100%', padding: '12px', backgroundColor: '#1E293B',
+                    border: '1px solid #475569', borderRadius: '8px', color: '#F1F5F9', fontSize: '14px'
                   }} />
                 </div>
               )}
               <div>
-                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Template Content</label>
-                <textarea defaultValue={editingTemplate.subject || 'Template content here...'} style={
-{
-                  width: '100%',
-                  minHeight: '200px',
-                  padding: '12px',
-                  backgroundColor: '#1E293B',
-                  border: '1px solid #475569',
-                  borderRadius: '8px',
-                  color: '#F1F5F9',
-                  fontSize: '14px',
-                  fontFamily: 'monospace',
-                  resize: 'vertical'
-                }} />
+                <label style={{ color: '#F1F5F9', fontSize: '14px', fontWeight: '500', marginBottom: '8px', display: 'block' }}>Email Body</label>
+                {/* Toolbar */}
+                <div style={{
+                  display: 'flex', flexWrap: 'wrap', gap: '2px', padding: '8px',
+                  backgroundColor: '#1E293B', borderRadius: '8px 8px 0 0',
+                  border: '1px solid #475569', borderBottom: 'none',
+                }}>
+                  {/* Font Family */}
+                  <select defaultValue="Arial" onChange={(e) => document.execCommand('fontName', false, e.target.value)} style={{
+                    padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155',
+                    borderRadius: '4px', color: '#F1F5F9', fontSize: '12px', cursor: 'pointer',
+                  }}>
+                    {['Arial', 'Helvetica', 'Georgia', 'Times New Roman', 'Courier New', 'Verdana', 'Trebuchet MS', 'Tahoma'].map(f => (
+                      <option key={f} value={f} style={{ fontFamily: f }}>{f}</option>
+                    ))}
+                  </select>
+                  {/* Font Size */}
+                  <select defaultValue="3" onChange={(e) => document.execCommand('fontSize', false, e.target.value)} style={{
+                    padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155',
+                    borderRadius: '4px', color: '#F1F5F9', fontSize: '12px', cursor: 'pointer', width: '56px',
+                  }}>
+                    <option value="1">8</option><option value="2">10</option><option value="3">12</option>
+                    <option value="4">14</option><option value="5">18</option><option value="6">24</option><option value="7">36</option>
+                  </select>
+                  <div style={{ width: '1px', backgroundColor: '#334155', margin: '0 4px' }} />
+                  {/* Text formatting */}
+                  {[
+                    { cmd: 'bold', label: 'B', style: { fontWeight: 'bold' } },
+                    { cmd: 'italic', label: 'I', style: { fontStyle: 'italic' } },
+                    { cmd: 'underline', label: 'U', style: { textDecoration: 'underline' } },
+                    { cmd: 'strikeThrough', label: 'S', style: { textDecoration: 'line-through' } },
+                  ].map(btn => (
+                    <button key={btn.cmd} type="button" onClick={() => document.execCommand(btn.cmd)}
+                      style={{
+                        padding: '4px 10px', backgroundColor: '#0F1629', border: '1px solid #334155',
+                        borderRadius: '4px', color: '#F1F5F9', fontSize: '13px', cursor: 'pointer', ...btn.style,
+                      }}>{btn.label}</button>
+                  ))}
+                  <div style={{ width: '1px', backgroundColor: '#334155', margin: '0 4px' }} />
+                  {/* Font Color */}
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', color: '#94A3B8' }}>
+                    A
+                    <input type="color" defaultValue="#F1F5F9" onChange={(e) => document.execCommand('foreColor', false, e.target.value)}
+                      style={{ width: '20px', height: '20px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }} />
+                  </label>
+                  {/* Background Color */}
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', color: '#94A3B8' }}>
+                    <span style={{ backgroundColor: '#FFE066', padding: '0 3px', borderRadius: '2px', color: '#000', fontSize: '11px' }}>A</span>
+                    <input type="color" defaultValue="#FFE066" onChange={(e) => document.execCommand('hiliteColor', false, e.target.value)}
+                      style={{ width: '20px', height: '20px', border: 'none', cursor: 'pointer', backgroundColor: 'transparent' }} />
+                  </label>
+                  <div style={{ width: '1px', backgroundColor: '#334155', margin: '0 4px' }} />
+                  {/* Alignment */}
+                  {[
+                    { cmd: 'justifyLeft', label: '⫷' },
+                    { cmd: 'justifyCenter', label: '⫿' },
+                    { cmd: 'justifyRight', label: '⫸' },
+                  ].map(btn => (
+                    <button key={btn.cmd} type="button" onClick={() => document.execCommand(btn.cmd)}
+                      style={{
+                        padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155',
+                        borderRadius: '4px', color: '#F1F5F9', fontSize: '12px', cursor: 'pointer',
+                      }}>{btn.label}</button>
+                  ))}
+                  <div style={{ width: '1px', backgroundColor: '#334155', margin: '0 4px' }} />
+                  {/* Lists */}
+                  <button type="button" onClick={() => document.execCommand('insertUnorderedList')}
+                    style={{ padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', color: '#F1F5F9', fontSize: '12px', cursor: 'pointer' }}
+                    title="Bullet list">&#8226; List</button>
+                  <button type="button" onClick={() => document.execCommand('insertOrderedList')}
+                    style={{ padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', color: '#F1F5F9', fontSize: '12px', cursor: 'pointer' }}
+                    title="Numbered list">1. List</button>
+                  <div style={{ width: '1px', backgroundColor: '#334155', margin: '0 4px' }} />
+                  {/* Insert Link */}
+                  <button type="button" onClick={() => {
+                    const url = prompt('Enter URL:');
+                    if (url) document.execCommand('createLink', false, url);
+                  }} style={{ padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', color: '#3B82F6', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}
+                    title="Insert hyperlink">Link</button>
+                  <button type="button" onClick={() => document.execCommand('unlink')}
+                    style={{ padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', color: '#EF4444', fontSize: '12px', cursor: 'pointer' }}
+                    title="Remove link">Unlink</button>
+                  {/* Insert Image */}
+                  <button type="button" onClick={() => {
+                    const url = prompt('Enter image URL:');
+                    if (url) document.execCommand('insertImage', false, url);
+                  }} style={{ padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', color: '#F1F5F9', fontSize: '12px', cursor: 'pointer' }}
+                    title="Insert image">Image</button>
+                  <div style={{ width: '1px', backgroundColor: '#334155', margin: '0 4px' }} />
+                  {/* Undo / Redo */}
+                  <button type="button" onClick={() => document.execCommand('undo')}
+                    style={{ padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', color: '#F1F5F9', fontSize: '12px', cursor: 'pointer' }}
+                    title="Undo">↶</button>
+                  <button type="button" onClick={() => document.execCommand('redo')}
+                    style={{ padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', color: '#F1F5F9', fontSize: '12px', cursor: 'pointer' }}
+                    title="Redo">↷</button>
+                  <div style={{ width: '1px', backgroundColor: '#334155', margin: '0 4px' }} />
+                  {/* Clear formatting */}
+                  <button type="button" onClick={() => document.execCommand('removeFormat')}
+                    style={{ padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', color: '#94A3B8', fontSize: '11px', cursor: 'pointer' }}
+                    title="Clear formatting">Clear</button>
+                  {/* Horizontal rule */}
+                  <button type="button" onClick={() => document.execCommand('insertHorizontalRule')}
+                    style={{ padding: '4px 8px', backgroundColor: '#0F1629', border: '1px solid #334155', borderRadius: '4px', color: '#94A3B8', fontSize: '11px', cursor: 'pointer' }}
+                    title="Insert horizontal line">— HR</button>
+                </div>
+                {/* Editable content area */}
+                <div
+                  contentEditable
+                  suppressContentEditableWarning
+                  style={{
+                    width: '100%', minHeight: '350px', padding: '16px',
+                    backgroundColor: '#FFFFFF', border: '1px solid #475569',
+                    borderRadius: '0 0 8px 8px', color: '#1a1a1a', fontSize: '14px',
+                    fontFamily: 'Arial, sans-serif', outline: 'none', lineHeight: '1.6',
+                    overflowY: 'auto', maxHeight: '500px',
+                  }}
+                  dangerouslySetInnerHTML={{ __html: `<p>Dear <strong>{{visitor_name}}</strong>,</p><p>We are pleased to confirm your visit to <strong>{{company_name}}</strong> on <strong>{{visit_date}}</strong> at <strong>{{visit_time}}</strong>.</p><p><strong>Visit Details:</strong></p><ul><li>Host: {{host_name}}</li><li>Location: {{location}}</li><li>Purpose: {{purpose}}</li></ul><p>Please bring a valid photo ID for verification at the reception desk.</p><p>If you have any questions, please don&apos;t hesitate to contact us.</p><p>Best regards,<br/><em>{{company_name}} Reception Team</em></p>` }}
+                />
+                <p style={{ color: '#64748B', fontSize: '11px', marginTop: '8px' }}>
+                  Available variables: {'{'}{'{'}<span style={{ color: '#3B82F6' }}>visitor_name</span>{'}'}{'}'},
+                  {' '}{'{'}{'{'}<span style={{ color: '#3B82F6' }}>company_name</span>{'}'}{'}'},
+                  {' '}{'{'}{'{'}<span style={{ color: '#3B82F6' }}>visit_date</span>{'}'}{'}'},
+                  {' '}{'{'}{'{'}<span style={{ color: '#3B82F6' }}>visit_time</span>{'}'}{'}'},
+                  {' '}{'{'}{'{'}<span style={{ color: '#3B82F6' }}>host_name</span>{'}'}{'}'},
+                  {' '}{'{'}{'{'}<span style={{ color: '#3B82F6' }}>location</span>{'}'}{'}'},
+                  {' '}{'{'}{'{'}<span style={{ color: '#3B82F6' }}>purpose</span>{'}'}{'}'},
+                  {' '}{'{'}{'{'}<span style={{ color: '#3B82F6' }}>access_code</span>{'}'}{'}'}
+                </p>
               </div>
               <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
                 <button type="submit" style={{
-                  flex: 1,
-                  backgroundColor: '#3B82F6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '12px 24px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  fontSize: '14px'
+                  flex: 1, backgroundColor: '#3B82F6', color: 'white', border: 'none',
+                  borderRadius: '8px', padding: '12px 24px', fontWeight: '500', cursor: 'pointer', fontSize: '14px'
                 }}>Save Template</button>
                 <button type="button" onClick={() => setShowTemplateEditor(false)} style={{
-                  flex: 1,
-                  backgroundColor: 'transparent',
-                  color: '#F1F5F9',
-                  border: '1px solid #475569',
-                  borderRadius: '8px',
-                  padding: '12px 24px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  fontSize: '14px'
+                  flex: 1, backgroundColor: 'transparent', color: '#F1F5F9',
+                  border: '1px solid #475569', borderRadius: '8px', padding: '12px 24px',
+                  fontWeight: '500', cursor: 'pointer', fontSize: '14px'
                 }}>Cancel</button>
               </div>
             </form>
