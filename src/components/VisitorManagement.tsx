@@ -37,6 +37,8 @@ interface FormState {
   guests: GuestRow[]
   visitDate: string
   visitTime: string
+  visitEndDate: string
+  visitEndTime: string
   purpose: string
   location: string
   bookParking: boolean
@@ -113,6 +115,8 @@ function defaultFormState(): FormState {
     guests: [emptyGuest()],
     visitDate: todayStr(),
     visitTime: '09:00',
+    visitEndDate: todayStr(),
+    visitEndTime: '10:00',
     purpose: '',
     location: '',
     bookParking: false,
@@ -304,6 +308,8 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
       }],
       visitDate: inv.visitDate,
       visitTime: inv.visitTime,
+      visitEndDate: inv.visitEndDate || inv.visitDate,
+      visitEndTime: inv.visitEndTime || inv.visitTime,
       purpose: inv.purpose,
       location: inv.location,
       bookParking: inv.bookParking || false,
@@ -386,6 +392,8 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
         visitorCompany: guest.company.trim() || undefined,
         visitDate: form.visitDate,
         visitTime: form.visitTime,
+        visitEndDate: form.visitEndDate,
+        visitEndTime: form.visitEndTime,
         purpose: form.purpose.trim(),
         location: form.location.trim(),
         bookParking: form.bookParking,
@@ -410,6 +418,8 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
           hostName: 'System',
           visitDate: form.visitDate,
           visitTime: form.visitTime,
+          visitEndDate: form.visitEndDate,
+          visitEndTime: form.visitEndTime,
           purpose: form.purpose.trim(),
           location: form.location.trim(),
           status: 'pending',
@@ -1394,10 +1404,10 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
             </div>
 
             {/* ── Shared fields ──────────────────────────────────────── */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '14px', marginBottom: '24px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: colors.secondary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>
-                  Visit Date *
+                  Start Date *
                 </label>
                 <input
                   type="date"
@@ -1408,12 +1418,34 @@ export default function VisitorManagement({ tenantId }: VisitorManagementProps) 
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: colors.secondary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>
-                  Visit Time *
+                  Start Time *
                 </label>
                 <input
                   type="time"
                   value={form.visitTime}
                   onChange={e => setForm(prev => ({ ...prev, visitTime: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: colors.secondary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>
+                  End Date *
+                </label>
+                <input
+                  type="date"
+                  value={form.visitEndDate}
+                  onChange={e => setForm(prev => ({ ...prev, visitEndDate: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: colors.secondary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>
+                  End Time *
+                </label>
+                <input
+                  type="time"
+                  value={form.visitEndTime}
+                  onChange={e => setForm(prev => ({ ...prev, visitEndTime: e.target.value }))}
                   style={inputStyle}
                 />
               </div>
