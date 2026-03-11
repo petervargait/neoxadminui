@@ -5,68 +5,13 @@ import {
   DASH,
   ComboBarLineChart,
   MonthSelector,
+  HorizontalBarChart,
 } from '../charts/DashboardCharts'
 import { Invitation } from '../../context/GlobalStateContext'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface Props {
   invitations: Invitation[]
-}
-
-// ─── iOS Phone Icon ───────────────────────────────────────────────────────────
-function IOSIcon() {
-  return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-      {/* Phone body */}
-      <rect x="5" y="2" width="14" height="20" rx="3" stroke={DASH.gold} strokeWidth="1.5" fill="none" />
-      {/* Home button */}
-      <circle cx="12" cy="18.5" r="1.2" stroke={DASH.gold} strokeWidth="1.2" fill="none" />
-      {/* Notch */}
-      <rect x="9" y="3" width="6" height="1.5" rx="0.75" fill={DASH.gold} />
-      {/* Apple logo hint */}
-      <path d="M10.5 9.5 C10.5 8.2 11.3 7.5 12 7.5 C12.7 7.5 13.5 8.2 13.5 9.5 C13.5 11 12.5 11.5 12.5 12.5 L11.5 12.5 C11.5 11.5 10.5 11 10.5 9.5Z" fill={DASH.gold} />
-    </svg>
-  )
-}
-
-// ─── Android Phone Icon ───────────────────────────────────────────────────────
-function AndroidIcon() {
-  return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-      {/* Phone body */}
-      <rect x="5" y="4" width="14" height="18" rx="2" stroke={DASH.gold} strokeWidth="1.5" fill="none" />
-      {/* Antenna left */}
-      <line x1="8" y1="4" x2="6.5" y2="2" stroke={DASH.gold} strokeWidth="1.2" strokeLinecap="round" />
-      {/* Antenna right */}
-      <line x1="16" y1="4" x2="17.5" y2="2" stroke={DASH.gold} strokeWidth="1.2" strokeLinecap="round" />
-      {/* Screen area */}
-      <rect x="7" y="6" width="10" height="12" rx="1" fill={DASH.gold} opacity="0.15" stroke={DASH.gold} strokeWidth="0.5" />
-      {/* Android robot eyes */}
-      <circle cx="10" cy="9" r="1" fill={DASH.gold} />
-      <circle cx="14" cy="9" r="1" fill={DASH.gold} />
-      {/* Bottom dot */}
-      <circle cx="12" cy="20.5" r="0.8" fill={DASH.gold} />
-    </svg>
-  )
-}
-
-// ─── Vending Machine / Cash Icon ─────────────────────────────────────────────
-function VendingIcon() {
-  return (
-    <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
-      {/* Outer machine */}
-      <rect x="6" y="4" width="36" height="40" rx="4" stroke={DASH.gold} strokeWidth="2" fill="none" />
-      {/* Screen */}
-      <rect x="10" y="8" width="28" height="14" rx="2" fill={DASH.gold} opacity="0.2" stroke={DASH.gold} strokeWidth="1.2" />
-      {/* Product rows */}
-      <rect x="10" y="26" width="28" height="6" rx="1" fill={DASH.gold} opacity="0.15" stroke={DASH.gold} strokeWidth="1" />
-      <rect x="10" y="34" width="28" height="4" rx="1" fill={DASH.gold} opacity="0.1" stroke={DASH.gold} strokeWidth="1" />
-      {/* Coin slot */}
-      <rect x="30" y="12" width="4" height="1.5" rx="0.75" fill={DASH.gold} />
-      {/* Money symbol */}
-      <text x="24" y="19" textAnchor="middle" fill={DASH.gold} fontSize="7" fontWeight="800">Ft</text>
-    </svg>
-  )
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -140,7 +85,7 @@ export default function Dashboard5VisitorCenter({ invitations }: Props) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '36px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <h1 style={{ color: DASH.textWhite, fontSize: '32px', fontWeight: 800, margin: 0, marginTop: '4px' }}>
-            Visitor Center
+            Visitor Services
           </h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', marginTop: '4px' }}>
@@ -148,7 +93,7 @@ export default function Dashboard5VisitorCenter({ invitations }: Props) {
         </div>
       </div>
 
-      {/* ─── Visitor Center Card ─── */}
+      {/* ─── Visitor Services Card ─── */}
       <div style={{
         backgroundColor: DASH.cardBg,
         border: `1px solid ${DASH.cardBorder}`,
@@ -157,7 +102,7 @@ export default function Dashboard5VisitorCenter({ invitations }: Props) {
         marginBottom: '24px',
       }}>
         <h2 style={{ color: DASH.textWhite, fontSize: '20px', fontWeight: 800, margin: '0 0 28px 0' }}>
-          Visitor Center
+          Visitor Services
         </h2>
 
         {/* ── Number of visitors by weekdays ── */}
@@ -187,104 +132,37 @@ export default function Dashboard5VisitorCenter({ invitations }: Props) {
         </div>
       </div>
 
-      {/* ─── Bottom Row: SkyDeck + Vending ─── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '20px' }}>
-
-        {/* ── SkyDeck App Downloads ── */}
-        <div style={{
-          backgroundColor: DASH.cardBg,
-          border: `1px solid ${DASH.cardBorder}`,
-          borderRadius: '16px',
-          padding: '24px',
-        }}>
-          <h2 style={{ color: DASH.textWhite, fontSize: '18px', fontWeight: 800, margin: '0 0 24px 0' }}>
-            SkyDeck App downloads
-          </h2>
-
-          <div style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
-            {/* iOS */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <IOSIcon />
-              <div>
-                <div style={{ color: DASH.textWhite, fontSize: '30px', fontWeight: 800, lineHeight: 1 }}>455</div>
-                <div style={{ color: DASH.label, fontSize: '13px', marginTop: '4px' }}>iOS</div>
-              </div>
-            </div>
-
-            {/* Android */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <AndroidIcon />
-              <div>
-                <div style={{ color: DASH.textWhite, fontSize: '30px', fontWeight: 800, lineHeight: 1 }}>933</div>
-                <div style={{ color: DASH.label, fontSize: '13px', marginTop: '4px' }}>Android</div>
-              </div>
-            </div>
+      {/* ════════════════════════════════════════════════════════════════════════
+          VISITOR MANAGEMENT (from Occupancy Services)
+      ════════════════════════════════════════════════════════════════════════ */}
+      <div style={{ marginBottom: '28px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ color: DASH.textWhite, fontSize: '20px', fontWeight: 800, margin: 0 }}>Visitors by company</h2>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ padding: '6px 14px', backgroundColor: DASH.cardBg2, border: `1px solid ${DASH.cardBorder}`, borderRadius: '20px', color: DASH.label, fontSize: '12px', whiteSpace: 'nowrap' as const }}>Filter to floor</div>
+            <div style={{ padding: '6px 14px', backgroundColor: DASH.cardBg2, border: `1px solid ${DASH.cardBorder}`, borderRadius: '20px', color: DASH.label, fontSize: '12px', whiteSpace: 'nowrap' as const }}>February 2025</div>
           </div>
         </div>
 
-        {/* ── Vending Machines ── */}
-        <div style={{
-          backgroundColor: DASH.cardBg,
-          border: `1px solid ${DASH.cardBorder}`,
-          borderRadius: '16px',
-          padding: '24px',
-        }}>
-          <h2 style={{ color: DASH.textWhite, fontSize: '18px', fontWeight: 800, margin: '0 0 20px 0' }}>
-            Vending machines
-          </h2>
-
-          <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
-            {/* Left: total revenue */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
-              <VendingIcon />
-              <div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  <span style={{ color: DASH.textWhite, fontSize: '26px', fontWeight: 800, lineHeight: 1 }}>
-                    1 234 567 Ft
-                  </span>
-                  <span style={{ color: DASH.trendUp, fontSize: '20px', fontWeight: 700 }}>↑</span>
-                </div>
-                <div style={{ color: DASH.label, fontSize: '13px', marginTop: '4px' }}>
-                  Total value of sold items
-                </div>
-              </div>
-            </div>
-
-            {/* Right: TOP 3 */}
-            <div style={{ minWidth: '180px' }}>
-              <div style={{ color: DASH.label, fontSize: '12px', fontWeight: 600, marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                TOP 3 sold items
-              </div>
-              <ol style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                {[
-                  { rank: 1, name: 'MOL T-shirt' },
-                  { rank: 2, name: 'MOL Campus pen' },
-                  { rank: 3, name: 'Voucher' },
-                ].map(item => (
-                  <li key={item.rank} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    marginBottom: '8px',
-                  }}>
-                    <span style={{
-                      color: DASH.gold,
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      minWidth: '16px',
-                    }}>
-                      {item.rank}.
-                    </span>
-                    <span style={{ color: DASH.textWhite, fontSize: '13px', fontWeight: 500 }}>
-                      {item.name}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
+        <div style={{ backgroundColor: DASH.cardBg, border: `1px solid ${DASH.cardBorder}`, borderRadius: '16px', padding: '24px' }}>
+          <HorizontalBarChart
+            data={[
+              { label: 'Apex Data Solutions', value: 286, trend: 'up' as const },
+              { label: 'Horizon Analytics', value: 268, trend: 'up' as const },
+              { label: 'Willowbrook Consulting', value: 225, trend: 'up' as const },
+              { label: 'Starlight Technologies', value: 207, trend: 'up' as const },
+              { label: 'Lumina Insights', value: 187, trend: 'down' as const },
+              { label: 'Quantum Metric Corp', value: 183, trend: 'down' as const },
+              { label: 'SynergyWorks Group', value: 150, trend: 'up' as const },
+              { label: 'NovaSphere Industries', value: 138, trend: 'down' as const },
+              { label: 'Veridian Dynamics', value: 113, trend: 'neutral' as const },
+              { label: 'Crimson DataFlow', value: 101, trend: 'neutral' as const },
+            ]}
+            width={700}
+            barColor={DASH.gold}
+            showTrend={true}
+          />
         </div>
-
       </div>
     </div>
   )

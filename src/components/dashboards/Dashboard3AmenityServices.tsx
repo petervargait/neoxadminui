@@ -75,6 +75,27 @@ function Top3Services({ items }: { items: string[] }) {
   )
 }
 
+function FilterPill({ label }: { label: string }) {
+  return (
+    <div style={{
+      padding: '7px 18px',
+      backgroundColor: DASH.cardBg,
+      border: `1px solid ${DASH.cardBorder}`,
+      borderRadius: '20px',
+      color: DASH.text,
+      fontSize: '13px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      cursor: 'pointer',
+      whiteSpace: 'nowrap',
+    }}>
+      {label}
+      <span style={{ color: DASH.label, fontSize: '10px' }}>▼</span>
+    </div>
+  )
+}
+
 // ─── Grouped bar chart for Catering (Breakfast + Lunch per weekday) ──────────
 function BreakfastLunchBarChart() {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
@@ -376,6 +397,77 @@ export default function Dashboard3AmenityServices() {
         </CardPanel>
 
         {/* ════════════════════════════════════════════════════════════════════
+            RESTAURANT OCCUPANCY
+        ════════════════════════════════════════════════════════════════════ */}
+        <div style={{ marginBottom: '28px' }}>
+          <SectionHeader title="Restaurant occupancy">
+            <FilterPill label="February 2025" />
+          </SectionHeader>
+
+          <CardPanel>
+            <div style={{ color: DASH.label, fontSize: '13px', marginBottom: '16px' }}>
+              Daily occupancy trends <span style={{ color: DASH.muted, fontSize: '12px' }}>Today vs Prediction vs Average</span>
+            </div>
+
+            {/* Custom Restaurant Line Chart */}
+            <svg width="700" height="280" viewBox="0 0 700 280" style={{ overflow: 'visible' }}>
+              {/* Grid lines */}
+              {[0, 1, 2, 3, 4, 5].map(i => {
+                const y = 20 + i * 45
+                return (
+                  <React.Fragment key={i}>
+                    <line x1="60" y1={y} x2="680" y2={y} stroke={DASH.cardBorder} strokeWidth="1" strokeDasharray="4,4" />
+                    <text x="50" y={y + 4} fill={DASH.muted} fontSize="11" textAnchor="end">{500 - i * 100}</text>
+                  </React.Fragment>
+                )
+              })}
+
+              {/* X-axis labels */}
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
+                <text key={day} x={100 + i * 90} y={270} fill={DASH.muted} fontSize="11" textAnchor="middle">{day}</text>
+              ))}
+
+              {/* Today line (gold solid) */}
+              <polyline
+                points="100,110 190,85 280,60 370,95 460,120 550,175 640,200"
+                fill="none"
+                stroke={DASH.gold}
+                strokeWidth="2.5"
+              />
+              {[110, 85, 60, 95, 120, 175, 200].map((y, i) => (
+                <circle key={`today-${i}`} cx={100 + i * 90} cy={y} r="4" fill={DASH.gold} />
+              ))}
+
+              {/* Prediction line (dark dashed) */}
+              <polyline
+                points="100,130 190,105 280,80 370,115 460,140 550,190 640,215"
+                fill="none"
+                stroke={DASH.muted}
+                strokeWidth="2"
+                strokeDasharray="6,4"
+              />
+
+              {/* Average line (blue dashed) */}
+              <polyline
+                points="100,150 190,125 280,100 370,130 460,155 550,195 640,220"
+                fill="none"
+                stroke={DASH.blue}
+                strokeWidth="2"
+                strokeDasharray="6,4"
+              />
+
+              {/* Legend */}
+              <circle cx="100" cy={255} r="4" fill={DASH.gold} />
+              <text x="110" y={259} fill={DASH.label} fontSize="11">Today</text>
+              <line x1="170" y1={255} x2="195" y2={255} stroke={DASH.muted} strokeWidth="2" strokeDasharray="4,3" />
+              <text x="200" y={259} fill={DASH.label} fontSize="11">Prediction</text>
+              <line x1="280" y1={255} x2="305" y2={255} stroke={DASH.blue} strokeWidth="2" strokeDasharray="4,3" />
+              <text x="310" y={259} fill={DASH.label} fontSize="11">Average</text>
+            </svg>
+          </CardPanel>
+        </div>
+
+        {/* ════════════════════════════════════════════════════════════════════
             SECTION 3 · SHARED SERVICE AREA
         ════════════════════════════════════════════════════════════════════ */}
         <CardPanel>
@@ -487,10 +579,10 @@ export default function Dashboard3AmenityServices() {
         </CardPanel>
 
         {/* ════════════════════════════════════════════════════════════════════
-            SECTION 5 · FRESH CORNER EASY (1st floor)
+            SECTION 5 · CAFFE ON 6TH FLOOR
         ════════════════════════════════════════════════════════════════════ */}
         <CardPanel>
-          <SectionHeader title="Fresh Corner Easy (1st floor)" />
+          <SectionHeader title="Caffe on 6th Floor" />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
             <KPICard value="12 345 678" unit="Ft" trend="neutral" label="Total sales" />
             <KPICard value="1 287" trend="neutral" label="Number of sold coffee" />
@@ -500,12 +592,12 @@ export default function Dashboard3AmenityServices() {
         </CardPanel>
 
         {/* ════════════════════════════════════════════════════════════════════
-            SECTION 6 · FRESH CORNER CAFE (Groundfloor) + SHUTTLE BUS
+            SECTION 6 · CAFFE ON GROUND FLOOR + SHUTTLE BUS
         ════════════════════════════════════════════════════════════════════ */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '24px' }}>
-          {/* Fresh Corner Cafe */}
+          {/* Caffe on Ground Floor */}
           <CardPanel>
-            <SectionHeader title="Fresh Corner Cafe (Groundfloor)" />
+            <SectionHeader title="Caffe on Ground Floor" />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
               <KPICard value="12 345 678" unit="Ft" trend="up" label="Total sales" />
               <KPICard value="1 287" trend="neutral" label="Number of sold coffee" />

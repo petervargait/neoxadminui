@@ -1,8 +1,8 @@
 # NEOX Infinity App - Comprehensive Detailed Specification for Azure DevOps
 
 ## Document Information
-- **Version**: 1.0
-- **Date**: 2025-10-28
+- **Version**: 2.0
+- **Date**: 2026-03-11
 - **Purpose**: Complete work item hierarchy for Azure DevOps implementation with detailed technical specifications
 - **Target Audience**: Development Teams, Product Owners, Project Managers, QA Engineers, System Architects
 - **Confidentiality**: Internal Use Only
@@ -17,16 +17,18 @@
 4. [Technology Stack](#technology-stack)
 5. [Service Level Definition](#service-level)
 6. [Epic Level Modules](#epic-level-modules)
-7. [Detailed Use Cases & Work Items](#detailed-use-cases--work-items)
-8. [Summary & Statistics](#summary-statistics)
-9. [Development Guidelines](#development-guidelines)
-10. [Appendices](#appendices)
+7. [Admin & Tenant Navigation Structure](#admin--tenant-navigation-structure)
+8. [Key Data Models](#key-data-models)
+9. [Detailed Use Cases & Work Items](#detailed-use-cases--work-items)
+10. [Summary & Statistics](#summary-statistics)
+11. [Development Guidelines](#development-guidelines)
+12. [Appendices](#appendices)
 
 ---
 
 ## Executive Summary
 
-The NEOX Infinity App is a comprehensive, enterprise-grade, multi-tenant Software-as-a-Service (SaaS) platform designed to revolutionize building management, facility operations, and workplace services. This system provides organizations with a unified solution to manage visitors, parking, digital credentials, space bookings, lockers, and various other facility-related operations through an intuitive administrative interface and robust API infrastructure.
+The NEOX Infinity App is a comprehensive, enterprise-grade, multi-tenant Software-as-a-Service (SaaS) platform designed to revolutionize building management, facility operations, and workplace services. This system provides organizations with a unified solution to manage visitors, events, parking, digital credentials, space bookings, lockers, and various other facility-related operations through an intuitive administrative interface, an Integration Studio connecting 38 vendor systems across 13 canonical domains, real-time operational dashboards, and robust API infrastructure.
 
 ### Business Context
 
@@ -72,8 +74,8 @@ The NEOX Infinity App addresses these challenges by providing a unified, cloud-b
 The NEOX Infinity App follows a modern, cloud-native architecture with the following components:
 
 #### Frontend Layer
-- **Global Admin Interface**: Web application for platform administrators (React/Next.js)
-- **Tenant Admin Interface**: Web application for organization administrators (React/Next.js)
+- **Global Admin Interface**: Web application for platform administrators (React 18+ / Next.js 15, Fluent UI React Icons, React Context state management)
+- **Tenant Admin Interface**: Web application for organization administrators (React 18+ / Next.js 15, Fluent UI React Icons, React Context state management)
 - **Mobile Applications**: iOS and Android apps for end users (React Native or native)
 - **API Documentation Portal**: Interactive API documentation (Swagger/OpenAPI)
 
@@ -170,15 +172,17 @@ This hierarchical structure ensures:
 
 ## Technology Stack
 
-### Recommended Frontend Technologies
+### Implemented Frontend Technologies
 
 **Admin Interfaces (Global & Tenant)**
-- **Framework**: React 18+ with Next.js 14+ for server-side rendering and static generation
-- **UI Library**: Material-UI (MUI) v5+ or Ant Design for enterprise-grade components
-- **State Management**: Redux Toolkit with RTK Query for API state management
+- **Framework**: React 18+ with Next.js 15 (App Router) for server-side rendering and static generation
+- **UI Library**: Custom component library with Fluent UI design language
+- **Icons**: Fluent UI React Icons (`@fluentui/react-icons`) for all iconography
+- **State Management**: React Context (GlobalStateContext) with localStorage persistence -- no Redux or external state libraries
 - **Form Handling**: React Hook Form with Zod validation
-- **Charts/Visualization**: Recharts or Chart.js for analytics dashboards
-- **Calendar Components**: FullCalendar or react-big-calendar for booking interfaces
+- **Charts/Visualization**: Custom pure SVG chart library (no external charting dependencies such as Recharts or Chart.js)
+- **Calendar Components**: Custom Outlook-style calendar views (day/week/month) built in-house for Visitor Management and Event Management
+- **Rich Text Editing**: Native `contentEditable` with `document.execCommand` for WYSIWYG email template editing (fonts, colors, images, hyperlinks) -- no external rich-text editor libraries
 - **File Upload**: Dropzone or react-dropzone for drag-and-drop file uploads
 - **QR Code**: qrcode.react or react-qr-code for QR code generation
 - **PDF Generation**: jsPDF or pdfmake for client-side PDF generation
@@ -249,7 +253,7 @@ This hierarchical structure ensures:
 | **ID** | 001 |
 | **Type** | Service |
 | **Title** | NEOX Infinity App |
-| **Description** | The NEOX Infinity App is a comprehensive, enterprise-grade, multi-tenant administrative platform designed for modern workplace management. It provides organizations with integrated solutions for visitor management, parking allocation, space booking, digital credential management, locker assignment, and facility operations. The platform features a Global Admin interface for system-wide management, Tenant Admin interfaces for organization-specific configuration, robust REST APIs for integration, and mobile applications for end-user access. Built with scalability, security, and compliance at its core, the system supports unlimited tenants, users, and buildings while maintaining strict data isolation and customization capabilities. |
+| **Description** | The NEOX Infinity App is a comprehensive, enterprise-grade, multi-tenant administrative platform designed for modern workplace management. It provides organizations with integrated solutions for visitor management, event management, parking allocation, space booking, digital credential management, locker assignment, and facility operations. The platform features a Global Admin interface (19 sidebar sections) for system-wide management, Tenant Admin interfaces (15 sidebar sections) for organization-specific configuration, an Integration Studio with 16 modules connecting 38 vendor systems across 13 canonical domains, an Operational Dashboard for real-time system health monitoring, robust REST APIs for integration, and mobile applications for end-user access. Built with scalability, security, and compliance at its core, the system supports unlimited tenants, users, and buildings while maintaining strict data isolation and customization capabilities. |
 | **Status** | Active |
 | **ParentID** | (None - Top Level) |
 | **Owner** | Product Management |
@@ -259,7 +263,7 @@ This hierarchical structure ensures:
 | **Strategic Goals** | 1. Become the leading workplace management platform<br>2. Achieve 95%+ customer satisfaction<br>3. Support 10,000+ tenants within 3 years<br>4. Integrate with top 20 enterprise platforms |
 | **Success Metrics** | - Time to check-in visitor: < 30 seconds<br>- Space booking conversion rate: > 85%<br>- System uptime: 99.9%<br>- API response time: < 200ms (p95)<br>- User adoption rate: > 80% within first month |
 | **Implementation Areas** | Global Admin, Tenant Admin, REST API, Mobile Apps, API Documentation |
-| **Estimated Total Effort** | ~2,105 Story Points (~8,420 hours, ~4.2 developer-years) |
+| **Estimated Total Effort** | ~2,629 Story Points (~10,716 hours, ~5.4 developer-years) |
 | **Dependencies** | Cloud infrastructure (AWS/Azure), Email service (SendGrid/SES), SMS service (Twilio), Payment gateway (Stripe/PayPal), Calendar APIs (Microsoft/Google), Identity providers (Azure AD, Okta) |
 
 ---
@@ -268,7 +272,9 @@ This hierarchical structure ensures:
 
 ### Overview
 
-The NEOX Infinity App consists of 12 major functional modules (Epics), each representing a distinct area of workplace management functionality. These modules are designed to work independently while sharing common infrastructure, data models, and user management systems. Each module can be enabled or disabled at the tenant level, allowing organizations to activate only the features they need.
+The NEOX Infinity App consists of 14 major functional modules (Epics), each representing a distinct area of workplace management functionality. These modules are designed to work independently while sharing common infrastructure, data models, and user management systems. Each module can be enabled or disabled at the tenant level, allowing organizations to activate only the features they need.
+
+> **Note (v2.0):** The former "Smart Spaces" module has been retired as a standalone admin module; its functionality is now integrated into the Operational Dashboard and Building Management modules. The former "Integration Hub" has been replaced by the full **Integration Studio** platform (see EPIC 001-011). Two new modules have been added: **Operational Dashboard** (EPIC 001-013) and **Event Management** (EPIC 001-014). **Bulk CSV Upload** is no longer a separate module -- it is integrated directly into User Management (EPIC 001-006) with a "Download Template" button for every CSV upload form.
 
 ---
 
@@ -299,6 +305,8 @@ The Visitor Management module provides a comprehensive solution for managing the
 - Blacklist management for denied entry
 - Integration with building access control systems
 - Comprehensive visitor reports and analytics
+- **Outlook-style calendar views** (day/week/month) for visualizing visitor schedules
+- **Rich WYSIWYG email template editor** (fonts, colors, images, hyperlinks) using native contentEditable for visitor notification templates
 
 **Business Impact:**
 - Reduces visitor check-in time from 5-10 minutes to under 30 seconds
@@ -356,6 +364,7 @@ The Parking Management module provides a complete solution for managing parking 
 - Zone-based access control (executive parking, visitor parking, etc.)
 - Parking violation tracking and enforcement
 - Utilization analytics and peak hour identification
+- **Hover-to-release** on occupied parking grid boxes -- hovering over an occupied space reveals a release/free action
 
 **Business Impact:**
 - Reduces parking conflicts and eliminates "first-come, first-served" frustrations
@@ -469,6 +478,7 @@ The Lockers module provides a complete locker management solution for organizati
 - Utilization reports and occupancy tracking
 - Floor plan visualization of locker locations
 - Bulk locker assignment for teams or departments
+- **Hover-to-release** on occupied locker grid boxes -- hovering over an occupied locker reveals a release/free action
 
 **Business Impact:**
 - Supports flexible workplace strategies (hot-desking, hybrid work)
@@ -527,6 +537,7 @@ The Space Management module is a comprehensive workspace and meeting room bookin
 - Booking approval workflows for special spaces
 - Space utilization analytics and occupancy reports
 - Capacity management and social distancing support
+- **Hover-to-release** on occupied space grid boxes -- hovering over an occupied space reveals a release/free action
 
 **Business Impact:**
 - Optimizes space utilization (typical 20-40% improvement)
@@ -578,6 +589,7 @@ The User Management module is the foundation of the NEOX Infinity App, providing
 
 **Key Capabilities:**
 - User registration with manual entry or bulk import (CSV/Excel)
+- **Bulk CSV Upload** integrated directly into User Management with a **Download Template** button for every CSV upload form (no separate Bulk Upload module)
 - Multiple authentication methods: email/password, SSO (SAML, OAuth), multi-factor authentication
 - Role-Based Access Control (RBAC) with customizable roles and permissions
 - User profile management with photos, contact information, and preferences
@@ -640,6 +652,7 @@ The Tenant Management module provides the multi-tenancy foundation of the NEOX I
 **Key Capabilities:**
 - Tenant creation and provisioning with subdomain/custom domain setup
 - Tenant-specific configuration (branding, localization, module activation)
+- **Tenant-level policy management** with global fallback logic: tenant-specific policy version takes precedence over global version; global version takes precedence over "not uploaded." Policy files tracked via `tenantPolicyFiles: Record<tenantId, Record<policyType, PolicyFile | null>>`
 - Subscription management with multiple plan tiers (Basic, Professional, Enterprise)
 - Usage tracking and billing (users, storage, API calls)
 - Tenant monitoring with health checks and activity metrics
@@ -649,6 +662,7 @@ The Tenant Management module provides the multi-tenancy foundation of the NEOX I
 - White-labeling support for tenant branding
 - Feature flags for gradual rollouts
 - Tenant analytics and reporting
+- **Context-aware tenant menu**: when a specific tenant is selected, the sidebar shows only that tenant's navigation; when no tenant is selected, the full admin menu is shown
 
 **Business Impact:**
 - Enables SaaS business model with scalable tenant onboarding
@@ -780,7 +794,7 @@ The Reporting & Analytics module provides comprehensive business intelligence ca
 **Technical Considerations:**
 - Data warehouse or analytics database for fast queries
 - ETL processes for data aggregation
-- Chart rendering libraries (Recharts, Chart.js, D3.js)
+- Custom pure SVG chart rendering library (no external charting dependencies)
 - PDF generation for report exports
 - Excel generation with formatting
 - Query builder for custom reports
@@ -817,6 +831,7 @@ The Notifications module provides a multi-channel notification system that keeps
 
 **Key Capabilities:**
 - Email notifications with customizable templates
+- **Rich WYSIWYG email template editor** with full formatting (fonts, colors, images, hyperlinks) built using native `contentEditable` and `document.execCommand` -- no external rich-text library dependencies
 - SMS text message notifications for critical alerts
 - Mobile and web push notifications
 - In-app notification center with read/unread status
@@ -861,30 +876,48 @@ The Notifications module provides a multi-channel notification system that keeps
 
 ---
 
-### EPIC 001-011: Integration Hub
+### EPIC 001-011: Integration Studio
 
 | Attribute | Value |
 |---|---|
 | **ID** | 001-011 |
 | **Type** | Epic |
-| **Title** | Integration Hub |
+| **Title** | Integration Studio |
 | **ParentID** | 001 |
-| **Implementation Areas** | Global Admin, API Documentation |
+| **Implementation Areas** | Global Admin, Tenant Admin, API Documentation |
 | **Priority** | High |
 | **Business Value** | Very High |
 
 #### Epic Description
 
-The Integration Hub module provides comprehensive API management, third-party integrations, and data import/export capabilities. This module enables the NEOX Infinity App to connect with existing enterprise systems, exchange data with external platforms, and provide developers with the tools needed to build custom integrations.
+The Integration Studio is a comprehensive integration management platform that replaces the former Integration Hub. It provides 16 dedicated integration modules covering 38 vendor systems across 13 canonical domains. The platform enables the NEOX Infinity App to connect with building management systems, AV/UC infrastructure, IoT platforms, access control, digital badge providers, smart lockers, ticketing, elevator systems, visitor management vendors, parking systems, event management platforms, restaurant/catering systems, and waste management solutions.
 
-**Key Capabilities:**
+**Canonical Integration Domains (13):**
+1. **BMS** (Building Management Systems) - HVAC, lighting, energy management
+2. **AV/UC** (Audio-Visual / Unified Communications) - Room AV systems, video conferencing
+3. **IoT** (Internet of Things) - Sensors, environmental monitoring, smart devices
+4. **Access Control** - Door controllers, turnstiles, gates, card readers
+5. **Digital Badge** - Mobile credential providers, NFC/BLE badge systems
+6. **Lockers** - Smart locker systems, package lockers
+7. **Ticketing** - Helpdesk, service request, and facility ticketing platforms
+8. **Elevator** - Elevator dispatch and destination control systems
+9. **Visitor Management** - Third-party visitor management system connectors
+10. **Parking** - Parking guidance, LPR, barrier gate systems
+11. **Event Management** - External event and conference management platforms
+12. **Restaurant** - Catering, cafeteria ordering, and food service systems
+13. **Waste Management** - Smart waste monitoring and collection optimization
+
+**Key Capabilities (16 Modules, 38 Vendor Systems):**
+- Per-environment API credential management (dev/staging/production) for each vendor connector
+- Health monitoring with real-time status (Online/Offline/Degraded/Maintenance) per connected system
+- Integration coverage metrics per domain
 - Comprehensive REST API with OpenAPI documentation
 - Interactive API documentation with Swagger UI
 - API key generation and management with scoped permissions
 - Webhooks for real-time event notifications
-- Pre-built integrations (Microsoft 365, Google Workspace, Slack, Salesforce)
+- Pre-built connectors for major enterprise platforms (Microsoft 365, Google Workspace, Slack, Salesforce)
 - OAuth 2.0 for third-party app authorization
-- Data import from CSV/Excel with field mapping
+- Data import from CSV/Excel with field mapping and downloadable templates
 - Bulk data export capabilities
 - Integration marketplace for discovering connectors
 - API usage analytics and monitoring
@@ -893,33 +926,38 @@ The Integration Hub module provides comprehensive API management, third-party in
 - Developer portal with code examples
 
 **Business Impact:**
-- Enables enterprise integration with existing systems (HR, ERP, CRM)
+- Enables enterprise integration with 38+ vendor systems across 13 building/facility domains
 - Reduces implementation time with pre-built connectors
 - Provides data portability and migration tools
 - Supports custom workflows and automation
 - Increases platform value through extensibility
 - Attracts developers and partners to ecosystem
+- Centralizes all vendor integration management in a single admin interface
 
 **Technical Considerations:**
+- ExternalSystem data model with per-environment API credentials (apiUrl, apiKey, clientId, clientSecret per env)
+- IntegrationConnector model with health status tracking and domain coverage
 - RESTful API design principles
 - OpenAPI 3.0 specification
 - API gateway for routing and security
 - Webhook delivery system with retry logic
 - OAuth 2.0 authorization server
 - Integration framework for third-party connectors
-- CSV/Excel parsing and validation
+- CSV/Excel parsing and validation with downloadable templates
 - Data transformation and mapping engine
 - API monitoring and analytics platform
 
-#### Use Cases (5)
+#### Use Cases (7)
 1. **UC01**: API Documentation - Comprehensive API documentation
 2. **UC02**: API Key Management - Generate and manage API keys
 3. **UC03**: Webhooks - Send events to external systems
-4. **UC04**: Third-Party Integrations - Pre-built integrations
-5. **UC05**: Data Import/Export - Bulk data migration tools
+4. **UC04**: Vendor System Management - Configure and manage 38 vendor connectors across 13 domains
+5. **UC05**: Data Import/Export - Bulk data migration tools with CSV template downloads
+6. **UC06**: Integration Health Monitoring - Real-time status and health dashboards per connector
+7. **UC07**: Per-Environment Credential Management - Manage API credentials across dev/staging/production environments
 
-**Total Work Items**: 29  
-**Estimated Story Points**: 196 SP (~784 hours)
+**Total Work Items**: 42
+**Estimated Story Points**: 280 SP (~1,120 hours)
 
 ---
 
@@ -980,8 +1018,287 @@ The Security & Compliance module provides enterprise-grade security controls, au
 4. **UC04**: Compliance Reporting - Generate compliance reports
 5. **UC05**: Backup & Disaster Recovery - Data backup and recovery
 
-**Total Work Items**: 30  
+**Total Work Items**: 30
 **Estimated Story Points**: 196 SP (~784 hours)
+
+---
+
+### EPIC 001-013: Operational Dashboard
+
+| Attribute | Value |
+|---|---|
+| **ID** | 001-013 |
+| **Type** | Epic |
+| **Title** | Operational Dashboard |
+| **ParentID** | 001 |
+| **Implementation Areas** | Global Admin, Tenant Admin |
+| **Priority** | High |
+| **Business Value** | High |
+
+#### Epic Description
+
+The Operational Dashboard provides a centralized, real-time overview of all integrated systems and their health status. It replaces the former standalone Smart Spaces module by consolidating building intelligence, system monitoring, and operational alerts into a single dashboard experience available to both Global Admins and Tenant Admins.
+
+**Key Capabilities:**
+- Real-time display of all integrated external system statuses: **Online**, **Offline**, **Degraded**, **Maintenance**
+- System messages feed showing operational messages with severity levels (info, warning, error, critical) and state tracking (active/resolved)
+- Per-system health indicators across all Integration Studio connectors
+- Aggregated KPIs: total systems online, total degraded, total offline, active alerts count
+- Auto-refresh with configurable intervals
+- Drill-down into individual system status history
+- Integration with Integration Studio for connector health data
+- Custom SVG-based status charts (no external charting library)
+
+**Business Impact:**
+- Provides facility managers with a single pane of glass for all building systems
+- Reduces mean time to detect (MTTD) system failures
+- Enables proactive maintenance through early degradation detection
+- Replaces multiple vendor-specific dashboards with one unified view
+
+**Technical Considerations:**
+- OperationalMessage interface for system messages
+- Custom pure SVG chart rendering for status visualization
+- WebSocket or polling for real-time status updates
+- State management via React Context (GlobalStateContext) with localStorage persistence
+
+#### Use Cases (3)
+1. **UC01**: System Status Overview - View all integrated systems with real-time health status
+2. **UC02**: Operational Messages - View, filter, and manage system messages by severity and state
+3. **UC03**: System Health Drill-Down - Inspect individual system health history and trends
+
+**Total Work Items**: 15
+**Estimated Story Points**: 90 SP (~360 hours)
+
+---
+
+### EPIC 001-014: Event Management
+
+| Attribute | Value |
+|---|---|
+| **ID** | 001-014 |
+| **Type** | Epic |
+| **Title** | Event Management |
+| **ParentID** | 001 |
+| **Implementation Areas** | Global Admin, Tenant Admin, API |
+| **Priority** | Medium-High |
+| **Business Value** | High |
+
+#### Epic Description
+
+The Event Management module provides a complete solution for creating, managing, and tracking events within the organization. It includes participant management, RSVP tracking, CSV-based bulk participant upload, and Outlook-style calendar views. Events can be linked to spaces, visitor registrations, and catering services.
+
+**Key Capabilities:**
+- Create and manage events with full details (title, description, date/time, location, capacity)
+- **Outlook-style calendar views** (day/week/month) for visualizing event schedules
+- Participant management with RSVP status tracking (invited, accepted, declined, tentative)
+- **CSV upload** for bulk participant import with downloadable template
+- Event invitation workflow with customizable email templates (WYSIWYG editor)
+- EventInvitation and EventParticipant data models for tracking invite lifecycle
+- Integration with Visitor Management for external guest event registration
+- Integration with Space Management for room booking
+- Integration with Parking Management for event parking allocation
+- Event analytics and attendance reporting
+- Recurring event support
+- Event cancellation with automatic participant notification
+
+**Business Impact:**
+- Centralizes event management within the facility platform
+- Reduces event coordination effort with integrated participant management
+- Improves event attendance tracking with RSVP workflow
+- Enables data-driven event planning with analytics
+- Eliminates manual participant list management with CSV upload
+
+**Technical Considerations:**
+- EventInvitation interface: { id, eventId, userId, email, invitedAt, respondedAt, status }
+- EventParticipant interface: { id, eventId, userId, name, email, rsvpStatus, checkInTime, notes }
+- Outlook-style calendar component built in-house (day/week/month views)
+- CSV parsing with field mapping and validation
+- Email template rendering with WYSIWYG-edited content
+- Integration hooks to Visitor Management and Space Management modules
+
+#### Use Cases (5)
+1. **UC01**: Event Creation & Setup - Create events with details, location, and capacity
+2. **UC02**: Participant Management - Add, import (CSV), and manage event participants
+3. **UC03**: RSVP Workflow - Send invitations and track RSVP responses
+4. **UC04**: Event Calendar Views - Outlook-style day/week/month calendar visualization
+5. **UC05**: Event Analytics - Track attendance, no-shows, and event metrics
+
+**Total Work Items**: 25
+**Estimated Story Points**: 150 SP (~600 hours)
+
+---
+
+## Admin & Tenant Navigation Structure
+
+### Global Admin Sidebar (19 sections)
+
+The Global Admin interface provides 19 sidebar navigation sections:
+
+| # | Section | Description |
+|---|---|---|
+| 1 | Dashboard | Operational Dashboard with integrated system status and KPIs |
+| 2 | Tasks | Pending tasks and action items for the admin |
+| 3 | Tenants | Tenant creation, configuration, and lifecycle management |
+| 4 | Users | User management with bulk CSV upload and template download |
+| 5 | Modules | Module activation/deactivation per tenant |
+| 6 | Digital Badges | Digital credential management and badge templates |
+| 7 | White Label Settings | Branding and white-label configuration |
+| 8 | Policies | Global and tenant-level policy management with fallback logic |
+| 9 | Parking Management | Parking space inventory, zones, and reservations |
+| 10 | Locker Management | Locker banks, assignments, and maintenance |
+| 11 | Space Management | Meeting rooms, desks, and bookable resources |
+| 12 | Building Management | Buildings, floors, zones, and access points |
+| 13 | Visitor Check-in | Reception desk check-in/check-out operations |
+| 14 | Visitor Management | Visitor pre-registration, lists, and configuration |
+| 15 | Event Management | Event creation, participant management, RSVP, calendar views |
+| 16 | Ticket Management | Service requests and helpdesk ticketing |
+| 17 | Notifications | Notification rules, templates (WYSIWYG editor), and delivery |
+| 18 | System Status | Integration Studio health monitoring and system status |
+| 19 | Audit Logs | Comprehensive audit trail and compliance reporting |
+
+### Tenant Admin Sidebar (15 sections)
+
+The Tenant Admin interface provides 15 sidebar navigation sections (context-aware: shows only the selected tenant when one is picked):
+
+| # | Section | Description |
+|---|---|---|
+| 1 | Dashboard | Tenant-specific operational dashboard and KPIs |
+| 2 | Tasks | Tenant-specific pending tasks and action items |
+| 3 | Analytics | Tenant-specific reports and analytics |
+| 4 | Users | User management with bulk CSV upload and template download |
+| 5 | Visitor Management | Visitor pre-registration, calendar views, and configuration |
+| 6 | Event Management | Event creation, participant management, RSVP, calendar views |
+| 7 | Parking | Parking space management and reservations |
+| 8 | Lockers | Locker assignment and management |
+| 9 | Spaces | Space booking and management |
+| 10 | Building Config | Building, floor, and zone configuration |
+| 11 | Digital Badges | Badge templates and issuance |
+| 12 | Templates | Email and notification templates (WYSIWYG editor) |
+| 13 | Policies | Tenant-level policy management (tenant version > global version > not uploaded) |
+| 14 | Modules | Module configuration for the tenant |
+| 15 | Support | Support requests and helpdesk |
+
+---
+
+## Key Data Models
+
+### OperationalMessage
+
+Represents system messages displayed on the Operational Dashboard.
+
+```typescript
+interface OperationalMessage {
+  id: string;
+  systemName: string;
+  severity: 'info' | 'warning' | 'error' | 'critical';
+  message: string;
+  timestamp: string; // ISO 8601
+  state: 'active' | 'resolved';
+}
+```
+
+### ExternalSystem
+
+Represents a third-party vendor system managed in Integration Studio, with per-environment API credentials.
+
+```typescript
+interface ExternalSystem {
+  id: string;
+  name: string;
+  domain: string; // One of 13 canonical domains (BMS, AV/UC, IoT, etc.)
+  vendor: string;
+  description: string;
+  status: 'Online' | 'Offline' | 'Degraded' | 'Maintenance';
+  environments: {
+    dev?: ApiCredentials;
+    staging?: ApiCredentials;
+    production?: ApiCredentials;
+  };
+  lastHealthCheck: string; // ISO 8601
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ApiCredentials {
+  apiUrl: string;
+  apiKey?: string;
+  clientId?: string;
+  clientSecret?: string;
+  authType: 'apiKey' | 'oauth2' | 'basic' | 'certificate';
+}
+```
+
+### IntegrationConnector
+
+Represents the health and coverage of a connector within Integration Studio.
+
+```typescript
+interface IntegrationConnector {
+  id: string;
+  externalSystemId: string;
+  domain: string;
+  connectorName: string;
+  status: 'Online' | 'Offline' | 'Degraded' | 'Maintenance';
+  healthScore: number; // 0-100
+  coverage: string[]; // List of capabilities/features supported
+  lastSyncTime: string; // ISO 8601
+  errorCount: number;
+  warningCount: number;
+}
+```
+
+### Tenant Policy Files
+
+Tracks policy file uploads per tenant with global fallback logic.
+
+```typescript
+// tenantPolicyFiles: Record<tenantId, Record<policyType, PolicyFile | null>>
+// Resolution order: tenant version > global version > not uploaded
+
+interface PolicyFile {
+  id: string;
+  tenantId: string | null; // null = global policy
+  policyType: string; // e.g., 'privacy', 'nda', 'acceptable-use', 'safety'
+  fileName: string;
+  fileUrl: string;
+  version: string;
+  uploadedAt: string; // ISO 8601
+  uploadedBy: string;
+}
+```
+
+### EventInvitation
+
+Represents an invitation sent for an event.
+
+```typescript
+interface EventInvitation {
+  id: string;
+  eventId: string;
+  userId?: string;
+  email: string;
+  invitedAt: string; // ISO 8601
+  respondedAt?: string; // ISO 8601
+  status: 'pending' | 'accepted' | 'declined' | 'tentative';
+}
+```
+
+### EventParticipant
+
+Represents a confirmed participant in an event.
+
+```typescript
+interface EventParticipant {
+  id: string;
+  eventId: string;
+  userId?: string;
+  name: string;
+  email: string;
+  rsvpStatus: 'invited' | 'accepted' | 'declined' | 'tentative' | 'no-response';
+  checkInTime?: string; // ISO 8601
+  notes?: string;
+}
+```
 
 ---
 
@@ -2654,23 +2971,27 @@ The check-in/check-out process is the core operation of visitor management, exec
 | 001-003 | Digital Badges | 5 | 25 | 155 | 620 |
 | 001-004 | Lockers | 5 | 27 | 149 | 596 |
 | 001-005 | Space Management | 6 | 37 | 215 | 860 |
-| 001-006 | User Management | 6 | 36 | 194 | 776 |
+| 001-006 | User Management (incl. Bulk CSV Upload) | 6 | 36 | 194 | 776 |
 | 001-007 | Tenant Management | 5 | 25 | 168 | 672 |
 | 001-008 | Building Management | 5 | 24 | 130 | 520 |
 | 001-009 | Reporting & Analytics | 5 | 25 | 180 | 720 |
 | 001-010 | Notifications | 5 | 25 | 164 | 656 |
-| 001-011 | Integration Hub | 5 | 29 | 196 | 784 |
+| 001-011 | Integration Studio (formerly Integration Hub) | 7 | 42 | 280 | 1,120 |
 | 001-012 | Security & Compliance | 5 | 30 | 196 | 784 |
-| **TOTAL** | **12 Epics** | **62 Use Cases** | **348 Work Items** | **~2,105 SP** | **~8,420 hours** |
+| 001-013 | Operational Dashboard | 3 | 15 | 90 | 360 |
+| 001-014 | Event Management | 5 | 25 | 150 | 600 |
+| **TOTAL** | **14 Epics** | **72 Use Cases** | **430 Work Items** | **~2,629 SP** | **~10,716 hours** |
+
+> **Note (v2.0):** Smart Spaces has been retired as a standalone module; its functionality is integrated into the Operational Dashboard (001-013) and Building Management (001-008). Integration Hub has been replaced by Integration Studio with expanded scope. Event Management and Operational Dashboard are new additions.
 
 ### Effort Distribution by Implementation Area
 
 | Implementation Area | Work Items | Story Points | Estimated Hours | Percentage |
 |---|---|---|---|---|
-| Tenant Admin (Frontend) | ~140 | ~890 | ~3,560 | 42% |
-| API (Backend) | ~185 | ~990 | ~3,960 | 47% |
-| Global Admin | ~40 | ~185 | ~740 | 9% |
-| API Documentation | ~8 | ~40 | ~160 | 2% |
+| Tenant Admin (Frontend) | ~175 | ~1,110 | ~4,440 | 42% |
+| API (Backend) | ~225 | ~1,230 | ~4,920 | 46% |
+| Global Admin | ~55 | ~260 | ~1,040 | 10% |
+| API Documentation | ~10 | ~50 | ~200 | 2% |
 
 *Note: Many work items span multiple implementation areas, so totals exceed 100%*
 
@@ -2688,11 +3009,12 @@ Assuming an 8-person development team working 5 days/week:
 
 | Phase | Duration | Milestones |
 |---|---|---|
-| Phase 1: Foundation | 3 months | User Management, Tenant Management, Building Setup, Security Core |
-| Phase 2: Core Modules | 3 months | Visitor Management, Space Management, Notifications |
-| Phase 3: Additional Modules | 3 months | Parking, Digital Badges, Lockers |
-| Phase 4: Advanced Features | 3 months | Reporting, Analytics, Integrations, Polish |
-| **Total** | **12 months** | Production-ready platform |
+| Phase 1: Foundation | 3 months | User Management (with Bulk CSV Upload), Tenant Management, Building Setup, Security Core |
+| Phase 2: Core Modules | 3 months | Visitor Management (with Calendar Views), Space Management, Notifications (with WYSIWYG Editor) |
+| Phase 3: Additional Modules | 3 months | Parking, Digital Badges, Lockers, Event Management |
+| Phase 4: Integration & Dashboard | 3 months | Integration Studio (16 modules, 38 vendors), Operational Dashboard |
+| Phase 5: Advanced Features | 2 months | Reporting, Analytics, Policy Management, Polish |
+| **Total** | **14 months** | Production-ready platform |
 
 ---
 
@@ -2700,10 +3022,14 @@ Assuming an 8-person development team working 5 days/week:
 
 ### Code Standards
 
-**Frontend (React/Next.js)**:
+**Frontend (React 18+ / Next.js 15)**:
 - Use TypeScript for type safety
 - Follow Airbnb JavaScript Style Guide
 - Use functional components with hooks
+- Use React Context (GlobalStateContext) with localStorage persistence for state management -- no Redux or external state management libraries
+- Use Fluent UI React Icons (`@fluentui/react-icons`) for all iconography -- not Lucide React
+- Use custom pure SVG chart library for all data visualization -- no external charting dependencies
+- Use native `contentEditable` + `document.execCommand` for rich text editing -- no external WYSIWYG library
 - Implement proper error boundaries
 - Use React.memo for performance optimization
 - Implement code splitting and lazy loading
@@ -2922,6 +3248,7 @@ User Story,001-001-UC01-WI01,Create visitor registration form,"Design and implem
 | Version | Date | Author | Changes |
 |---|---|---|---|
 | 1.0 | 2025-10-28 | System | Initial comprehensive detailed specification with full implementation guidance, technical specifications, database schemas, and development guidelines |
+| 2.0 | 2026-03-11 | System | Major update reflecting current application state: Integration Hub replaced by Integration Studio (16 modules, 38 vendors, 13 domains); Smart Spaces retired and merged into Operational Dashboard; Event Management module added; Bulk CSV Upload moved into User Management; Outlook-style calendar views added to Visitor and Event Management; Rich WYSIWYG email template editor (native contentEditable); Tenant-level policy management with global fallback; Hover-to-release on parking/locker/space grids; Context-aware tenant menu; Tech stack updated to Next.js 15, Fluent UI React Icons, React Context state management, custom SVG chart library; Admin sidebar expanded to 19 sections; Tenant sidebar expanded to 15 sections; New data models (OperationalMessage, ExternalSystem, IntegrationConnector, PolicyFile, EventInvitation, EventParticipant) |
 
 ---
 

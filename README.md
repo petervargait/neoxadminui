@@ -1,164 +1,194 @@
 # NEOX Infinity - Multi-Tenant Admin Platform
 
-A production-ready, multi-tenant administrative web application built with Next.js 14, TypeScript, Prisma, and NextAuth.js. Features comprehensive role-based access control, white-labeling capabilities, and OWASP security compliance.
+A comprehensive, multi-tenant administrative platform for building and facility management built with Next.js 15, TypeScript, and React Context. Features role-based access control, white-labeling, Integration Studio for third-party systems, operational dashboards, and complete visitor/event/space management.
 
-## 🚀 Features
+**Live Demo:** Deployed on Vercel
 
-### Global Admin (NEOX Admin)
-- **Multi-tenant Management**: Create, suspend, and manage tenant organizations
-- **GDPR Compliance**: Complete tenant data export and backup/restore functionality
-- **Module & Permission Management**: Granular control over features and access
-- **White-labeling**: Custom branding, logos, and themes per tenant
-- **User Management**: Excel import, manual user creation, and Entra ID integration
-- **Reporting**: Customizable analytics and audit trails
-- **Environment Management**: Production, staging, and development environments
+## Features
 
-### Tenant Admin (Reception/Office Manager)
-- **User Management**: Invite, manage, and organize team members
-- **Visitor Management**: Digital visitor registration and tracking
-- **Email Templates**: Rich-text template editor with white-label previews
-- **Invitation System**: Automated visitor invitations with deep-link authentication
-- **Parking Management**: Real-time parking availability tracking
-- **Domain Blocking**: Internal domain restrictions for security
-- **Multi-language Support**: English and Hungarian localization
+### Global Admin (NEOX Admin) - 19 Modules
+- **Dashboard** - Global overview with tenant statistics and operational dashboard showing integrated systems status
+- **Tasks** - Approval workflow with pending/processed task management
+- **Tenants** - Multi-tenant CRUD with context-aware tenant views
+- **User Management** - User profiles, roles, bulk CSV upload with template download
+- **Modules** - Module and profile configuration per tenant
+- **Digital Badges** - NFC badge creation, assignment, and tracking with IMEI management
+- **White Label Settings** - Custom branding (logo, colors with gradients, fonts) per tenant
+- **Policies** - Global policy file management (GDPR, T&C, Passwords, Installation Guide)
+- **Parking Management** - Space grid with types (EV, disabled, VIP), booking, hover-to-release
+- **Locker Management** - 5 locker types (permanent, gym, bike, temporary, storage) with zone management
+- **Space Management** - Desks, offices, meeting rooms, conference rooms, social hubs
+- **Building Management** - Buildings, floors, zones, basement levels configuration
+- **Visitor Check-in** - QR code and manual check-in/check-out with duration tracking
+- **Visitor Management** - Invitation workflow with parking/WiFi/locker access requests
+- **Event Management** - Event scheduling, participant management, RSVP, CSV upload with templates
+- **Ticket Management** - Support tickets with priority, assignment, and status tracking
+- **Notifications** - System notifications and alerts
+- **System Status** - System health monitoring
+- **Audit Logs** - Comprehensive activity logging
 
-## 🏗️ Tech Stack
+### Tenant Admin - 15 Modules
+- **Dashboard** - Tenant-specific metrics with operational dashboard (integrated systems status)
+- **Tasks** - Tenant-scoped approval tasks
+- **Analytics** - Date-filtered analytics dashboard
+- **User Management** - Tenant user CRUD with bulk CSV upload
+- **Visitor Management** - Visitor invitations with Outlook-style calendar views (day/week/month)
+- **Event Management** - Events with Outlook-style calendar views and CSV participant upload
+- **Parking** - Space grid with assign/release on hover
+- **Lockers** - Locker assignment with hover-to-release
+- **Spaces** - Space/desk booking with release functionality
+- **Building Config** - Building and floor configuration
+- **Digital Badges** - Badge assignment and tracking
+- **Templates** - Rich WYSIWYG email template editor (fonts, colors, images, hyperlinks)
+- **Policies** - Tenant policy management with global fallback (tenant version > global version)
+- **Modules** - Module availability configuration
+- **Support** - Help and support section
 
-- **Framework**: Next.js 14 (App Router)
+### Integration Studio - 16 Modules
+Complete third-party integration platform at `/integration-studio`:
+- **Dashboard** - Domain health cards across 13 canonical domains
+- **External Systems** - 38 vendor systems (Siemens, Honeywell, HikVision, etc.) with per-env API credentials
+- **Canonical APIs** - 13 domain API catalogs with operations, methods, paths
+- **Connectors** - Connector management with coverage %, health badges
+- **Connector Builder** - Multi-step wizard for creating new connectors
+- **Mapping Designer** - Split-pane canonical-to-vendor schema mapping
+- **Flows** - Multi-step flow orchestration with compensation steps
+- **Events & Sync** - Webhook subscriptions and polling jobs
+- **Testing** - Test console with dry-run/live toggle
+- **Health & Logs** - Connector health monitoring with correlation IDs
+- **Incidents** - Incident tracking with severity S1-S4
+- **Issue Reporting** - Taxonomy tree and routing rules
+- **Identity** - SSO providers, directory sync, role mapping
+- **Templates** - Pre-built connector templates per domain
+
+### Dashboard & Analytics - 10 Dashboards
+Full analytics suite at `/dashboard`:
+1. Energy Monitor - Energy consumption, waste, CO2 emissions
+2. Wellbeing Services - Climate, traffic, weather, occupancy prediction
+3. Office Building - Electricity, climate, heating/cooling
+4. Office Services - Issue handling, ticket resolution, frequent requests
+5. Office Services Full - SLA statistics, KPIs, cleaning stats
+6. Amenity Services - Fitness, catering, shuttle, peak utilization
+7. Employee Services - Parking, meetings, vending
+8. Visitor Center - Visitor counts, app downloads, vending
+9. Parking & Restaurant - Parking metrics, restaurant occupancy
+10. Occupancy Services - Visitor/parking/access/workplace utilization
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: NextAuth.js with Microsoft Entra ID
-- **Styling**: Tailwind CSS with custom NEOX theme
-- **UI Components**: Radix UI primitives
-- **File Storage**: Vercel Blob
-- **Email Service**: Resend
+- **State Management**: React Context (GlobalStateContext) with localStorage persistence
+- **Icons**: Fluent UI React Icons (`@fluentui/react-icons`)
+- **Charts**: Custom pure SVG chart library (9 chart types, no external dependencies)
+- **Styling**: Inline styles with dark navy design system
 - **Deployment**: Vercel
-- **Excel Processing**: SheetJS (xlsx)
-- **Icons**: Lucide React
+- **Rich Text**: Native contentEditable + document.execCommand WYSIWYG editor
 
-## 🎨 Design System
+## Design System
 
-The application uses a custom NEOX design system with:
 - **Primary Colors**: Navy (#08122E) and Gold (#D7BB91)
+- **Dashboard Theme**: Dark navy (#08122E, #0F1A2E, #162032, #1E293B) with gold accents (#C9963B)
 - **Typography**: Poppins font family
-- **Components**: Rounded corners, soft shadows, and gradient backgrounds
-- **Responsive**: Mobile-first design approach
+- **Text Colors**: #F1F5F9 (primary), #94A3B8 (secondary), #64748B (muted)
+- **Components**: Rounded corners (8-16px), soft shadows, gradient backgrounds
+- **Icons**: Fluent UI React Icons exclusively (no emojis, no Lucide)
+- **Responsive**: Mobile-first with breakpoints at 640px, 768px, 1024px, 1280px
 
-## 📦 Installation
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
-- PostgreSQL database
-- Azure AD application (for authentication)
-- Resend account (for emails)
-- Vercel account (for blob storage)
+- Node.js 18+
 
-### 1. Clone and Install
+### Installation
 
 ```bash
 git clone <repository-url>
 cd neoxadminui
 npm install
-```
-
-### 2. Environment Setup
-
-Copy the example environment file:
-
-```bash
-cp .env.example .env.local
-```
-
-Update the following required variables in `.env.local`:
-
-```bash
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/neoxadmin"
-
-# NextAuth
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-key-here"
-
-# Azure AD
-AZURE_AD_CLIENT_ID="your-client-id"
-AZURE_AD_CLIENT_SECRET="your-client-secret"
-AZURE_AD_TENANT_ID="your-tenant-id"
-
-# Resend
-RESEND_API_KEY="your-resend-api-key"
-
-# Vercel Blob
-BLOB_READ_WRITE_TOKEN="your-blob-token"
-```
-
-### 3. Database Setup
-
-```bash
-# Generate Prisma client
-npm run db:generate
-
-# Push database schema
-npm run db:push
-
-# Seed database with default data
-npm run db:seed
-```
-
-### 4. Development Server
-
-```bash
 npm run dev
 ```
 
 The application will be available at `http://localhost:3000`.
 
-## 👥 Default Users
-
-After seeding the database, you can log in with:
-
-- **Super Admin**: `admin@neox.hu`
-- **Demo Tenant Admin**: `demo@neox.hu`
-- **Demo Tenant**: `demo.neox.hu`
-
-## 🛠️ Available Scripts
+### Build
 
 ```bash
-# Development
-npm run dev                # Start development server
-npm run build              # Build for production
-npm run start              # Start production server
-
-# Database
-npm run db:generate        # Generate Prisma client
-npm run db:push            # Push schema to database
-npm run db:migrate         # Run database migrations
-npm run db:seed            # Seed database with default data
-npm run db:studio          # Open Prisma Studio
-
-# Code Quality
-npm run lint               # Run ESLint
-npm run type-check         # Run TypeScript compiler check
+npm run build
+npm run start
 ```
 
-## 🚀 Next Steps
+### Deploy to Vercel
 
-To complete the implementation, you'll need to create:
+```bash
+npx vercel --prod
+```
 
-1. **UI Components**: Complete the shadcn/ui component library
-2. **Admin Dashboard**: Global admin interface with tenant management
-3. **Tenant Dashboard**: Tenant-specific admin interface
-4. **Authentication Pages**: Custom sign-in and error pages
-5. **API Routes**: Server actions and API endpoints
-6. **Email Integration**: Resend email service implementation
-7. **File Upload**: Blob storage for white-label assets
-8. **Excel Processing**: User import/export functionality
-9. **Internationalization**: next-intl setup for EN/HU
-10. **Testing**: Unit and integration tests
+## Project Structure
 
-## 📞 Support
+```
+src/
+  app/
+    page.tsx                    # Home page with tenant cards
+    admin/page.tsx              # Global admin (19 sidebar sections)
+    tenant/page.tsx             # Tenant admin (15 sidebar sections)
+    dashboard/page.tsx          # Dashboard & Analytics (10 dashboards)
+    integration-studio/page.tsx # Integration Studio (16 modules)
+    energy/page.tsx             # Energy management
+    api-docs/page.tsx           # API documentation
+  components/
+    VisitorManagement.tsx       # Visitor invitation management
+    EventManagement.tsx         # Event & participant management
+    VisitorDashboard.tsx        # Visitor dashboard panel
+    ParkingDashboard.tsx        # Parking dashboard panel
+    LockerDashboard.tsx         # Locker dashboard panel
+    BadgesDashboard.tsx         # Digital badges dashboard panel
+    SpaceBookingDashboard.tsx   # Space booking dashboard panel
+    SmartSpacesDashboard.tsx    # Smart spaces operations
+    DashboardFilters.tsx        # Date range filtering
+    ColorPicker.tsx             # Color picker with gradient support
+    FontFamilySelector.tsx      # Font selection component
+    charts/
+      DashboardCharts.tsx       # Shared SVG chart library (9 types)
+    dashboards/
+      Dashboard1-10*.tsx        # 10 analytics dashboards
+    integration-studio/
+      IS*.tsx                   # 16 Integration Studio modules
+  context/
+    GlobalStateContext.tsx       # Global state with 29+ interfaces
+```
+
+## Key Data Models
+
+- **User** - Name, email, role, department, status, profile, tenant
+- **Tenant** - Organization, domain, modules, contact, status
+- **Invitation** - Visitor invitations with access codes, parking/WiFi/locker
+- **EventInvitation** - Events with participant management
+- **ParkingSpace** - Types (EV, disabled, VIP), building, status
+- **Locker** - Types (permanent, gym, bike, temporary, storage)
+- **Space** - Types (desk, office, meeting-room, conference-room, social-hub)
+- **Building** - Floors, zones, basement levels
+- **Ticket** - Priority, category, assignment, comments
+- **Badge** - Card type, IMEI, status tracking
+- **ExternalSystem** - 38 vendor systems across 13 domains
+- **IntegrationConnector** - Health, coverage, environment versions
+- **OperationalMessage** - System alerts (info/warning/error/critical)
+- **PolicyFile** - Global and tenant-level policy documents
+- **WhiteLabelSettings** - Branding with colors, fonts, logo
+
+## Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+```
+
+## Support
 
 For questions or support, contact: admin@neox.hu
 
 ---
 
-**Built with ❤️ by the NEOX Team**
+**Built by the NEOX Team**

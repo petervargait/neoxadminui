@@ -6,6 +6,10 @@ import {
   MonthSelector,
   GoldBarChart,
   PieChart,
+  CardPanel,
+  FilterDropdown,
+  LineChart,
+  StackedHorizontalBarChart,
 } from '../charts/DashboardCharts'
 import { Ticket } from '../../context/GlobalStateContext'
 
@@ -50,9 +54,43 @@ function Arrow({ dir, size = 16 }: { dir: 'up' | 'down'; size?: number }) {
   return <span style={{ color, fontSize: size, fontWeight: 700 }}>{dir === 'up' ? '↑' : '↓'}</span>
 }
 
+// ─── Filter Pill ─────────────────────────────────────────────────────────────
+function FilterPill({ label }: { label: string }) {
+  return (
+    <div style={{ padding: '6px 14px', backgroundColor: DASH.cardBg2, border: `1px solid ${DASH.cardBorder}`, borderRadius: '20px', color: DASH.label, fontSize: '12px', whiteSpace: 'nowrap' }}>
+      {label}
+    </div>
+  )
+}
+
+// ─── Section Row ─────────────────────────────────────────────────────────────
+function SectionRow({ title, filter, dateRange }: { title: string; filter: string; dateRange: string }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <h2 style={{ color: DASH.textWhite, fontSize: '20px', fontWeight: 800, margin: 0 }}>{title}</h2>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <FilterPill label={filter} />
+        <FilterPill label={dateRange} />
+      </div>
+    </div>
+  )
+}
+
+// ─── KPI Bullet ──────────────────────────────────────────────────────────────
+function KPIBullet({ text }: { text: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginBottom: '7px' }}>
+      <span style={{ color: DASH.gold, fontSize: '12px', marginTop: '2px', flexShrink: 0 }}>•</span>
+      <span style={{ color: DASH.label, fontSize: '12px', lineHeight: 1.5 }}>{text}</span>
+    </div>
+  )
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function Dashboard1OfficeServices({ tickets }: Props) {
   const [month, setMonth] = useState('February 2025')
+  const [tenantFilter, setTenantFilter] = useState('')
+  const [floorFilter, setFloorFilter] = useState('')
 
   // Derive basic counts from tickets, fall back to hardcoded demo values
   const openTickets = tickets.filter(t => t.status === 'open' || t.status === 'in-progress').length
@@ -60,6 +98,45 @@ export default function Dashboard1OfficeServices({ tickets }: Props) {
 
   const openedCount = openTickets > 0 ? openTickets : 307
   const completedCount = resolvedTickets > 0 ? resolvedTickets : 1187
+
+  const companyData = [
+    { rowLabel: 'Apex Data Solutions',      segments: [165, 121], total: 286, trend: 'up'      as const },
+    { rowLabel: 'Horizon Analytics',        segments: [137, 131], total: 268, trend: 'up'      as const },
+    { rowLabel: 'Lumina Insights',          segments: [78, 109],  total: 187, trend: 'down'    as const },
+    { rowLabel: 'Quantum Metric Corp',      segments: [74, 109],  total: 183, trend: 'down'    as const },
+    { rowLabel: 'Veridian Dynamics',        segments: [41, 72],   total: 113, trend: 'neutral' as const },
+    { rowLabel: 'Starlight Technologies',   segments: [79, 128],  total: 207, trend: 'up'      as const },
+    { rowLabel: 'SynergyWorks Group',       segments: [63, 87],   total: 150, trend: 'up'      as const },
+    { rowLabel: 'NovaSphere Industries',    segments: [43, 95],   total: 138, trend: 'down'    as const },
+    { rowLabel: 'Crimson DataFlow',         segments: [39, 62],   total: 101, trend: 'neutral' as const },
+    { rowLabel: 'Willowbrook Consulting',   segments: [49, 176],  total: 225, trend: 'up'      as const },
+  ]
+
+  const levelSLAData = [
+    { rowLabel: 'Level 01', segments: [83, 121],  total: 204, trend: 'up'   as const },
+    { rowLabel: 'Level 02', segments: [109, 169], total: 278, trend: 'up'   as const },
+    { rowLabel: 'Level 03', segments: [16, 53],   total:  69, trend: 'down' as const },
+    { rowLabel: 'Level 04', segments: [50, 128],  total: 178, trend: 'up'   as const },
+    { rowLabel: 'Level 05', segments: [59, 105],  total: 164, trend: 'down' as const },
+    { rowLabel: 'Level 06', segments: [43, 79],   total: 122, trend: 'up'   as const },
+    { rowLabel: 'Level 07', segments: [29, 62],   total:  91, trend: 'down' as const },
+    { rowLabel: 'Level 08', segments: [72, 188],  total: 260, trend: 'up'   as const },
+  ]
+
+  const cleaningData = [
+    { rowLabel: 'Level 01', segments: [620, 149], total: 769, trend: 'up'   as const },
+    { rowLabel: 'Level 02', segments: [600, 140], total: 740, trend: 'up'   as const },
+    { rowLabel: 'Level 03', segments: [570, 150], total: 720, trend: 'down' as const },
+    { rowLabel: 'Level 04', segments: [610, 149], total: 760, trend: 'up'   as const },
+    { rowLabel: 'Level 05', segments: [580, 150], total: 730, trend: 'down' as const },
+    { rowLabel: 'Level 06', segments: [560, 170], total: 730, trend: 'up'   as const },
+    { rowLabel: 'Level 07', segments: [620, 150], total: 770, trend: 'down' as const },
+    { rowLabel: 'Level 08', segments: [630, 150], total: 780, trend: 'up'   as const },
+  ]
+
+  const frequentedXLabels = ['Feb 14', 'Feb 15', 'Feb 16', 'Feb 17', 'Feb 18', 'Feb 19', 'Feb 20', 'Feb 21', 'Feb 22']
+  const frequentedToday     = [1800, 2600, 3480, 3100, 2700, 2200, 1500, 2400, 2800]
+  const frequentedPrediction = [1600, 2200, 2800, 2500, 2300, 2000, 1800, 2200, 2500]
 
   return (
     <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif", color: DASH.text, padding: '32px 40px', width: '100%', boxSizing: 'border-box' as const }}>
@@ -437,6 +514,84 @@ export default function Dashboard1OfficeServices({ tickets }: Props) {
           </div>
         </div>
       </div>
+
+      {/* ─── Ticket Statistics by Company (in/out of SLA) ─── */}
+      <CardPanel style={{ marginBottom: '20px' }}>
+        <SectionRow title="Ticket Statistics (in or out of SLA)" filter="Filter to floor" dateRange="15.-22. February 2025" />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
+          <span style={{ color: DASH.label, fontSize: '13px' }}>Tickets by company <span style={{ color: DASH.muted, fontSize: '12px' }}>compared to last period</span></span>
+          <span style={{ color: DASH.textWhite, fontSize: '18px', fontWeight: 700 }}>Total <span style={{ color: DASH.textWhite, fontSize: '22px', fontWeight: 800 }}>7 315</span></span>
+        </div>
+        <StackedHorizontalBarChart data={companyData} colors={[DASH.gold, DASH.blue]} labels={['End of SLA', 'In SLA']} width={860} total={300} showTotal={true} />
+      </CardPanel>
+
+      {/* ─── Ticket Statistics by Level ─── */}
+      <CardPanel style={{ marginBottom: '20px' }}>
+        <SectionRow title="Ticket Statistics (in or out of SLA)" filter="Filter to floor" dateRange="15-22. February 2025" />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
+          <span style={{ color: DASH.label, fontSize: '13px' }}>Tickets by level <span style={{ color: DASH.muted, fontSize: '12px' }}>compared to last period</span></span>
+          <span style={{ color: DASH.textWhite, fontSize: '18px', fontWeight: 700 }}>Total <span style={{ color: DASH.textWhite, fontSize: '22px', fontWeight: 800 }}>6 419</span></span>
+        </div>
+        <StackedHorizontalBarChart data={levelSLAData} colors={[DASH.gold, DASH.blue]} labels={['Opened by System', 'Opened by User']} width={860} total={300} showTotal={true} />
+      </CardPanel>
+
+      {/* ─── KPI ─── */}
+      <CardPanel style={{ marginBottom: '20px' }}>
+        <SectionRow title="KPI" filter="Filter to floor" dateRange="15-22. February 2025" />
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <KPIBullet text="Elevator up- and down-trips (4,410 trips/day) above average, increased compared to previous week." />
+          <KPIBullet text="Average daily occupied meeting rooms (Campus): 9.4/10 occupied (94%)" />
+          <KPIBullet text="Facility Operating temperature regulation deviation (above 24°C): temperature above 4.52" />
+          <KPIBullet text="Occupied parking spaces: 44 bookings/day (88%)" />
+          <KPIBullet text="Average daily occupied lockers: 37.5/50 (75%) but 7 lockers malfunctioned, service needed" />
+          <KPIBullet text="Facility Opening room temperature accuracy (20°C): 98.3%" />
+          <KPIBullet text="Energy monitoring – Building Operating maintenance (within 1 year): 12.6 kWh/sqm" />
+          <KPIBullet text="Facility Operating temperature regulation deviation (above 24°C): occurred in 3.5% of cases" />
+          <KPIBullet text="Electric systems operational accuracy (Power): 99.1%" />
+          <KPIBullet text="Surface functional accuracy (Floor, wall, ceiling): 97.4% (maintenance needed on 2.6% of total area)" />
+          <KPIBullet text="Doors and windows operational accuracy: 98.8% (0 malfunctioned units)" />
+          <KPIBullet text="Cleaning quality accuracy: 97.2%" />
+        </div>
+      </CardPanel>
+
+      {/* ─── Frequented Users ─── */}
+      <CardPanel style={{ marginBottom: '20px' }}>
+        <SectionRow title="Frequented users" filter="Filter to tenant" dateRange="15.-22. February 2025" />
+        <LineChart
+          series={[
+            { data: frequentedToday, color: DASH.lineToday, label: 'Today', dashed: false },
+            { data: frequentedPrediction, color: DASH.linePrediction, label: 'Prediction', dashed: true },
+          ]}
+          xLabels={frequentedXLabels}
+          width={860}
+          height={300}
+          yMax={3500}
+          yTicks={7}
+        />
+      </CardPanel>
+
+      {/* ─── Arriving and Leaving ─── */}
+      <CardPanel style={{ marginBottom: '20px' }}>
+        <SectionRow title="Arriving and leaving" filter="Filter to floor" dateRange="15-22. February 2025" />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '180px', flexDirection: 'column', gap: '16px', padding: '24px' }}>
+          <p style={{ color: DASH.textWhite, fontSize: '18px', fontWeight: 700, textAlign: 'center', margin: 0, lineHeight: 1.5 }}>
+            Expected arrival and departure blocks
+          </p>
+          <p style={{ color: DASH.gold, fontSize: '15px', fontWeight: 600, textAlign: 'center', margin: 0 }}>
+            Arrivals 06:00–11:00<br />Departures 15:00–20:00
+          </p>
+        </div>
+      </CardPanel>
+
+      {/* ─── Cleaning Statistics ─── */}
+      <CardPanel style={{ marginBottom: '20px' }}>
+        <SectionRow title="Cleaning statistics" filter="Filter to floor" dateRange="15-22. February 2025" />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
+          <span style={{ color: DASH.label, fontSize: '13px' }}>Cleaning by levels <span style={{ color: DASH.muted, fontSize: '12px' }}>compared to last period</span></span>
+          <span style={{ color: DASH.textWhite, fontSize: '18px', fontWeight: 700 }}>Total <span style={{ color: DASH.textWhite, fontSize: '22px', fontWeight: 800 }}>6 220</span></span>
+        </div>
+        <StackedHorizontalBarChart data={cleaningData} colors={[DASH.gold, DASH.cardBorder]} labels={['Opened by System', 'Opened by User']} width={860} total={800} showTotal={true} />
+      </CardPanel>
 
     </div>
   )

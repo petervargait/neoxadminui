@@ -171,6 +171,22 @@ const wasteColors = [
 
 const wasteLabels = ['Glass', 'Paper', 'Aluminum', 'Plastic', 'Communal']
 
+// ─── CO2 Emissions Data ─────────────────────────────────────────────────────
+const CO2_ITEMS = [
+  { label: 'HVAC Systems', value: 1245, color: '#C9963B' },
+  { label: 'Lighting', value: 485, color: '#3B82F6' },
+  { label: 'IT Infrastructure', value: 380, color: '#06B6D4' },
+  { label: 'Elevators & Escalators', value: 215, color: '#10B981' },
+  { label: 'Kitchen & Catering', value: 195, color: '#8B5CF6' },
+  { label: 'Hot Water Systems', value: 165, color: '#F97316' },
+  { label: 'Transportation (Fleet)', value: 125, color: '#EC4899' },
+  { label: 'Cleaning Equipment', value: 65, color: '#EF4444' },
+  { label: 'Waste Processing', value: 55, color: '#475569' },
+  { label: 'Other Equipment', value: 30, color: '#64748B' },
+]
+const CO2_TOTAL = 2960
+const CO2_MAX = Math.max(...CO2_ITEMS.map(i => i.value))
+
 // ─── Pie Segment Labels ───────────────────────────────────────────────────────
 function HeatingCoolingChart() {
   const segments = [
@@ -349,7 +365,75 @@ export default function Dashboard9Sustainability() {
       </div>
 
       {/* ════════════════════════════════════════════════════════
-          SECTION 3 – Waste Management
+          SECTION 3 – CO2 Emissions
+          ════════════════════════════════════════════════════════ */}
+      <div style={{ marginBottom: '24px' }}>
+        <SectionHeader title="CO2 Emissions">
+          <FilterPill label="Filter to tenant" />
+          <FilterPill label="Filter to level" />
+          <FilterPill label="February 2025" />
+        </SectionHeader>
+
+        <CardPanel>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', alignItems: 'start' }}>
+
+            {/* LEFT – Itemized list with bars */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {CO2_ITEMS.map((item) => {
+                const pct = ((item.value / CO2_TOTAL) * 100).toFixed(1)
+                const barWidth = (item.value / CO2_MAX) * 100
+                return (
+                  <div key={item.label}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                      <span style={{ color: DASH.textWhite, fontSize: '13px', fontWeight: 600 }}>{item.label}</span>
+                      <span style={{ color: DASH.label, fontSize: '12px' }}>
+                        <span style={{ color: DASH.textWhite, fontWeight: 700 }}>{item.value.toLocaleString()}</span>{' '}
+                        t/year &middot; {pct}%
+                      </span>
+                    </div>
+                    <div style={{ height: '6px', borderRadius: '3px', backgroundColor: DASH.cardBorder }}>
+                      <div style={{
+                        height: '100%',
+                        width: `${barWidth}%`,
+                        borderRadius: '3px',
+                        backgroundColor: item.color,
+                      }} />
+                    </div>
+                  </div>
+                )
+              })}
+
+              {/* Total row */}
+              <div style={{
+                borderTop: `1px solid ${DASH.cardBorder}`,
+                paddingTop: '10px',
+                marginTop: '4px',
+              }}>
+                <span style={{ color: DASH.gold, fontSize: '14px', fontWeight: 800 }}>
+                  Total: ~2,960 tonnes CO2/year
+                </span>
+              </div>
+            </div>
+
+            {/* RIGHT – Pie chart */}
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <PieChart
+                segments={CO2_ITEMS.map(item => ({
+                  label: item.label,
+                  value: item.value,
+                  color: item.color,
+                }))}
+                size={260}
+                donut={false}
+              />
+            </div>
+
+          </div>
+        </CardPanel>
+      </div>
+
+      {/* ════════════════════════════════════════════════════════
+          SECTION 4 – Waste Management
           ════════════════════════════════════════════════════════ */}
       <div style={{ marginBottom: '24px' }}>
         <SectionHeader title="Waste management">
@@ -378,36 +462,6 @@ export default function Dashboard9Sustainability() {
             total={250}
             showTotal={true}
           />
-        </CardPanel>
-      </div>
-
-      {/* ════════════════════════════════════════════════════════
-          SECTION 4 – CO² Emission
-          ════════════════════════════════════════════════════════ */}
-      <div style={{ marginBottom: '24px' }}>
-        <SectionHeader title="CO² emission">
-          <FilterPill label="Filter to tenant" />
-          <FilterPill label="February 2025" />
-        </SectionHeader>
-
-        <CardPanel style={{ minHeight: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ textAlign: 'center' }}>
-            <p style={{
-              color: DASH.textWhite,
-              fontSize: '16px',
-              fontWeight: 700,
-              margin: '0 0 8px 0',
-            }}>
-              ponosan milyen adatokat és hogyan kéne vizualizálni?
-            </p>
-            <p style={{
-              color: DASH.label,
-              fontSize: '14px',
-              margin: 0,
-            }}>
-              1 fa = 21kg CO2
-            </p>
-          </div>
         </CardPanel>
       </div>
 

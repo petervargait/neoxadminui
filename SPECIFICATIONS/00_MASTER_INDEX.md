@@ -1,10 +1,10 @@
 # NEOX Infinity App - Master Specification Index
 ## Complete Pixel-Perfect Documentation for All Modules
 
-**Version**: 4.0 - ULTRA DETAILED
-**Date**: 2026-03-05
-**Total Documentation**: 176,500+ lines across 16 files
-**Detail Level**: Implementation-ready - Every button, field, validation, error message, and interaction documented
+**Version**: 5.0
+**Date**: 2026-03-11
+**Status**: All core modules implemented and deployed
+**Detail Level**: Implementation-ready specifications for all modules
 
 ---
 
@@ -201,12 +201,12 @@ Complete implementation of 10 Figma-based analytic dashboards for the NEOX admin
    - Bulk permission assignment
    - Custom permissions
 
-7. **Bulk User Import Screen**
-   - CSV upload
-   - Field mapping
-   - Validation results
-   - Error handling
-   - Import progress
+7. **Bulk User Import** (Embedded in User Management, not separate section)
+   - CSV upload with drag-and-drop
+   - Download template button (auto-generates CSV with correct headers)
+   - CSV format info panel
+   - Validation results and error warnings
+   - Collapsible panel within User Management header
 
 8. **User Directory Screen**
    - Grid/list view toggle
@@ -492,10 +492,10 @@ Complete implementation of 10 Figma-based analytic dashboards for the NEOX admin
       - Date range selector
       - Export chart as image
 
-13. **Visitor Calendar View**
-    - Monthly calendar
-    - Day view (timeline)
-    - Week view
+13. **Visitor Calendar View** (Outlook-style, implemented)
+    - **Day view** (Today): Hourly time slots from 7:00 to 20:00 with visitors placed in slots
+    - **Week view** (This Week): 7-column grid with day columns + hour rows (Outlook-style layout)
+    - **Month view** (This Month/Custom): Monthly calendar grid with event dots
     - Color-coded by status
     - Click to view details
     - Drag to reschedule
@@ -699,7 +699,14 @@ Complete chart specifications (Recharts).
 #### Screens (8 screens):
 1. **Notification Center** (In-app)
 2. **Notification Preferences**
-3. **Email Template Editor**
+3. **Email Template Editor** (Rich WYSIWYG, implemented)
+   - contentEditable + document.execCommand based editor
+   - Font family, font size, bold/italic/underline/strikethrough
+   - Font color picker, highlight color picker
+   - Text alignment (left, center, right, justify)
+   - Ordered and unordered lists
+   - Insert/remove hyperlinks, insert images
+   - Undo/redo, clear formatting, horizontal rule
 4. **SMS Template Editor**
 5. **Push Notification Setup**
 6. **Notification Rules Engine**
@@ -710,26 +717,38 @@ Template editor with variables documented.
 
 ---
 
-## 🔗 Module 11: Integration Hub
+## Module 11: Integration Studio (Replaces Integration Hub)
 
-### 14. Integration Hub Module
-**File**: `14_INTEGRATION_HUB.md` (10,000 lines)
+### 14. Integration Studio Platform
+**File**: `../Integration_Studio_UI_Specification.md`
+**Status**: Fully Implemented
 
 **Contents:**
 
-#### Screens (10 screens):
-1. **Integration Dashboard**
-2. **API Documentation Portal**
-3. **API Key Management**
-4. **Webhook Configuration**
-5. **Integration Marketplace**
-6. **Microsoft 365 Setup**
-7. **Google Workspace Setup**
-8. **Data Import Wizard**
-9. **Data Export Center**
-10. **API Usage Analytics**
+#### Modules (16 modules):
+1. **Dashboard** - Domain health cards (13 domains), top failing connectors, error rate chart
+2. **External Systems** - 38 vendor systems with CRUD, per-env API credentials, connectivity test
+3. **Canonical APIs** - 13 domain API catalogs with operations, methods, paths, schemas
+4. **Connectors** - Connector list with coverage %, health badges, environment versions
+5. **Connector Builder** - Multi-step wizard for creating new connectors
+6. **Mapping Designer** - Split-pane canonical-to-vendor schema mapping with rules
+7. **Flows** - Multi-step flow orchestration with compensation steps
+8. **Events & Sync** - Webhook subscriptions + polling jobs with replay capability
+9. **Testing** - Test console with dry-run/live toggle for 14 connectors
+10. **Health & Logs** - Connector health monitoring + request logs with correlation IDs
+11. **Incidents** - Incident tracking with severity S1-S4, assignment, linked logs
+12. **Issue Reporting** - Taxonomy tree, routing rules, backend connectors
+13. **Identity** - SSO providers, directory sync, role mapping, identity correlation
+14. **Templates** - 13 pre-built connector templates (one per domain)
 
-Complete OpenAPI specifications.
+**13 Canonical Domains:** BMS, AV/UC, IoT, Access Control, Digital Badge, Lockers, Ticketing, Elevator, Visitor Management, Parking, Event Management, Restaurant, Waste Management
+
+**38 Vendor Systems:** Including Siemens Desigo CC, Honeywell Niagara, HikCentral, Haltian Empathic Building, Kone, Schindler, and more.
+
+**Implementation:**
+- Page: `src/app/integration-studio/page.tsx`
+- Components: `src/components/integration-studio/IS*.tsx` (16 files)
+- Shared UI: `ISShared.tsx` (StatusBadge, EnvironmentBadge, CoverageBadge, ISTable, ISModal, ISInput, ISSelect, ISButton, ISTabBar, JsonPreview, WizardStepper, SchemaTree)
 
 ---
 
@@ -797,7 +816,78 @@ Complete React Native specifications.
 
 ---
 
-## 📚 Summary Statistics
+## Module 13: Operational Dashboard (NEW)
+**Status**: Fully Implemented
+
+The Operational Dashboard shows all integrated systems from Integration Studio with their current status and system messages.
+
+**Features:**
+1. **Integrated Systems Status Grid** - Shows all external systems with status badges:
+   - Online (green) - Active system with healthy connector
+   - Offline (red) - Inactive system or critical connector health
+   - Degraded (yellow) - Connector health warning
+   - Maintenance (blue) - System in maintenance mode
+
+2. **System Messages Panel** - Displays active warnings, errors, and incidents:
+   - OperationalMessage interface: `{ id, systemName, severity, message, timestamp, state }`
+   - Severity levels: info, warning, error, critical
+   - States: active, resolved
+
+**Locations:**
+- Global admin dashboard (all tenants view) - after stat cards, before Recent Tenants
+- Tenant-specific admin dashboard - filtered by selected tenant
+- Tenant page dashboard - filtered by tenant
+
+**Data Model** (in GlobalStateContext):
+```typescript
+interface OperationalMessage {
+  id: string
+  systemName: string
+  severity: 'info' | 'warning' | 'error' | 'critical'
+  message: string
+  timestamp: string
+  state: 'active' | 'resolved'
+}
+```
+
+---
+
+## Module 14: Event Management (NEW)
+**Status**: Fully Implemented
+**Component**: `src/components/EventManagement.tsx`
+
+**Features:**
+1. **Event List** - All events with status, date, participant count
+2. **Create/Edit Event** - Event name, description, date, time, location, capacity
+3. **Participant Management** - Add participants manually or via CSV upload
+4. **CSV Upload** - Bulk participant import with template download (name, email, company)
+5. **RSVP Tracking** - Confirmed, pending, declined, waitlisted statuses
+6. **Calendar Views** - Outlook-style day/week/month views (same as Visitor Management)
+7. **Check-in** - Mark participants as attended
+8. **Custom Questions** - Add custom registration questions
+9. **Dietary Requirements** - Track dietary needs and special assistance
+
+---
+
+## Module 15: Tenant Policy Management (NEW)
+**Status**: Fully Implemented
+
+**Features:**
+- Tenant admins upload their own versions of 4 standard policies (GDPR, T&C, Passwords, Installation Guide)
+- Tenant admins can add custom policies
+- Fallback hierarchy: Tenant version > Global version > Not uploaded
+- Source badges: "Tenant Version" (green), "Global Version" (purple), "Not Uploaded" (gray)
+- Upload, download, and delete for tenant policies
+
+**Data Model** (in GlobalStateContext):
+```typescript
+tenantPolicyFiles: Record<string, Record<string, PolicyFile | null>>
+// Methods: uploadTenantPolicy, deleteTenantPolicy, addTenantCustomPolicy
+```
+
+---
+
+## Summary Statistics
 
 | Module | Screens | Fields | Validations | Interactions | Lines |
 |--------|---------|--------|-------------|--------------|-------|
@@ -815,7 +905,10 @@ Complete React Native specifications.
 | Building | 10 | 70 | 300 | 500 | 9,000 |
 | Reporting | 12 | 80 | 200 | 600 | 13,000 |
 | Notifications | 8 | 40 | 150 | 300 | 8,000 |
-| Integration Hub | 10 | 60 | 200 | 400 | 10,000 |
+| Integration Studio | 16 | 100 | 300 | 600 | See spec |
+| Operational Dashboard | 2 | 10 | 20 | 50 | - |
+| Event Management | 9 | 40 | 100 | 200 | - |
+| Tenant Policies | 3 | 15 | 30 | 50 | - |
 | Security | 9 | 50 | 200 | 350 | 8,000 |
 | Mobile App | 20 | 100 | 400 | 800 | 12,000 |
 | Testing | - | - | - | - | 6,000 |
@@ -852,42 +945,45 @@ Complete React Native specifications.
 
 ---
 
-## 📅 Implementation Phases
+## Implementation Status
 
-### Phase 1: Foundation (Months 1-3)
-Files to implement:
-- 01_DESIGN_SYSTEM.md
-- 02_AUTHENTICATION.md
-- 03_NAVIGATION_LAYOUT.md
-- 04_USER_MANAGEMENT.md
-- 10_TENANT_MANAGEMENT.md
+All core modules have been implemented and deployed. The following features are fully operational:
 
-### Phase 2: Core Modules (Months 4-6)
-Files to implement:
-- 05_VISITOR_MANAGEMENT.md
-- 07_SPACE_MANAGEMENT.md
-- 13_NOTIFICATIONS.md
+### Completed (All Phases)
+- Design System (dark navy theme, Fluent UI icons, Poppins font)
+- Authentication (session-based with tenant selection)
+- Navigation & Layout (19 admin sections, 15 tenant sections)
+- User Management (with bulk CSV upload, template download)
+- Tenant Management (with context-aware views)
+- Visitor Management (with Outlook-style calendar views)
+- Event Management (with participant CSV upload)
+- Parking Management (with hover-to-release)
+- Space Management (with hover-to-release)
+- Digital Badges (creation, assignment, tracking)
+- Lockers (with hover-to-release)
+- Building Management (floors, zones, basement levels)
+- Dashboard & Analytics (10 dashboards, pure SVG charts)
+- Integration Studio (16 modules, 38 vendor systems)
+- Operational Dashboard (system status + messages)
+- Notifications (with rich WYSIWYG email editor)
+- Policy Management (global + tenant-level with fallback)
+- White Label Settings (colors, fonts, logo per tenant)
+- Ticket Management (priority, assignment, status)
+- Audit Logs
 
-### Phase 3: Additional Modules (Months 7-9)
-Files to implement:
-- 06_PARKING_MANAGEMENT.md
-- 08_DIGITAL_BADGES.md
-- 09_LOCKERS.md
-- 11_BUILDING_MANAGEMENT.md
-
-### Phase 4: Advanced (Months 10-12)
-Files to implement:
-- 12_REPORTING_ANALYTICS.md
-- 14_INTEGRATION_HUB.md
-- 15_SECURITY_COMPLIANCE.md
-- 16_MOBILE_APP.md
+### Enhancement Backlog
+- Profile edit/delete in admin
+- Badge user selection dropdown
+- Module inheritance from profiles
+- Badge assignment on user creation
 
 ---
 
-## 🔄 Document Updates
+## Document Updates
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 5.0 | 2026-03-11 | Added Integration Studio (replacing Integration Hub), Operational Dashboard, Event Management, Tenant Policy Management, Outlook-style calendar views, rich email editor, bulk upload in User Management |
 | 4.0 | 2026-03-05 | Added Dashboard & Analytics module (05_DASHBOARDS_ANALYTICS.md) with 10 implemented dashboards |
 | 3.0 | 2025-10-28 | Complete ultra-detailed specifications for all modules |
 | 2.0 | 2025-10-28 | Added design system and authentication |

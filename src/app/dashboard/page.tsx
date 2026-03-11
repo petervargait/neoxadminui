@@ -10,6 +10,7 @@ import ParkingDashboard from '../../components/ParkingDashboard'
 import LockerDashboard from '../../components/LockerDashboard'
 import BadgesDashboard from '../../components/BadgesDashboard'
 import SpaceBookingDashboard from '../../components/SpaceBookingDashboard'
+import Dashboard0OperationalOverview from '../../components/dashboards/Dashboard0OperationalOverview'
 import Dashboard1OfficeServices from '../../components/dashboards/Dashboard1OfficeServices'
 import Dashboard2OfficeBuilding from '../../components/dashboards/Dashboard2OfficeBuilding'
 import Dashboard3AmenityServices from '../../components/dashboards/Dashboard3AmenityServices'
@@ -17,7 +18,6 @@ import Dashboard4EmployeeServices from '../../components/dashboards/Dashboard4Em
 import Dashboard5VisitorCenter from '../../components/dashboards/Dashboard5VisitorCenter'
 import Dashboard6ParkingRestaurant from '../../components/dashboards/Dashboard6ParkingRestaurant'
 import Dashboard7OccupancyServices from '../../components/dashboards/Dashboard7OccupancyServices'
-import Dashboard8OfficeServicesFull from '../../components/dashboards/Dashboard8OfficeServicesFull'
 import Dashboard9Sustainability from '../../components/dashboards/Dashboard9Sustainability'
 import Dashboard10Wellbeing from '../../components/dashboards/Dashboard10Wellbeing'
 
@@ -27,7 +27,7 @@ export default function DashboardPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [username, setUsername] = useState('')
   const [selectedTenant, setSelectedTenant] = useState<string>('')
-  const [activeDashboard, setActiveDashboard] = useState<string>('sustainability')
+  const [activeDashboard, setActiveDashboard] = useState<string>('operationalOverview')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
@@ -66,15 +66,15 @@ export default function DashboardPage() {
   const tenantTickets = globalState.tickets?.filter(t => t.tenantId === selectedTenant) || []
 
   const dashboards = [
+    { id: 'operationalOverview', label: 'Operational Overview', icon: '◉', color: '#10B981' },
     { id: 'sustainability', label: 'Energy Monitor', icon: '▨', color: '#10B981' },
     { id: 'wellbeing', label: 'Wellbeing', icon: '▩', color: '#06B6D4' },
     { id: 'officeBuilding', label: 'Office Building', icon: '◈', color: '#3B82F6' },
     { id: 'officeServices', label: 'Office Services', icon: '◇', color: '#D4A847' },
-    { id: 'officeServicesFull', label: 'Office Services Full', icon: '▧', color: '#D4A847' },
     { id: 'amenityServices', label: 'Amenity Services', icon: '▣', color: '#D4A847' },
     { id: 'employeeServices', label: 'Employee Services', icon: '◫', color: '#64748B' },
-    { id: 'visitorCenter', label: 'Visitor Center', icon: '▤', color: '#D4A847' },
-    { id: 'parkingRestaurant', label: 'Parking & Restaurant', icon: '▥', color: '#8B5CF6' },
+    { id: 'visitorServices', label: 'Visitor Services', icon: '▤', color: '#D4A847' },
+    { id: 'parkingServices', label: 'Parking Services', icon: '▥', color: '#8B5CF6' },
     { id: 'occupancyServices', label: 'Occupancy Services', icon: '▦', color: '#3B82F6' },
   ]
 
@@ -365,6 +365,14 @@ export default function DashboardPage() {
             </div>
           )}
 
+          {/* ─── Operational Overview ─── */}
+          {activeDashboard === 'operationalOverview' && (
+            <Dashboard0OperationalOverview
+              externalSystems={globalState.externalSystems}
+              tickets={tenantTickets}
+            />
+          )}
+
           {/* ─── Figma-based Dashboards ─── */}
           {activeDashboard === 'officeServices' && (
             <Dashboard1OfficeServices tickets={tenantTickets} />
@@ -382,10 +390,10 @@ export default function DashboardPage() {
               spaces={tenantSpaces || []}
             />
           )}
-          {activeDashboard === 'visitorCenter' && (
+          {activeDashboard === 'visitorServices' && (
             <Dashboard5VisitorCenter invitations={tenantInvitations} />
           )}
-          {activeDashboard === 'parkingRestaurant' && (
+          {activeDashboard === 'parkingServices' && (
             <Dashboard6ParkingRestaurant
               parkingSpaces={tenantParkingSpaces}
               parkingBookings={tenantParkingBookings}
@@ -393,13 +401,8 @@ export default function DashboardPage() {
           )}
           {activeDashboard === 'occupancyServices' && (
             <Dashboard7OccupancyServices
-              invitations={tenantInvitations}
-              parkingSpaces={tenantParkingSpaces}
               badgeSwipes={tenantBadgeSwipes || []}
             />
-          )}
-          {activeDashboard === 'officeServicesFull' && (
-            <Dashboard8OfficeServicesFull tickets={tenantTickets} />
           )}
           {activeDashboard === 'sustainability' && (
             <Dashboard9Sustainability />

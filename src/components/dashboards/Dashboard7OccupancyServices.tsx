@@ -1,22 +1,19 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import {
   DASH,
   CardPanel,
   MonthSelector,
-  HorizontalBarChart,
   StackedHorizontalBarChart,
   GaugeChart,
   FloorHeatmap,
   TrendArrow,
 } from '../charts/DashboardCharts'
-import { Invitation, ParkingSpace, BadgeSwipe } from '../../context/GlobalStateContext'
+import { BadgeSwipe } from '../../context/GlobalStateContext'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface Props {
-  invitations: Invitation[]
-  parkingSpaces: ParkingSpace[]
   badgeSwipes: BadgeSwipe[]
 }
 
@@ -59,26 +56,6 @@ function PillSelect({
 }
 
 // ─── Static data constants ───────────────────────────────────────────────────
-const VISITOR_COMPANIES_STATIC = [
-  { label: 'Apex Data Solutions', value: 169, trend: 'down' as const },
-  { label: 'Horizon Analytics', value: 121, trend: 'neutral' as const },
-  { label: 'Lumina Insights', value: 53, trend: 'neutral' as const },
-  { label: 'Quantum Metric Corp', value: 105, trend: 'down' as const },
-  { label: 'Veridian Dynamics', value: 72, trend: 'down' as const },
-  { label: 'Starlight Technologies', value: 128, trend: 'neutral' as const },
-  { label: 'SynergyWorks Group', value: 34, trend: 'neutral' as const },
-  { label: 'Crimson DataFlow', value: 62, trend: 'down' as const },
-  { label: 'Willowbrook Consulting', value: 176, trend: 'neutral' as const },
-  { label: 'NovaSphere Industries', value: 95, trend: 'neutral' as const },
-]
-
-const PARKING_LEVELS_STATIC = [
-  { label: 'Level -1', value: 3426, trend: 'down' as const },
-  { label: 'Level -2', value: 2267, trend: 'down' as const },
-  { label: 'Level -3', value: 2946, trend: 'neutral' as const },
-  { label: 'Level -4', value: 2052, trend: 'neutral' as const },
-]
-
 // Access Management stacked data: [Physical badge, Digital badge, Watch badge]
 const ACCESS_COMPANIES_STATIC = [
   { rowLabel: 'Apex Data Solutions',      segments: [76, 381, 329], total: 786,  trend: 'up'      as const },
@@ -170,11 +147,6 @@ const FLOOR_OPTIONS = [
     label: `${i + 1}${i === 0 ? 'st' : i === 1 ? 'nd' : i === 2 ? 'rd' : 'th'} floor`,
   })).reverse(),
   { value: '0', label: 'Ground floor' },
-]
-
-const COMPANY_OPTIONS = [
-  { value: 'all', label: 'All companies' },
-  ...VISITOR_COMPANIES_STATIC.map((c) => ({ value: c.label, label: c.label })),
 ]
 
 const TENANT_OPTIONS = [
@@ -284,164 +256,6 @@ function DailyEstimateChart({
         ))}
       </g>
     </svg>
-  )
-}
-
-// ─── Visitor Management Section ───────────────────────────────────────────────
-function VisitorManagementSection({ invitations }: { invitations: Invitation[] }) {
-  const [floor, setFloor] = useState('all')
-  const [month, setMonth] = useState('February 2025')
-
-  // Derive from real invitations, fall back to static
-  const fromData = useMemo(() => {
-    const counts: Record<string, number> = {}
-    invitations.forEach((inv) => {
-      const co = inv.visitorCompany || 'Unknown'
-      counts[co] = (counts[co] || 0) + 1
-    })
-    return Object.entries(counts)
-      .map(([label, value]) => ({ label, value, trend: 'neutral' as const }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 10)
-  }, [invitations])
-
-  const chartData = fromData.length >= 5 ? fromData : VISITOR_COMPANIES_STATIC
-  const total = chartData.reduce((s, d) => s + d.value, 0)
-
-  return (
-    <section>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px',
-        }}
-      >
-        <h2 style={{ color: DASH.text, fontSize: '20px', fontWeight: 700, margin: 0 }}>
-          Visitor Management
-        </h2>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <PillSelect
-            value={floor}
-            onChange={setFloor}
-            options={FLOOR_OPTIONS}
-            placeholder="Filter to floor"
-          />
-          <MonthSelector value={month} onChange={setMonth} />
-        </div>
-      </div>
-      <CardPanel>
-        {/* Chart header */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: '16px',
-          }}
-        >
-          <div>
-            <span style={{ color: DASH.text, fontWeight: 700, fontSize: '15px' }}>
-              Visitors by company
-            </span>{' '}
-            <span style={{ color: DASH.muted, fontSize: '13px' }}>compared to last period</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-            <span style={{ color: DASH.label, fontSize: '14px', fontWeight: 600 }}>Total</span>
-            <span style={{ color: DASH.textWhite, fontSize: '22px', fontWeight: 800 }}>
-              {total.toLocaleString()}
-            </span>
-          </div>
-        </div>
-        <HorizontalBarChart
-          data={chartData}
-          width={580}
-          barColor={DASH.gold}
-          showTrend={true}
-        />
-      </CardPanel>
-    </section>
-  )
-}
-
-// ─── Parking Management Section ───────────────────────────────────────────────
-function ParkingManagementSection({ parkingSpaces }: { parkingSpaces: ParkingSpace[] }) {
-  const [company, setCompany] = useState('all')
-  const [month, setMonth] = useState('February 2025')
-
-  // Derive per-level counts from real parking spaces, fall back to static
-  const fromData = useMemo(() => {
-    const counts: Record<string, number> = {}
-    parkingSpaces.forEach((ps) => {
-      const lev = ps.level || ps.floor || 'Unknown'
-      counts[lev] = (counts[lev] || 0) + 1
-    })
-    const entries = Object.entries(counts).map(([label, value]) => ({
-      label,
-      value,
-      trend: 'neutral' as const,
-    }))
-    return entries.length >= 2 ? entries : null
-  }, [parkingSpaces])
-
-  const chartData = fromData || PARKING_LEVELS_STATIC
-  const total = chartData.reduce((s, d) => s + d.value, 0)
-
-  return (
-    <section>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px',
-        }}
-      >
-        <h2 style={{ color: DASH.text, fontSize: '20px', fontWeight: 700, margin: 0 }}>
-          Parking Management
-        </h2>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <PillSelect
-            value={company}
-            onChange={setCompany}
-            options={COMPANY_OPTIONS}
-            placeholder="Filter to company"
-          />
-          <MonthSelector value={month} onChange={setMonth} />
-        </div>
-      </div>
-      <CardPanel>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: '16px',
-          }}
-        >
-          <div>
-            <span style={{ color: DASH.text, fontWeight: 700, fontSize: '15px' }}>
-              Parked cars by levels
-            </span>{' '}
-            <span style={{ color: DASH.muted, fontSize: '13px' }}>compared to last period</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-            <span style={{ color: DASH.label, fontSize: '14px', fontWeight: 600 }}>Total</span>
-            <span style={{ color: DASH.textWhite, fontSize: '22px', fontWeight: 800 }}>
-              {total.toLocaleString()}
-            </span>
-          </div>
-        </div>
-        <HorizontalBarChart
-          data={chartData}
-          width={580}
-          barColor={DASH.cyan}
-          showTrend={true}
-          maxValue={4000}
-        />
-      </CardPanel>
-    </section>
   )
 }
 
@@ -714,8 +528,6 @@ function WorkplaceUtilizationSection() {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function Dashboard7OccupancyServices({
-  invitations,
-  parkingSpaces,
   badgeSwipes,
 }: Props) {
   return (
@@ -751,8 +563,6 @@ export default function Dashboard7OccupancyServices({
 
       {/* Sections */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
-        <VisitorManagementSection invitations={invitations} />
-        <ParkingManagementSection parkingSpaces={parkingSpaces} />
         <AccessManagementSection badgeSwipes={badgeSwipes} />
         <WorkplaceUtilizationSection />
       </div>
