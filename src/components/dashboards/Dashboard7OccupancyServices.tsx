@@ -17,44 +17,6 @@ interface Props {
   badgeSwipes: BadgeSwipe[]
 }
 
-// ─── Styled dropdown (pill) ──────────────────────────────────────────────────
-function PillSelect({
-  value,
-  onChange,
-  options,
-  placeholder,
-}: {
-  value: string
-  onChange: (v: string) => void
-  options: { value: string; label: string }[]
-  placeholder?: string
-}) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      style={{
-        padding: '7px 18px',
-        backgroundColor: DASH.cardBg2,
-        border: `1px solid ${DASH.cardBorder}`,
-        borderRadius: '20px',
-        color: DASH.text,
-        fontSize: '13px',
-        outline: 'none',
-        cursor: 'pointer',
-        minWidth: '150px',
-      }}
-    >
-      {placeholder && <option value="">{placeholder}</option>}
-      {options.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
-  )
-}
-
 // ─── Static data constants ───────────────────────────────────────────────────
 
 // Floor heatmap data
@@ -124,15 +86,6 @@ const DAILY_EST_DATA = [
     weeklyMax: 534,
     weeklyPeak: 303,
   },
-]
-
-const FLOOR_OPTIONS = [
-  { value: 'all', label: 'All floors' },
-  ...Array.from({ length: 29 }, (_, i) => ({
-    value: String(i + 1),
-    label: `${i + 1}${i === 0 ? 'st' : i === 1 ? 'nd' : i === 2 ? 'rd' : 'th'} floor`,
-  })).reverse(),
-  { value: '0', label: 'Ground floor' },
 ]
 
 const TENANT_OPTIONS = [
@@ -307,9 +260,11 @@ function getFloorOccColor(floor: number): string {
 export default function Dashboard7OccupancyServices({
   badgeSwipes,
 }: Props) {
-  const [floorFilter, setFloorFilter] = useState('')
   const [selectedFloor, setSelectedFloor] = useState<number | null>(null)
   const [selectedFloorName, setSelectedFloorName] = useState('')
+  const [dateRange, setDateRange] = useState<string>('Today')
+  const [customFrom, setCustomFrom] = useState('')
+  const [customTo, setCustomTo] = useState('')
 
   const totalAccess = DEPT_ACCESS_DATA.reduce((s, d) => s + d.total, 0)
 
@@ -323,18 +278,32 @@ export default function Dashboard7OccupancyServices({
         boxSizing: 'border-box' as const,
       }}
     >
-      {/* Header */}
-      <h1
-        style={{
-          color: DASH.textWhite || '#FFFFFF',
-          fontSize: '36px',
-          fontWeight: 800,
-          margin: '0 0 40px 0',
-          letterSpacing: '-0.5px',
-        }}
-      >
-        Occupancy Services
-      </h1>
+      {/* Header with date filter */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+        <h1 style={{ color: '#FFFFFF', fontSize: '36px', fontWeight: 800, margin: 0, letterSpacing: '-0.5px' }}>
+          Occupancy Services
+        </h1>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {(['Today', 'This Week', 'This Month'] as const).map(label => (
+            <button key={label} onClick={() => setDateRange(label)}
+              style={{
+                padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+                backgroundColor: dateRange === label ? '#1E3A5F' : DASH.cardBg2,
+                border: `1px solid ${dateRange === label ? '#3B82F6' : DASH.cardBorder}`,
+                color: dateRange === label ? '#F1F5F9' : '#94A3B8',
+              }}>
+              {label}
+            </button>
+          ))}
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            <input type="date" value={customFrom} onChange={e => { setCustomFrom(e.target.value); setDateRange('custom') }}
+              style={{ padding: '7px 10px', backgroundColor: DASH.cardBg2, border: `1px solid ${DASH.cardBorder}`, borderRadius: '8px', color: '#F1F5F9', fontSize: '12px', outline: 'none' }} />
+            <span style={{ color: '#64748B', fontSize: '12px' }}>to</span>
+            <input type="date" value={customTo} onChange={e => { setCustomTo(e.target.value); setDateRange('custom') }}
+              style={{ padding: '7px 10px', backgroundColor: DASH.cardBg2, border: `1px solid ${DASH.cardBorder}`, borderRadius: '8px', color: '#F1F5F9', fontSize: '12px', outline: 'none' }} />
+          </div>
+        </div>
+      </div>
 
       {/* ─── Section 1: 3D Building Model ─────────────────────────────────── */}
       <div style={{ position: 'relative', marginBottom: '24px' }}>
@@ -342,11 +311,25 @@ export default function Dashboard7OccupancyServices({
           <div style={{ padding: '16px 20px', borderBottom: `1px solid ${DASH.cardBorder}` }}>
             <h2 style={{ color: '#FFFFFF', fontSize: '20px', fontWeight: 800, margin: 0 }}>Building Overview</h2>
             <p style={{ color: DASH.label, fontSize: '12px', margin: '4px 0 0' }}>
-              {selectedFloor !== null ? `Viewing ${selectedFloorName}` : 'Click a floor in Ghost mode to view floor plan'}
+              {selectedFloor !== null
+                ? `Showing data for ${selectedFloorName} · Click "All Floors" to reset`
+                : 'Click a floor in Ghost mode to filter all dashboard data to that floor'}
             </p>
           </div>
           <div style={{ position: 'relative' }}>
             <BuildingModel3D height={520} onFloorSelect={(floorNum, floorName) => { setSelectedFloor(floorNum); setSelectedFloorName(floorName) }} />
+            {/* "All" button — reset to whole building view */}
+            {selectedFloor !== null && (
+              <button onClick={() => { setSelectedFloor(null); setSelectedFloorName('') }}
+                style={{
+                  position: 'absolute', top: 12, left: 200, zIndex: 10,
+                  padding: '6px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+                  backgroundColor: '#1E3A5F', border: '1px solid #3B82F6', color: '#F1F5F9',
+                  backdropFilter: 'blur(8px)',
+                }}>
+                All Floors
+              </button>
+            )}
             {/* HSE & Occupancy overlay panels */}
             <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ padding: '12px 16px', backgroundColor: 'rgba(15,26,46,0.9)', border: '1px solid #1E3A5F', borderRadius: '10px', backdropFilter: 'blur(8px)', minWidth: '160px' }}>
@@ -405,8 +388,6 @@ export default function Dashboard7OccupancyServices({
               gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '24px',
               marginBottom: '32px',
-              borderTop: `1px solid ${DASH.cardBorder}`,
-              paddingTop: '28px',
             }}
           >
             <div style={{ textAlign: 'center' }}>
@@ -460,38 +441,10 @@ export default function Dashboard7OccupancyServices({
 
       {/* ─── Section 3: Access by Department ──────────────────────────────── */}
       <section style={{ marginTop: '36px' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '16px',
-          }}
-        >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <h2 style={{ color: DASH.text, fontSize: '20px', fontWeight: 700, margin: 0 }}>
             Access by Department
           </h2>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <PillSelect
-              value={floorFilter}
-              onChange={setFloorFilter}
-              options={FLOOR_OPTIONS}
-              placeholder="Filter to floor"
-            />
-            <div
-              style={{
-                padding: '7px 18px',
-                backgroundColor: DASH.cardBg2,
-                border: `1px solid ${DASH.cardBorder}`,
-                borderRadius: '20px',
-                color: DASH.text,
-                fontSize: '13px',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              15 -22. February 2025
-            </div>
-          </div>
         </div>
         <CardPanel>
           <div
