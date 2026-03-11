@@ -262,6 +262,47 @@ function DailyEstimateChart({
   )
 }
 
+// Floor data for HSE capacity and current occupancy
+const FLOOR_DATA: Record<number, { hse: number; current: number }> = {
+  0: { hse: 300, current: 255 },   // Ground - Reception
+  1: { hse: 200, current: 144 },   // Cafeteria
+  2: { hse: 150, current: 97 },    // Fitness
+  3: { hse: 250, current: 225 },   // Conference
+  4: { hse: 280, current: 196 },   // Office
+  5: { hse: 280, current: 224 },
+  6: { hse: 280, current: 210 },
+  7: { hse: 280, current: 252 },
+  8: { hse: 280, current: 238 },
+  9: { hse: 280, current: 196 },
+  10: { hse: 280, current: 174 },
+  11: { hse: 280, current: 112 },
+  12: { hse: 280, current: 126 },
+  13: { hse: 280, current: 202 },
+  14: { hse: 280, current: 162 },
+  15: { hse: 280, current: 182 },
+  16: { hse: 280, current: 196 },
+  17: { hse: 250, current: 145 },
+  18: { hse: 250, current: 110 },
+  19: { hse: 120, current: 48 },    // Executive
+  20: { hse: 80, current: 32 },
+  21: { hse: 100, current: 42 },    // Rooftop
+}
+
+function getFloorHSE(floor: number): string {
+  return (FLOOR_DATA[floor]?.hse || 200).toLocaleString()
+}
+function getFloorCurrent(floor: number): string {
+  return (FLOOR_DATA[floor]?.current || 0).toLocaleString()
+}
+function getFloorOccColor(floor: number): string {
+  const d = FLOOR_DATA[floor]
+  if (!d) return '#94A3B8'
+  const pct = d.current / d.hse
+  if (pct >= 0.8) return '#EF4444'   // Red
+  if (pct >= 0.5) return '#F59E0B'   // Amber
+  return '#10B981'                    // Green
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function Dashboard7OccupancyServices({
   badgeSwipes,
@@ -298,44 +339,57 @@ export default function Dashboard7OccupancyServices({
       </h1>
 
       {/* ─── Section 1: 3D Building Model ─────────────────────────────────── */}
-      <CardPanel style={{ marginBottom: '24px', padding: '0', overflow: 'hidden' }}>
-        <div style={{ padding: '16px 20px', borderBottom: `1px solid ${DASH.cardBorder}` }}>
-          <h2 style={{ color: '#FFFFFF', fontSize: '20px', fontWeight: 800, margin: 0 }}>
-            Building Overview
-          </h2>
-          <p style={{ color: DASH.label, fontSize: '12px', margin: '4px 0 0' }}>
-            {selectedFloor !== null
-              ? `Viewing ${selectedFloorName} floor plan`
-              : 'Click a floor in Ghost mode to view its floor plan with zone occupancy'}
-          </p>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            gap: '0',
-            minHeight: '520px',
-          }}
-        >
-          <div style={{ flex: selectedFloor !== null ? '0 0 45%' : '1 1 100%', transition: 'flex 0.3s ease' }}>
-            <BuildingModel3D
-              height={520}
-              onFloorSelect={(floorNum, floorName) => {
-                setSelectedFloor(floorNum)
-                setSelectedFloorName(floorName)
-              }}
-            />
+      <div style={{ position: 'relative', marginBottom: '24px' }}>
+        <CardPanel style={{ padding: '0', overflow: 'hidden' }}>
+          <div style={{ padding: '16px 20px', borderBottom: `1px solid ${DASH.cardBorder}` }}>
+            <h2 style={{ color: '#FFFFFF', fontSize: '20px', fontWeight: 800, margin: 0 }}>Building Overview</h2>
+            <p style={{ color: DASH.label, fontSize: '12px', margin: '4px 0 0' }}>
+              {selectedFloor !== null ? `Viewing ${selectedFloorName}` : 'Click a floor in Ghost mode to view floor plan'}
+            </p>
           </div>
-          {selectedFloor !== null && (
-            <div style={{ flex: '0 0 55%', borderLeft: `1px solid ${DASH.cardBorder}` }}>
-              <FloorplanWithZones
-                floorNumber={selectedFloor}
-                floorName={selectedFloorName}
-                onClose={() => setSelectedFloor(null)}
-              />
+          <div style={{ position: 'relative' }}>
+            <BuildingModel3D height={520} onFloorSelect={(floorNum, floorName) => { setSelectedFloor(floorNum); setSelectedFloorName(floorName) }} />
+            {/* HSE & Occupancy overlay panels */}
+            <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ padding: '12px 16px', backgroundColor: 'rgba(15,26,46,0.9)', border: '1px solid #1E3A5F', borderRadius: '10px', backdropFilter: 'blur(8px)', minWidth: '160px' }}>
+                <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>HSE Capacity</div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#F1F5F9', lineHeight: 1.2 }}>5,000</div>
+                <div style={{ fontSize: '11px', color: '#64748B' }}>Maximum allowed</div>
+              </div>
+              <div style={{ padding: '12px 16px', backgroundColor: 'rgba(15,26,46,0.9)', border: '1px solid #1E3A5F', borderRadius: '10px', backdropFilter: 'blur(8px)', minWidth: '160px' }}>
+                <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current Occupancy</div>
+                <div style={{ fontSize: '28px', fontWeight: 800, color: '#10B981', lineHeight: 1.2 }}>1,247</div>
+                <div style={{ fontSize: '11px', color: '#64748B' }}>People in building</div>
+              </div>
+              {selectedFloor !== null && (
+                <>
+                  <div style={{ padding: '12px 16px', backgroundColor: 'rgba(15,26,46,0.9)', border: '1px solid #3B82F6', borderRadius: '10px', backdropFilter: 'blur(8px)', minWidth: '160px' }}>
+                    <div style={{ fontSize: '11px', color: '#3B82F6', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{selectedFloorName} HSE</div>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#F1F5F9', lineHeight: 1.2 }}>{getFloorHSE(selectedFloor)}</div>
+                    <div style={{ fontSize: '11px', color: '#64748B' }}>Floor max capacity</div>
+                  </div>
+                  <div style={{ padding: '12px 16px', backgroundColor: 'rgba(15,26,46,0.9)', border: '1px solid #3B82F6', borderRadius: '10px', backdropFilter: 'blur(8px)', minWidth: '160px' }}>
+                    <div style={{ fontSize: '11px', color: '#3B82F6', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{selectedFloorName} Current</div>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: getFloorOccColor(selectedFloor), lineHeight: 1.2 }}>{getFloorCurrent(selectedFloor)}</div>
+                    <div style={{ fontSize: '11px', color: '#64748B' }}>People on floor</div>
+                  </div>
+                </>
+              )}
             </div>
-          )}
-        </div>
-      </CardPanel>
+          </div>
+        </CardPanel>
+      </div>
+
+      {/* Floorplan panel - appears below when floor selected */}
+      {selectedFloor !== null && (
+        <CardPanel style={{ marginBottom: '24px', padding: '0', overflow: 'hidden' }}>
+          <FloorplanWithZones
+            floorNumber={selectedFloor}
+            floorName={selectedFloorName}
+            onClose={() => setSelectedFloor(null)}
+          />
+        </CardPanel>
+      )}
 
       {/* ─── Section 2: Workplace Utilization ─────────────────────────────── */}
       <section>
@@ -465,40 +519,33 @@ export default function Dashboard7OccupancyServices({
             }}
           >
             <div style={{ textAlign: 'center' }}>
-              <div style={{ color: DASH.muted, fontSize: '12px', marginBottom: '8px', lineHeight: 1.4 }}>
-                Ide jöhetne valami szöveg még magyarázásba
-              </div>
               <GaugeChart
-                value={126}
-                max={100}
+                value={4200}
+                max={5000}
                 label="Allocation"
+                sublabel="4,200 / 5,000"
                 size={180}
-                color={DASH.gold}
+                color={DASH.blue}
               />
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ color: DASH.muted, fontSize: '12px', marginBottom: '8px', lineHeight: 1.4 }}>
-                Ide jöhetne valami szöveg még magyarázásba
-              </div>
               <GaugeChart
-                value={30}
+                value={25}
                 max={100}
-                label="Utilization"
+                label="Current Utilization"
+                sublabel="1,247 / 5,000"
                 size={180}
-                color={DASH.gold}
+                color={DASH.blue}
               />
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ color: DASH.muted, fontSize: '12px', marginBottom: '8px', lineHeight: 1.4 }}>
-                Ide jöhetne valami szöveg még magyarázásba
-              </div>
               <GaugeChart
-                value={56}
+                value={68}
                 max={100}
-                label="Peak utilization"
-                sublabel="56,47%"
+                label="Peak Utilization"
+                sublabel="3,400 / 5,000"
                 size={180}
-                color={DASH.gold}
+                color={DASH.blue}
               />
             </div>
           </div>

@@ -35,6 +35,40 @@ const DASH = {
   cyan: '#06B6D4',
 } as const
 
+// Floor occupancy data for RAG coloring (floor index 0-24, where 0-2 are basements)
+const FLOOR_OCCUPANCY_PCT: Record<number, number> = {
+  0: 0, 1: 0, 2: 0,          // Basements B3, B2, B1
+  3: 85,  // Floor 0 - Ground (reception)
+  4: 72,  // Floor 1 - Cafeteria
+  5: 65,  // Floor 2 - Fitness
+  6: 90,  // Floor 3 - Conference
+  7: 70,  // Floor 4 - Office
+  8: 80,  // Floor 5
+  9: 75,  // Floor 6
+  10: 90, // Floor 7
+  11: 85, // Floor 8
+  12: 70, // Floor 9
+  13: 62, // Floor 10
+  14: 40, // Floor 11
+  15: 45, // Floor 12
+  16: 72, // Floor 13
+  17: 58, // Floor 14
+  18: 65, // Floor 15
+  19: 70, // Floor 16
+  20: 58, // Floor 17
+  21: 44, // Floor 18
+  22: 40, // Floor 19 - Executive
+  23: 40, // Floor 20
+  24: 42, // Floor 21 - Rooftop
+}
+
+function getFloorHighlightColor(floorIndex: number): number {
+  const pct = FLOOR_OCCUPANCY_PCT[floorIndex] ?? 50
+  if (pct >= 80) return 0xEF4444  // Red
+  if (pct >= 50) return 0xF59E0B  // Amber
+  return 0x10B981                  // Green
+}
+
 // ---------------------------------------------------------------------------
 // Props
 // ---------------------------------------------------------------------------
@@ -211,15 +245,16 @@ const BuildingModel3D: React.FC<BuildingModel3DProps> = ({ onFloorSelect, height
     const clipBottom = clipBottomRef.current
     const clipTop = clipTopRef.current
 
-    // --- Floor highlight material ---
+    // --- Floor highlight material (color updated dynamically per floor) ---
     const floorHighlightMat = new THREE.MeshBasicMaterial({
-      color: 0x44eebb,
+      color: 0x10B981,
       transparent: true,
       opacity: 0.5,
       depthWrite: false,
       side: THREE.DoubleSide,
       clippingPlanes: [clipBottom, clipTop],
     })
+    const floorHighlightMatRef = { current: floorHighlightMat }
 
     // --- Load model ---
     const dracoLoader = new DRACOLoader()
@@ -356,11 +391,15 @@ const BuildingModel3D: React.FC<BuildingModel3DProps> = ({ onFloorSelect, height
         clipBottomRef.current.constant = -floorMinY
         clipTopRef.current.constant = floorMaxY
 
+        // Update highlight color based on floor occupancy (RAG)
+        floorHighlightMatRef.current.color.set(getFloorHighlightColor(clampedFloor))
+
         if (highlightGroupRef.current) highlightGroupRef.current.visible = true
         currentFloorRef.current = clampedFloor
 
+        const pct = FLOOR_OCCUPANCY_PCT[clampedFloor] ?? 0
         const floorName = getFloorName(clampedFloor)
-        setHoveredFloor(floorName)
+        setHoveredFloor(`${floorName} — ${pct}% occupied`)
 
         // Position tooltip
         if (tooltipRef.current) {
