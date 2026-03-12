@@ -7,7 +7,7 @@
 - No TypeScript errors
 - Production-ready
 
-## Completed Implementations (22 Major Features)
+## Completed Implementations (36 Major Features)
 
 ### ✅ 1. Tasks Approval Workflow
 **Status:** Fully Implemented
@@ -288,6 +288,112 @@
 - Upload, download, and delete functionality for tenant policies
 **Files Modified:** `src/context/GlobalStateContext.tsx`, `src/app/tenant/page.tsx`
 
+### 23. Dashboard Restructuring
+**Status:** Fully Implemented
+- Operational Overview redesigned with blue/neutral theme (removed gold accents)
+- Occupancy Services moved to 2nd tab position
+- Office Services merged (removed duplicate)
+- Amenity Services renamed to Caffe Services
+- Visitor Center renamed to Visitor Services
+- Parking & Restaurant renamed to Parking Services
+- CO2 emissions panel added to Energy Monitor
+- 11 dashboards total (added Operational Overview as Dashboard 0)
+**Files Modified:** `src/app/dashboard/page.tsx`
+**Files Added:** `src/components/dashboards/Dashboard0OperationalOverview.tsx`
+
+### 24. 3D Building Model in Occupancy Dashboard
+**Status:** Fully Implemented
+- Three.js BuildingModel3D component with @react-three/fiber and @react-three/drei
+- Shaded and Ghost rendering modes (toggle in UI)
+- Floor hover highlighting with RAG colors (red/amber/green based on occupancy percentage)
+- Click floor to view floorplan details
+- "All Floors" button to reset floor selection
+- HSE Capacity & Occupancy overlay panels (building: 5,000 HSE / 1,247 current; floor-specific when selected)
+**Files Added:** `src/components/dashboards/BuildingModel3D.tsx`
+**Files Modified:** `src/components/dashboards/Dashboard7OccupancyServices.tsx`
+
+### 25. Floorplan with Occupancy Zones
+**Status:** Fully Implemented
+- FloorplanWithZones component showing floor plan images with heatmap blob overlays
+- Red blobs for zones >=80% occupancy, amber for >=50%, green for <50%
+- Blob overlays clipped to building walls using mask images from public/floorplans/
+- Positioned via CSS absolute divs on floorplan image
+**Files Added:** `src/components/dashboards/FloorplanWithZones.tsx`, `public/floorplans/` (floor images and masks)
+
+### 26. Workplace Utilization Gauges
+**Status:** Fully Implemented
+- Allocation gauge: 4,200/5,000 = 84%
+- Current Utilization gauge: 1,247/5,000 = 25%
+- Peak Utilization gauge: 3,400/5,000 = 68%
+- GaugeChart SVG rendering fixed for values >50% (largeArc flag correction)
+**Files Modified:** `src/components/dashboards/Dashboard7OccupancyServices.tsx`, `src/components/charts/DashboardCharts.tsx`
+
+### 27. Access by Department
+**Status:** Fully Implemented
+- Replaced company-based visitor view with department breakdown
+- Departments: Finance, IT, HR, Marketing, Operations, Legal, Executive, Facilities
+- Shows Workers/Visitors/Contractors per department
+**Files Modified:** `src/components/dashboards/Dashboard7OccupancyServices.tsx`
+
+### 28. Date Range Filter on Occupancy
+**Status:** Fully Implemented
+- Filter options: Today, This Week, This Month, Custom
+- Displayed in Occupancy Services header bar
+**Files Modified:** `src/components/dashboards/Dashboard7OccupancyServices.tsx`
+
+### 29. Google Maps in Wellbeing
+**Status:** Fully Implemented
+- Replaced SVG traffic map placeholder with real Google Maps embed
+- Location: Arboc utca, Budapest with dark mode styling
+- Live Traffic toggle to enable/disable traffic layer
+**Files Modified:** `src/components/dashboards/Dashboard10Wellbeing.tsx`
+
+### 30. Permanent/Temporary Assignment Toggle
+**Status:** Fully Implemented
+- Parking, Locker, and Space assignment includes permanent/temporary toggle
+- Temporary assignment shows start date and end date pickers
+- Applies to both admin and tenant assignment workflows
+**Files Modified:** `src/app/admin/page.tsx`, `src/app/tenant/page.tsx`
+
+### 31. Free/Assigned/Occupied RAG Status
+**Status:** Fully Implemented
+- Each parking space, locker, and space grid box shows RAG color: green (free/available), amber (assigned/reserved), red (occupied/in-use)
+- Summary cards at top of each management section match RAG colors
+- Assign action sets status to "reserved" (amber), not "occupied" (red)
+**Files Modified:** `src/app/admin/page.tsx`, `src/app/tenant/page.tsx`
+
+### 32. Visitor Invitation Date Range
+**Status:** Fully Implemented
+- Start date+time and end date+time fields on invitation form
+- Applied to both tenant page visitor section and VisitorManagement component
+**Files Modified:** `src/app/tenant/page.tsx`, `src/components/VisitorManagement.tsx`
+
+### 33. Calendar View Grouping
+**Status:** Fully Implemented
+- Multiple visitors in same time slot grouped together
+- Shows +N badge when more than one visitor in a slot
+- Hover tooltip reveals all grouped visitors
+**Files Modified:** `src/components/VisitorManagement.tsx`
+
+### 34. Integration Studio Tenant Selector
+**Status:** Fully Implemented
+- Tenant dropdown added to Integration Studio top navigation bar
+- Uses existing GlobalState tenants list
+**Files Modified:** `src/app/integration-studio/page.tsx`
+
+### 35. Mobile Responsive Dashboard
+**Status:** Fully Implemented
+- Sidebar hidden on mobile viewports
+- Top navigation bar wraps for smaller screens
+- Dashboard content adapts to available width
+**Files Modified:** `src/app/dashboard/page.tsx`
+
+### 36. GaugeChart Fix
+**Status:** Fully Implemented
+- Fixed largeArc SVG flag rendering for gauge values >50%
+- Gauges now correctly render arcs past the halfway point
+**Files Modified:** `src/components/charts/DashboardCharts.tsx`
+
 ## Remaining Enhancement Backlog
 
 ### Medium Priority
@@ -338,10 +444,27 @@
 15. Add Outlook-style calendar views for Visitor and Event Management
 16. Add hover-to-release on occupied grid boxes and rich email template editor
 17. Add tenant-level policy management with global fallback
+18. Major dashboard restructuring and documentation update
+19. Replace traffic map placeholder with Google Maps embed
+20. Add Permanent/Temporary assignment toggle, visitor date range, and calendar grouping
+21. Add start/end date+time to VisitorManagement component invitation form
+22. Add 3D building model to Occupancy dashboard, redesign Operational Overview
+23. Fix Occupancy dashboard: floorplan below model, HSE panels, RAG floor colors
+24. Fix occupancy dashboard: correct floor numbers, smaller zones, fix gauges
+25. Change floorplan zones from rectangles to soft circles (heatmap blobs)
+26. Clip floorplan blobs within walls, add date filter, fix dashboard UI
+27. Fix blob positions from actual floorplan images, keep selected floor highlighted
+28. Fix blobs to use CSS positioned divs on image, fix gauge arcs, move All button
+29. Use mask images to clip occupancy blobs within building walls
+30. Smaller blobs, amber/red 3D floors, mobile responsive dashboard
+31. Add tenant selector to Integration Studio top bar
+32. Add Free/Assigned/Occupied status cards for Parking, Lockers, Spaces
+33. Add Free/Assigned/Occupied RAG status to each individual grid box
+34. Fix assignment flow: assign sets 'reserved' (amber), not 'occupied' (red)
 
 ## Statistics
 
-### Features Completed: 22 major features
+### Features Completed: 36 major features
 - ✅ Tasks Approval Workflow
 - ✅ Tenant Persistence & Visibility
 - ✅ User Management with Profile Selection
@@ -350,7 +473,7 @@
 - ✅ Ticket Creation & Visibility
 - ✅ Policy Visibility (Global)
 - ✅ Visitor Invitation Management
-- ✅ Dashboard & Analytics (10 dashboards)
+- ✅ Dashboard & Analytics (11 dashboards)
 - ✅ Shared Chart Library (9 SVG chart types)
 - ✅ Building Management
 - ✅ Visitor Check-in/Check-out
@@ -364,6 +487,20 @@
 - ✅ Hover-to-Release Grid Boxes
 - ✅ Rich WYSIWYG Email Template Editor
 - ✅ Tenant Policy Management with Global Fallback
+- ✅ Dashboard Restructuring (Operational Overview, renamed dashboards)
+- ✅ 3D Building Model (Three.js, Shaded/Ghost modes, RAG floor colors)
+- ✅ Floorplan with Occupancy Zones (heatmap blobs, mask clipping)
+- ✅ Workplace Utilization Gauges (Allocation/Current/Peak)
+- ✅ Access by Department (replaced company view)
+- ✅ Date Range Filter on Occupancy
+- ✅ Google Maps in Wellbeing (live traffic)
+- ✅ Permanent/Temporary Assignment Toggle
+- ✅ Free/Assigned/Occupied RAG Status (green/amber/red)
+- ✅ Visitor Invitation Date Range (start/end date+time)
+- ✅ Calendar View Grouping (+N badge, hover tooltip)
+- ✅ Integration Studio Tenant Selector
+- ✅ Mobile Responsive Dashboard
+- ✅ GaugeChart Fix (largeArc SVG rendering)
 
 ## Production Readiness
 
@@ -375,11 +512,20 @@ The application is fully functional with:
 - White label customization
 - Policy distribution (global + tenant-level)
 - User profile management with bulk CSV upload
-- Operational Dashboard with integrated systems status
-- Integration Studio with 38 vendor systems
-- Outlook-style calendar views for Visitor and Event Management
+- Operational Dashboard (blue/neutral theme) with integrated systems status
+- Integration Studio with 38 vendor systems and tenant selector
+- Outlook-style calendar views with grouped visitors (+N badge)
 - Rich WYSIWYG email template editor
-- Interactive grid management (parking, lockers, spaces) with hover-to-release
+- Interactive grid management (parking, lockers, spaces) with hover-to-release and RAG status
+- 3D interactive building model with Three.js (Shaded/Ghost modes, floor click navigation)
+- Floorplan with heatmap blob overlays clipped to building walls
+- HSE capacity and occupancy panels with floor-level detail
+- Workplace utilization gauges (Allocation, Current, Peak)
+- Access by department breakdown (Finance, IT, HR, Marketing, Operations, Legal, Executive, Facilities)
+- Google Maps live traffic embed in Wellbeing dashboard
+- Permanent/temporary assignment toggle with date pickers
+- Visitor invitation date range (start/end date+time)
+- Mobile responsive dashboard layout
 
 ### Enhancement Backlog
 Remaining items are quality-of-life improvements that don't block core functionality.
@@ -469,7 +615,7 @@ onSubmit={(e) => {
 - ✅ Chrome/Edge (Chromium)
 - ✅ Firefox
 - ✅ Safari
-- ⚠️ Mobile (partially tested)
+- ✅ Mobile (responsive dashboard, sidebar hidden on mobile)
 
 ## Documentation
 - `README.md` - Project overview and setup guide
@@ -486,7 +632,7 @@ onSubmit={(e) => {
 - `src/app/page.tsx` - Home page with tenant cards + Integration Studio
 - `src/app/admin/page.tsx` - Global admin (19 sidebar sections)
 - `src/app/tenant/page.tsx` - Tenant admin (15 sidebar sections)
-- `src/app/dashboard/page.tsx` - Dashboard & Analytics (10 dashboards)
+- `src/app/dashboard/page.tsx` - Dashboard & Analytics (11 dashboards)
 - `src/app/integration-studio/page.tsx` - Integration Studio (16 modules)
 - `src/app/energy/page.tsx` - Energy management
 - `src/app/api-docs/page.tsx` - API documentation
@@ -504,6 +650,9 @@ onSubmit={(e) => {
 - `src/components/ColorPicker.tsx` - Color picker with gradients
 - `src/components/FontFamilySelector.tsx` - Font selection
 - `src/components/charts/DashboardCharts.tsx` - SVG chart library (9 types)
+- `src/components/dashboards/BuildingModel3D.tsx` - Three.js 3D building model
+- `src/components/dashboards/FloorplanWithZones.tsx` - Floorplan with heatmap blob overlays
+- `src/components/dashboards/Dashboard0OperationalOverview.tsx` - Operational Overview
 - `src/components/dashboards/Dashboard1-10*.tsx` - 10 analytics dashboards
 - `src/components/integration-studio/IS*.tsx` - 16 Integration Studio modules
 
@@ -515,14 +664,20 @@ onSubmit={(e) => {
 The NEOX Infinity Admin platform is production-ready with 22 major features fully implemented across global admin, tenant admin, Integration Studio, and Dashboard & Analytics. The platform manages multi-tenant building/facility operations with comprehensive visitor, event, parking, locker, space, and badge management, plus a full third-party integration platform with 38 vendor systems.
 
 **Key Achievements:**
-- 22 major features complete
+- 36 major features complete
 - 19 admin sidebar sections + 15 tenant sidebar sections
-- 10 analytics dashboards with pure SVG chart library
-- Integration Studio with 16 modules and 38 vendor systems
-- Operational Dashboard with real-time system status
-- Outlook-style calendar views
+- 11 analytics dashboards with pure SVG chart library + Three.js 3D model
+- Integration Studio with 16 modules, 38 vendor systems, and tenant selector
+- Operational Dashboard with blue/neutral theme and real-time system status
+- Interactive 3D building model with Shaded/Ghost modes and RAG floor highlighting
+- Floorplan visualization with heatmap blob overlays and mask-based wall clipping
+- HSE capacity/occupancy panels and workplace utilization gauges
+- Free/Assigned/Occupied RAG status across parking, lockers, and spaces
+- Google Maps live traffic integration in Wellbeing dashboard
+- Outlook-style calendar views with visitor grouping (+N badge)
+- Mobile responsive dashboard layout
 - Rich WYSIWYG email template editor
 - Tenant policy management with global fallback
-- Interactive grid management with hover-to-release
+- Interactive grid management with hover-to-release and permanent/temporary assignment
 
 **Status:** PRODUCTION READY

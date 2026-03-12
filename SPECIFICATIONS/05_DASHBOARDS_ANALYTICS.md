@@ -1,6 +1,6 @@
 # Dashboard & Analytics - Complete Specification
 
-Version 4.0 | Date: 2026-03-05 | Status: Implemented
+Version 5.0 | Date: 2026-03-12 | Status: Implemented
 
 ---
 
@@ -9,16 +9,17 @@ Version 4.0 | Date: 2026-03-05 | Status: Implemented
 1. [Architecture](#1-architecture)
 2. [Design System](#2-design-system)
 3. [Shared Chart Components](#3-shared-chart-components)
-4. [Dashboard 1 - Energy Monitor](#4-energy-monitor)
-5. [Dashboard 2 - Wellbeing Services](#5-wellbeing-services)
-6. [Dashboard 3 - Office Building](#6-office-building)
-7. [Dashboard 4 - Office Services](#7-office-services)
-8. [Dashboard 5 - Office Services Full](#8-office-services-full)
-9. [Dashboard 6 - Amenity Services](#9-amenity-services)
-10. [Dashboard 7 - Employee Services](#10-employee-services)
-11. [Dashboard 8 - Visitor Center](#11-visitor-center)
-12. [Dashboard 9 - Parking & Restaurant](#12-parking--restaurant)
-13. [Dashboard 10 - Occupancy Services](#13-occupancy-services)
+4. [Dashboard 0 - Operational Overview](#4-operational-overview)
+5. [Dashboard 1 - Occupancy Services](#5-occupancy-services)
+6. [Dashboard 2 - Energy Monitor](#6-energy-monitor)
+7. [Dashboard 3 - Wellbeing Services](#7-wellbeing-services)
+8. [Dashboard 4 - Office Building](#8-office-building)
+9. [Dashboard 5 - Office Services](#9-office-services)
+10. [Dashboard 6 - Caffe Services](#10-caffe-services)
+11. [Dashboard 7 - Employee Services](#11-employee-services)
+12. [Dashboard 8 - Visitor Services](#12-visitor-services)
+13. [Dashboard 9 - Parking Services](#13-parking-services)
+14. [Dashboard 10 - Office Services Full](#14-office-services-full)
 
 ---
 
@@ -64,22 +65,29 @@ Version 4.0 | Date: 2026-03-05 | Status: Implemented
 
 ### Sidebar Navigation Items (in order)
 
-| # | ID                  | Label                 | Icon | Color    |
-|---|---------------------|-----------------------|------|----------|
-| 1 | `sustainability`    | Energy Monitor        | `▨`  | #10B981  |
-| 2 | `wellbeing`         | Wellbeing             | `▩`  | #06B6D4  |
-| 3 | `officeBuilding`    | Office Building       | `◈`  | #3B82F6  |
-| 4 | `officeServices`    | Office Services       | `◇`  | #D4A847  |
-| 5 | `officeServicesFull`| Office Services Full  | `▧`  | #D4A847  |
-| 6 | `amenityServices`   | Amenity Services      | `▣`  | #D4A847  |
-| 7 | `employeeServices`  | Employee Services     | `◫`  | #64748B  |
-| 8 | `visitorCenter`     | Visitor Center        | `▤`  | #D4A847  |
-| 9 | `parkingRestaurant` | Parking & Restaurant  | `▥`  | #8B5CF6  |
-|10 | `occupancyServices` | Occupancy Services    | `▦`  | #3B82F6  |
+| # | ID                    | Label                 | Icon | Color    |
+|---|----------------------|-----------------------|------|----------|
+| 0 | `operationalOverview` | Operational Overview  | `▨`  | #3B82F6  |
+| 1 | `occupancyServices`   | Occupancy Services    | `▦`  | #3B82F6  |
+| 2 | `sustainability`      | Energy Monitor        | `▨`  | #10B981  |
+| 3 | `wellbeing`           | Wellbeing             | `▩`  | #06B6D4  |
+| 4 | `officeBuilding`      | Office Building       | `◈`  | #3B82F6  |
+| 5 | `officeServices`      | Office Services       | `◇`  | #D4A847  |
+| 6 | `caffeServices`       | Caffe Services        | `▣`  | #D4A847  |
+| 7 | `employeeServices`    | Employee Services     | `◫`  | #64748B  |
+| 8 | `visitorServices`     | Visitor Services      | `▤`  | #D4A847  |
+| 9 | `parkingServices`     | Parking Services      | `▥`  | #8B5CF6  |
+|10 | `officeServicesFull`  | Office Services Full  | `▧`  | #D4A847  |
 
 ### Default Active Dashboard
 
-`sustainability` (Energy Monitor) is the default on page load.
+`operationalOverview` (Operational Overview) is the default on page load.
+
+### Mobile Responsive Layout
+
+- Sidebar is hidden on mobile viewports
+- Top navigation bar wraps for smaller screens
+- Dashboard content adapts to available width
 
 ### Data Flow Pattern
 
@@ -93,18 +101,23 @@ Version 4.0 | Date: 2026-03-05 | Status: Implemented
 
 | File | Purpose |
 |------|---------|
-| `src/app/dashboard/page.tsx` | Page shell, sidebar, routing |
+| `src/app/dashboard/page.tsx` | Page shell, sidebar, routing, mobile responsive |
 | `src/components/charts/DashboardCharts.tsx` | Shared chart library & design tokens |
+| `src/components/dashboards/BuildingModel3D.tsx` | Three.js 3D building model (Shaded/Ghost modes) |
+| `src/components/dashboards/FloorplanWithZones.tsx` | Floorplan with heatmap blob overlays and mask clipping |
+| `src/components/dashboards/Dashboard0OperationalOverview.tsx` | Operational Overview (blue/neutral theme) |
 | `src/components/dashboards/Dashboard1OfficeServices.tsx` | Office Services |
 | `src/components/dashboards/Dashboard2OfficeBuilding.tsx` | Office Building |
-| `src/components/dashboards/Dashboard3AmenityServices.tsx` | Amenity Services |
+| `src/components/dashboards/Dashboard3AmenityServices.tsx` | Caffe Services (renamed from Amenity) |
 | `src/components/dashboards/Dashboard4EmployeeServices.tsx` | Employee Services |
-| `src/components/dashboards/Dashboard5VisitorCenter.tsx` | Visitor Center |
-| `src/components/dashboards/Dashboard6ParkingRestaurant.tsx` | Parking & Restaurant |
-| `src/components/dashboards/Dashboard7OccupancyServices.tsx` | Occupancy Services |
+| `src/components/dashboards/Dashboard5VisitorCenter.tsx` | Visitor Services (renamed from Visitor Center) |
+| `src/components/dashboards/Dashboard6ParkingRestaurant.tsx` | Parking Services (renamed from Parking & Restaurant) |
+| `src/components/dashboards/Dashboard7OccupancyServices.tsx` | Occupancy Services (3D model, floorplan, HSE, gauges) |
 | `src/components/dashboards/Dashboard8OfficeServicesFull.tsx` | Office Services Full |
-| `src/components/dashboards/Dashboard9Sustainability.tsx` | Energy Monitor |
-| `src/components/dashboards/Dashboard10Wellbeing.tsx` | Wellbeing Services |
+| `src/components/dashboards/Dashboard9Sustainability.tsx` | Energy Monitor (with CO2 emissions) |
+| `src/components/dashboards/Dashboard10Wellbeing.tsx` | Wellbeing Services (Google Maps traffic) |
+| `public/models/` | 3D building model assets |
+| `public/floorplans/` | Floor plan images and mask files |
 
 ---
 
@@ -210,7 +223,151 @@ All exported from `src/components/charts/DashboardCharts.tsx`.
 
 ---
 
-## 4. Energy Monitor
+## 4. Operational Overview
+
+- **File:** `Dashboard0OperationalOverview.tsx`
+- **Sidebar:** "Operational Overview" | `▨` | `#3B82F6`
+- **Props:** none (uses GlobalStateContext for external systems)
+- **Title:** "Operational Overview" (36px, weight 800)
+- **Theme:** Blue/neutral (no gold accents) - redesigned from original gold-themed dashboard
+
+### Design
+
+Uses a blue/neutral color scheme distinct from the gold-accented analytics dashboards. Primary accent is `#3B82F6` (blue) instead of `#C9963B` (gold).
+
+### Section 1: Integrated Systems Status
+
+- Shows all external systems from Integration Studio
+- Status badges: Online (green), Offline (red), Degraded (yellow), Maintenance (blue)
+- System count summary at top
+
+### Section 2: System Messages
+
+- Active warnings, errors, and incidents from OperationalMessages
+- Severity indicators with color coding
+- Timestamp and source system for each message
+
+### Section 3: CO2 Emissions
+
+- CO2 emissions monitoring panel
+- Building-level carbon footprint tracking
+- Reference: 1 tree = 21kg CO2 absorbed annually
+
+---
+
+## 5. Occupancy Services
+
+- **File:** `Dashboard7OccupancyServices.tsx`
+- **Sidebar:** "Occupancy Services" | `▦` | `#3B82F6`
+- **Props:** `invitations: Invitation[]`, `parkingSpaces: ParkingSpace[]`, `badgeSwipes: BadgeSwipe[]`
+- **Title:** "Occupancy services" (36px, weight 800)
+- **State:** `selectedFloor`, `viewMode` (Shaded/Ghost), `dateRange` (Today/This Week/This Month/Custom)
+
+### Header Controls
+
+- Date range filter: Today | This Week | This Month | Custom (pill-style selector in header)
+- "All Floors" button to reset floor selection on 3D model
+
+### Section 1: 3D Building Model
+
+**Component:** `BuildingModel3D.tsx` (Three.js with @react-three/fiber and @react-three/drei)
+
+- Interactive 3D building rendered with Three.js
+- **Shaded mode:** Solid materials with lighting and shadows
+- **Ghost mode:** Transparent/wireframe materials showing internal structure
+- Toggle between modes via UI button
+- Each floor is a separate clickable mesh
+- **Floor hover highlighting:** RAG colors based on occupancy percentage:
+  - Red: >=80% occupancy
+  - Amber: >=50% occupancy
+  - Green: <50% occupancy
+- Click on a floor to select it and view its floorplan below
+
+### Section 2: HSE Capacity & Occupancy Panels
+
+Overlay panels positioned on the 3D model view:
+
+**Building-level (always visible):**
+- HSE Capacity: **5,000** (maximum safe occupancy)
+- Current Occupancy: **1,247** (real-time count)
+
+**Floor-level (shown when a floor is selected):**
+- Floor HSE Capacity (floor-specific maximum)
+- Floor Current Occupancy (floor-specific count)
+
+### Section 3: Floorplan with Occupancy Zones
+
+**Component:** `FloorplanWithZones.tsx`
+
+- Displays below the 3D model when a floor is selected
+- Shows floor plan image from `public/floorplans/`
+- Heatmap blob overlays positioned via CSS absolute divs on the floorplan image
+- **Blob colors based on zone occupancy:**
+  - Red: >=80% occupancy
+  - Amber: >=50% occupancy
+  - Green: <50% occupancy
+- Blobs are clipped to building walls using mask images from `public/floorplans/`
+- Soft circular blob shapes (not rectangles)
+
+### Section 4: Workplace Utilization
+
+**Gauge row (3 across):**
+
+| Gauge | Numerator | Denominator | Percentage | Label |
+|-------|-----------|-------------|-----------|-------|
+| 1 | 4,200 | 5,000 | 84% | Allocation |
+| 2 | 1,247 | 5,000 | 25% | Current Utilization |
+| 3 | 3,400 | 5,000 | 68% | Peak Utilization |
+
+Note: GaugeChart SVG rendering fixed for values >50% (largeArc flag correction).
+
+### Section 5: Access by Department
+
+- **Sub-header:** "Access by department" | "compared to last period"
+- Replaced previous company-based visitor breakdown
+- **Chart:** StackedHorizontalBarChart
+
+| Department | Workers | Visitors | Contractors | Trend |
+|------------|---------|----------|-------------|-------|
+| Finance | - | - | - | - |
+| IT | - | - | - | - |
+| HR | - | - | - | - |
+| Marketing | - | - | - | - |
+| Operations | - | - | - | - |
+| Legal | - | - | - | - |
+| Executive | - | - | - | - |
+| Facilities | - | - | - | - |
+
+**Segment colors:** Workers (gold), Visitors (blue), Contractors (muted)
+
+### Section 6: Parking Management
+
+- **Filters:** PillSelect (company), MonthSelector
+- **Sub-header:** "Parked cars by levels" | Total: **9 615** (derived)
+- **Chart:** HorizontalBarChart (cyan, width 580, maxValue 4000)
+
+| Level | Value | Trend |
+|-------|-------|-------|
+| Level -1 | 3426 | down |
+| Level -2 | 2267 | down |
+| Level -3 | 2946 | neutral |
+| Level -4 | 2052 | neutral |
+
+### Section 7: Access Management
+
+- **Filters:** PillSelect (floor), date range pill
+- **Sub-header:** "Access by badge type" | Total: **21 421** (derived)
+- **Chart:** StackedHorizontalBarChart (width 620, total scale 900)
+- **Segment colors:** gold = Physical badge, `#1E3A5F` = Digital badge, red = Watch badge
+
+### Section 8: Daily Average People & Peak Estimate
+
+Custom grouped bar chart (3 bars per month):
+- Colors: orange = Weekly avg., gold = Weekly max., red = Weekly peak check-in
+
+---
+
+## 6. Energy Monitor
 
 - **File:** `Dashboard9Sustainability.tsx`
 - **Sidebar:** "Energy Monitor" | `▨` | `#10B981`
@@ -285,12 +442,13 @@ Labels positioned left/right of pie in a 3-column grid layout.
 
 - **Header:** "CO2 emission"
 - **Filters:** "Filter to tenant" pill, "February 2025" pill
-- **Content:** Placeholder card (min-height 180px, centered text)
-- **Text:** "ponosan milyen adatokat es hogyan kene vizualizalni?" / "1 fa = 21kg CO2"
+- **Content:** CO2 emissions monitoring panel with building carbon footprint data
+- **Reference:** 1 tree = 21kg CO2 absorbed annually
+- **Visualization:** Emissions trend chart and current carbon intensity metrics
 
 ---
 
-## 5. Wellbeing Services
+## 7. Wellbeing Services
 
 - **File:** `Dashboard10Wellbeing.tsx`
 - **Sidebar:** "Wellbeing" | `▩` | `#06B6D4`
@@ -356,8 +514,10 @@ Labels positioned left/right of pie in a 3-column grid layout.
 ### Section 3: Traffic Around the Building
 
 - **Title:** "Traffic around the building"
-- **Content:** SVG map placeholder (760x240) with grid lines, road paths, building blocks, green areas, pin marker
-- **Toggle:** "Live Traffic" button (top-right, toggles orange/red route highlights)
+- **Content:** Google Maps embed (replaces previous SVG placeholder)
+- **Location:** Arboc utca, Budapest, Hungary
+- **Styling:** Dark mode map theme
+- **Toggle:** "Live Traffic" button (top-right, enables/disables Google Maps traffic layer)
 
 ### Section 4: Outdoor Weather Prediction
 
@@ -394,7 +554,7 @@ X-labels: `['15.02', '16.02', '17.02', '18.02', '19.02', '20.02', '21.02', '22.0
 
 ---
 
-## 6. Office Building
+## 8. Office Building
 
 - **File:** `Dashboard2OfficeBuilding.tsx`
 - **Sidebar:** "Office Building" | `◈` | `#3B82F6`
@@ -445,7 +605,7 @@ X-labels: `['15.02', '16.02', '17.02', '18.02', '19.02', '20.02', '21.02', '22.0
 
 ---
 
-## 7. Office Services
+## 9. Office Services
 
 - **File:** `Dashboard1OfficeServices.tsx`
 - **Sidebar:** "Office Services" | `◇` | `#D4A847`
@@ -504,7 +664,7 @@ X-labels: `['15.02', '16.02', '17.02', '18.02', '19.02', '20.02', '21.02', '22.0
 
 ---
 
-## 8. Office Services Full
+## 14. Office Services Full
 
 - **File:** `Dashboard8OfficeServicesFull.tsx`
 - **Sidebar:** "Office Services Full" | `▧` | `#D4A847`
@@ -603,7 +763,7 @@ Same as Dashboard 1 Section 3, full-width charts.
 
 ---
 
-## 9. Amenity Services
+## 10. Caffe Services (formerly Amenity Services)
 
 - **File:** `Dashboard3AmenityServices.tsx`
 - **Sidebar:** "Amenity Services" | `▣` | `#D4A847`
@@ -714,7 +874,7 @@ Same as Dashboard 1 Section 3, full-width charts.
 
 ---
 
-## 10. Employee Services
+## 11. Employee Services
 
 - **File:** `Dashboard4EmployeeServices.tsx`
 - **Sidebar:** "Employee Services" | `◫` | `#64748B`
@@ -768,7 +928,7 @@ Same as Dashboard 1 Section 3, full-width charts.
 
 ---
 
-## 11. Visitor Center
+## 12. Visitor Services (formerly Visitor Center)
 
 - **File:** `Dashboard5VisitorCenter.tsx`
 - **Sidebar:** "Visitor Center" | `▤` | `#D4A847`
@@ -799,7 +959,7 @@ Same as Dashboard 1 Section 3, full-width charts.
 
 ---
 
-## 12. Parking & Restaurant
+## 13. Parking Services (formerly Parking & Restaurant)
 
 - **File:** `Dashboard6ParkingRestaurant.tsx`
 - **Sidebar:** "Parking & Restaurant" | `▥` | `#8B5CF6`
@@ -843,111 +1003,20 @@ Same as Dashboard 1 Section 3, full-width charts.
 
 ---
 
-## 13. Occupancy Services
-
-- **File:** `Dashboard7OccupancyServices.tsx`
-- **Sidebar:** "Occupancy Services" | `▦` | `#3B82F6`
-- **Props:** `invitations: Invitation[]`, `parkingSpaces: ParkingSpace[]`, `badgeSwipes: BadgeSwipe[]`
-- **Title:** "Occupancy services" (36px, weight 800)
-
-### Section 1: Visitor Management
-
-- **Filters:** PillSelect (floor), MonthSelector
-- **Sub-header:** "Visitors by company" | "compared to last period" | Total: **1 015**
-- **Chart:** HorizontalBarChart (gold, width 580)
-
-| Company | Value | Trend |
-|---------|-------|-------|
-| Apex Data Solutions | 169 | down |
-| Horizon Analytics | 121 | neutral |
-| Lumina Insights | 53 | neutral |
-| Quantum Metric Corp | 105 | down |
-| Veridian Dynamics | 72 | down |
-| Starlight Technologies | 128 | neutral |
-| SynergyWorks Group | 34 | neutral |
-| Crimson DataFlow | 62 | down |
-| Willowbrook Consulting | 176 | neutral |
-| NovaSphere Industries | 95 | neutral |
-
-### Section 2: Parking Management
-
-- **Filters:** PillSelect (company), MonthSelector
-- **Sub-header:** "Parked cars by levels" | Total: **9 615** (derived)
-- **Chart:** HorizontalBarChart (cyan, width 580, maxValue 4000)
-
-| Level | Value | Trend |
-|-------|-------|-------|
-| Level -1 | 3426 | down |
-| Level -2 | 2267 | down |
-| Level -3 | 2946 | neutral |
-| Level -4 | 2052 | neutral |
-
-### Section 3: Access Management
-
-- **Filters:** PillSelect (floor), date range pill "15-22. February 2025"
-- **Sub-header:** "Visitors by company" | Total: **21 421** (derived)
-- **Chart:** StackedHorizontalBarChart (width 620, total scale 900)
-- **Segment colors:** gold = Physical badge, `#1E3A5F` = Digital badge, red = Watch badge
-
-| Company | Physical | Digital | Watch | Total | Trend |
-|---------|----------|---------|-------|-------|-------|
-| Apex Data Solutions | 76 | 381 | 329 | 786 | up |
-| Horizon Analytics | 41 | 284 | 206 | 531 | up |
-| Lumina Insights | 68 | 101 | 498 | 667 | up |
-| Quantum Metric Corp | 89 | 381 | 171 | 641 | up |
-| Veridian Dynamics | 76 | 271 | 439 | 786 | up |
-| Starlight Technologies | 79 | 331 | 376 | 786 | up |
-| SynergyWorks Group | 79 | 284 | 124 | 487 | up |
-| Crimson DataFlow | 91 | 318 | 72 | 481 | up |
-| Willowbrook Consulting | 48 | 221 | 112 | 381 | up |
-
-### Section 4: Workplace Utilization
-
-- **Filters:** PillSelect (tenant), MonthSelector
-
-**Floor Heatmap** (FloorHeatmap, width 180, height 480):
-31 floors from Groundfloor (82%) through 29th (12%), color-coded by occupancy threshold (>25% = gold, <=25% = blue).
-
-**Center metrics:**
-- Average floor occupancy: **45** (+10%)
-- Peak floor occupancy: **93** (-20%)
-
-**Right KPI cards:**
-- HSE Capacity: **1036** (up)
-- Avg. daily entrance: **1373** (up)
-
-**Gauge row (3 across):**
-
-| Gauge | Value | Label | Sublabel |
-|-------|-------|-------|----------|
-| 1 | 126% | Allocation | - |
-| 2 | 30% | Utilization | - |
-| 3 | 56% | Peak utilization | 56,47% |
-
-**Daily average people & peak estimate by date:** Custom grouped bar chart (3 bars per month)
-- Colors: orange = Weekly avg., gold = Weekly max., red = Weekly peak check-in
-
-| Month | Weekly Avg | Weekly Max | Weekly Peak |
-|-------|-----------|-----------|-------------|
-| August | 2300 | 2156 | 400 |
-| September | 1900 | 2000 | 423 |
-| October | 1411 | 1768 | 342 |
-| November | 1002 | 1578 | 456 |
-| December | 412 | 534 | 303 |
-
 ---
 
 ## Appendix: Figma Screenshot Reference
 
 | Dashboard | Screenshot File |
 |-----------|----------------|
+| Operational Overview | (new - no Figma reference) |
+| Occupancy Services | `DashBoards/DashBoard7.png` (significantly expanded with 3D model) |
 | Office Services | `DashBoards/DashBoard1.png` |
 | Office Building | `DashBoards/DashBoard2.png` |
-| Amenity Services | `DashBoards/DashBoard3.png` |
+| Caffe Services | `DashBoards/DashBoard3.png` |
 | Employee Services | `DashBoards/DashBoard4.png` |
-| Visitor Center | `DashBoards/DashBoard5.png` |
-| Parking & Restaurant | `DashBoards/DashBoard6.png` |
-| Occupancy Services | `DashBoards/DashBoard7.png` |
+| Visitor Services | `DashBoards/DashBoard5.png` |
+| Parking Services | `DashBoards/DashBoard6.png` |
 | Office Services Full | `DashBoards/DashBoard8.png` |
 | Energy Monitor | `DashBoards/DashBoard9.png` |
 | Wellbeing Services | `DashBoards/DashBoard10.png` |
