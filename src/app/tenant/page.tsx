@@ -2261,11 +2261,16 @@ export default function TenantPage() {
                 <div style={{ padding: '24px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
                     {tenantParkingSpaces.map((space) => {
-                      const isOccupied = space.status === 'occupied';
+                      const isFree = space.status === 'available';
+                      const isAssigned = space.status === 'occupied' && !space.vehiclePlate;
+                      const isOccupied = space.status === 'occupied' && !!space.vehiclePlate;
+                      const borderColor = isOccupied ? '#EF4444' : isAssigned ? '#F59E0B' : '#10B981';
+                      const statusLabel = isOccupied ? 'Occupied' : isAssigned ? 'Assigned' : 'Free';
+                      const statusColor = isOccupied ? '#EF4444' : isAssigned ? '#F59E0B' : '#10B981';
                       return (
                         <div key={space.id}
                           onClick={() => {
-                            if (!isOccupied) {
+                            if (isFree) {
                               setSelectedParkingSpace(space.spaceNumber);
                               setAssignType('permanent'); setAssignStartDate(''); setAssignEndDate('');
                               setShowParkingModal(true);
@@ -2273,13 +2278,13 @@ export default function TenantPage() {
                           }}
                           style={{
                           padding: '20px',
-                          backgroundColor: isOccupied ? '#1E293B' : '#0F1629',
-                          border: `2px solid ${isOccupied ? '#EF4444' : '#10B981'}`,
+                          backgroundColor: isFree ? '#0F1629' : '#1E293B',
+                          border: `2px solid ${borderColor}`,
                           borderRadius: '8px',
                           textAlign: 'center',
                           cursor: 'pointer',
                           transition: 'all 0.2s',
-                          opacity: isOccupied ? 0.8 : 1,
+                          opacity: isOccupied ? 0.85 : 1,
                           position: 'relative' as const,
                         }}
                         onMouseEnter={(e) => {
@@ -2292,12 +2297,12 @@ export default function TenantPage() {
                           const overlay = e.currentTarget.querySelector('[data-release-overlay]') as HTMLElement;
                           if (overlay) overlay.style.opacity = '0';
                         }}>
-                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: isOccupied ? '#EF4444' : '#10B981', marginBottom: '4px' }}>{space.spaceNumber}</div>
-                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{isOccupied ? 'Occupied' : 'Available'}</div>
-                          {isOccupied && space.assignedToName && (
+                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: statusColor, marginBottom: '4px' }}>{space.spaceNumber}</div>
+                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{statusLabel}</div>
+                          {(isOccupied || isAssigned) && space.assignedToName && (
                             <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '4px' }}>{space.assignedToName}</div>
                           )}
-                          {isOccupied && (
+                          {(isOccupied || isAssigned) && (
                             <div data-release-overlay="" style={{
                               position: 'absolute', inset: 0, borderRadius: '6px',
                               background: 'rgba(239, 68, 68, 0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -2442,11 +2447,16 @@ export default function TenantPage() {
                 <div style={{ padding: '24px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
                     {tenantLockers.map((locker) => {
-                      const isOccupied = locker.status === 'occupied';
+                      const isFree = locker.status === 'available';
+                      const isAssigned = locker.status === 'occupied' && locker.assignmentType === 'temporary';
+                      const isOccupied = locker.status === 'occupied' && locker.assignmentType !== 'temporary';
+                      const borderColor = isOccupied ? '#EF4444' : isAssigned ? '#F59E0B' : '#10B981';
+                      const statusLabel = isOccupied ? 'Occupied' : isAssigned ? 'Assigned' : 'Free';
+                      const statusColor = borderColor;
                       return (
                         <div key={locker.id}
                           onClick={() => {
-                            if (!isOccupied) {
+                            if (isFree) {
                               setSelectedLocker(locker.lockerNumber);
                               setAssignType('permanent'); setAssignStartDate(''); setAssignEndDate('');
                               setShowLockerModal(true);
@@ -2454,13 +2464,13 @@ export default function TenantPage() {
                           }}
                           style={{
                           padding: '20px',
-                          backgroundColor: isOccupied ? '#1E293B' : '#0F1629',
-                          border: `2px solid ${isOccupied ? '#EF4444' : '#10B981'}`,
+                          backgroundColor: isFree ? '#0F1629' : '#1E293B',
+                          border: `2px solid ${borderColor}`,
                           borderRadius: '8px',
                           textAlign: 'center',
                           cursor: 'pointer',
                           transition: 'all 0.2s',
-                          opacity: isOccupied ? 0.8 : 1,
+                          opacity: isOccupied ? 0.85 : 1,
                           position: 'relative' as const,
                         }}
                         onMouseEnter={(e) => {
@@ -2473,12 +2483,12 @@ export default function TenantPage() {
                           const overlay = e.currentTarget.querySelector('[data-release-overlay]') as HTMLElement;
                           if (overlay) overlay.style.opacity = '0';
                         }}>
-                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: isOccupied ? '#EF4444' : '#10B981', marginBottom: '4px' }}>{locker.lockerNumber}</div>
-                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{isOccupied ? 'Occupied' : 'Available'}</div>
-                          {isOccupied && locker.assignedToName && (
+                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: statusColor, marginBottom: '4px' }}>{locker.lockerNumber}</div>
+                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{statusLabel}</div>
+                          {(isOccupied || isAssigned) && locker.assignedToName && (
                             <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '4px' }}>{locker.assignedToName}</div>
                           )}
-                          {isOccupied && (
+                          {(isOccupied || isAssigned) && (
                             <div data-release-overlay="" style={{
                               position: 'absolute', inset: 0, borderRadius: '6px',
                               background: 'rgba(239, 68, 68, 0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -2625,19 +2635,16 @@ export default function TenantPage() {
                 <div style={{ padding: '24px' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
                     {tenantSpaces.map((space) => {
-                      const isOccupied = space.status === 'occupied';
-                      const typeColors: Record<string, string> = {
-                        'desk': '#3B82F6',
-                        'office': '#8B5CF6',
-                        'meeting-room': '#10B981',
-                        'conference-room': '#F59E0B',
-                        'social-hub': '#EC4899'
-                      };
-                      const typeColor = typeColors[space.type] || '#64748B';
+                      const isFree = space.status === 'available';
+                      const isAssigned = space.status === 'occupied' && space.assignmentType === 'temporary';
+                      const isOccupied = space.status === 'occupied' && space.assignmentType !== 'temporary';
+                      const borderColor = isOccupied ? '#EF4444' : isAssigned ? '#F59E0B' : '#10B981';
+                      const statusLabel = isOccupied ? 'Occupied' : isAssigned ? 'Assigned' : 'Free';
+                      const statusColor = borderColor;
                       return (
                         <div key={space.id}
                           onClick={() => {
-                            if (!isOccupied) {
+                            if (isFree) {
                               setSelectedSpace(space.spaceNumber);
                               setAssignType('permanent'); setAssignStartDate(''); setAssignEndDate('');
                               setShowSpaceModal(true);
@@ -2645,13 +2652,13 @@ export default function TenantPage() {
                           }}
                           style={{
                           padding: '20px',
-                          backgroundColor: isOccupied ? '#1E293B' : '#0F1629',
-                          border: `2px solid ${isOccupied ? '#EF4444' : typeColor}`,
+                          backgroundColor: isFree ? '#0F1629' : '#1E293B',
+                          border: `2px solid ${borderColor}`,
                           borderRadius: '8px',
                           textAlign: 'center',
                           cursor: 'pointer',
                           transition: 'all 0.2s',
-                          opacity: isOccupied ? 0.8 : 1,
+                          opacity: isOccupied ? 0.85 : 1,
                           position: 'relative' as const,
                         }}
                         onMouseEnter={(e) => {
@@ -2664,15 +2671,15 @@ export default function TenantPage() {
                           const overlay = e.currentTarget.querySelector('[data-release-overlay]') as HTMLElement;
                           if (overlay) overlay.style.opacity = '0';
                         }}>
-                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: isOccupied ? '#EF4444' : typeColor, marginBottom: '4px' }}>{space.spaceNumber}</div>
+                          <div style={{ fontSize: '18px', fontWeight: 'bold', color: statusColor, marginBottom: '4px' }}>{space.spaceNumber}</div>
                           <div style={{ fontSize: '10px', color: '#64748B', textTransform: 'uppercase', marginBottom: '4px' }}>
                             {space.type === 'meeting-room' ? 'Meeting' : space.type === 'conference-room' ? 'Conference' : space.type === 'social-hub' ? 'Social' : space.type}
                           </div>
-                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{isOccupied ? 'Occupied' : 'Available'}</div>
-                          {isOccupied && space.assignedToName && (
+                          <div style={{ fontSize: '11px', color: '#64748B', textTransform: 'uppercase' }}>{statusLabel}</div>
+                          {(isOccupied || isAssigned) && space.assignedToName && (
                             <div style={{ fontSize: '10px', color: '#94A3B8', marginTop: '4px' }}>{space.assignedToName}</div>
                           )}
-                          {isOccupied && (
+                          {(isOccupied || isAssigned) && (
                             <div data-release-overlay="" style={{
                               position: 'absolute', inset: 0, borderRadius: '6px',
                               background: 'rgba(239, 68, 68, 0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
