@@ -3,13 +3,13 @@
 import React from 'react'
 
 // ---------------------------------------------------------------------------
-// Types — circles positioned as percentage of floorplan image dimensions
+// Types
 // ---------------------------------------------------------------------------
 interface Blob {
-  cx: number       // center X as % of image width (0-100)
-  cy: number       // center Y as % of image height (0-100)
-  r: number        // radius as % of image width
-  occupancy: number // 0-100
+  cx: number       // center X as % (0-100)
+  cy: number       // center Y as % (0-100)
+  r: number        // radius as % of width
+  occupancy: number
 }
 
 interface FloorplanWithZonesProps {
@@ -19,198 +19,152 @@ interface FloorplanWithZonesProps {
 }
 
 // ---------------------------------------------------------------------------
-// Blob positions traced from actual floorplan images.
-// Only RED (>=80%) and AMBER (>=50%) are rendered.
-//
-// Floor 0-3: Long horizontal building footprint
-//   Walls roughly: x 5%-93%, y 15%-78%
-// Floor 4-9: Hourglass/bowtie shape
-//   Left wing x 5%-40% y 12%-88%, neck x 35%-65% y 25%-75%, right wing x 60%-95% y 12%-88%
-// Floor 10+: Three separate towers
-//   Left tower x 4%-28% y 8%-72%, Center tower x 34%-58% y 5%-68%, Right tower x 64%-96% y 8%-78%
+// Which floors have mask files (0-13, then 13 reused for 14-19)
+// ---------------------------------------------------------------------------
+function getMaskUrl(floor: number): string | null {
+  if (floor <= 13) return `/floorplans/Floor${floor}Mask.png`
+  if (floor <= 19) return `/floorplans/Floor13Mask.png` // reuse 13 for 14-19
+  return null // 20-21 no mask
+}
+
+// ---------------------------------------------------------------------------
+// Blob data — many blobs covering the interior heavily.
+// The mask image will clip anything outside walls automatically.
+// So we can place blobs generously and let the mask do the work.
 // ---------------------------------------------------------------------------
 const FLOOR_BLOBS: Record<number, Blob[]> = {
-  // Floors 0-3: Long horizontal building
+  // Floors 0-3: Long horizontal building — spread blobs across full area
   0: [
-    { cx: 14, cy: 38, r: 9, occupancy: 92 },
-    { cx: 28, cy: 35, r: 7, occupancy: 85 },
-    { cx: 22, cy: 55, r: 8, occupancy: 78 },
-    { cx: 42, cy: 42, r: 11, occupancy: 65 },
-    { cx: 55, cy: 38, r: 10, occupancy: 58 },
-    { cx: 68, cy: 45, r: 8, occupancy: 52 },
-    { cx: 80, cy: 35, r: 9, occupancy: 70 },
-    { cx: 88, cy: 50, r: 7, occupancy: 60 },
+    { cx: 10, cy: 30, r: 12, occupancy: 92 }, { cx: 25, cy: 35, r: 14, occupancy: 85 },
+    { cx: 40, cy: 40, r: 16, occupancy: 78 }, { cx: 55, cy: 35, r: 15, occupancy: 65 },
+    { cx: 70, cy: 38, r: 14, occupancy: 72 }, { cx: 85, cy: 35, r: 12, occupancy: 60 },
+    { cx: 15, cy: 50, r: 11, occupancy: 80 }, { cx: 35, cy: 55, r: 10, occupancy: 68 },
+    { cx: 60, cy: 50, r: 12, occupancy: 58 }, { cx: 80, cy: 48, r: 10, occupancy: 55 },
   ],
   1: [
-    { cx: 12, cy: 40, r: 8, occupancy: 88 },
-    { cx: 24, cy: 35, r: 7, occupancy: 92 },
-    { cx: 18, cy: 58, r: 9, occupancy: 75 },
-    { cx: 38, cy: 40, r: 10, occupancy: 82 },
-    { cx: 50, cy: 45, r: 12, occupancy: 68 },
-    { cx: 65, cy: 38, r: 8, occupancy: 55 },
-    { cx: 78, cy: 42, r: 9, occupancy: 72 },
-    { cx: 88, cy: 38, r: 7, occupancy: 60 },
+    { cx: 10, cy: 32, r: 13, occupancy: 88 }, { cx: 25, cy: 38, r: 15, occupancy: 92 },
+    { cx: 40, cy: 35, r: 16, occupancy: 82 }, { cx: 55, cy: 40, r: 14, occupancy: 75 },
+    { cx: 70, cy: 35, r: 13, occupancy: 70 }, { cx: 85, cy: 38, r: 11, occupancy: 62 },
+    { cx: 18, cy: 52, r: 10, occupancy: 78 }, { cx: 48, cy: 50, r: 12, occupancy: 68 },
+    { cx: 75, cy: 50, r: 10, occupancy: 55 },
   ],
   2: [
-    { cx: 13, cy: 38, r: 9, occupancy: 82 },
-    { cx: 26, cy: 42, r: 8, occupancy: 70 },
-    { cx: 40, cy: 38, r: 11, occupancy: 65 },
-    { cx: 55, cy: 45, r: 9, occupancy: 58 },
-    { cx: 70, cy: 40, r: 8, occupancy: 52 },
-    { cx: 84, cy: 42, r: 7, occupancy: 55 },
+    { cx: 12, cy: 30, r: 14, occupancy: 82 }, { cx: 28, cy: 38, r: 15, occupancy: 75 },
+    { cx: 45, cy: 35, r: 16, occupancy: 70 }, { cx: 62, cy: 40, r: 14, occupancy: 65 },
+    { cx: 78, cy: 35, r: 13, occupancy: 58 }, { cx: 90, cy: 40, r: 10, occupancy: 52 },
+    { cx: 20, cy: 52, r: 11, occupancy: 68 }, { cx: 55, cy: 50, r: 10, occupancy: 55 },
   ],
   3: [
-    { cx: 14, cy: 40, r: 10, occupancy: 90 },
-    { cx: 28, cy: 35, r: 8, occupancy: 85 },
-    { cx: 42, cy: 42, r: 12, occupancy: 78 },
-    { cx: 58, cy: 38, r: 9, occupancy: 65 },
-    { cx: 72, cy: 45, r: 8, occupancy: 72 },
-    { cx: 85, cy: 40, r: 7, occupancy: 55 },
+    { cx: 10, cy: 32, r: 14, occupancy: 90 }, { cx: 26, cy: 36, r: 15, occupancy: 85 },
+    { cx: 42, cy: 40, r: 16, occupancy: 78 }, { cx: 58, cy: 35, r: 14, occupancy: 72 },
+    { cx: 74, cy: 38, r: 13, occupancy: 65 }, { cx: 88, cy: 35, r: 11, occupancy: 58 },
+    { cx: 15, cy: 52, r: 10, occupancy: 80 }, { cx: 50, cy: 52, r: 11, occupancy: 60 },
   ],
 
-  // Floors 4-9: Hourglass/bowtie shape
+  // Floors 4-9: Hourglass/bowtie — blobs in both wings and neck
   4: [
-    { cx: 15, cy: 30, r: 8, occupancy: 72 },
-    { cx: 25, cy: 50, r: 9, occupancy: 65 },
-    { cx: 15, cy: 70, r: 7, occupancy: 58 },
-    { cx: 48, cy: 45, r: 8, occupancy: 55 },
-    { cx: 72, cy: 30, r: 9, occupancy: 68 },
-    { cx: 82, cy: 55, r: 8, occupancy: 80 },
-    { cx: 75, cy: 72, r: 7, occupancy: 62 },
+    { cx: 12, cy: 25, r: 12, occupancy: 72 }, { cx: 25, cy: 40, r: 14, occupancy: 68 },
+    { cx: 15, cy: 60, r: 12, occupancy: 62 }, { cx: 30, cy: 70, r: 10, occupancy: 55 },
+    { cx: 45, cy: 45, r: 10, occupancy: 58 }, { cx: 55, cy: 40, r: 9, occupancy: 52 },
+    { cx: 70, cy: 25, r: 12, occupancy: 80 }, { cx: 80, cy: 42, r: 14, occupancy: 75 },
+    { cx: 75, cy: 65, r: 11, occupancy: 65 }, { cx: 88, cy: 55, r: 10, occupancy: 58 },
   ],
   5: [
-    { cx: 14, cy: 28, r: 9, occupancy: 85 },
-    { cx: 24, cy: 52, r: 10, occupancy: 78 },
-    { cx: 16, cy: 72, r: 7, occupancy: 65 },
-    { cx: 45, cy: 42, r: 8, occupancy: 60 },
-    { cx: 70, cy: 28, r: 9, occupancy: 82 },
-    { cx: 80, cy: 50, r: 10, occupancy: 75 },
-    { cx: 78, cy: 74, r: 7, occupancy: 55 },
+    { cx: 12, cy: 22, r: 13, occupancy: 85 }, { cx: 24, cy: 42, r: 15, occupancy: 80 },
+    { cx: 14, cy: 62, r: 12, occupancy: 72 }, { cx: 28, cy: 72, r: 10, occupancy: 65 },
+    { cx: 44, cy: 44, r: 10, occupancy: 62 }, { cx: 56, cy: 38, r: 9, occupancy: 55 },
+    { cx: 72, cy: 22, r: 13, occupancy: 82 }, { cx: 82, cy: 40, r: 15, occupancy: 78 },
+    { cx: 76, cy: 64, r: 11, occupancy: 68 }, { cx: 90, cy: 52, r: 10, occupancy: 60 },
   ],
   6: [
-    { cx: 15, cy: 30, r: 9, occupancy: 80 },
-    { cx: 22, cy: 55, r: 8, occupancy: 72 },
-    { cx: 14, cy: 72, r: 7, occupancy: 60 },
-    { cx: 48, cy: 45, r: 7, occupancy: 55 },
-    { cx: 73, cy: 30, r: 9, occupancy: 78 },
-    { cx: 83, cy: 52, r: 8, occupancy: 70 },
-    { cx: 76, cy: 72, r: 7, occupancy: 58 },
+    { cx: 13, cy: 24, r: 12, occupancy: 80 }, { cx: 24, cy: 44, r: 14, occupancy: 75 },
+    { cx: 15, cy: 64, r: 11, occupancy: 68 }, { cx: 45, cy: 44, r: 9, occupancy: 58 },
+    { cx: 72, cy: 24, r: 12, occupancy: 78 }, { cx: 82, cy: 44, r: 14, occupancy: 72 },
+    { cx: 76, cy: 66, r: 10, occupancy: 62 },
   ],
   7: [
-    { cx: 16, cy: 28, r: 10, occupancy: 88 },
-    { cx: 24, cy: 52, r: 9, occupancy: 82 },
-    { cx: 15, cy: 74, r: 7, occupancy: 68 },
-    { cx: 46, cy: 44, r: 8, occupancy: 62 },
-    { cx: 72, cy: 28, r: 10, occupancy: 85 },
-    { cx: 82, cy: 52, r: 9, occupancy: 78 },
-    { cx: 77, cy: 75, r: 7, occupancy: 60 },
+    { cx: 12, cy: 22, r: 14, occupancy: 88 }, { cx: 25, cy: 42, r: 15, occupancy: 82 },
+    { cx: 15, cy: 65, r: 12, occupancy: 72 }, { cx: 46, cy: 42, r: 10, occupancy: 65 },
+    { cx: 72, cy: 22, r: 14, occupancy: 85 }, { cx: 83, cy: 42, r: 15, occupancy: 80 },
+    { cx: 76, cy: 68, r: 11, occupancy: 68 },
   ],
   8: [
-    { cx: 15, cy: 30, r: 9, occupancy: 82 },
-    { cx: 24, cy: 54, r: 8, occupancy: 75 },
-    { cx: 16, cy: 72, r: 7, occupancy: 62 },
-    { cx: 48, cy: 45, r: 7, occupancy: 58 },
-    { cx: 74, cy: 30, r: 9, occupancy: 80 },
-    { cx: 82, cy: 55, r: 8, occupancy: 72 },
-    { cx: 78, cy: 74, r: 6, occupancy: 55 },
+    { cx: 13, cy: 24, r: 13, occupancy: 82 }, { cx: 25, cy: 44, r: 14, occupancy: 78 },
+    { cx: 15, cy: 64, r: 11, occupancy: 65 }, { cx: 46, cy: 44, r: 9, occupancy: 60 },
+    { cx: 73, cy: 24, r: 13, occupancy: 80 }, { cx: 83, cy: 44, r: 14, occupancy: 75 },
+    { cx: 76, cy: 66, r: 10, occupancy: 62 },
   ],
   9: [
-    { cx: 16, cy: 28, r: 8, occupancy: 70 },
-    { cx: 22, cy: 52, r: 9, occupancy: 65 },
-    { cx: 15, cy: 72, r: 7, occupancy: 55 },
-    { cx: 47, cy: 44, r: 7, occupancy: 52 },
-    { cx: 72, cy: 28, r: 8, occupancy: 68 },
-    { cx: 80, cy: 52, r: 9, occupancy: 60 },
+    { cx: 12, cy: 25, r: 12, occupancy: 72 }, { cx: 24, cy: 45, r: 13, occupancy: 68 },
+    { cx: 15, cy: 65, r: 10, occupancy: 58 }, { cx: 45, cy: 45, r: 9, occupancy: 55 },
+    { cx: 72, cy: 25, r: 12, occupancy: 70 }, { cx: 82, cy: 45, r: 13, occupancy: 65 },
+    { cx: 76, cy: 67, r: 10, occupancy: 55 },
   ],
 
-  // Floors 10+: Three separate towers (left ~4-28%, center ~34-58%, right ~64-96%)
+  // Floors 10-13: Three towers — fill each tower area
   10: [
-    { cx: 14, cy: 28, r: 7, occupancy: 72 },
-    { cx: 18, cy: 50, r: 8, occupancy: 65 },
-    { cx: 12, cy: 62, r: 6, occupancy: 55 },
-    { cx: 44, cy: 25, r: 8, occupancy: 78 },
-    { cx: 48, cy: 48, r: 9, occupancy: 70 },
-    { cx: 78, cy: 28, r: 8, occupancy: 82 },
-    { cx: 82, cy: 52, r: 7, occupancy: 68 },
-    { cx: 76, cy: 68, r: 6, occupancy: 55 },
+    { cx: 12, cy: 22, r: 10, occupancy: 75 }, { cx: 18, cy: 42, r: 12, occupancy: 70 },
+    { cx: 12, cy: 58, r: 10, occupancy: 62 },
+    { cx: 40, cy: 18, r: 10, occupancy: 80 }, { cx: 46, cy: 38, r: 12, occupancy: 75 },
+    { cx: 42, cy: 55, r: 10, occupancy: 65 },
+    { cx: 74, cy: 18, r: 10, occupancy: 85 }, { cx: 80, cy: 38, r: 12, occupancy: 78 },
+    { cx: 78, cy: 58, r: 10, occupancy: 68 },
   ],
   11: [
-    { cx: 14, cy: 30, r: 7, occupancy: 62 },
-    { cx: 17, cy: 52, r: 6, occupancy: 55 },
-    { cx: 44, cy: 28, r: 8, occupancy: 68 },
-    { cx: 47, cy: 50, r: 7, occupancy: 58 },
-    { cx: 78, cy: 30, r: 7, occupancy: 72 },
-    { cx: 82, cy: 55, r: 6, occupancy: 60 },
+    { cx: 13, cy: 24, r: 10, occupancy: 65 }, { cx: 18, cy: 45, r: 11, occupancy: 60 },
+    { cx: 41, cy: 20, r: 10, occupancy: 72 }, { cx: 46, cy: 40, r: 11, occupancy: 65 },
+    { cx: 75, cy: 20, r: 10, occupancy: 78 }, { cx: 80, cy: 42, r: 11, occupancy: 70 },
   ],
   12: [
-    { cx: 15, cy: 32, r: 7, occupancy: 65 },
-    { cx: 18, cy: 55, r: 6, occupancy: 52 },
-    { cx: 45, cy: 28, r: 8, occupancy: 70 },
-    { cx: 48, cy: 52, r: 7, occupancy: 58 },
-    { cx: 79, cy: 30, r: 7, occupancy: 75 },
-    { cx: 82, cy: 54, r: 6, occupancy: 62 },
+    { cx: 13, cy: 25, r: 10, occupancy: 68 }, { cx: 18, cy: 46, r: 11, occupancy: 62 },
+    { cx: 41, cy: 22, r: 10, occupancy: 75 }, { cx: 46, cy: 42, r: 11, occupancy: 68 },
+    { cx: 75, cy: 22, r: 10, occupancy: 80 }, { cx: 80, cy: 44, r: 11, occupancy: 72 },
   ],
   13: [
-    { cx: 14, cy: 30, r: 7, occupancy: 68 },
-    { cx: 17, cy: 54, r: 6, occupancy: 55 },
-    { cx: 44, cy: 26, r: 8, occupancy: 72 },
-    { cx: 47, cy: 48, r: 7, occupancy: 60 },
-    { cx: 78, cy: 28, r: 8, occupancy: 80 },
-    { cx: 82, cy: 52, r: 7, occupancy: 65 },
+    { cx: 12, cy: 24, r: 10, occupancy: 70 }, { cx: 18, cy: 44, r: 11, occupancy: 65 },
+    { cx: 40, cy: 20, r: 10, occupancy: 78 }, { cx: 46, cy: 40, r: 11, occupancy: 72 },
+    { cx: 74, cy: 20, r: 10, occupancy: 82 }, { cx: 80, cy: 42, r: 11, occupancy: 75 },
   ],
+  // Floors 14-19: Same tower layout as 13 with decreasing occupancy
   14: [
-    { cx: 15, cy: 32, r: 7, occupancy: 62 },
-    { cx: 45, cy: 28, r: 7, occupancy: 65 },
-    { cx: 48, cy: 50, r: 6, occupancy: 55 },
-    { cx: 79, cy: 30, r: 7, occupancy: 70 },
-    { cx: 82, cy: 55, r: 6, occupancy: 58 },
+    { cx: 12, cy: 24, r: 10, occupancy: 65 }, { cx: 18, cy: 44, r: 11, occupancy: 58 },
+    { cx: 40, cy: 20, r: 10, occupancy: 72 }, { cx: 46, cy: 40, r: 11, occupancy: 65 },
+    { cx: 74, cy: 20, r: 10, occupancy: 75 }, { cx: 80, cy: 42, r: 11, occupancy: 68 },
   ],
   15: [
-    { cx: 14, cy: 30, r: 7, occupancy: 65 },
-    { cx: 17, cy: 52, r: 6, occupancy: 52 },
-    { cx: 44, cy: 26, r: 8, occupancy: 72 },
-    { cx: 47, cy: 48, r: 7, occupancy: 60 },
-    { cx: 78, cy: 28, r: 8, occupancy: 78 },
-    { cx: 82, cy: 52, r: 7, occupancy: 62 },
+    { cx: 12, cy: 24, r: 10, occupancy: 62 }, { cx: 18, cy: 44, r: 11, occupancy: 55 },
+    { cx: 40, cy: 20, r: 10, occupancy: 68 }, { cx: 46, cy: 40, r: 11, occupancy: 62 },
+    { cx: 74, cy: 20, r: 10, occupancy: 72 }, { cx: 80, cy: 42, r: 11, occupancy: 65 },
   ],
   16: [
-    { cx: 15, cy: 32, r: 6, occupancy: 58 },
-    { cx: 45, cy: 28, r: 7, occupancy: 65 },
-    { cx: 79, cy: 30, r: 7, occupancy: 68 },
-    { cx: 82, cy: 55, r: 6, occupancy: 55 },
+    { cx: 12, cy: 24, r: 10, occupancy: 58 }, { cx: 40, cy: 20, r: 10, occupancy: 65 },
+    { cx: 46, cy: 40, r: 11, occupancy: 58 }, { cx: 74, cy: 20, r: 10, occupancy: 68 },
+    { cx: 80, cy: 42, r: 11, occupancy: 60 },
   ],
   17: [
-    { cx: 14, cy: 30, r: 6, occupancy: 55 },
-    { cx: 44, cy: 26, r: 7, occupancy: 60 },
-    { cx: 78, cy: 28, r: 7, occupancy: 62 },
-    { cx: 82, cy: 52, r: 6, occupancy: 52 },
+    { cx: 12, cy: 24, r: 10, occupancy: 55 }, { cx: 40, cy: 20, r: 10, occupancy: 60 },
+    { cx: 74, cy: 20, r: 10, occupancy: 62 }, { cx: 80, cy: 42, r: 11, occupancy: 55 },
   ],
   18: [
-    { cx: 15, cy: 32, r: 6, occupancy: 52 },
-    { cx: 45, cy: 28, r: 6, occupancy: 55 },
-    { cx: 79, cy: 30, r: 6, occupancy: 58 },
+    { cx: 12, cy: 24, r: 10, occupancy: 52 }, { cx: 40, cy: 20, r: 10, occupancy: 55 },
+    { cx: 74, cy: 20, r: 10, occupancy: 58 },
   ],
   19: [
-    { cx: 14, cy: 30, r: 6, occupancy: 55 },
-    { cx: 44, cy: 26, r: 7, occupancy: 62 },
-    { cx: 78, cy: 28, r: 7, occupancy: 58 },
+    { cx: 12, cy: 24, r: 10, occupancy: 55 }, { cx: 40, cy: 20, r: 10, occupancy: 60 },
+    { cx: 74, cy: 20, r: 10, occupancy: 58 },
   ],
   20: [
-    { cx: 15, cy: 32, r: 6, occupancy: 52 },
-    { cx: 45, cy: 28, r: 6, occupancy: 58 },
-    { cx: 79, cy: 30, r: 6, occupancy: 55 },
+    { cx: 30, cy: 35, r: 12, occupancy: 52 }, { cx: 60, cy: 35, r: 12, occupancy: 55 },
   ],
   21: [
-    { cx: 14, cy: 30, r: 6, occupancy: 50 },
-    { cx: 44, cy: 28, r: 7, occupancy: 52 },
-    { cx: 80, cy: 32, r: 7, occupancy: 55 },
+    { cx: 35, cy: 35, r: 14, occupancy: 50 }, { cx: 65, cy: 35, r: 12, occupancy: 52 },
   ],
 }
 
 const DEFAULT_BLOBS: Blob[] = [
-  { cx: 15, cy: 35, r: 8, occupancy: 65 },
-  { cx: 45, cy: 40, r: 9, occupancy: 72 },
-  { cx: 78, cy: 38, r: 8, occupancy: 58 },
+  { cx: 25, cy: 35, r: 14, occupancy: 65 },
+  { cx: 50, cy: 40, r: 16, occupancy: 72 },
+  { cx: 75, cy: 35, r: 14, occupancy: 58 },
 ]
 
 // ---------------------------------------------------------------------------
@@ -222,6 +176,7 @@ const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
   onClose,
 }) => {
   const blobs = FLOOR_BLOBS[floorNumber] ?? DEFAULT_BLOBS
+  const maskUrl = getMaskUrl(floorNumber)
 
   return (
     <div
@@ -286,34 +241,52 @@ const FloorplanWithZones: React.FC<FloorplanWithZonesProps> = ({
         ))}
       </div>
 
-      {/* Floorplan with blob overlay — blobs as CSS divs on top of img */}
+      {/* Floorplan with mask-clipped blob overlay */}
       <div style={{ flex: 1, position: 'relative', padding: '12px', overflow: 'auto' }}>
         <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+          {/* Floorplan image */}
           <img
             src={`/floorplans/Floor${floorNumber}.png`}
             alt={`${floorName} floor plan`}
             style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '6px' }}
           />
-          {/* Blobs — only >=50% occupancy (red & amber) */}
-          {blobs.filter(b => b.occupancy >= 50).map((blob, i) => {
-            const isRed = blob.occupancy >= 80
-            return (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  left: `${blob.cx - blob.r}%`,
-                  top: `${blob.cy - blob.r}%`,
-                  width: `${blob.r * 2}%`,
-                  height: `${blob.r * 2}%`,
-                  borderRadius: '50%',
-                  backgroundColor: isRed ? 'rgba(239,68,68,0.45)' : 'rgba(245,158,11,0.40)',
-                  filter: 'blur(4px)',
-                  pointerEvents: 'none',
-                }}
-              />
-            )
-          })}
+
+          {/* Blob container — masked by the building outline image */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              // Use the mask image: black areas = visible, white = hidden
+              ...(maskUrl ? {
+                WebkitMaskImage: `url(${maskUrl})`,
+                maskImage: `url(${maskUrl})`,
+                WebkitMaskSize: '100% 100%',
+                maskSize: '100% 100%',
+                WebkitMaskRepeat: 'no-repeat',
+                maskRepeat: 'no-repeat',
+              } : {}),
+            }}
+          >
+            {blobs.filter(b => b.occupancy >= 50).map((blob, i) => {
+              const isRed = blob.occupancy >= 80
+              return (
+                <div
+                  key={i}
+                  style={{
+                    position: 'absolute',
+                    left: `${blob.cx - blob.r}%`,
+                    top: `${blob.cy - blob.r}%`,
+                    width: `${blob.r * 2}%`,
+                    height: `${blob.r * 2}%`,
+                    borderRadius: '50%',
+                    backgroundColor: isRed ? 'rgba(239,68,68,0.50)' : 'rgba(245,158,11,0.45)',
+                    filter: 'blur(4px)',
+                    pointerEvents: 'none',
+                  }}
+                />
+              )
+            })}
+          </div>
         </div>
       </div>
     </div>
