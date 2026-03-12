@@ -39,6 +39,7 @@ export default function IntegrationStudioPage() {
   const globalState = useGlobalState()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [username, setUsername] = useState('')
+  const [selectedTenant, setSelectedTenant] = useState<string>('')
   const [activeSection, setActiveSection] = useState<string>('dashboard')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
@@ -51,8 +52,10 @@ export default function IntegrationStudioPage() {
     } else {
       setIsAuthenticated(true)
       setUsername(storedUsername)
+      const firstTenant = globalState.tenants.find(t => t.status === 'active')
+      if (firstTenant) setSelectedTenant(firstTenant.id)
     }
-  }, [router])
+  }, [router, globalState.tenants])
 
   if (!isAuthenticated) return null
 
@@ -116,6 +119,26 @@ export default function IntegrationStudioPage() {
           </h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Tenant selector */}
+          <select
+            value={selectedTenant}
+            onChange={(e) => setSelectedTenant(e.target.value)}
+            style={{
+              padding: '8px 12px',
+              backgroundColor: '#1E293B',
+              border: '1px solid #475569',
+              borderRadius: '8px',
+              color: '#F1F5F9',
+              fontSize: '14px',
+              outline: 'none',
+              minWidth: '200px',
+              cursor: 'pointer',
+            }}
+          >
+            {globalState.tenants.filter(t => t.status === 'active').map(t => (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+          </select>
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -222,6 +245,17 @@ export default function IntegrationStudioPage() {
               </button>
             ))}
           </div>
+
+          {/* Tenant info at bottom */}
+          {!sidebarCollapsed && selectedTenant && (() => {
+            const t = globalState.tenants.find(x => x.id === selectedTenant)
+            return t ? (
+              <div style={{ marginTop: 'auto', padding: '16px', borderTop: '1px solid #1E293B' }}>
+                <div style={{ color: '#64748B', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>Tenant</div>
+                <div style={{ color: '#F1F5F9', fontSize: '13px', fontWeight: '600' }}>{t.name}</div>
+              </div>
+            ) : null
+          })()}
         </div>
 
         {/* Main Content */}
