@@ -38,14 +38,14 @@ const DASH = {
 // Floor occupancy % = current / hse capacity (matching Dashboard7 FLOOR_DATA)
 const FLOOR_OCCUPANCY_PCT: Record<number, number> = {
   0: 0, 1: 0, 2: 0,       // Basements B3, B2, B1
-  3: 32,   // Floor 0 - Ground 95/300
+  3: 85,   // Floor 0 - Ground 95/300
   4: 36,   // Floor 1 - Cafeteria 72/200
   5: 25,   // Floor 2 - Fitness 38/150
-  6: 45,   // Floor 3 - Conference 112/250
-  7: 28,   // Floor 4 - Office 78/280
-  8: 30,   // Floor 5 - 85/280
+  6: 82,   // Floor 3 - Conference 112/250
+  7: 55,   // Floor 4 - Office 78/280
+  8: 62,   // Floor 5 - 85/280
   9: 26,   // Floor 6 - 74/280
-  10: 33,  // Floor 7 - 92/280
+  10: 58,  // Floor 7 - 92/280
   11: 31,  // Floor 8 - 88/280
   12: 23,  // Floor 9 - 65/280
   13: 19,  // Floor 10 - 52/280

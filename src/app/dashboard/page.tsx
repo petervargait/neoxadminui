@@ -88,8 +88,20 @@ export default function DashboardPage() {
       display: 'flex',
       flexDirection: 'column'
     }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .dash-sidebar { display: none !important; }
+          .dash-topbar { padding: 0 12px !important; flex-wrap: wrap; height: auto !important; min-height: 56px; gap: 8px; }
+          .dash-topbar h1 { font-size: 14px !important; }
+          .dash-topbar select { min-width: 120px !important; font-size: 12px !important; }
+          .dash-content { padding: 0 !important; }
+        }
+        @media (max-width: 480px) {
+          .dash-topbar { padding: 0 8px !important; }
+        }
+      `}</style>
       {/* Top Navigation */}
-      <div style={{
+      <div className="dash-topbar" style={{
         height: '70px',
         backgroundColor: '#162032',
         borderBottom: '1px solid #1E293B',
@@ -173,7 +185,7 @@ export default function DashboardPage() {
 
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Sidebar */}
-        <div style={{
+        <div className="dash-sidebar" style={{
           width: sidebarCollapsed ? '60px' : '220px',
           backgroundColor: '#0B1426',
           borderRight: '1px solid #1E293B',
@@ -267,7 +279,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '0' }}>
+        <div className="dash-content" style={{ flex: 1, overflow: 'auto', padding: '0' }}>
           {activeDashboard === 'smartSpaces' && (
             <SmartSpacesDashboard
               buildings={tenantBuildings}
