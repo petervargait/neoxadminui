@@ -2213,6 +2213,7 @@ export default function TenantPage() {
             // Filter parking spaces for this tenant (either assigned to this tenant or global spaces without tenantId)
             const tenantParkingSpaces = globalState.parkingSpaces.filter(p => !p.tenantId || p.tenantId === selectedTenantId);
             const occupiedSpaces = tenantParkingSpaces.filter(p => p.status === 'occupied');
+            const assignedSpaces = tenantParkingSpaces.filter(p => p.status === 'reserved');
             const availableSpaces = tenantParkingSpaces.filter(p => p.status === 'available');
 
             return (
@@ -2229,12 +2230,12 @@ export default function TenantPage() {
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #F59E0B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Assigned</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{occupiedSpaces.filter(s => !s.vehiclePlate).length || Math.ceil(occupiedSpaces.length * 0.4)}</div>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{assignedSpaces.length}</div>
                   <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>Reserved but not present</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #EF4444' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Occupied</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{occupiedSpaces.filter(s => s.vehiclePlate).length || Math.floor(occupiedSpaces.length * 0.6)}</div>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{occupiedSpaces.length}</div>
                   <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>Currently in use</div>
                 </div>
               </div>
@@ -2262,8 +2263,8 @@ export default function TenantPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
                     {tenantParkingSpaces.map((space) => {
                       const isFree = space.status === 'available';
-                      const isAssigned = space.status === 'occupied' && !space.vehiclePlate;
-                      const isOccupied = space.status === 'occupied' && !!space.vehiclePlate;
+                      const isAssigned = space.status === 'reserved';
+                      const isOccupied = space.status === 'occupied';
                       const borderColor = isOccupied ? '#EF4444' : isAssigned ? '#F59E0B' : '#10B981';
                       const statusLabel = isOccupied ? 'Occupied' : isAssigned ? 'Assigned' : 'Free';
                       const statusColor = isOccupied ? '#EF4444' : isAssigned ? '#F59E0B' : '#10B981';
@@ -2399,6 +2400,7 @@ export default function TenantPage() {
             // Filter permanent lockers for this tenant (either assigned to this tenant or global lockers without tenantId)
             const tenantLockers = globalState.lockers.filter(l => l.type === 'permanent' && (!l.tenantId || l.tenantId === selectedTenantId));
             const occupiedLockers = tenantLockers.filter(l => l.status === 'occupied');
+            const assignedLockers = tenantLockers.filter(l => l.status === 'reserved');
             const availableLockers = tenantLockers.filter(l => l.status === 'available');
 
             return (
@@ -2415,12 +2417,12 @@ export default function TenantPage() {
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #F59E0B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Assigned</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{Math.ceil(occupiedLockers.length * 0.4)}</div>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{assignedLockers.length}</div>
                   <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>Reserved but not present</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #EF4444' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Occupied</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{Math.floor(occupiedLockers.length * 0.6)}</div>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{occupiedLockers.length}</div>
                   <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>Currently in use</div>
                 </div>
               </div>
@@ -2448,8 +2450,8 @@ export default function TenantPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
                     {tenantLockers.map((locker) => {
                       const isFree = locker.status === 'available';
-                      const isAssigned = locker.status === 'occupied' && locker.assignmentType === 'temporary';
-                      const isOccupied = locker.status === 'occupied' && locker.assignmentType !== 'temporary';
+                      const isAssigned = locker.status === 'reserved';
+                      const isOccupied = locker.status === 'occupied';
                       const borderColor = isOccupied ? '#EF4444' : isAssigned ? '#F59E0B' : '#10B981';
                       const statusLabel = isOccupied ? 'Occupied' : isAssigned ? 'Assigned' : 'Free';
                       const statusColor = borderColor;
@@ -2587,6 +2589,7 @@ export default function TenantPage() {
             // Filter spaces for this tenant
             const tenantSpaces = globalState.spaces.filter(s => !s.tenantId || s.tenantId === selectedTenantId);
             const occupiedSpaces = tenantSpaces.filter(s => s.status === 'occupied');
+            const assignedSpaces2 = tenantSpaces.filter(s => s.status === 'reserved');
             const availableSpaces = tenantSpaces.filter(s => s.status === 'available');
 
             return (
@@ -2603,12 +2606,12 @@ export default function TenantPage() {
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #F59E0B' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Assigned</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{Math.ceil(occupiedSpaces.length * 0.4)}</div>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#F59E0B' }}>{assignedSpaces2.length}</div>
                   <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>Reserved but not present</div>
                 </div>
                 <div style={{ padding: '20px', backgroundColor: '#162032', borderRadius: '12px', border: '1px solid #EF4444' }}>
                   <h4 style={{ color: '#64748B', fontSize: '14px', margin: '0 0 8px 0' }}>Occupied</h4>
-                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{Math.floor(occupiedSpaces.length * 0.6)}</div>
+                  <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#EF4444' }}>{occupiedSpaces.length}</div>
                   <div style={{ fontSize: '11px', color: '#64748B', marginTop: '4px' }}>Currently in use</div>
                 </div>
               </div>
@@ -2636,8 +2639,8 @@ export default function TenantPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '12px' }}>
                     {tenantSpaces.map((space) => {
                       const isFree = space.status === 'available';
-                      const isAssigned = space.status === 'occupied' && space.assignmentType === 'temporary';
-                      const isOccupied = space.status === 'occupied' && space.assignmentType !== 'temporary';
+                      const isAssigned = space.status === 'reserved';
+                      const isOccupied = space.status === 'occupied';
                       const borderColor = isOccupied ? '#EF4444' : isAssigned ? '#F59E0B' : '#10B981';
                       const statusLabel = isOccupied ? 'Occupied' : isAssigned ? 'Assigned' : 'Free';
                       const statusColor = borderColor;
@@ -4573,10 +4576,10 @@ export default function TenantPage() {
               const space = globalState.parkingSpaces.find(p => p.spaceNumber === selectedParkingSpace);
               if (space) {
                 globalState.updateParkingSpace(space.id, {
-                  status: 'occupied',
+                  status: 'reserved',
                   assignedTo: userId,
                   assignedToName: userName,
-                  vehiclePlate: vehiclePlate,
+                  vehiclePlate: vehiclePlate || undefined,
                   assignedDate: assignType === 'temporary' ? assignStartDate : new Date().toISOString(),
                   assignmentType: assignType,
                   assignmentEndDate: assignType === 'temporary' ? assignEndDate : undefined
@@ -4709,7 +4712,7 @@ export default function TenantPage() {
               const locker = globalState.lockers.find(l => l.lockerNumber === selectedLocker);
               if (locker) {
                 globalState.updateLocker(locker.id, {
-                  status: 'occupied',
+                  status: 'reserved',
                   assignedTo: userId,
                   assignedToName: userName,
                   assignedDate: assignType === 'temporary' ? assignStartDate : new Date().toISOString(),
@@ -4832,7 +4835,7 @@ export default function TenantPage() {
               const space = globalState.spaces.find(s => s.spaceNumber === selectedSpace);
               if (space) {
                 globalState.updateSpace(space.id, {
-                  status: 'occupied',
+                  status: 'reserved',
                   assignedTo: userId,
                   assignedToName: userName,
                   assignedDate: assignType === 'temporary' ? assignStartDate : new Date().toISOString(),
